@@ -1,0 +1,10 @@
+target/
+logs/
+src/main/frontend/node_modules
+src/main/frontend/build
+src/main/frontend/npm-debug.log*
+src/main/frontend/yarn-debug.log*
+src/main/frontend/yarn-error.log*
+src/main/frontend/yarn.lock
+src/main/frontend/package-lock.json
+**/.DS_Store

@@ -12,7 +12,6 @@ import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,24 +21,33 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
+import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.web.DefaultRelyingPartyRegistrationResolver;
+import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
 import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @PropertySource("classpath:application.properties")
-
 public class SecurityConfig {
+
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("${security.config}")
     private String securityConfigFile;
 
-    @Autowired
-    private RelyingPartyRegistrationRepository relyingPartyRegistrationRepository;
+    private String assertingPartyMetadataLocation;
 
+    @Bean
+    public RelyingPartyRegistrationRepository relyingPartyRegistrations() {
+        RelyingPartyRegistration registration = RelyingPartyRegistrations
+                .fromMetadataLocation(assertingPartyMetadataLocation)
+                .registrationId("example")
+                .build();
+        return new InMemoryRelyingPartyRegistrationRepository(registration);
+    }
     private String securityType;
 
     @PostConstruct
@@ -77,8 +85,7 @@ public class SecurityConfig {
     }
 
     public SecurityFilterChain getOidcFilterChain(HttpSecurity http) throws Exception {
-        DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(this.relyingPartyRegistrationRepository);
-        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrationResolver, new OpenSamlMetadataResolver());
+        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrations(), new OpenSamlMetadataResolver());
 
         http.authorizeHttpRequests(authorize -> authorize.anyRequest()
                 .authenticated())
@@ -89,8 +96,7 @@ public class SecurityConfig {
     }
 
     private SecurityFilterChain getSamlFilterChain(HttpSecurity http) throws Exception {
-        DefaultRelyingPartyRegistrationResolver relyingPartyRegistrationResolver = new DefaultRelyingPartyRegistrationResolver(this.relyingPartyRegistrationRepository);
-        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrationResolver, new OpenSamlMetadataResolver());
+        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrations(), new OpenSamlMetadataResolver());
 
         http.authorizeHttpRequests(authorize -> authorize.anyRequest()
                 .authenticated())

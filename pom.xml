@@ -275,7 +275,7 @@
                                 ${project.build.directory}/${project.build.finalName}.war</location>
                             <properties>
                                 <context>
-                                    jrdemo</context>
+                                    qvu</context>
                             </properties>
                         </deployable>
                     </deployables>

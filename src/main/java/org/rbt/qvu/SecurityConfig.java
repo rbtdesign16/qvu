@@ -44,6 +44,7 @@ public class SecurityConfig {
 
     @PostConstruct
     private void init() {
+        LOG.info("in SecurityConfig.init()");
         try (InputStream is = new FileInputStream(securityConfigFile)) {
             Properties p = new Properties();
             p.load(is);

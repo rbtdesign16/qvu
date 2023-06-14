@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 public class QvuDataSource {
 
     private static Logger LOG = LoggerFactory.getLogger(QvuDataSource.class);
-    private Map<String, HikariConfig> dbPoolConfig = new HashMap<>();
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
 
     @Value("${database.config}")
@@ -44,7 +43,8 @@ public class QvuDataSource {
 
     @PostConstruct
     private void init() {
-        LOG.info("in QvuDataSOurce.init()");
+        LOG.info("in QvuDataSource.init()");
+        LOG.info("database config file: " + databaseConfigFile);
         try (InputStream is = new FileInputStream(databaseConfigFile)) {
             Properties p = new Properties();
             p.load(is);
@@ -85,10 +85,14 @@ public class QvuDataSource {
                     config.setMaximumPoolSize(Integer.parseInt(maxPoolSize));
                 }
 
-                dbPoolConfig.put(ds, config);
                 dbDataSources.put(ds, new HikariDataSource(config));
             }
 
+            LOG.info("datasources"
+            );
+            for (String db : getAllDatabaseInfo()) {
+                LOG.info("\tdatabase: " + db);
+            }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
@@ -108,14 +112,17 @@ public class QvuDataSource {
 
         return retval;
     }
-    
+
     public String getDatabaseInfo(String dsname) {
         String retval = null;
 
         try (Connection conn = getConnection(dsname)) {
             retval = conn.getCatalog();
+            if (StringUtils.isEmpty(retval)) {
+                retval = conn.getSchema();
+            }
         } catch (Exception ex) {
-            LOG.error("MainServiceImpl unable to get DB name for datasource[" + dsname + "]: " + ex.getMessage());
+            LOG.error("QvuDataSource - unable to get DB name for datasource[" + dsname + "]: " + ex.getMessage());
         }
 
         if (retval == null) {
@@ -129,17 +136,12 @@ public class QvuDataSource {
         List<String> retval = new ArrayList<>();
 
         for (String dsname : dbDataSources.keySet()) {
-
-            try (Connection conn = getConnection(dsname)) {
-                retval.add(conn.getCatalog());
-            } catch (Exception ex) {
-                LOG.error("MainServiceImpl unable to get DB name for datasource[" + dsname + "]: " + ex.getMessage());
-            }
+            retval.add(getDatabaseInfo(dsname));
         }
-        
+
         Collections.sort(retval);
-        
+
         return retval;
-    }    
+    }
 
 }

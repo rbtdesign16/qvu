@@ -53,11 +53,14 @@ public class SecurityConfig {
     @PostConstruct
     private void init() {
         LOG.info("in SecurityConfig.init()");
+        LOG.info("security config file: " + securityConfigFile);
         try (InputStream is = new FileInputStream(securityConfigFile)) {
             Properties p = new Properties();
             p.load(is);
 
             securityType = p.getProperty("security.type");
+            
+            LOG.info("secuity type: " + securityType);
 
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

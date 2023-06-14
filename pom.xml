@@ -20,6 +20,7 @@
         <opensaml.version>4.1.1</opensaml.version>
         <gson.version>2.10</gson.version>
         <poi.version>5.0.0</poi.version>
+        <slf4j.version>1.7.5</slf4j.version>
         <mssql.jdbc.version>7.4.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>23.2.0.0</oracle.jdbc.version>
         <mysql.jdbc.version>8.0.33</mysql.jdbc.version>
@@ -164,6 +165,16 @@
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml-saml-api</artifactId>
             <version>${opensaml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
     <build>

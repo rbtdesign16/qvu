@@ -19,7 +19,7 @@ public class QvuConfig implements WebMvcConfigurer {
  
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("/index");
+        registry.addViewController("/").setViewName("forward:/index.html");
     }
 
     @Override

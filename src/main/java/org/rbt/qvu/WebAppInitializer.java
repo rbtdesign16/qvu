@@ -12,7 +12,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 public class WebAppInitializer implements WebApplicationInitializer {
     private static Logger LOG = LoggerFactory.getLogger(WebAppInitializer.class);
-
+    
     @Override
     public void onStartup(ServletContext container) {
         LOG.info("in WebAppInitializer.onSartup()");

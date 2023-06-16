@@ -126,7 +126,7 @@ public class QvuDataSource {
         }
 
         if (retval == null) {
-            retval = "NONE";
+            retval = Constants.NONE;
         }
 
         return retval;

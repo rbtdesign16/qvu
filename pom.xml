@@ -20,7 +20,7 @@
         <opensaml.version>4.1.1</opensaml.version>
         <gson.version>2.10</gson.version>
         <poi.version>5.0.0</poi.version>
-        <slf4j.version>1.7.5</slf4j.version>
+        <log4j.version>2.20.0</log4j.version>
         <mssql.jdbc.version>7.4.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>23.2.0.0</oracle.jdbc.version>
         <mysql.jdbc.version>8.0.33</mysql.jdbc.version>
@@ -167,14 +167,14 @@
             <version>${opensaml.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -250,47 +250,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.cargo</groupId>
-                <artifactId>cargo-maven3-plugin</artifactId>
-                <version>1.10.3</version>
-                <configuration>
-                    <container>
-                        <containerId>
-                            tomcat10x</containerId>
-                        <zipUrlInstaller>
-                            <url>
-                                https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/10.1.7/tomcat-10.1.7.zip</url>
-                        </zipUrlInstaller>
-                        <timeout>
-                            200000</timeout>
-                    </container>
-                    <configuration>
-                        <files>
-                            <copy>
-                                <file>
-                                    ${project.basedir}/src/test/resources/server.xml</file>
-                                <tofile>
-                                    conf/server.xml</tofile>
-                                <configfile>true</configfile>
-                                <overwrite>true</overwrite>
-                            </copy>
-                        </files>
-                    </configuration>
-                    <deployables>
-                        <deployable>
-                            <type>
-                                war</type>
-                            <location>
-                                ${project.build.directory}/${project.build.finalName}.war</location>
-                            <properties>
-                                <context>
-                                    qvu</context>
-                            </properties>
-                        </deployable>
-                    </deployables>
-                </configuration>
             </plugin>
         </plugins>
         <finalName>qvu</finalName>

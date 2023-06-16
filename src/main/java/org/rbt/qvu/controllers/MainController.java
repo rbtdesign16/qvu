@@ -39,4 +39,5 @@ public class MainController {
         LOG.debug("getDatabaseInfo called");
         return service.getAllDatabaseInfo();
     }
+
 }

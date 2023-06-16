@@ -5,16 +5,20 @@
 package org.rbt.qvu;
 
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
+import org.rbt.qvu.security.SamlCondition;
 import org.rbt.qvu.util.Constants;
-import org.rbt.qvu.util.Messages;
+import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,78 +39,65 @@ public class SecurityConfig {
 
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
+    @Value("${security.type}")
+    private String securityType;
+
     @Value("${security.config}")
     private String securityConfigFile;
 
-    private String assertingPartyMetadataLocation;
-
-    @Bean
-    public RelyingPartyRegistrationRepository relyingPartyRegistrations() {
-        RelyingPartyRegistration registration = RelyingPartyRegistrations
-                .fromMetadataLocation(assertingPartyMetadataLocation)
-                .registrationId("example")
-                .build();
-        return new InMemoryRelyingPartyRegistrationRepository(registration);
-    }
-    private String securityType;
-
     @PostConstruct
     private void init() {
-        LOG.info("in SecurityConfig.init()");
+        LOG.info("security type: " + securityType);
         LOG.info("security config file: " + securityConfigFile);
-        try (InputStream is = new FileInputStream(securityConfigFile)) {
-            Properties p = new Properties();
-            p.load(is);
-
-            securityType = p.getProperty("security.type");
-            
-            LOG.info("secuity type: " + securityType);
-
-        } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
-        }
     }
 
+    @Bean("samlrepo")
+    @Conditional(SamlCondition.class)
+    RelyingPartyRegistrationRepository samlRepo() throws Exception {
+        Properties p = Helper.loadProperties(securityConfigFile);
+        RelyingPartyRegistration relyingPartyRegistration
+                = RelyingPartyRegistrations.fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
+                         .registrationId("simple").build();
+        return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
+    }
+
+    /*
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        switch (securityType) {
-            case Constants.BASIC_SECURITY_TYPE:
-                return getBasicAuthFilterChain(http);
-            case Constants.OIDC_SECURITY_TYPE:
-                return getOidcFilterChain(http);
-            case Constants.SAML_SECURITY_TYPE:
-                return getSamlFilterChain(http);
-            default:
-                throw new Exception(Messages.INVALID_SECURITY_CONFIGURATION);
-
-        }
-    }
-
+    @DependsOn("basicrepo")
     private SecurityFilterChain getBasicAuthFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic(withDefaults());
         return http.build();
     }
 
+    @Bean
+    @DependsOn("oidcrepo")
     public SecurityFilterChain getOidcFilterChain(HttpSecurity http) throws Exception {
-        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrations(), new OpenSamlMetadataResolver());
-
+        return http.build();
+    }
+     */
+    @Bean
+    @DependsOn("samlrepo")
+    @Conditional(SamlCondition.class)
+    public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize.anyRequest()
                 .authenticated())
                 .saml2Login(withDefaults())
                 .saml2Logout(withDefaults())
-                .addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class);
+                .addFilterBefore(new Saml2MetadataFilter(samlRepo(), new OpenSamlMetadataResolver()), Saml2WebSsoAuthenticationFilter.class);
+
         return http.build();
     }
 
-    private SecurityFilterChain getSamlFilterChain(HttpSecurity http) throws Exception {
-        Saml2MetadataFilter filter = new Saml2MetadataFilter(relyingPartyRegistrations(), new OpenSamlMetadataResolver());
+    private X509Certificate getX509Certificate(String fileName) {
+        X509Certificate retval = null;
+        try (FileInputStream is = new FileInputStream(fileName)) {
+            final CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            retval = (X509Certificate) factory.generateCertificate(is);
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
 
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest()
-                .authenticated())
-                .saml2Login(withDefaults())
-                .saml2Logout(withDefaults())
-                .addFilterBefore(filter, Saml2WebSsoAuthenticationFilter.class);
-        return http.build();
+        return retval;
     }
 
 }

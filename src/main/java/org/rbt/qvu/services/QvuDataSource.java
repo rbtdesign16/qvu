@@ -23,6 +23,7 @@ import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,12 +36,13 @@ public class QvuDataSource {
     private static Logger LOG = LoggerFactory.getLogger(QvuDataSource.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
 
-    private String databaseConfigFile = System.getProperty(Constants.DATABASE_CONFIG_PROPERTY);
+    @Value("#{environment.QVU_DB_CONFIG_FILE}")
+    private String databaseConfigFile;
 
     @PostConstruct
     private void init() {
         LOG.info("in QvuDataSource.init()");
-        LOG.debug("database config file: " + databaseConfigFile);
+        LOG.info("database config file: " + databaseConfigFile);
         try (InputStream is = new FileInputStream(databaseConfigFile)) {
             Properties p = new Properties();
             p.load(is);

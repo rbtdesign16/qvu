@@ -160,11 +160,32 @@
                         <goals>
                             <goal>yarn</goal>
                         </goals>
-                        <phase>prepare-package</phase>
+                        <phase>compile</phase>
                         <configuration>
                             <arguments>
                                 build</arguments>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-frontend</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/public</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>${frontend-src-dir}/build</directory>
+                                 </resource>
+                            </resources>              
+                        </configuration>            
                     </execution>
                 </executions>
             </plugin>

@@ -29,12 +29,15 @@ import org.springframework.context.annotation.DependsOn;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @Configuration
 @EnableWebSecurity
@@ -55,6 +58,10 @@ public class SecurityConfig {
         LOG.info("security config file: " + securityConfigFile);
     }
 
+    @Bean
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
 
     /*
     @DependsOn("basicrepo")
@@ -81,17 +88,18 @@ public class SecurityConfig {
 
             relyingPartyRegistration = RelyingPartyRegistrations
                     .fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
-                    .registrationId("simple")
+                    .registrationId("qvusaml")
                     .signingX509Credentials((c) -> c.add(credentials))
                     .build();
         } else {
             relyingPartyRegistration
                     = RelyingPartyRegistrations
                             .fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
-                            .registrationId("simple")
+                            .registrationId("qvusaml")
                             .build();
 
         }
+
         return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
 
     }
@@ -123,7 +131,7 @@ public class SecurityConfig {
         byte[] key = Files.readAllBytes(Paths.get(keyFile));
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
-        return keyFactory.generatePrivate(keySpec);    
+        return keyFactory.generatePrivate(keySpec);
     }
 
     private X509Certificate getCertificate(String certFile) throws Exception {

@@ -5,8 +5,6 @@
 package org.rbt.qvu.security;
 
 import org.rbt.qvu.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -16,13 +14,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * @author rbtuc
  */
 public class SamlCondition implements Condition {
-    private static Logger LOG = LoggerFactory.getLogger(SamlCondition.class);
-
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        LOG.info("env=" + System.getProperty("QVU_SECURITY_TYPE"));
-        boolean retval = Constants.SAML_SECURITY_TYPE.equals(System.getProperty("QVU_SECURITY_TYPE"));
-        LOG.info("retval=" + retval);
-        return retval;
+        return Constants.SAML_SECURITY_TYPE.equals(System.getProperty(Constants.SECURITY_TYPE_PROPERTY));
     }
 }

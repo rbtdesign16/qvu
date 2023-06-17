@@ -7,16 +7,19 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
+import javax.annotation.PostConstruct;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 public class WebAppInitializer implements WebApplicationInitializer {
     private static Logger LOG = LoggerFactory.getLogger(WebAppInitializer.class);
+    @PostConstruct
+    private void init() {
+        LOG.info("in WebAppInitializer.init()");
+    }
     
     @Override
     public void onStartup(ServletContext container) {
-        LOG.info("in WebAppInitializer.onSartup()");
-
         // Create the 'root' Spring application context
         AnnotationConfigWebApplicationContext rootContext
                 = new AnnotationConfigWebApplicationContext();

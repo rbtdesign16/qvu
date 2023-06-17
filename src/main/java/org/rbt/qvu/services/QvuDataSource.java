@@ -23,8 +23,6 @@ import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Messages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,19 +30,17 @@ import org.springframework.stereotype.Component;
  * @author rbtuc
  */
 @Component
-@PropertySource("classpath:application.properties")
 public class QvuDataSource {
 
     private static Logger LOG = LoggerFactory.getLogger(QvuDataSource.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
 
-    @Value("${database.config}")
-    private String databaseConfigFile;
+    private String databaseConfigFile = System.getProperty(Constants.DATABASE_CONFIG_PROPERTY);
 
     @PostConstruct
     private void init() {
         LOG.info("in QvuDataSource.init()");
-        LOG.info("database config file: " + databaseConfigFile);
+        LOG.debug("database config file: " + databaseConfigFile);
         try (InputStream is = new FileInputStream(databaseConfigFile)) {
             Properties p = new Properties();
             p.load(is);
@@ -88,10 +84,10 @@ public class QvuDataSource {
                 dbDataSources.put(ds, new HikariDataSource(config));
             }
 
-            LOG.info("datasources"
+            LOG.debug("datasources"
             );
             for (String db : getAllDatabaseInfo()) {
-                LOG.info("\tdatabase: " + db);
+                LOG.debug("\tdatabase: " + db);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

@@ -5,8 +5,6 @@
 package org.rbt.qvu.security;
 
 import org.rbt.qvu.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -16,10 +14,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * @author rbtuc
  */
 public class BasicCondition implements Condition {
-    private static Logger LOG = LoggerFactory.getLogger(BasicCondition.class);
-
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return Constants.BASIC_SECURITY_TYPE.equals(System.getProperty("QVU_SECURITY_TYPE"));
+        return Constants.BASIC_SECURITY_TYPE.equals(System.getProperty(Constants.SECURITY_TYPE_PROPERTY));
     }
 }

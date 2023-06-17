@@ -14,12 +14,10 @@ import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.PropertySource;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,32 +32,20 @@ import org.springframework.security.saml2.provider.service.web.authentication.Sa
 
 @Configuration
 @EnableWebSecurity
-@PropertySource("classpath:application.properties")
 public class SecurityConfig {
-
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${security.type}")
-    private String securityType;
+    private final String securityType = System.getProperty(Constants.SECURITY_TYPE_PROPERTY);
+    private final String securityConfigFile = System.getProperty(Constants.SECURITY_CONFIG_PROPERTY);
 
-    @Value("${security.config}")
-    private String securityConfigFile;
 
     @PostConstruct
     private void init() {
+        LOG.info("in SecurityConfig.init()");
         LOG.info("security type: " + securityType);
         LOG.info("security config file: " + securityConfigFile);
     }
 
-    @Bean("samlrepo")
-    @Conditional(SamlCondition.class)
-    RelyingPartyRegistrationRepository samlRepo() throws Exception {
-        Properties p = Helper.loadProperties(securityConfigFile);
-        RelyingPartyRegistration relyingPartyRegistration
-                = RelyingPartyRegistrations.fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
-                         .registrationId("simple").build();
-        return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
-    }
 
     /*
     @Bean
@@ -75,15 +61,28 @@ public class SecurityConfig {
         return http.build();
     }
      */
+    @Bean("samlrepo")
+    @Conditional(SamlCondition.class)
+    RelyingPartyRegistrationRepository samlRepository() {
+        LOG.debug("in samlRepository()");
+        Properties p = Helper.loadProperties(securityConfigFile);
+        RelyingPartyRegistration relyingPartyRegistration
+                = RelyingPartyRegistrations.fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
+                        .registrationId("simple").build();
+
+        return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
+    }
+
     @Bean
     @DependsOn("samlrepo")
     @Conditional(SamlCondition.class)
     public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
+        LOG.debug("in samlFilterChain()");
         http.authorizeHttpRequests(authorize -> authorize.anyRequest()
                 .authenticated())
                 .saml2Login(withDefaults())
                 .saml2Logout(withDefaults())
-                .addFilterBefore(new Saml2MetadataFilter(samlRepo(), new OpenSamlMetadataResolver()), Saml2WebSsoAuthenticationFilter.class);
+                .addFilterBefore(new Saml2MetadataFilter(samlRepository(), new OpenSamlMetadataResolver()), Saml2WebSsoAuthenticationFilter.class);
 
         return http.build();
     }

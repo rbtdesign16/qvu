@@ -3,14 +3,14 @@ package org.rbt.qvu.controllers;
 import java.util.List;
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.rbt.qvu.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The type Main controller.
@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*")
 public class MainController {
-  private static Logger LOG = LoggerFactory.getLogger(MainController.class);
+
+    private static Logger LOG = LogManager.getLogger(MainController.class);
 
     @Autowired
     MainService service;

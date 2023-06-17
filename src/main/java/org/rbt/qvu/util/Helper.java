@@ -6,10 +6,8 @@ package org.rbt.qvu.util;
 
 import java.io.FileInputStream;
 import java.util.Properties;
-import org.rbt.qvu.SecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 /**
  *
  * @author rbtuc

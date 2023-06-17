@@ -26,6 +26,7 @@
         <oracle.jdbc.version>23.2.0.0</oracle.jdbc.version>
         <postgres.jdbc.version>42.6.0</postgres.jdbc.version>
         <javax.annotation.version>1.3.2</javax.annotation.version>
+        <io.utils.version>2.13.0</io.utils.version>
     </properties>
     <dependencies>
         <dependency>
@@ -105,6 +106,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${io.utils.version}</version>
         </dependency>
     </dependencies>
 

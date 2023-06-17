@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+   <property name="CONSOLE_LOG_PATTERN"
+      value="%n%clr(%d{HH:mm:ss.SSS}){faint} %highlight(${LOG_LEVEL_PATTERN:-%5p}) [%marker] %clr(${PID:- }){magenta} %clr(---){faint} [trace=%X{X-Trace-Id:-},span=%X{X-Span-Id:-}] %magenta([%t]){faint} %yellow(%-40.40logger{39}){cyan}%clr(:){faint} %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
+   <property name="FILE_LOG_PATTERN"
+      value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} [%marker] ${PID:- } --- [trace=%X{X-Trace-Id:-},span=%X{X-Span-Id:-}] [%t] %logger{39}: %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
+
+   <logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR" />
+   <logger name="org.apache.catalina.util.LifecycleBase" level="ERROR" />
+   <logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN" />
+   <logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN" />
+   <logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN" />
+   <logger name="org.crsh.plugin" level="WARN" />
+   <logger name="org.crsh.ssh" level="WARN" />
+   <logger name="org.eclipse.jetty.util.component.AbstractLifeCycle"
+      level="ERROR" />
+   <logger name="org.hibernate.validator.internal.util.Version" level="WARN" />
+   <logger
+      name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration"
+      level="WARN" />
+   <logger name="org.springframework.boot.actuate.endpoint.jmx"
+      additivity="false">
+      <appender-ref ref="DEBUG_LEVEL_REMAPPER" />
+   </logger>
+   <logger name="org.springframework.security.saml2" level="DEBUG" />
+
+
+   <logger name="org.rbt" level="INFO" />
+
+   <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${QVU_LOG_FOLDER}/qvu.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+         <fileNamePattern>${QVU_LOG_FOLDER}/qvu.log-%d{yyyy-MM-dd-HH}-%i</fileNamePattern>
+         <timeBasedFileNamingAndTriggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>5MB</maxFileSize>
+         </timeBasedFileNamingAndTriggeringPolicy>
+         <maxHistory>3</maxHistory>
+      </rollingPolicy>
+      <encoder>
+         <pattern>${FILE_LOG_PATTERN}</pattern>
+      </encoder>
+   </appender>
+
+   <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+      <appender-ref ref="ROLLING_FILE" />
+      <includeCallerData>true</includeCallerData>
+      <discardingThreshold>0</discardingThreshold>
+   </appender>
+
+   <root level="INFO">
+      <appender-ref ref="ASYNC_FILE" />
+   </root>
+
+</configuration>                                      
+

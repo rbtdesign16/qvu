@@ -15,6 +15,9 @@ public class Constants {
     public static final String SECURITY_CONFIG_PROPERTY = "QVU_SECURITY_CONFIG_FILE";
     public static final String DATABASE_CONFIG_PROPERTY = "QVU_DB_CONFIG_FILE";
     public static final String SIGN_SAML_ASSERTIONS_PROPERTY = "saml.sign.assertions";
+    public static final String SAML_SP_ENTITY_ID_PROPERTY = "saml.sp.entityid";
+    public static final String SAML_SIGNING_CERTIFICAT_FILE_PROPERTY = "saml.signing.cert.file";
+    public static final String SAML_SIGNING_KEY_FILE_PROPERTY = "saml.signing.key.file";
     public static final String SAML_IDP_URL_PROPERTY = "saml.idp.url";
     public static final String BASIC_SECURITY_TYPE = "basic";
     public static final String OIDC_SECURITY_TYPE = "oidc";

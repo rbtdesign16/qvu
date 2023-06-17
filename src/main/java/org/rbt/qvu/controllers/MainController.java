@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * The type Main controller.
@@ -34,10 +36,16 @@ public class MainController {
 
     @GetMapping("/")
     public String index(Model model, @AuthenticationPrincipal Saml2AuthenticatedPrincipal principal) {
+        LOG.info("-------->" + principal);
         String emailAddress = principal.getFirstAttribute("email");
         model.addAttribute("emailAddress", emailAddress);
         model.addAttribute("userAttributes", principal.getAttributes());
         return "index";
+    }
+    
+    @PostMapping("/saml2/authenticate/simple")
+    public void samlAuthentication(@RequestBody Object o) {
+         LOG.info("samlAuthentication called=" + o);
     }
 
     @GetMapping("api/v1/db/info/{dsname}")

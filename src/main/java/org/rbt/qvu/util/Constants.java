@@ -29,19 +29,9 @@ public class Constants {
     public static final String SAML_IDP_URL_PROPERTY = "saml.idp.url";
  
     // ouath config properties
-    public static final String OAUTH_CLIENT_REGISTRATION_ID_PROPERTY = "oauth.client.registration.id";
-    public static final String OAUTH_CLIENT_ID_PROPERTY = "oauth.client.id";
+    public static final String OAUTH_ISSUER_LOCATION_URL_PROPERTY = "oauth.issuer.location.url";
     public static final String OAUTH_CLIENT_SECRET_PROPERTY = "oauth.client.secret";
-    public static final String OAUTH_CLIENT_AUTH_METHOD_PROPERTY = "oauth.client.auth.method";
-    public static final String OAUTH_GRANT_TYPE_PROPERTY = "oauth.grant.type";
-    public static final String OAUTH_REDIRECT_URI_PROPERTY = "oauth.redirect.uri";
-    public static final String OAUTH_SCOPE_PROPERTY = "oauth.scope";
-    public static final String OAUTH_AUTH_URI_PROPERTY = "oauth.auth.uri";
-    public static final String OAUTH_TOKEN_URI_PROPERTY = "oauth.token.uri";
-    public static final String OAUTH_USERINFO_URI_PROPERTY = "oauth.userinfo.uri";
-    public static final String OAUTH_USER_NAME_ATT_NAME_PROPERTY = "oauth.user.name.att.name";
-    public static final String OAUTH_JWK_SET_PROPERTY = "oauth.jwk.set.uri";    
-    public static final String OAUTH_CLIENT_NAME_PROPERTY = "oauth.client.name";
+    public static final String OAUTH_CLIENT_ID_PROPERTY = "oauth.client.id";
     
     
     

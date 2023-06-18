@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <property name="LOG_PATTERN"
-              value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} [%marker] ${PID:- } --- [trace=%X{X-Trace-Id:-},span=%X{X-Span-Id:-}] [%t] %logger{39}: %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
 
+    
+    <property name="LOG_PATTERN"
+              value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} %logger: %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${QVU_LOG_FOLDER}/qvu.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -28,8 +36,9 @@
         <appender-ref ref="ASYNC_FILE" />
     </root>
 
-    <logger name="org.rbt.qvu" level="INFO" >
+    <logger name="org.rbt.qvu" level="${QVU_LOG_LEVEL:INFO}" >
         <appender-ref ref="ASYNC_FILE" />
+        <appender-ref ref="CONSOLE" />
     </logger>
 </configuration>                                      
 

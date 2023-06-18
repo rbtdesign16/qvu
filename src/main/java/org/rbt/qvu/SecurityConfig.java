@@ -32,10 +32,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
@@ -109,21 +107,11 @@ public class SecurityConfig {
     ClientRegistrationRepository oauthRepository() throws Exception {
         LOG.debug("in oauthRepository()");
         Properties p = Helper.loadProperties(securityConfigFile);
-	ClientRegistration clientRegistration = ClientRegistration
-            .withRegistrationId(p.getProperty(Constants.OAUTH_CLIENT_REGISTRATION_ID_PROPERTY))
-            .clientId(p.getProperty(Constants.OAUTH_CLIENT_ID_PROPERTY))
-            .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY))
-            .clientAuthenticationMethod(new ClientAuthenticationMethod(p.getProperty(Constants.OAUTH_CLIENT_AUTH_METHOD_PROPERTY)))
-            .authorizationGrantType(new AuthorizationGrantType(p.getProperty(Constants.OAUTH_GRANT_TYPE_PROPERTY)))
-            .redirectUri(p.getProperty(Constants.OAUTH_REDIRECT_URI_PROPERTY))
-            .scope(p.getProperty(Constants.OAUTH_SCOPE_PROPERTY))
-            .authorizationUri(p.getProperty(Constants.OAUTH_AUTH_URI_PROPERTY))
-            .tokenUri(p.getProperty(Constants.OAUTH_TOKEN_URI_PROPERTY))
-            .userInfoUri(p.getProperty(Constants.OAUTH_USERINFO_URI_PROPERTY))
-            .userNameAttributeName(p.getProperty(Constants.OAUTH_USER_NAME_ATT_NAME_PROPERTY))
-            .jwkSetUri(p.getProperty(Constants.OAUTH_JWK_SET_PROPERTY))
-            .clientName(p.getProperty(Constants.OAUTH_CLIENT_NAME_PROPERTY))
-            .build();
+        ClientRegistration clientRegistration = ClientRegistrations
+            .fromOidcIssuerLocation(p.getProperty(Constants.OAUTH_ISSUER_LOCATION_URL_PROPERTY))
+                .clientId(p.getProperty(Constants.OAUTH_CLIENT_ID_PROPERTY))
+            .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY)).build();
+	
         return new InMemoryClientRegistrationRepository(clientRegistration);
 
     }
@@ -141,7 +129,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    @DependsOn("oauthcrepo")
+    @DependsOn("oauthrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OAUTH_SECURITY_TYPE)
     public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
         LOG.debug("in oauthFilterChain()");

@@ -17,16 +17,20 @@ import java.util.Properties;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.security.BasicAuthSecurityProvider;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -46,7 +50,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("#{environment.QVU_SECURITY_TYPE}")
@@ -62,18 +65,23 @@ public class SecurityConfig {
         LOG.info("security config file: " + securityConfigFile);
     }
 
+    @Autowired
+    private BasicAuthSecurityProvider basicAuthProvider;
+
     @Bean
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
-
-    /*
-    @DependsOn("basicrepo")
-    private SecurityFilterChain getBasicAuthFilterChain(HttpSecurity http) throws Exception {
-        http.httpBasic(withDefaults());
-        return http.build();
+    
+    @Bean("basicmgr")
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
+    AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = 
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(basicAuthProvider);
+        return authenticationManagerBuilder.build();
     }
-     */
+
     @Bean("samlrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
     RelyingPartyRegistrationRepository samlRepository() throws Exception {
@@ -108,12 +116,23 @@ public class SecurityConfig {
         LOG.debug("in oauthRepository()");
         Properties p = Helper.loadProperties(securityConfigFile);
         ClientRegistration clientRegistration = ClientRegistrations
-            .fromOidcIssuerLocation(p.getProperty(Constants.OAUTH_ISSUER_LOCATION_URL_PROPERTY))
+                .fromOidcIssuerLocation(p.getProperty(Constants.OAUTH_ISSUER_LOCATION_URL_PROPERTY))
                 .clientId(p.getProperty(Constants.OAUTH_CLIENT_ID_PROPERTY))
-            .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY)).build();
-	
+                .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY)).build();
+
         return new InMemoryClientRegistrationRepository(clientRegistration);
 
+    }
+
+    @Bean
+    @DependsOn("basicmgr")
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+            .authenticationManager(basicAuthManager(http))
+            .httpBasic(withDefaults());
+        return http.build();
     }
 
     @Bean
@@ -134,10 +153,10 @@ public class SecurityConfig {
     public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
         LOG.debug("in oauthFilterChain()");
         http
-            .authorizeHttpRequests(authorize -> authorize
-            .anyRequest().authenticated()
-            )
-            .oauth2Login(withDefaults());
+                .authorizeHttpRequests(authorize -> authorize
+                .anyRequest().authenticated()
+                )
+                .oauth2Login(withDefaults());
         return http.build();
     }
 

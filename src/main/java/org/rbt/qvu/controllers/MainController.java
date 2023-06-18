@@ -84,5 +84,4 @@ public class MainController {
     public List<String> getAllDatabaseInfo() {
         return service.getAllDatabaseInfo();
     }
-
 }

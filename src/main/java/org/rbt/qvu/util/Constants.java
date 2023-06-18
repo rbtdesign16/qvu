@@ -33,11 +33,10 @@ public class Constants {
     public static final String OAUTH_CLIENT_SECRET_PROPERTY = "oauth.client.secret";
     public static final String OAUTH_CLIENT_ID_PROPERTY = "oauth.client.id";
     
-    
-    
-    
-    
-    
+    // basic config properties
+    public static final String BASIC_AUTHENTICATOR_CLASS_PROPERTY = "basic.authenticator.class";
+    public static final String BASIC_AUTH_USERS_PROPERTY = "basic.auth.users";
+    public static final String BASIC_AUTH_USER_ROLES_PROPERTY = "basic.auth.user.$.roles";
     
     public static final String NONE = "none";
 }

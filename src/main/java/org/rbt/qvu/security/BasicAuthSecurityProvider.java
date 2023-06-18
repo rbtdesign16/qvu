@@ -7,6 +7,7 @@ package org.rbt.qvu.security;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -23,6 +24,8 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,7 +43,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     private String authenticatorClass;
 
     private Map<String, String> userMap = new HashMap<>();
-    private Map<String, String[]> userRolesMap = new HashMap<>();
+    private Map<String, List<String>> userRolesMap = new HashMap<>();
 
     @PostConstruct
     private void init() {
@@ -93,12 +96,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
         Class returnType = m.getReturnType();
 
-        if (Map.class.isAssignableFrom(returnType)) {
+        if (List.class.isAssignableFrom(returnType)) {
             Object o = c.getDeclaredConstructor().newInstance();
-            Map auth = (Map) m.invoke(o, name, password);
+            List details = (List) m.invoke(o, name, password);
 
-            if (auth != null) {
-                retval = new UsernamePasswordAuthenticationToken(name, password, new ArrayList<>());
+            if (details != null) {
+                retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(details));
             }
         }
 
@@ -110,7 +113,14 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         String pass = userMap.get(name);
 
         if (password.trim().equals(pass)) {
-            retval = new UsernamePasswordAuthenticationToken(name, password, new ArrayList<>());
+            List<String> roles = userRolesMap.get(name);
+            
+            List<SimpleGrantedAuthority> gal = new ArrayList<>();
+            if (roles != null) {
+                gal.addAll(toGrantedAuthority(roles));
+            }
+            
+            retval = new UsernamePasswordAuthenticationToken(name, password,gal);
         }
         return retval;
     }
@@ -126,9 +136,22 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 userMap.put(creds[0], creds[1]);
                 String roles = p.getProperty(Constants.BASIC_AUTH_USER_ROLES_PROPERTY.replace("$", creds[0]));
                 if (StringUtils.isNotEmpty(roles)) {
-                    userRolesMap.put(creds[0], roles.split(","));
+                    userRolesMap.put(creds[0], Helper.commaDelimitedToList(roles));
                 }
             }
         }
+    }
+    
+    private List<SimpleGrantedAuthority> toGrantedAuthority(List <String> in) {
+        List <SimpleGrantedAuthority> retval = new ArrayList<>();
+        
+        if (in != null) {
+            for (String s : in) {
+                retval.add(new SimpleGrantedAuthority(s));
+               
+            }
+        }
+        
+        return retval;
     }
 }

@@ -1,7 +1,9 @@
 package org.rbt.qvu.controllers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.rbt.qvu.services.MainService;
@@ -16,7 +18,8 @@ import org.rbt.qvu.dto.AuthenticatedUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 
 /**
  * The type Main controller.
@@ -39,27 +42,37 @@ public class MainController {
     public AuthenticatedUser getAuthenticatedInfo() {
         AuthenticatedUser retval = new AuthenticatedUser();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        retval.setName( auth.getName());
+
+        retval.setName(auth.getName());
         for (GrantedAuthority ga : auth.getAuthorities()) {
             retval.getGrantedAuthorities().add(ga.getAuthority());
         }
-         
-        if (auth.getPrincipal() instanceof DefaultSaml2AuthenticatedPrincipal) {
-            DefaultSaml2AuthenticatedPrincipal p = (DefaultSaml2AuthenticatedPrincipal)auth.getPrincipal();
-            
-            for (String att : p.getAttributes().keySet()) {
-                List l2 = p.getAttribute(att);
-                if (l2 != null) {
-                    List<String> l = new ArrayList();
-                    retval.getAttributes().put(att, l);
-                    for (Object o : l2) {
+
+        if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
+             loadUserAttributes(retval, ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+        } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
+            loadUserAttributes(retval, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+        }
+
+        return retval;
+    }
+
+    private void loadUserAttributes(AuthenticatedUser user, Map attributes) {
+        for (Object att : attributes.keySet()) {
+            Object val = attributes.get(att);
+            if (val != null) {
+                List<String> l = new ArrayList();
+                user.getAttributes().put(att.toString(), l);
+
+                if (val instanceof Collection) {
+                    for (Object o : (Collection) val) {
                         l.add(o.toString());
                     }
+                } else {
+                    l.add(val.toString());
                 }
             }
         }
-        
-        return retval;
     }
 
     @GetMapping("api/v1/db/info/{dsname}")

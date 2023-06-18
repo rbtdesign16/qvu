@@ -23,15 +23,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
@@ -44,6 +48,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("#{environment.QVU_SECURITY_TYPE}")
@@ -68,12 +73,6 @@ public class SecurityConfig {
     @DependsOn("basicrepo")
     private SecurityFilterChain getBasicAuthFilterChain(HttpSecurity http) throws Exception {
         http.httpBasic(withDefaults());
-        return http.build();
-    }
-
-    @Bean
-    @DependsOn("oidcrepo")
-    public SecurityFilterChain getOidcFilterChain(HttpSecurity http) throws Exception {
         return http.build();
     }
      */
@@ -105,10 +104,35 @@ public class SecurityConfig {
 
     }
 
+    @Bean("oauthrepo")
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OAUTH_SECURITY_TYPE)
+    ClientRegistrationRepository oauthRepository() throws Exception {
+        LOG.debug("in oauthRepository()");
+        Properties p = Helper.loadProperties(securityConfigFile);
+	ClientRegistration clientRegistration = ClientRegistration
+            .withRegistrationId(p.getProperty(Constants.OAUTH_CLIENT_REGISTRATION_ID_PROPERTY))
+            .clientId(p.getProperty(Constants.OAUTH_CLIENT_ID_PROPERTY))
+            .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY))
+            .clientAuthenticationMethod(new ClientAuthenticationMethod(p.getProperty(Constants.OAUTH_CLIENT_AUTH_METHOD_PROPERTY)))
+            .authorizationGrantType(new AuthorizationGrantType(p.getProperty(Constants.OAUTH_GRANT_TYPE_PROPERTY)))
+            .redirectUri(p.getProperty(Constants.OAUTH_REDIRECT_URI_PROPERTY))
+            .scope(p.getProperty(Constants.OAUTH_SCOPE_PROPERTY))
+            .authorizationUri(p.getProperty(Constants.OAUTH_AUTH_URI_PROPERTY))
+            .tokenUri(p.getProperty(Constants.OAUTH_TOKEN_URI_PROPERTY))
+            .userInfoUri(p.getProperty(Constants.OAUTH_USERINFO_URI_PROPERTY))
+            .userNameAttributeName(p.getProperty(Constants.OAUTH_USER_NAME_ATT_NAME_PROPERTY))
+            .jwkSetUri(p.getProperty(Constants.OAUTH_JWK_SET_PROPERTY))
+            .clientName(p.getProperty(Constants.OAUTH_CLIENT_NAME_PROPERTY))
+            .build();
+        return new InMemoryClientRegistrationRepository(clientRegistration);
+
+    }
+
     @Bean
     @DependsOn("samlrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
     public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
+        LOG.debug("in samlFilterChain()");
         http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
@@ -116,18 +140,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-    public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in samlFilterChain()");
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest()
-                .authenticated())
-                .saml2Login(withDefaults())
-                .saml2Logout(withDefaults())
-                .addFilterBefore(new Saml2MetadataFilter(samlRepository(),
-                        new OpenSamlMetadataResolver()), Saml2WebSsoAuthenticationFilter.class);
+    @Bean
+    @DependsOn("oauthcrepo")
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OAUTH_SECURITY_TYPE)
+    public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
+        LOG.debug("in oauthFilterChain()");
+        http
+            .authorizeHttpRequests(authorize -> authorize
+            .anyRequest().authenticated()
+            )
+            .oauth2Login(withDefaults());
         return http.build();
     }
-     */
+
     private PrivateKey getPrivateKey(String keyFile) throws Exception {
         byte[] key = Files.readAllBytes(Paths.get(keyFile));
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -144,6 +169,5 @@ public class SecurityConfig {
 
         return retval;
     }
-    
-   
+
 }

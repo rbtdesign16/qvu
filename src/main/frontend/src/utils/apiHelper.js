@@ -24,7 +24,7 @@ export const getApiURL = () => {
 }
 
 
-export const getAUtenticatedUserInfo( = () => {
+export const getAutenticatedUserInfo = () => {
     
 }
 

@@ -1,57 +1,104 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 :root {
-  --default-font-sz: 10pt;
-  --label-font-sz: 12pt;
-  --btn-font-sz: 9pt;
-  --loader-color: aqua; 
+    --default-background-color: white;
+    --default-font-color: back;
+    --default-font-size: 10pt;
+    --btn-font-sz: 9pt;
+    --loader-color: aqua;
+    --default-border-color: lightsteelblue;
+    --header-background-color: powderblue;
+    --footer-background-color: gainsboro;
+    --default-label-font-size: 10pt;
+    --default-label-font-weight: 600;
+    --default-label-font-color: darkslategray;
 }
 
 
 html {
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
 }
 
 body {
-  font-family: "Roboto", sans-serif;
-  font-size: var(--default-font-sz);
-  background-color: #fff;
-  color: #333;
-  height: 100%;
-  width: 100%;
-  overflow: none;
+    font-family: "Roboto", sans-serif;
+    font-size: var(--default-font-sz);
+    background-color: #fff;
+    color: #333;
+    height: 100%;
+    width: 100%;
+    overflow: none;
 }
 
 .loader {
-  width: 40px;
-  height: 40px;
-  border: 5px solid var(--loader-color);
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  display: inline-block;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+    width: 40px;
+    height: 40px;
+    border: 5px solid var(--loader-color);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .header {
+    position: fixed;
+    top: 0;
     height: 30px;
-    float: top;
     width: 100%;
+    border-bottom: solid 1px var(--default-border-color);
+    background: var(--header-background-color);
+
+}
+
+.header .logo img {
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+.header .logo span {
+    padding-left: 3px;
+    vertical-align: bottom;
+    font-weight: var(--default-label-font-weight);
+    color: var(--default-label-font-color);
+    font-size: var(--default-label-font-size);
 }
 
 .footer {
+    position: fixed;
+    bottom: 0;
     height: 20px;
     float: bottom;
     width: 100%;
+    background: var(--footer-background-color);
+    border-top: solid 1px var(--default-border-color);
+}
+
+.home {
+    width: 100%;
+    height: 100%;
+    background: var(--default-background-color);
+    color: var(--default-font-color);
+}
+
+.tab-container {
+    width: 100%;
+    position: fixed;
+    top: 31px;
+    height: calc (100% - 50px);
+}
+
+img {
+    padding: 0;
+    margin: 0;
 }

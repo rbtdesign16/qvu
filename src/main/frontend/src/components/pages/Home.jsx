@@ -1,24 +1,33 @@
 import React from "react";
-import { Tabs, Tab } from "react-bootstrap";
+import { Tabs, Tab }
+from "react-bootstrap";
+import Header from "../widgets/Header";
+import Footer from "../widgets/Footer";
 import AuthState from "../../context/auth/AuthState";
+import Admin from "./admin/Admin";
+import QueryDesign from "./querydesign/QueryDesign";
+import ReportDesign from "./reportdesign/ReportDesign";
 
 const Home = () => {
     return (
             <AuthState>
-                <div style={{paddingTop: "5px"}}>
-                    <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
-                        <Tab eventKey="imp" title="Admin">
-                            <h1>admin</h1>
-                        </Tab>
-                        <Tab eventKey="qdsgn" title="Query Design">
-                            <h1>query design</h1>
-                        </Tab>
-                        <Tab eventKey="rdsgn" title="Report Design">
-                            <h1>report design</h1>
-                        </Tab>
-                    </Tabs>
+                <div className="home">
+                    <Header/>
+                    <div className="tab-container">
+                        <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
+                            <Tab eventKey="imp" title="Admin">
+                                <Admin/>
+                            </Tab>
+                            <Tab eventKey="qdsgn" title="Query Design">
+                                <QueryDesign/>
+                            </Tab>
+                            <Tab eventKey="rdsgn" title="Report Design">
+                                <ReportDesign/>
+                            </Tab>
+                        </Tabs>
+                    </div>
+                    <Footer/>
                 </div>
-            </AuthState>
-            );
+            </AuthState>);
 };
 export default Home;

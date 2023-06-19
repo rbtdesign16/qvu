@@ -1,8 +1,5 @@
 import React, { createContext, useReducer } from "react";
 import authReducer from "./authReducer";
-import { getApiURL } from "../../api/api";
-
-import axios from "axios";
 
 import { SET_AUTHENTICATED_USER, CLEAR_AUTHENTICATED_USER } from "../types";
 
@@ -25,16 +22,16 @@ const AuthState = ({ children }) => {
         }
     };
 
-    const setAuthenticatedUser = (user) {
+    const setAuthenticatedUser = (user) => {
         dispatch({type: SET_AUTHENTICATED_USER, pauyload: user});
-
     }
+    
     const logout = () => {
         dispatch({type: CLEAR_AUTHENTICATED_USER});
     };
 
     return (
-            <Provider
+            <AuthContext.Provider
                 value={{
                                 authenticatedUser: state.authenticatedUser,
                                 hasRole,
@@ -43,7 +40,8 @@ const AuthState = ({ children }) => {
                             }}
                 >
                 {children}
-            </Provider>
+            </AuthContext.Provider>
             );
 };
+
 export default AuthState;

@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu;
 
+import org.rbt.qvu.configuration.Config;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -15,16 +16,13 @@ import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
-import org.rbt.qvu.security.BasicAuthSecurityProvider;
-import org.rbt.qvu.security.OidcConfiguration;
-import org.rbt.qvu.security.SamlConfiguration;
-import org.rbt.qvu.security.SecurityConfiguration;
+import org.rbt.qvu.configuration.security.BasicAuthSecurityProvider;
+import org.rbt.qvu.configuration.security.OidcConfiguration;
+import org.rbt.qvu.configuration.security.SamlConfiguration;
 import org.rbt.qvu.util.Constants;
-import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,17 +52,14 @@ public class SecurityConfig {
 
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("#{environment.QVU_SECURITY_TYPE}")
-    private String securityType;
-
-    @Value("#{environment.QVU_SECURITY_CONFIG_FILE}")
-    private String securityConfigFile;
+    @Autowired
+    private Config config;
 
     @PostConstruct
     private void init() {
         LOG.info("in SecurityConfig.init()");
-        LOG.info("security type: " + securityType);
-        LOG.info("security config file: " + securityConfigFile);
+        LOG.info("security type: " + config.getAppConfig().getSecurityType());
+        LOG.info("security config file: " + config.getAppConfig().getSecurityConfigurationFile());
     }
 
     @Autowired
@@ -76,6 +71,7 @@ public class SecurityConfig {
     }
 
     @Bean("basicmgr")
+    @DependsOn("config")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder
@@ -89,8 +85,7 @@ public class SecurityConfig {
     RelyingPartyRegistrationRepository samlRepository() throws Exception {
         LOG.debug("in samlRepository()");
         RelyingPartyRegistration relyingPartyRegistration = null;
-        SecurityConfiguration config = Helper.jsonToObject(new File(securityConfigFile), SecurityConfiguration.class);
-        SamlConfiguration samlConfig = config.getSamlConfiguration();
+        SamlConfiguration samlConfig = config.getSecurityConfig().getSamlConfiguration();
         if (samlConfig.isSignAssertions()) {
             final Saml2X509Credential credentials
                     = Saml2X509Credential.signing(getPrivateKey(samlConfig.getSigningKeyFileName()),
@@ -118,8 +113,7 @@ public class SecurityConfig {
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
     ClientRegistrationRepository oauthRepository() throws Exception {
         LOG.debug("in oauthRepository()");
-        SecurityConfiguration config = Helper.jsonToObject(new File(securityConfigFile), SecurityConfiguration.class);
-        OidcConfiguration oidcConfig = config.getOidcConfiguration();
+        OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
                 .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
                 .clientId(oidcConfig.getClientId())

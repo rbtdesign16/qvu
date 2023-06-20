@@ -2,24 +2,23 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.rbt.qvu.security;
+package org.rbt.qvu.configuration.security;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.util.Constants;
-import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,8 +36,9 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("#{environment.QVU_SECURITY_CONFIG_FILE}")
-    private String securityConfigFile;
+    @Autowired
+    private Config config;
+    
     private String authenticatorClass;
 
     private Map<String, UserInformation> userMap = new HashMap<>();
@@ -47,12 +47,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     private void init() {
         LOG.info("in BasicAuthSecurityProvider.init()");
         try {
-            SecurityConfiguration config = Helper.jsonToObject(new File(securityConfigFile), SecurityConfiguration.class);
-            authenticatorClass = config.getBasicConfiguration().getAuthenticatorServiceClassName();
+            SecurityConfiguration securityConfig = config.getSecurityConfig();
+            authenticatorClass = securityConfig.getBasicConfiguration().getAuthenticatorServiceClassName();
             LOG.info("authenticatorClass=" + authenticatorClass);
 
             if (StringUtils.isEmpty(authenticatorClass)) {
-                for (UserInformation uinfo : config.getBasicConfiguration().getUsers()) {
+                for (UserInformation uinfo : securityConfig.getBasicConfiguration().getUsers()) {
                     userMap.put(uinfo.getUserId(), uinfo);
                 }
             }
@@ -89,18 +89,18 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> authentication
-    ) {
+    public boolean supports(Class<?> authentication) {
         return true;
     }
 
     private Authentication authenticateWithClass(String className, String name, String password) throws Exception {
         Authentication retval = null;
         Class c = Class.forName(className);
-        Object o = c.getDeclaredConstructor().newInstance();
-        if (o instanceof QvuAuthenticationService) {
-            QvuAuthenticationService service = (QvuAuthenticationService) o;
+        LOG.debug("in authenticateWithClass: class=" + c);
+        if (QvuAuthenticationService.class.isAssignableFrom(c)) {
+            QvuAuthenticationService service = (QvuAuthenticationService)c.getDeclaredConstructor().newInstance();
 
+            LOG.debug("found QvuAuthenticationService");
             if (service.authenticate(name, password)) {
                 UserInformation uinfo = service.getUserInformation(name);
                 retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
@@ -126,6 +126,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     }
 
     private Authentication authenticateFromProperties(String name, String password) throws Exception {
+        LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
         UserInformation uinfo = userMap.get(name);
 

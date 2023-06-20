@@ -1,6 +1,6 @@
 package org.rbt.qvu.services;
 
-import org.rbt.qvu.database.DataSources;
+import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 
 import javax.annotation.PostConstruct;

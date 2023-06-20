@@ -12,7 +12,7 @@
     "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
   },
   "basicConfiguration": {
-    "authenticatorServiceClassName": "org.rbt.qvu.security.DefaultBasicAuthenticator",
+    "authenticatorServiceClassName": "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator",
     "users": [
       {
         "userId": "tester1",

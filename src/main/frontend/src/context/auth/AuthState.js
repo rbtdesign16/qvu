@@ -4,6 +4,7 @@ import authReducer from "./authReducer";
 import { SET_AUTHENTICATED_USER, CLEAR_AUTHENTICATED_USER } from "../types";
 
 export const AuthContext = createContext();
+const { Provider } = AuthContext;
 
 const AuthState = ({ children }) => {
     // set up initial state and reducer
@@ -31,7 +32,7 @@ const AuthState = ({ children }) => {
     };
 
     return (
-            <AuthContext.Provider
+            <Provider
                 value={{
                                 authenticatedUser: state.authenticatedUser,
                                 hasRole,
@@ -40,7 +41,7 @@ const AuthState = ({ children }) => {
                             }}
                 >
                 {children}
-            </AuthContext.Provider>
+            </Provider>
             );
 };
 

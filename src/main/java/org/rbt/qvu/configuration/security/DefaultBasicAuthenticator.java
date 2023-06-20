@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.rbt.qvu.security;
+package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +11,17 @@ import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.client.utils.AuthenticationException;
 import org.rbt.qvu.client.utils.UserAttribute;
+import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author rbtuc
  */
 public class DefaultBasicAuthenticator implements QvuAuthenticationService {
+    private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
     private static final String[] ROLES = {
         "administrator", 
         "query designer", 
@@ -26,6 +30,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     private static final String ADMIN = "admin";
     private static final String USER = "user";
 
+    @Override
     public boolean authenticate(String user, String pass) throws AuthenticationException  {
         boolean retval = false;
 
@@ -34,6 +39,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
             retval = true;
         }
         
+        LOG.debug("in authenticate: user=" + user + ", retval=" + retval);
         return retval;
     }
 

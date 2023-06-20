@@ -2,11 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.rbt.qvu.database;
+package org.rbt.qvu.configuration.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,11 +15,11 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.util.Constants;
-import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,17 +28,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DataSources {
-
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
 
-    @Value("#{environment.QVU_DB_CONFIG_FILE}")
-    private String databaseConfigFile;
-
+    @Autowired
+    private Config config;
+    
     @PostConstruct
     private void init() {
         LOG.info("in QvuDataSource.init()");
-        LOG.info("database config file: " + databaseConfigFile);
+        LOG.info("database config file: " + config.getAppConfig().getDatabaseConfigurationFile());
 
         try {
             loadDataSources();
@@ -95,32 +93,32 @@ public class DataSources {
     }
 
     public void loadDataSources() throws Exception {
-        DataSourcesConfiguration dsc = Helper.jsonToObject(new File(databaseConfigFile), DataSourcesConfiguration.class);
+        DataSourcesConfiguration dsc = config.getDatasourcesConfig();
 
         for (DataSourceConfiguration c : dsc.getDatasources()) {
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(c.getUrl());
-            config.setUsername(c.getUsername());
-            config.setPassword(c.getPassword());
-            config.setDriverClassName(c.getDriver());
+            HikariConfig pconfig = new HikariConfig();
+            pconfig.setJdbcUrl(c.getUrl());
+            pconfig.setUsername(c.getUsername());
+            pconfig.setPassword(c.getPassword());
+            pconfig.setDriverClassName(c.getDriver());
 
             if (c.getConnectionTimeout() != null) {
-                config.setConnectionTimeout(c.getConnectionTimeout());
+                pconfig.setConnectionTimeout(c.getConnectionTimeout());
             }
 
             if (c.getIdleTimeout() != null) {
-                config.setIdleTimeout(c.getIdleTimeout());
+                pconfig.setIdleTimeout(c.getIdleTimeout());
             }
 
             if (c.getMaxLifeTime() != null) {
-                config.setMaxLifetime(c.getMaxLifeTime());
+                pconfig.setMaxLifetime(c.getMaxLifeTime());
             }
 
             if (c.getMaxPoolSize() != null) {
-                config.setMaximumPoolSize(c.getMaxPoolSize());
+                pconfig.setMaximumPoolSize(c.getMaxPoolSize());
             }
 
-            dbDataSources.put(c.getDatasourceName(), new HikariDataSource(config));
+            dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
         }
     }
 }

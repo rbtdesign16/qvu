@@ -49,9 +49,4 @@ public class Helper {
 
         return retval;
     }
-    
-    public static <T> T jsonToObject(File f, Class<T> c) throws IOException {
-        Gson gson = new Gson();
-        return gson.fromJson(FileUtils.readFileToString(f, "UTF-8"), c);
-    }
 }

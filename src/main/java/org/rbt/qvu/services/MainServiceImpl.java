@@ -1,5 +1,6 @@
 package org.rbt.qvu.services;
 
+import org.rbt.qvu.database.DataSources;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -15,7 +16,7 @@ public class MainServiceImpl implements MainService {
     private static Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
     @Autowired
-    QvuDataSource qvuds;
+    DataSources qvuds;
 
     @PostConstruct
     private void init() {

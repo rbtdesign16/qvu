@@ -49,9 +49,11 @@ public class MainController {
         }
 
         if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
-             loadUserAttributes(retval, ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+            loadUserAttributes(retval, ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
         } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
             loadUserAttributes(retval, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+        } else {
+            
         }
 
         return retval;

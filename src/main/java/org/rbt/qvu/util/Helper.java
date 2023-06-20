@@ -4,11 +4,15 @@
  */
 package org.rbt.qvu.util;
 
+import com.google.gson.Gson;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,5 +48,10 @@ public class Helper {
         }
 
         return retval;
+    }
+    
+    public static <T> T jsonToObject(File f, Class<T> c) throws IOException {
+        Gson gson = new Gson();
+        return gson.fromJson(FileUtils.readFileToString(f, "UTF-8"), c);
     }
 }

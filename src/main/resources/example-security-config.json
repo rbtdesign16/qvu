@@ -1,0 +1,57 @@
+{
+  "samlConfiguration": {
+    "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
+    "signAssertions": true,
+    "spEntityId": "http://localhost:8080/realms/qvu-realm",
+    "signingCertFileName": "c:/dev/certs/rsa_cert.pem",
+    "signingKeyFileName": "c:/dev/certs/private.key"
+  },
+  "oidcConfiguration": {
+    "issuerLocationUrl": "http://localhost:8080/realms/qvu-realm",
+    "clientId": "qvu-oauth",
+    "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
+  },
+  "basicConfiguration": {
+    "authenticatorServiceClassName": "org.rbt.qvu.security.DefaultBasicAuthenticator",
+    "users": [
+      {
+        "userId": "tester1",
+        "attributes": [
+          {
+            "name": "password",
+            "value": "test"
+          }
+        ],
+        "roles": [
+          "user"
+        ]
+      },
+      {
+        "userId": "tester2",
+        "attributes": [
+          {
+            "name": "password",
+            "value": "test"
+          }
+        ],
+        "roles": [
+          "administrator",
+          "user"
+        ]
+      },
+      {
+        "userId": "tester3",
+        "attributes": [
+          {
+            "name": "password",
+            "value": "test"
+          }
+        ],
+        "roles": [
+          "query designer",
+          "report designer"
+        ]
+      }
+    ]
+  }
+}

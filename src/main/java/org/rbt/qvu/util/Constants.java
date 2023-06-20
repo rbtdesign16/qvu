@@ -19,24 +19,11 @@ public class Constants {
 
     // security authentication types supported
     public static final String BASIC_SECURITY_TYPE = "basic";
-    public static final String OAUTH_SECURITY_TYPE = "oauth";
+    public static final String OIDC_SECURITY_TYPE = "oidc";
     public static final String SAML_SECURITY_TYPE = "saml";
 
-    // saml config properties
-    public static final String SAML_SP_ENTITY_ID_PROPERTY = "saml.sp.entityid";
-    public static final String SAML_SIGNING_CERTIFICAT_FILE_PROPERTY = "saml.signing.cert.file";
-    public static final String SAML_SIGNING_KEY_FILE_PROPERTY = "saml.signing.key.file";
-    public static final String SAML_IDP_URL_PROPERTY = "saml.idp.url";
- 
-    // ouath config properties
-    public static final String OAUTH_ISSUER_LOCATION_URL_PROPERTY = "oauth.issuer.location.url";
-    public static final String OAUTH_CLIENT_SECRET_PROPERTY = "oauth.client.secret";
-    public static final String OAUTH_CLIENT_ID_PROPERTY = "oauth.client.id";
-    
-    // basic config properties
-    public static final String BASIC_AUTHENTICATOR_CLASS_PROPERTY = "basic.authenticator.class";
-    public static final String BASIC_AUTH_USERS_PROPERTY = "basic.auth.users";
-    public static final String BASIC_AUTH_USER_ROLES_PROPERTY = "basic.auth.user.$.roles";
+    public static final String PASSWORD_ATTRIBUTE_NAME = "password";
+
     
     public static final String NONE = "none";
 }

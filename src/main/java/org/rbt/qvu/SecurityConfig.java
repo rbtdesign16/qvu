@@ -13,11 +13,12 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Properties;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.security.BasicAuthSecurityProvider;
+import org.rbt.qvu.security.OidcConfiguration;
+import org.rbt.qvu.security.SamlConfiguration;
+import org.rbt.qvu.security.SecurityConfiguration;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("#{environment.QVU_SECURITY_TYPE}")
@@ -72,12 +74,12 @@ public class SecurityConfig {
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
-    
+
     @Bean("basicmgr")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = 
-            http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManagerBuilder authenticationManagerBuilder
+                = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(basicAuthProvider);
         return authenticationManagerBuilder.build();
     }
@@ -86,21 +88,23 @@ public class SecurityConfig {
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
     RelyingPartyRegistrationRepository samlRepository() throws Exception {
         LOG.debug("in samlRepository()");
-        Properties p = Helper.loadProperties(securityConfigFile);
         RelyingPartyRegistration relyingPartyRegistration = null;
-        if (StringUtils.isNotEmpty(p.getProperty(Constants.SAML_SIGNING_CERTIFICAT_FILE_PROPERTY))) {
-            final Saml2X509Credential credentials = Saml2X509Credential.signing(getPrivateKey(p.getProperty(Constants.SAML_SIGNING_KEY_FILE_PROPERTY)),
-                    getCertificate(p.getProperty(Constants.SAML_SIGNING_CERTIFICAT_FILE_PROPERTY)));
+        SecurityConfiguration config = Helper.jsonToObject(new File(securityConfigFile), SecurityConfiguration.class);
+        SamlConfiguration samlConfig = config.getSamlConfiguration();
+        if (samlConfig.isSignAssertions()) {
+            final Saml2X509Credential credentials
+                    = Saml2X509Credential.signing(getPrivateKey(samlConfig.getSigningKeyFileName()),
+                            getCertificate(samlConfig.getSigningCertFileName()));
 
             relyingPartyRegistration = RelyingPartyRegistrations
-                    .fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
+                    .fromMetadataLocation(samlConfig.getIdpUrl())
                     .registrationId("qvusaml")
                     .signingX509Credentials((c) -> c.add(credentials))
                     .build();
         } else {
             relyingPartyRegistration
                     = RelyingPartyRegistrations
-                            .fromMetadataLocation(p.getProperty(Constants.SAML_IDP_URL_PROPERTY))
+                            .fromMetadataLocation(samlConfig.getIdpUrl())
                             .registrationId("qvusaml")
                             .build();
 
@@ -111,14 +115,15 @@ public class SecurityConfig {
     }
 
     @Bean("oauthrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OAUTH_SECURITY_TYPE)
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
     ClientRegistrationRepository oauthRepository() throws Exception {
         LOG.debug("in oauthRepository()");
-        Properties p = Helper.loadProperties(securityConfigFile);
+        SecurityConfiguration config = Helper.jsonToObject(new File(securityConfigFile), SecurityConfiguration.class);
+        OidcConfiguration oidcConfig = config.getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
-                .fromOidcIssuerLocation(p.getProperty(Constants.OAUTH_ISSUER_LOCATION_URL_PROPERTY))
-                .clientId(p.getProperty(Constants.OAUTH_CLIENT_ID_PROPERTY))
-                .clientSecret(p.getProperty(Constants.OAUTH_CLIENT_SECRET_PROPERTY)).build();
+                .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
+                .clientId(oidcConfig.getClientId())
+                .clientSecret(oidcConfig.getClientSecret()).build();
 
         return new InMemoryClientRegistrationRepository(clientRegistration);
 
@@ -129,9 +134,9 @@ public class SecurityConfig {
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-            .authenticationManager(basicAuthManager(http))
-            .httpBasic(withDefaults());
+                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+                .authenticationManager(basicAuthManager(http))
+                .httpBasic(withDefaults());
         return http.build();
     }
 
@@ -149,7 +154,7 @@ public class SecurityConfig {
 
     @Bean
     @DependsOn("oauthrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OAUTH_SECURITY_TYPE)
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
     public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
         LOG.debug("in oauthFilterChain()");
         http

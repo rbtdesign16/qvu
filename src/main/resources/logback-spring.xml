@@ -36,7 +36,7 @@
         <appender-ref ref="ASYNC_FILE" />
     </root>
 
-    <logger name="org.rbt.qvu" level="${QVU_LOG_LEVEL:INFO}" >
+    <logger name="org.rbt.qvu" level="${QVU_LOG_LEVEL:-INFO}" >
         <appender-ref ref="ASYNC_FILE" />
         <appender-ref ref="CONSOLE" />
     </logger>

@@ -1,0 +1,23 @@
+{
+  "datasources": [
+    {
+      "databaseType": "Oracle",
+      "datasourceName": "oraclehr",
+      "url": "jdbc:oracle:thin:@localhost:1521:xe",
+      "driver": "oracle.jdbc.OracleDriver",
+      "username": "HR",
+      "password": "admin"
+    },
+    {
+      "databaseType": "Oracle",
+      "datasourceName": "oraclehr",
+      "url": "jdbc:oracle:thin:@localhost:1521:xe",
+      "driver": "oracle.jdbc.OracleDriver",
+      "username": "SH",
+      "password": "admin"
+    }
+  ]
+}
+
+
+            

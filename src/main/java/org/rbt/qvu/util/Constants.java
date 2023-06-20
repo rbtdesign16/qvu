@@ -20,5 +20,7 @@ public class Constants {
     public static final String PASSWORD_ATTRIBUTE_NAME = "password";
 
     
+    public static final String OFFLINE = "offline";
+    public static final String ONLINE = "online";
     public static final String NONE = "none";
 }

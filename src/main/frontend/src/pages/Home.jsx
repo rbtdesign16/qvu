@@ -12,8 +12,8 @@ const Home = (props) => {
     return (
             <div className="home">
                 <Header/>
+                <Message/>
                 <div className="tab-container">
-                    <Message/>
                     <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
                         <Tab eventKey="imp" title="Admin">
                             <Admin/>

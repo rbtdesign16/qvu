@@ -19,7 +19,7 @@
         <spring.oauth2.version>2.5.0.RELEASE</spring.oauth2.version>
         <spring.jwt.version>1.1.1.RELEASE</spring.jwt.version>
         <frontend-src-dir>${project.basedir}/src/main/frontend</frontend-src-dir>
-        <node.version>v14.15.4</node.version>
+        <node.version>v16.16.0</node.version>
         <yarn.version>v1.22.5</yarn.version>
         <frontend-maven-plugin.version>1.11.0</frontend-maven-plugin.version>
         <gson.version>2.10</gson.version>

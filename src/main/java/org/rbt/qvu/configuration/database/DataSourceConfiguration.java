@@ -4,6 +4,8 @@
  */
 package org.rbt.qvu.configuration.database;
 
+import org.rbt.qvu.util.Constants;
+
 /**
  *
  * @author rbtuc
@@ -19,6 +21,7 @@ public class DataSourceConfiguration {
     private Long idleTimeout;
     private Long maxLifeTime;
     private Integer maxPoolSize;
+    private String status = Constants.OFFLINE;
 
 
     public String getDatabaseType() {
@@ -99,6 +102,14 @@ public class DataSourceConfiguration {
 
     public void setMaxPoolSize(Integer maxPoolSize) {
         this.maxPoolSize = maxPoolSize;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
     
     

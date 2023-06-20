@@ -28,12 +28,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DataSources {
+
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
 
     @Autowired
     private Config config;
-    
+
     @PostConstruct
     private void init() {
         LOG.info("in QvuDataSource.init()");
@@ -92,33 +93,41 @@ public class DataSources {
         return retval;
     }
 
-    public void loadDataSources() throws Exception {
+    public void loadDataSources() {
         DataSourcesConfiguration dsc = config.getDatasourcesConfig();
 
         for (DataSourceConfiguration c : dsc.getDatasources()) {
-            HikariConfig pconfig = new HikariConfig();
-            pconfig.setJdbcUrl(c.getUrl());
-            pconfig.setUsername(c.getUsername());
-            pconfig.setPassword(c.getPassword());
-            pconfig.setDriverClassName(c.getDriver());
+            try {
+                HikariConfig pconfig = new HikariConfig();
+                pconfig.setJdbcUrl(c.getUrl());
+                pconfig.setUsername(c.getUsername());
+                pconfig.setPassword(c.getPassword());
+                pconfig.setDriverClassName(c.getDriver());
 
-            if (c.getConnectionTimeout() != null) {
-                pconfig.setConnectionTimeout(c.getConnectionTimeout());
+                if (c.getConnectionTimeout() != null) {
+                    pconfig.setConnectionTimeout(c.getConnectionTimeout());
+                }
+
+                if (c.getIdleTimeout() != null) {
+                    pconfig.setIdleTimeout(c.getIdleTimeout());
+                }
+
+                if (c.getMaxLifeTime() != null) {
+                    pconfig.setMaxLifetime(c.getMaxLifeTime());
+                }
+
+                if (c.getMaxPoolSize() != null) {
+                    pconfig.setMaximumPoolSize(c.getMaxPoolSize());
+                }
+
+                
+                dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
+                c.setStatus(Constants.ONLINE);
+            } catch (Exception ex) {
+                c.setStatus(Constants.OFFLINE);
+                LOG.error("error loading datasource " + c.getDatasourceName());
+                LOG.error(ex.toString(), ex);
             }
-
-            if (c.getIdleTimeout() != null) {
-                pconfig.setIdleTimeout(c.getIdleTimeout());
-            }
-
-            if (c.getMaxLifeTime() != null) {
-                pconfig.setMaxLifetime(c.getMaxLifeTime());
-            }
-
-            if (c.getMaxPoolSize() != null) {
-                pconfig.setMaximumPoolSize(c.getMaxPoolSize());
-            }
-
-            dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
         }
     }
 }

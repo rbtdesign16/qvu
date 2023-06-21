@@ -2,17 +2,32 @@
 
 :root {
     --default-background-color: white;
-    --default-font-color: back;
+    --default-font-color: darkslategray;
     --default-font-size: 10pt;
-    --btn-font-sz: 9pt;
-    --loader-color: aqua;
     --default-border-color: lightsteelblue;
-    --header-background-color: powderblue;
-    --footer-background-color: gainsboro;
     --default-label-font-size: 10pt;
     --default-label-font-weight: 600;
     --default-label-font-color: darkslategray;
- 
+
+    --header-background: linear-gradient(90deg, rgba(0,245,255,1) 0%, rgba(66,209,226,1) 0%, rgba(12,22,87,1) 100%, rgba(0,0,0,1) 100%);;
+    
+    --footer-background-color: gainsboro;
+    --footer-text-color: darkslategray;
+    --footer-font-size: 10pt;
+
+    --btn-font-sz: 9pt;
+
+    --info-message-background-color: cornsilk;
+    --success-message-background-color: green;
+    --warn-message-background-color: yellow;
+    --error-message-background-color: red;
+    --info-message-text-color: darkslategray;
+    --success-message-text-color: white;
+    --warn-message-text-color: darkslategray;
+    --error-message-text-color: white;
+
+    --message-header-font-size: 12pt;
+    --message-body-font-size: 12pt;
 }
 
 
@@ -25,31 +40,11 @@ html {
 body {
     font-family: "Roboto", sans-serif;
     font-size: var(--default-font-sz);
-    background-color: #fff;
-    color: #333;
+    background-color: var(--default-background-color));
+    color: var(--default-font-color);
     height: 100%;
     width: 100%;
     overflow: none;
-}
-
-.loader {
-    width: 40px;
-    height: 40px;
-    border: 5px solid var(--loader-color);
-    border-bottom-color: transparent;
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
-
-@keyframes rotation {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
 }
 
 .header {
@@ -58,7 +53,7 @@ body {
     height: 30px;
     width: 100%;
     border-bottom: solid 1px var(--default-border-color);
-    background: var(--header-background-color);
+    background: var(--header-background);
 
 }
 
@@ -68,21 +63,50 @@ body {
 }
 
 .header .logo span {
-    padding-left: 3px;
+    padding: 3px;
     vertical-align: bottom;
     font-weight: var(--default-label-font-weight);
     color: var(--default-label-font-color);
     font-size: var(--default-label-font-size);
 }
 
+
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+ 
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  border-top-color: #07d;
+  animation: spinner .6s linear infinite;
+}
+
 .footer {
     position: fixed;
     bottom: 0;
-    height: 20px;
+    height: 24px;
     float: bottom;
     width: 100%;
     background: var(--footer-background-color);
     border-top: solid 1px var(--default-border-color);
+}
+
+.footer-text {
+    font-size: var(--footer-font-size);
+    color: var(--footer-text-color);
+    font-size: var(--footer-font-size) !important;
+    padding-left: 10px;
+    vertical-align: top;
 }
 
 .home {
@@ -102,4 +126,50 @@ body {
 img {
     padding: 0;
     margin: 0;
+}
+
+
+.info-message {
+    background: var(--info-message-background-color);
+    color: var(--info-message-text-color);
+}
+
+.success-message {
+    background: var(--success-message-background-color);
+    color: var(--success-message-text-color);
+}
+
+.warn-message {
+    background: var(--warn-message-background-color);
+    color: var(--warn-message-text-color);
+}
+
+.error-message {
+    background: var(--warn-message-background-color);
+    color: var(--warn-message-text-color);
+}
+
+.message-header {
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(0.3rem - 1px);
+    border-top-right-radius: calc(0.3rem - 1px);
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    padding: 5px;
+    height: 35px;
+    font-size: var(--message-header-font-size);
+}
+
+.message-body {
+    flex: 1 1 auto;
+    position: relative;
+    font-size: var(--message-body-font-size);
+    padding: 10px
+}
+
+.message-title {
+    padding: 2px;
+    font-size: var(--message-header-font-size);
 }

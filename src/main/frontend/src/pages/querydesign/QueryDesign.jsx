@@ -12,12 +12,8 @@ const QueryDesign = (props) => {
     
     return (
             <div>
-   <button onClick={(e) => showMessage(WARN, "this is a test", "Warning")}>show</button>
-           
-           <button onClick={(e) => alert("xxx")}>test</button>
-   
-            </div>
-            );
+                query design
+             );
 }
 
 export default QueryDesign;

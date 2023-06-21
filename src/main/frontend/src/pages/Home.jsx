@@ -9,6 +9,10 @@ import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
 
 const Home = (props) => {
+    const getFooterText = () => {
+        return ("@" + new Date().getFullYear() + " Rbt");
+    }
+    
     return (
             <div className="home">
                 <Message/>
@@ -26,7 +30,7 @@ const Home = (props) => {
                         </Tab>
                     </Tabs>
                 </div>
-                <Footer text={new Date().getFullYear() + " Rbt"}/>
+                <Footer text={getFooterText()}/>
             </div>);
 };
 

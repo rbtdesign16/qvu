@@ -1,34 +1,5 @@
+@import "qvu-theme.css";
 @import "bootstrap/dist/css/bootstrap.min.css";
-
-:root {
-    --default-background-color: white;
-    --default-font-color: darkslategray;
-    --default-font-size: 10pt;
-    --default-border-color: lightsteelblue;
-    --default-label-font-size: 10pt;
-    --default-label-font-weight: 600;
-    --default-label-font-color: darkslategray;
-
-    --header-background: linear-gradient(90deg, rgba(0,245,255,1) 0%, rgba(66,209,226,1) 0%, rgba(12,22,87,1) 100%, rgba(0,0,0,1) 100%);;
-    
-    --footer-background-color: gainsboro;
-    --footer-text-color: darkslategray;
-    --footer-font-size: 10pt;
-
-    --btn-font-sz: 9pt;
-
-    --info-message-background-color: cornsilk;
-    --success-message-background-color: green;
-    --warn-message-background-color: yellow;
-    --error-message-background-color: red;
-    --info-message-text-color: darkslategray;
-    --success-message-text-color: white;
-    --warn-message-text-color: darkslategray;
-    --error-message-text-color: white;
-
-    --message-header-font-size: 12pt;
-    --message-body-font-size: 12pt;
-}
 
 
 html {
@@ -101,7 +72,7 @@ body {
     border-top: solid 1px var(--default-border-color);
 }
 
-.footer-text {
+.footer-copyright {
     font-size: var(--footer-font-size);
     color: var(--footer-text-color);
     font-size: var(--footer-font-size) !important;

@@ -7,16 +7,14 @@ import Admin from "./admin/Admin";
 import QueryDesign from "./querydesign/QueryDesign";
 import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
+import PropTypes from "prop-types";
 
 const Home = (props) => {
-    const getFooterText = () => {
-        return ("@" + new Date().getFullYear() + " Rbt");
-    }
-    
+    const {copyright, version} = props;
     return (
             <div className="home">
                 <Message/>
-                <Header/>
+                <Header version={version}/>
                 <div className="tab-container">
                     <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
                         <Tab eventKey="imp" title="Admin">
@@ -30,8 +28,14 @@ const Home = (props) => {
                         </Tab>
                     </Tabs>
                 </div>
-                <Footer text={getFooterText()}/>
+                <Footer copyright={copyright}/>
             </div>);
 };
+
+Home.propTypes = {
+    version: PropTypes.string.isRequired,
+    copyright: PropTypes.string.isRequired
+};
+
 
 export default Home;

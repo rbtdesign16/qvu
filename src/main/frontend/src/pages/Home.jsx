@@ -11,8 +11,8 @@ import Message from "../widgets/Message"
 const Home = (props) => {
     return (
             <div className="home">
-                <Header/>
                 <Message/>
+                <Header/>
                 <div className="tab-container">
                     <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
                         <Tab eventKey="imp" title="Admin">
@@ -26,7 +26,7 @@ const Home = (props) => {
                         </Tab>
                     </Tabs>
                 </div>
-                <Footer test={new Date().getFullYear() + " Rbt"}/>
+                <Footer text={new Date().getFullYear() + " Rbt"}/>
             </div>);
 };
 

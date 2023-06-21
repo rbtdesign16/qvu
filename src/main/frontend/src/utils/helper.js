@@ -3,6 +3,7 @@ export const ERROR = "error";
 export const WARN = "warn";
 export const INFO = "info";
 
+
 export const isNotEmpty = (val) => {
   return val && ("" + val).length > 0;
 };

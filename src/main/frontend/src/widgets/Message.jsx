@@ -11,7 +11,7 @@ INFO,
         SUCCESS,
         WARN,
         ERROR,
-        } from "../utils/helper";
+} from "../utils/helper";
 
 
 const Message = (props) => {
@@ -35,6 +35,17 @@ const Message = (props) => {
             return <div>{messageInfo.message}</div>
         }
     }
+
+    const getTitle = () => {
+        if (messageInfo.title) {
+            return messageInfo.title;
+        } else if (messageInfo.showSpinner) {
+            return "Loading...";
+        } else {
+            return messageInfo.type;
+        }
+    }
+    
     return (
             <Modal
                 show={messageInfo.show}
@@ -49,7 +60,7 @@ const Message = (props) => {
                 >
                 <Modal.Header bsPrefix="message-header" closeButton>
                     <Modal.Title bsPrefix="message-title" id="contained-modal-title-vcenter">
-                        {messageInfo.title ? messageInfo.title : messageInfo.type}
+                        {getTitle()}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body bsPrefix="message-body">{getMessage()}</Modal.Body>

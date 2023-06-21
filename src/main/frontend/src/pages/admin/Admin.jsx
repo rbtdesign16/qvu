@@ -10,7 +10,7 @@ const Admin = (props) => {
     
     return (
             <div>
-    <button onClick={(e) => showMessage(ERROR, "this is a test")}>show</button>
+    <button onClick={(e) => showMessage(INFO, "this is a test", null, true)}>show</button>
             </div>
             );
 }

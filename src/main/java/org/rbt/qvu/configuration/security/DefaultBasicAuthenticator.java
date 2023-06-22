@@ -45,10 +45,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
 
     @Override
     public UserInformation getUserInformation(String userId) {
-        UserInformation retval =  new UserInformation();
-        retval.setUserId(userId);
-        retval.getRoles().add(userId);
-        return retval;
+        return findUser(userId);
     }
 
     @Override
@@ -76,4 +73,15 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         return Arrays.asList(ROLES);
     }
 
+    private UserInformation findUser(String userId) {
+        UserInformation retval = null;
+        List<UserInformation> users = getAllUsers();
+        for (UserInformation u : users) {
+            if (userId.equalsIgnoreCase(u.getUserId())) {
+                retval = u;
+                break;
+            }
+        }
+        return retval;
+    }
 }

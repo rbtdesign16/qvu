@@ -7,7 +7,7 @@ const Splash = (props) => {
   return (
     <div className="splash">
       <img width={imageWidth} src={image}/>
-      <span className="splash-message">{message}</span>
+        <span className="splash-message">{message}</span>
     </div>
   );
 };

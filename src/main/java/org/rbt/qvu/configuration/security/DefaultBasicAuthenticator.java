@@ -62,6 +62,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         ui.setUserId("user");
         ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "user"));
         ui.getRoles().add("user");
+        ui.getRoles().add("report designer");
         
         retval.add(ui);
         

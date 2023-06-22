@@ -16,6 +16,13 @@ public class SecurityConfiguration {
     public  static final String TYPE_OIDC = "oidc";
     public  static final String TYPE_BASIC = "basic";
     
+    public static final String[] PREDEFINED_ROLES = {
+        "administrator",
+        "query designer",
+        "report designer",
+        "user"
+    };
+    
     private String authenticatorServiceClassName;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;

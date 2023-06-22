@@ -12,15 +12,15 @@ import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
 import PropTypes from "prop-types";
-import {INFO} from "../utils/helper"
+import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/helper"
 
 
-        const Home = (props) => {
+const Home = (props) => {
     const {copyright, version} = props;
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
     const {showMessage, hideMessage} = useMessage();
-    
+
     useEffect(() => {
         initializeAuth();
     }, [authData]);
@@ -33,15 +33,15 @@ import {INFO} from "../utils/helper"
         if (authData) {
             return (
                     <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
-                        <Tab eventKey="imp" title="Admin">
+                        { isAdministrator(authData) && <Tab eventKey="imp" title="Admin">
                             <Admin/>
-                        </Tab>
-                        <Tab eventKey="qdsgn" title="Query Design">
+                        </Tab> }
+                        { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">
                             <QueryDesign/>
-                        </Tab>
-                        <Tab eventKey="rdsgn" title="Report Design">
+                        </Tab>}
+                        { isReportDesigner(authData) && <Tab eventKey="rdsgn" title="Report Design">
                             <ReportDesign/>
-                        </Tab>
+                        </Tab>}
                     </Tabs>);
 
         } else {

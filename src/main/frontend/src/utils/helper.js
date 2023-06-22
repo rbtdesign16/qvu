@@ -4,6 +4,11 @@ export const WARN = "warn";
 export const INFO = "info";
 
 
+export const ADMINISTRATOR_ROLE = "administrator";
+export const QUERY_DESIGNER_ROLE = "query designer";
+export const REPORT_DESIGNER_ROLE = "report designer";
+
+
 export const isNotEmpty = (val) => {
   return val && ("" + val).length > 0;
 };
@@ -23,3 +28,23 @@ export const loadDocumentFromBlob = async (fileName, blob) => {
     downloadLink.remove();
   }
 };
+
+export const userHasRole = (authData, role) => {
+    console.log("--------->role=" + role);
+    console.log("------>" + JSON.stringify(authData));
+    if (authData.currentUser && authData.currentUser.roles) {
+        return authData.currentUser.roles.includes(role);
+    } 
+}
+
+export const isAdministrator = (authData) => {
+    return userHasRole(authData, ADMINISTRATOR_ROLE)
+}
+
+export const isQueryDesigner = (authData) => {
+    return userHasRole(authData, QUERY_DESIGNER_ROLE)
+}
+
+export const isReportDesigner = (authData) => {
+    return userHasRole(authData, REPORT_DESIGNER_ROLE)
+}

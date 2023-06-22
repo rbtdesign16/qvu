@@ -5,9 +5,13 @@
 package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.Config;
@@ -53,7 +57,15 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
             // if no authenticator service then load from config file
             if (securityConfig.getAuthenticatorService() == null) {
+                Set<String> predefinedRoles = new HashSet<>(Arrays.asList(SecurityConfiguration.PREDEFINED_ROLES));
                 for (UserInformation uinfo : securityConfig.getBasicConfiguration().getUsers()) {
+                    Iterator <String> it = uinfo.getRoles().iterator();
+                    while (it.hasNext()) {
+                        // remove duplicates when loading external roles
+                        if (predefinedRoles.contains(it.next().toLowerCase())) {
+                            it.remove();
+                        }
+                    }
                     userMap.put(uinfo.getUserId(), uinfo);
                 }
             }

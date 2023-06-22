@@ -2,6 +2,7 @@ package org.rbt.qvu.services;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
@@ -15,6 +16,7 @@ import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
+import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +42,15 @@ public class MainServiceImpl implements MainService {
     
     Gson gson = new Gson();
 
+    private Set<String> predefinedRoles = new HashSet<>();
 
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
+        
+        // load up a set for predfined roles to check
+        // for duplicates when loading external roles
+        predefinedRoles.addAll(Arrays.asList(SecurityConfiguration.PREDEFINED_ROLES));
     }
 
     @Override
@@ -65,7 +72,11 @@ public class MainServiceImpl implements MainService {
 
         user.setUserId(auth.getName());
         for (GrantedAuthority ga : auth.getAuthorities()) {
-            user.getRoles().add(ga.getAuthority());
+            String role = ga.getAuthority();
+            
+            if (!predefinedRoles.contains(role.toLowerCase())) {
+                user.getRoles().add(ga.getAuthority());
+            }
         }
 
         if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {

@@ -57,6 +57,7 @@ public class MainController {
     @GetMapping("api/v1/db/datasources/load")
     public List<DataSourceConfiguration> loadDatasources() {
         LOG.debug("in loadDatasources()");
+        
         return service.loadDatasources();
     }
 }

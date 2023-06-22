@@ -14,8 +14,12 @@ const getPort = () => {
   return window.location.port;
 }
 
+const getProtocol = () => {
+  return window.location.protocol;
+}
+
 export const getServerURL = () => {
-  return "https://" + getServer() + ":" + getPort() + "/qvu";
+  return getProtocol() + "//" + getServer() + ":" + getPort() + "/qvu";
 }
 
 // Create API URL using build type from environment

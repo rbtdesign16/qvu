@@ -51,7 +51,8 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             authenticatorClass = securityConfig.getBasicConfiguration().getAuthenticatorServiceClassName();
             LOG.info("authenticatorClass=" + authenticatorClass);
 
-            if (StringUtils.isEmpty(authenticatorClass)) {
+            // if no authenticator service then load from config file
+            if (securityConfig.getAuthenticatorService() == null) {
                 for (UserInformation uinfo : securityConfig.getBasicConfiguration().getUsers()) {
                     userMap.put(uinfo.getUserId(), uinfo);
                 }
@@ -74,8 +75,10 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 throw new Exception("usename and password required");
             }
 
-            if (StringUtils.isNotEmpty(authenticatorClass)) {
-                retval = authenticateWithClass(authenticatorClass, name, password);
+            
+            QvuAuthenticationService service = config.getSecurityConfig().getAuthenticatorService();
+            if (service != null) {
+                retval = authenticateWithClass(service, name, password);
             } else {
                 retval = authenticateFromProperties(name, password);
             }
@@ -93,18 +96,11 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         return true;
     }
 
-    private Authentication authenticateWithClass(String className, String name, String password) throws Exception {
+    private Authentication authenticateWithClass(QvuAuthenticationService service, String name, String password) throws Exception {
         Authentication retval = null;
-        Class c = Class.forName(className);
-        LOG.debug("in authenticateWithClass: class=" + c);
-        if (QvuAuthenticationService.class.isAssignableFrom(c)) {
-            QvuAuthenticationService service = (QvuAuthenticationService)c.getDeclaredConstructor().newInstance();
-
-            LOG.debug("found QvuAuthenticationService");
-            if (service.authenticate(name, password)) {
-                UserInformation uinfo = service.getUserInformation(name);
-                retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
-            }
+        if (service.authenticate(name, password)) {
+            UserInformation uinfo = service.getUserInformation(name);
+            retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
         }
 
         return retval;

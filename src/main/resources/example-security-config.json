@@ -1,4 +1,6 @@
 {
+  "authenticatorServiceClassName": "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator",
+
   "samlConfiguration": {
     "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
     "signAssertions": true,
@@ -12,7 +14,6 @@
     "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
   },
   "basicConfiguration": {
-    "authenticatorServiceClassName": "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator",
     "users": [
       {
         "userId": "tester1",

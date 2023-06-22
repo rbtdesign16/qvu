@@ -1,9 +1,6 @@
 package org.rbt.qvu.controllers;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.rbt.qvu.services.MainService;
@@ -15,12 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rbt.qvu.dto.AuthData;
-import org.rbt.qvu.dto.AuthenticatedUser;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 
 /**
  * The type Main controller.
@@ -51,6 +42,14 @@ public class MainController {
 
     @GetMapping("api/v1/auth/data/load")
     public AuthData loadAuthData() {
-        return service.loadAuthData();
+        LOG.debug("in loadAuthData()");
+        AuthData retval = null;
+        try {
+            retval = service.loadAuthData();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+        
+        return retval;
     }
 }

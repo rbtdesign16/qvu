@@ -8,13 +8,12 @@ export const AuthProvider = ({ children }) => {
     const [authData, setAuthData] = useState({});
 
     const initializeAuth = async () => {
-       authData = apiHelper.loadAuth();
-        
+       loadAuth();
     }
 
     return (
             <AuthContext.Provider
-                value={{authData}}>
+                value={{authData, initializeAuth}}>
                 {children}
             </AuthContext.Provider>
             );

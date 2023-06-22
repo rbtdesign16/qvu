@@ -5,7 +5,7 @@ import useMessage from "../../context/MessageContext";
 import {INFO, WARN, ERROR} from "../../utils/helper";
 
 const Admin = (props) => {
-    const {authenticatedUser, setAuthenticatedUser} = useAuth();
+    const {authData} = useAuth();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     
     return (

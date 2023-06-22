@@ -7,6 +7,6 @@ import org.rbt.qvu.dto.AuthData;
 public interface MainService {
     public String getDatabaseInfo(String dsname);
     public List<String> getAllDatabaseInfo();
-    public AuthData loadAuthData();
+    public AuthData loadAuthData() throws Exception;
 
 }

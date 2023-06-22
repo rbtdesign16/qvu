@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { Tabs, Tab }
 from "react-bootstrap";
 import Header from "../widgets/Header";
@@ -13,9 +13,10 @@ import PropTypes from "prop-types";
 
 const Home = (props) => {
     const {copyright, version} = props;
-    const {user, authInit} = useAuth();
+    const {initializeAuth} = useAuth();
     
     useEffect(() => {
+        initializeAuth();
     });
     
     

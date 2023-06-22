@@ -1,5 +1,6 @@
 package org.rbt.qvu.services;
 
+import com.google.gson.Gson;
 import java.util.Collection;
 import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.configuration.Config;
@@ -50,12 +52,10 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public AuthData loadAuthData() {
+    public AuthData loadAuthData() throws Exception {
         AuthData retval = new AuthData();
         
-        
         UserInformation user = new UserInformation();
-        
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         user.setUserId(auth.getName());
@@ -69,7 +69,24 @@ public class MainServiceImpl implements MainService {
             loadUserAttributes(user, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
         }
         
+        QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
+        
+        retval.setCurrentUser(user);
+        if (authService != null) {
+            retval.getAllRoles().addAll(authService.getAllRoles());
+            retval.getAllUsers().addAll(authService.getAllUsers());
+            UserInformation u = authService.getUserInformation(auth.getName());
+            
+            if (u != null) {
+                retval.setCurrentUser(u);
+            }
+        }
 
+        if (LOG.isDebugEnabled()) {
+            Gson gson = new Gson();
+            LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
+        }
+        
         return retval;
     }
     

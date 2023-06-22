@@ -7,10 +7,18 @@ import Admin from "./admin/Admin";
 import QueryDesign from "./querydesign/QueryDesign";
 import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
+import useAuth from "../context/AuthContext";
 import PropTypes from "prop-types";
+
 
 const Home = (props) => {
     const {copyright, version} = props;
+    const {user, authInit} = useAuth();
+    
+    useEffect(() => {
+    });
+    
+    
     return (
             <div className="home">
                 <Message/>

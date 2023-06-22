@@ -24,7 +24,8 @@ export const getApiURL = () => {
 }
 
 
-export const getAutenticatedUserInfo = () => {
+export const loadAuth = async() => {
+    let res = await axios.get(getApiURL() + "/auth/data/load");
     
 }
 

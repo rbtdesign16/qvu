@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.AuthenticatedUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,45 +39,6 @@ public class MainController {
         LOG.info("in MainController.init()");
     }
 
-    @GetMapping("api/v1/auth/info")
-    public AuthenticatedUser getAuthenticatedInfo() {
-        AuthenticatedUser retval = new AuthenticatedUser();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        retval.setName(auth.getName());
-        for (GrantedAuthority ga : auth.getAuthorities()) {
-            retval.getGrantedAuthorities().add(ga.getAuthority());
-        }
-
-        if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
-            loadUserAttributes(retval, ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-        } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
-            loadUserAttributes(retval, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-        } else {
-            
-        }
-
-        return retval;
-    }
-
-    private void loadUserAttributes(AuthenticatedUser user, Map attributes) {
-        for (Object att : attributes.keySet()) {
-            Object val = attributes.get(att);
-            if (val != null) {
-                List<String> l = new ArrayList();
-                user.getAttributes().put(att.toString(), l);
-
-                if (val instanceof Collection) {
-                    for (Object o : (Collection) val) {
-                        l.add(o.toString());
-                    }
-                } else {
-                    l.add(val.toString());
-                }
-            }
-        }
-    }
-
     @GetMapping("api/v1/db/info/{dsname}")
     public String getDatabaseInfo(@PathVariable String dsname) {
         return service.getDatabaseInfo(dsname);
@@ -85,5 +47,10 @@ public class MainController {
     @GetMapping("api/v1/db/all/info")
     public List<String> getAllDatabaseInfo() {
         return service.getAllDatabaseInfo();
+    }
+
+    @GetMapping("api/v1/auth/data/load")
+    public AuthData loadAuthData() {
+        return service.loadAuthData();
     }
 }

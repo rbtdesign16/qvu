@@ -31,5 +31,8 @@ export const getApiURL = () => {
 export const loadAuth = async() => {
     let res = await axios.get(getApiURL() + "/auth/data/load");
     
+    if (res) {
+        return res.data;
+    }
 }
 

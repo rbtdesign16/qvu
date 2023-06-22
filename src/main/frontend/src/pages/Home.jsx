@@ -29,11 +29,22 @@ const Home = (props) => {
         initializeDataHandler();
     }, [datasources]);
 
+
+    const getDefaultActiveTabKey = () => {
+        if (isAdministrator(authData)) {
+            return "adm";
+        } else if (isQueryDesigner(authData)) {
+            return "qdsgn";
+        } else if (isReportDesigner(authData)) {
+            return "rdsgn";
+        }
+    }
+    
     const getBody = () => {
         if (authData) {
             return (
-                    <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
-                        { isAdministrator(authData) && <Tab eventKey="imp" title="Admin">
+                    <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+                        { isAdministrator(authData) && <Tab eventKey="adm" title="Admin">
                             <Admin/>
                         </Tab> }
                         { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">

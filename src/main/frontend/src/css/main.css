@@ -53,6 +53,7 @@ body {
   position: absolute;
   width: 30px;
   height: 30px;
+  margin-top: -5px;
   border-radius: 50%;
   border: 1px solid #ccc;
   border-top-color: #07d;

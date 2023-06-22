@@ -5,10 +5,12 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     // set up initial state and reducer
-    const [authData, setAuthData] = useState({});
+    const [authData, setAuthData] = useState(null);
 
     const initializeAuth = async () => {
-       loadAuth();
+        if (!authData) {
+            setAuthData(await loadAuth());
+        }
     }
 
     return (

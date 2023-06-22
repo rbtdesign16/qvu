@@ -7,24 +7,31 @@ import Admin from "./admin/Admin";
 import QueryDesign from "./querydesign/QueryDesign";
 import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
+import Splash from "../widgets/Splash"
 import useAuth from "../context/AuthContext";
+import useDataHandler from "../context/DataHandlerContext";
+import useMessage from "../context/MessageContext";
 import PropTypes from "prop-types";
+import {INFO} from "../utils/helper"
 
 
-const Home = (props) => {
+        const Home = (props) => {
     const {copyright, version} = props;
-    const {initializeAuth} = useAuth();
+    const {authData, initializeAuth} = useAuth();
+    const {datasources, initializeDataHandler} = useDataHandler();
+    const {showMessage, hideMessage} = useMessage();
     
     useEffect(() => {
         initializeAuth();
-    });
-    
-    
-    return (
-            <div className="home">
-                <Message/>
-                <Header version={version}/>
-                <div className="tab-container">
+    }, [authData]);
+
+    useEffect(() => {
+        initializeDataHandler();
+    }, [datasources]);
+
+    const getBody = () => {
+        if (authData) {
+            return (
                     <Tabs defaultActiveKey="adm" id="t1" className="mb-3">
                         <Tab eventKey="imp" title="Admin">
                             <Admin/>
@@ -35,11 +42,22 @@ const Home = (props) => {
                         <Tab eventKey="rdsgn" title="Report Design">
                             <ReportDesign/>
                         </Tab>
-                    </Tabs>
+                    </Tabs>);
+
+        } else {
+            return <Splash image="logo.png" imageWidth="120" message="Initializing..."/>
+        }
+    }
+    return (
+            <div className="home">
+                <Message/>
+                <Header version={version}/>
+                <div className="tab-container">
+                    { getBody() }
                 </div>
-                <Footer copyright={copyright}/>
+                <Footer copyright={copyright} authData={authData} />
             </div>);
-};
+}
 
 Home.propTypes = {
     version: PropTypes.string.isRequired,

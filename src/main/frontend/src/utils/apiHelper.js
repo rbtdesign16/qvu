@@ -36,3 +36,11 @@ export const loadAuth = async() => {
     }
 }
 
+export const loadDatasources = async () => {
+    let res = await axios.get(getApiURL() + "/db/datasources/load");
+    
+    if (res) {
+        return res.data;
+    }
+    
+}

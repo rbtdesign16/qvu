@@ -27,4 +27,7 @@
 
     --message-header-font-size: 12pt;
     --message-body-font-size: 12pt;
+    
+    --splash-font-size: 30pt;
+    --splash-font-color: "#2370AC";
 }

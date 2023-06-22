@@ -4,11 +4,13 @@ export const MessageContext = createContext();
 export const MessageProvider = ({ children }) => {
     const [messageInfo, setMessageInfo] = useState({show: false});
     const hideMessage = () => {
-        setMessageInfo({show: false});
+        if (messageInfo.show) {
+            setMessageInfo({show: false});
+        }
     }
     
-    const showMessage = (type, message, title = null, showSpinner = false) => {
-        setMessageInfo({show: true, type: type, message: message, title: title, showSpinner: showSpinner});
+    const showMessage = (type, message, title = null, showSpinner = false, withBackdrop = false) => {
+        setMessageInfo({show: true, type: type, message: message, title: title, showSpinner: showSpinner, backdrop: withBackdrop});
     }
 
     return (

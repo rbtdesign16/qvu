@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 
 /**
@@ -51,5 +52,11 @@ public class MainController {
         }
         
         return retval;
+    }
+    
+    @GetMapping("api/v1/db/datasources/load")
+    public List<DataSourceConfiguration> loadDatasources() {
+        LOG.debug("in loadDatasources()");
+        return service.loadDatasources();
     }
 }

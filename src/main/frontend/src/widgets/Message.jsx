@@ -7,18 +7,15 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import useMessage from "../context/MessageContext";
 import {
-INFO,
-        SUCCESS,
-        WARN,
-        ERROR,
+    INFO,
+    SUCCESS,
+    WARN,
+    ERROR
 } from "../utils/helper";
 
 
 const Message = (props) => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const onEntering = () => {
-
-    }
 
     const onHide = () => {
         hideMessage();
@@ -52,8 +49,7 @@ const Message = (props) => {
                 size="sm"
                 onHide={onHide}
                 contentClassName={getClassName()}
-                onEntered={onEntering}
-                backdrop={false}
+                backdrop={messageInfo.backdrop}
                 id="message-popup"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered

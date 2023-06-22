@@ -1,6 +1,7 @@
 package org.rbt.qvu.services;
 
 import com.google.gson.Gson;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
@@ -13,6 +14,7 @@ import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,9 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private Config config;
     
+    Gson gson = new Gson();
+
+
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
@@ -54,7 +59,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public AuthData loadAuthData() throws Exception {
         AuthData retval = new AuthData();
-        
+
         UserInformation user = new UserInformation();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -68,35 +73,43 @@ public class MainServiceImpl implements MainService {
         } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
             loadUserAttributes(user, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
         }
-        
+
         QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
-        
+
         retval.setCurrentUser(user);
         if (authService != null) {
             retval.getAllRoles().addAll(authService.getAllRoles());
             retval.getAllUsers().addAll(authService.getAllUsers());
             UserInformation u = authService.getUserInformation(auth.getName());
-            
+
             if (u != null) {
                 retval.setCurrentUser(u);
             }
         }
 
         if (LOG.isDebugEnabled()) {
-            Gson gson = new Gson();
             LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
         }
-        
+
         return retval;
     }
-    
+
+    @Override
+    public List<DataSourceConfiguration> loadDatasources() {
+        List<DataSourceConfiguration> retval = config.getDatasourcesConfig().getDatasources();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
+        }
+        return retval;
+    }
+
     private void loadUserAttributes(UserInformation user, Map attributes) {
         Set<String> hs = new HashSet<>();
         for (Object o : attributes.keySet()) {
             Object val = attributes.get(o);
             if (val != null) {
-                 String att = o.toString();
-                 if (val instanceof Collection) {
+                String att = o.toString();
+                if (val instanceof Collection) {
                     int indx = 0;
                     for (Object o2 : (Collection) val) {
                         String val2 = o2.toString();

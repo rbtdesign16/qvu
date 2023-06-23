@@ -244,7 +244,7 @@ img {
     padding-left: 5px;
 }
 
-.btn-bar {
+.icon-btn-bar {
     display: inline-block;
     text-align: right;
     height: var(--header-height);

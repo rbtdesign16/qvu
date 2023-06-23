@@ -4,63 +4,69 @@ import useAuth from "../../context/AuthContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
+import { confirm } from "../../utils/helper";
+
 import {INFO, WARN, ERROR} from "../../utils/helper";
 
 const Admin = (props) => {
     const {authData} = useAuth();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources} = useDataHandler();
-    
+
+    const handleOnClick = async (message, okFunc) => {
+        if (await confirm(message)) {
+            okFunc();
+        }
+    }
     const addDatasource = () => {
         alert("add datasource");
     };
-    
+
     const editDatasource = (indx) => {
-        
-    };
-    
-    const deleteDatasource = (indx) => {
-        let ds = datasources[indx];
-        if (window.confirm("delete datasource " + ds.datasourceName + "?")) {
-            
-        }
-        
-    };
-    
-    const addRole = () => {
-        
-    };
-    
-    const editRole = (indx) => {
-        
-    };
-    
-    const deleteRole = (indx) => {
-        let r = authData.allRoles[indx];
-        if (window.confirm("delete role " + r.name+ "?")) {
-            
-        }
-        
-    };
-    
-    const addUser = () => {
-        
-    };
-    
-    const editUser = (indx) => {
-        
-    };
-    
-    const deleteUser = (indx) => {
-       let u = authData.allUsers[indx];
-        if (window.confirm("delete user " + u.userId + "?")) {
-            
-        }
-        
+
     };
 
-    const getDatasourcesConfig = () => {
-        return {
+    const deleteDatasource = (indx) => {
+        let ds = datasources[indx];
+        if (handleOnClick("delete datasource " + ds.datasourceName + "?", () => alert("do delete"))) {
+
+        }
+
+    };
+
+    const addRole = () => {
+
+    };
+
+    const editRole = (indx) => {
+
+    };
+
+    const deleteRole = (indx) => {
+        let r = authData.allRoles[indx];
+        if (window.confirm("delete role " + r.name + "?", "Cancel")) {
+
+        }
+
+    };
+
+    const addUser = () => {
+
+    };
+
+    const editUser = (indx) => {
+
+    };
+
+    const deleteUser = (indx) => {
+        let u = authData.allUsers[indx];
+        if (window.confirm("delete user " + u.userId + "?", "Cancel")) {
+
+        }
+
+    };
+
+    const datasourcesConfig = {
             title: "Datasources",
             width: "300px",
             height: "500px",
@@ -87,82 +93,67 @@ const Admin = (props) => {
                     field: "description"
                 }
             ]
-        };
     };
-    
-    const getRolesConfig = () => {
-        let retval = {
-            title: "Roles",
-            width: "300px",
-            height: "500px",
-            addTitle: "Add role",
-            editTitle: "Edit role",
-            delTitle: "Delete role",
-            labelStyle: {
-                width: "85px"
-            },
-            fieldStyle: {
-                width: "100px"
-            },
-            displayConfig: [
-                {
-                    label: "Name:",
-                    field: "name"
-                },
-                {
-                    label: "Description:",
-                    field: "description"
-                }
-            ],
-            data: authData.allRoles
-        };
-        
-        if (authData.canAddUsersAndRoles) {
-            retval.onAdd = addRole;
-            retval.onEdit = editRole;
-            retval.onDelete = deleteRole;
-        }
-        
-        return retval;
-    };
-    
-    const getUsersConfig = () => {
-        let retval = {
-            title: "Users",
-            width: "300px",
-            height: "500px",
-            addTitle: "Add user",
-            editTitle: "Edit user",
-            delTitle: "Delete user",
-            labelStyle: {
-                width: "85px"
-            },
-            fieldStyle: {
-                width: "100px"
-            },
-            displayConfig: [
-                {
-                    label: "User ID:",
-                    field: "userId"
-                }
-            ],
-            data: authData.allUsers
-        };
-        
-        if (authData.canAddUsersAndRoles) {
-            retval.onAdd = addUser;
-            retval.onEdit = editUser;
-            retval.onDelete = deleteUser;
-        }
 
-        return retval;
+    const rolesConfig = {
+        title: "Roles",
+        width: "300px",
+        height: "500px",
+        addTitle: "Add role",
+        editTitle: "Edit role",
+        delTitle: "Delete role",
+        onAdd: authData.canAddUsersAndRoles ? addRole : null,
+        onEdit: authData.canAddUsersAndRoles ? editRole : null,
+        onDelete: authData.canAddUsersAndRoles ? deleteRole : null,
+       labelStyle: {
+            width: "85px"
+        },
+        fieldStyle: {
+            width: "100px"
+        },
+        displayConfig: [
+            {
+                label: "Name:",
+                field: "name"
+            },
+            {
+                label: "Description:",
+                field: "description"
+            }
+        ],
+        data: authData.allRoles
     };
-    
+
+    const usersConfig = {
+        title: "Users",
+        width: "300px",
+        height: "500px",
+        addTitle: "Add user",
+        editTitle: "Edit user",
+        delTitle: "Delete user",
+        onAdd: authData.canAddUsersAndRoles ? addUser : null,
+        onEdit: authData.canAddUsersAndRoles ? editUser : null,
+        onDelete: authData.canAddUsersAndRoles ? deleteUser : null,
+        labelStyle: {
+            width: "85px"
+        },
+        fieldStyle: {
+            width: "100px"
+        },
+        displayConfig: [
+            {
+                label: "User ID:",
+                field: "userId"
+            }
+        ],
+        data: authData.allUsers
+    };
+
     return (
             <div className="admin-tab">
-                <EditableDataList listConfig={getDatasourcesConfig()}/>
-                <EditableDataList listConfig={getRolesConfig()}/>
-                <EditableDataList listConfig={getUsersConfig()}/>
+                <EditableDataList listConfig={datasourcesConfig}/>
+                <EditableDataList listConfig={rolesConfig}/>
+                <EditableDataList listConfig={usersConfig}/>
             </div>
             );
 }

@@ -22,10 +22,12 @@ const Home = (props) => {
 
     useEffect(() => {
         initializeAuth();
-        initializeDataHandler();
     }, [authData]);
 
-
+    useEffect(() => {
+        initializeDataHandler();
+    }, [datasources]);
+    
     const getDefaultActiveTabKey = () => {
         if (isAdministrator(authData)) {
             return "adm";

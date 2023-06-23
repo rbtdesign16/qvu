@@ -4,6 +4,7 @@ import useAuth from "../../context/AuthContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
+import EditDatasource from "./EditDatasource";
 import { confirm } from "../../utils/helper";
 
 import {INFO, WARN, ERROR} from "../../utils/helper";
@@ -12,6 +13,7 @@ const Admin = (props) => {
     const {authData} = useAuth();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources} = useDataHandler();
+    const [showEdit, setShowEdit] = useState({show: false, datasource: {}});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -19,17 +21,16 @@ const Admin = (props) => {
         }
     }
     const addDatasource = () => {
-        alert("add datasource");
+        setShowEdit({show: true, datasource: {}});
     };
 
     const editDatasource = (indx) => {
-
+        setShowEdit({show: true, datasource: {...datasources[indx]}});
     };
 
     const deleteDatasource = (indx) => {
         let ds = datasources[indx];
         if (handleOnClick("delete datasource " + ds.datasourceName + "?", () => alert("do delete"))) {
-
         }
 
     };
@@ -67,32 +68,32 @@ const Admin = (props) => {
     };
 
     const datasourcesConfig = {
-            title: "Datasources",
-            width: "300px",
-            height: "500px",
-            addTitle: "Add datasource",
-            editTitle: "Edit datasource",
-            delTitle: "Delete datasource",
-            onAdd: addDatasource,
-            onEdit: editDatasource,
-            onDelete: deleteDatasource,
-            data: datasources,
-            labelStyle: {
-                width: "85px"
+        title: "Datasources",
+        width: "300px",
+        height: "500px",
+        addTitle: "Add datasource",
+        editTitle: "Edit datasource",
+        delTitle: "Delete datasource",
+        onAdd: addDatasource,
+        onEdit: editDatasource,
+        onDelete: deleteDatasource,
+        data: datasources,
+        labelStyle: {
+            width: "85px"
+        },
+        fieldStyle: {
+            width: "100px"
+        },
+        displayConfig: [
+            {
+                label: "Name:",
+                field: "datasourceName"
             },
-            fieldStyle: {
-                width: "100px"
-            },
-            displayConfig: [
-                {
-                    label: "Name:",
-                    field: "datasourceName"
-                },
-                {
-                    label: "Description: ",
-                    field: "description"
-                }
-            ]
+            {
+                label: "Description: ",
+                field: "description"
+            }
+        ]
     };
 
     const rolesConfig = {
@@ -105,7 +106,7 @@ const Admin = (props) => {
         onAdd: authData.canAddUsersAndRoles ? addRole : null,
         onEdit: authData.canAddUsersAndRoles ? editRole : null,
         onDelete: authData.canAddUsersAndRoles ? deleteRole : null,
-       labelStyle: {
+        labelStyle: {
             width: "85px"
         },
         fieldStyle: {
@@ -149,13 +150,21 @@ const Admin = (props) => {
         data: authData.allUsers
     };
 
+    const hideEdit = () => {
+        setShowEdit({show: false, datasource: {}});
+    };
+
+    const saveDatasource = (ds) => {
+    };
+    
     return (
-            <div className="admin-tab">
-                <EditableDataList listConfig={datasourcesConfig}/>
-                <EditableDataList listConfig={rolesConfig}/>
-                <EditableDataList listConfig={usersConfig}/>
-            </div>
-            );
-}
+        <div className="admin-tab">
+            <EditDatasource show={showEdit.show} datasource={showEdit.datasource} onSave={saveDatasource} onCancel={hideEdit}/>
+            <EditableDataList listConfig={datasourcesConfig}/>
+            <EditableDataList listConfig={rolesConfig}/>
+            <EditableDataList listConfig={usersConfig}/>
+        </div>
+        );
+};
 
 export default Admin;

@@ -19,7 +19,11 @@ const Confirmation = ({
 }) => {
   return (
     <div className="static-modal">
-      <Modal animation={false} show={show} onHide={() => proceed(false)} backdrop={enableEscape ? true : 'static'} keyboard={enableEscape}>
+      <Modal animation={false} 
+        show={show} 
+        onHide={() => proceed(false)} 
+        backdrop={enableEscape ? true : 'static'} 
+        keyboard={enableEscape}>
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>

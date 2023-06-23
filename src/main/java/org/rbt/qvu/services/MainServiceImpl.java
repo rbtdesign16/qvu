@@ -96,7 +96,13 @@ public class MainServiceImpl implements MainService {
             if (u != null) {
                 retval.setCurrentUser(u);
             }
+        } else if (config.getSecurityConfig().isBasic()) {
+            retval.setCurrentUser(user);
+            retval.setAllRoles(config.getSecurityConfig().getBasicConfiguration().getRoles());
+            retval.setAllUsers(config.getSecurityConfig().getBasicConfiguration().getUsers());
         }
+        
+        retval.setCanCreateUsersAndRoles(config.getSecurityConfig().canAddUsersAndRoles());
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));

@@ -13,59 +13,73 @@
         "clientId": "qvu-oauth",
         "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
     },
-    
+
     "basicConfiguration": {
         "users": [{
-            "userId": "admin",
-            "attributes": [
-                {
-                    "name": "name",
-                    "value": "John Doe"
-                }
-            ],
-            "roles": [
-                "administrator",
-                "query designer"
-            ]
-        },
-        {
-        "userId": "tester1",
-        "attributes": [
+                "userId": "admin",
+                "attributes": [
+                    {
+                        "name": "name",
+                        "value": "John Doe"
+                    }
+                ],
+                "roles": [
+                    "administrator",
+                    "query designer"
+                ]
+            },
             {
-                "name": "password",
-                "value": "test"
+                "userId": "tester1",
+                "attributes": [
+                    {
+                        "name": "password",
+                        "value": "test"
+                    }
+                ],
+                "roles": [
+                    "user"
+                ]
+            },
+            {
+                "userId": "tester2",
+                "attributes": [
+                    {
+                        "name": "password",
+                        "value": "test"
+                    }
+                ],
+                "roles": [
+                    "administrator",
+                    "user"
+                ]
+            },
+            {
+                "userId": "tester3",
+                "attributes": [
+                    {
+                        "name": "password",
+                        "value": "test"
+                    }
+                ],
+                "roles": [
+                    "query designer",
+                    "report designer"
+                ]
             }
         ],
         "roles": [
-            "user"
+            {
+                "name": "tester",
+                "description": "rester role"
+            },
+            {
+                "name": "qa",
+                "description": "qa role"
+            },
+            {
+                "name": "developer",
+                "description": "developer role"
+            }
         ]
-    },
-    {
-    "userId": "tester2",
-            "attributes": [
-            {
-            "name": "password",
-                    "value": "test"
-            }
-            ],
-            "roles": [
-                    "administrator",
-                    "user"
-            ]
-    },
-    {
-    "userId": "tester3",
-            "attributes": [
-            {
-            "name": "password",
-                    "value": "test"
-            }
-            ],
-            "roles": [
-                    "query designer",
-                    "report designer"
-            ]
     }
-    ]
-    }
-    }
+}

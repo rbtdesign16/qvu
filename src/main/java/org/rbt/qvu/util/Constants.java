@@ -4,6 +4,10 @@
  */
 package org.rbt.qvu.util;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.rbt.qvu.client.utils.RoleInformation;
+
 /**
  *
  * @author rbtuc
@@ -23,4 +27,21 @@ public class Constants {
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";
     public static final String NONE = "none";
+    
+   public static final String[] PREDEFINED_ROLE_NAMES = {
+        "administrator", 
+        "query designer", 
+        "report designer",
+        "user"};
+   
+   public static final List<RoleInformation> PREDEFINED_ROLES = new ArrayList<>();
+   
+   static {
+       for (String roleName : PREDEFINED_ROLE_NAMES) {
+           RoleInformation ri = new RoleInformation();
+           ri.setName(roleName);
+           ri.setDescription("qvu " + roleName);
+           PREDEFINED_ROLES.add(ri);
+       }
+   }
 }

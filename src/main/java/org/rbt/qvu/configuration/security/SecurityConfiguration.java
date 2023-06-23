@@ -24,6 +24,7 @@ public class SecurityConfiguration {
     };
     
     private String authenticatorServiceClassName;
+    private String securityType;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
@@ -70,4 +71,21 @@ public class SecurityConfiguration {
         }
         return retval;
     }
+    
+    public boolean canAddUsersAndRoles() {
+        return (isBasic() && StringUtils.isEmpty(this.authenticatorServiceClassName));
+    }
+
+    public String getSecurityType() {
+        return securityType;
+    }
+
+    public void setSecurityType(String securityType) {
+        this.securityType = securityType;
+    }
+    
+    public boolean isBasic() {
+        return TYPE_BASIC.equals(this.securityType);
+    }
+    
 }

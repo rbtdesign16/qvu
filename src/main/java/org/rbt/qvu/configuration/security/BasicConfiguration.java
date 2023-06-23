@@ -6,6 +6,7 @@ package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.rbt.qvu.client.utils.RoleInformation;
 import org.rbt.qvu.client.utils.UserInformation;
 
 /**
@@ -15,6 +16,7 @@ import org.rbt.qvu.client.utils.UserInformation;
 public class BasicConfiguration {
     private String authenticatorServiceClassName;
     private List<UserInformation> users = new ArrayList<>();
+    private List<RoleInformation> roles = new ArrayList<>();
 
     public String getAuthenticatorServiceClassName() {
         return authenticatorServiceClassName;
@@ -31,6 +33,15 @@ public class BasicConfiguration {
     public void setUsers(List<UserInformation> users) {
         this.users = users;
     }
+
+    public List<RoleInformation> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<RoleInformation> roles) {
+        this.roles = roles;
+    }
+    
     
     
 }

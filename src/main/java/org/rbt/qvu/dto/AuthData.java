@@ -6,6 +6,7 @@ package org.rbt.qvu.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.rbt.qvu.client.utils.RoleInformation;
 import org.rbt.qvu.client.utils.UserInformation;
 
 /**
@@ -13,15 +14,16 @@ import org.rbt.qvu.client.utils.UserInformation;
  * @author rbtuc
  */
 public class AuthData {
-    private List<String> allRoles = new ArrayList<>();
+    private List<RoleInformation> allRoles = new ArrayList<>();
     private List<UserInformation> allUsers = new ArrayList<>();
     private UserInformation currentUser;
+    private boolean canCreateUsersAndRoles;
 
-    public List<String> getAllRoles() {
+    public List<RoleInformation> getAllRoles() {
         return allRoles;
     }
 
-    public void setAllRoles(List<String> allRoles) {
+    public void setAllRoles(List<RoleInformation> allRoles) {
         this.allRoles = allRoles;
     }
 
@@ -39,6 +41,14 @@ public class AuthData {
 
     public void setCurrentUser(UserInformation currentUser) {
         this.currentUser = currentUser;
+    }
+
+    public boolean isCanCreateUsersAndRoles() {
+        return canCreateUsersAndRoles;
+    }
+
+    public void setCanCreateUsersAndRoles(boolean canCreateUsersAndRoles) {
+        this.canCreateUsersAndRoles = canCreateUsersAndRoles;
     }
     
     

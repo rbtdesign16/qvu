@@ -13,6 +13,7 @@ import org.rbt.qvu.util.Constants;
 public class DataSourceConfiguration {
     private String databaseType;
     private String datasourceName;
+    private String description;
     private String url;
     private String driver;
     private String username;
@@ -110,6 +111,14 @@ public class DataSourceConfiguration {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     

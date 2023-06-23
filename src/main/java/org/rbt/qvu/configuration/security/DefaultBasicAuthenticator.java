@@ -10,6 +10,7 @@ import java.util.List;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.client.utils.AuthenticationException;
+import org.rbt.qvu.client.utils.RoleInformation;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.util.Constants;
@@ -22,11 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
-    private static final String[] ROLES = {
-        "administrator", 
-        "query designer", 
-        "report designer",
-        "user"};
+   
     private static final String ADMIN = "admin";
     private static final String USER = "user";
 
@@ -54,7 +51,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         UserInformation ui = new UserInformation();
         ui.setUserId("admin");
         ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "admin"));
-        ui.getRoles().addAll(Arrays.asList(ROLES));
+        ui.getRoles().addAll(Arrays.asList(Constants.PREDEFINED_ROLE_NAMES));
         
         retval.add(ui);
                 
@@ -70,8 +67,8 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     }
 
     @Override
-    public List<String> getAllRoles() {
-        return Arrays.asList(ROLES);
+    public List<RoleInformation> getAllRoles() {
+        return Constants.PREDEFINED_ROLES;
     }
 
     private UserInformation findUser(String userId) {

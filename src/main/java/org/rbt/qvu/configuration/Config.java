@@ -41,6 +41,7 @@ public class Config {
             appConfig = ConfigBuilder.build(applicationConfigFile, ApplicationConfiguration.class);
             System.setProperty(Constants.SECURITY_TYPE_PROPERTY, appConfig.getSecurityType());
             securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
+            securityConfig.setSecurityType(securityType);
             appConfig.setSecurityType(securityType);
             datasourcesConfig = ConfigBuilder.build(appConfig.getDatabaseConfigurationFile(), DataSourcesConfiguration.class);
         } catch (Exception ex) {

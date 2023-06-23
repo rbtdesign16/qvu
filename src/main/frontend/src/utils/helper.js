@@ -30,8 +30,6 @@ export const loadDocumentFromBlob = async (fileName, blob) => {
 };
 
 export const userHasRole = (authData, role) => {
-    console.log("--------->role=" + role);
-    console.log("------>" + JSON.stringify(authData));
     if (authData.currentUser && authData.currentUser.roles) {
         return authData.currentUser.roles.includes(role);
     } 

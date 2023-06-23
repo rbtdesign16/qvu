@@ -22,11 +22,8 @@ const Home = (props) => {
 
     useEffect(() => {
         initializeAuth();
-    }, [authData]);
-
-    useEffect(() => {
         initializeDataHandler();
-    }, [datasources]);
+    }, [authData]);
 
 
     const getDefaultActiveTabKey = () => {

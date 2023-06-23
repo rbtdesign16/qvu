@@ -11,11 +11,10 @@ html {
 body {
     font-family: "Roboto", sans-serif;
     font-size: var(--default-font-sz);
-    background-color: var(--default-background-color));
+    background-color: var(--default-background-color);
     color: var(--default-font-color);
     height: 100%;
     width: 100%;
-    overflow: none;
 }
 
 .header {
@@ -174,11 +173,9 @@ img {
 .admin-tab {
     position: absolute;
     height: 100%;
-    display: grid;
-    grid-template-columns: 400px 150px 250px;
-    gap: 10px;   
     padding-left: 16px;
     height: 500px;
+    white-space: nowrap;
 }
 
 .editable-data-list {
@@ -186,9 +183,11 @@ img {
     height: 100%;
     border: solid 1px var(--default-border-color);
     border-radius: 3px;
+    display: inline-block;
+    margin: 5px;
 }
 
-.editable-data-list .title {
+.title {
     text-align: left;
     font-size: var(--default-title-font-size);
     font-weight: var(--default-title-font-weight);
@@ -196,7 +195,6 @@ img {
     width: 100%;
     padding: 2px 2px 2px 4px;
     border-bottom: solid 1px var(--default-border-color);
-        
 }
 
 .editable-data-list .data-container {
@@ -206,14 +204,52 @@ img {
 
 .icon {
     cursor: pointer;
-    height: 20px;
+    padding: 3px;
 }
 
 .green {
     color: green;
 }
 
+.cloverGreen {
+    color: #3EA055;
+}
 .red {
-    color: green;
+    color: red;
 }
 
+.blue {
+    color: blue;
+}
+
+.cobaltBlue {
+    color: #0020C2;
+}
+
+.crimson {
+    color: crimson;
+}
+
+.label {
+    text-align: right;
+    padding-right: 5px;
+    display: inline-block;
+    font-size: var(--default-label-font-size);
+    font-weight: var(--default-label-font-weight);
+    color: var(--default-label-font-color);
+}
+
+.display-field {
+    display: inline-block;
+    padding-left: 5px;
+}
+
+.btn-bar {
+    display: inline-block;
+    text-align: right;
+    height: var(--header-height);
+    width: 100%;
+    padding-right: 5px;
+    border-top: solid 1px var(--default-border-color);
+    border-bottom: solid 2px var(--default-border-color);
+}

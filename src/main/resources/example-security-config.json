@@ -21,6 +21,9 @@
                     {
                         "name": "name",
                         "value": "John Doe"
+                    }, {
+                        "name": "password",
+                        "value": "21232f297a57a5a743894a0e4a801fc3"
                     }
                 ],
                 "roles": [
@@ -33,7 +36,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "test"
+                        "value": "098f6bcd4621d373cade4e832627b4f6"
                     }
                 ],
                 "roles": [
@@ -45,7 +48,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "test"
+                        "value": "098f6bcd4621d373cade4e832627b4f6"
                     }
                 ],
                 "roles": [
@@ -58,7 +61,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "test"
+                        "value": "098f6bcd4621d373cade4e832627b4f6"
                     }
                 ],
                 "roles": [

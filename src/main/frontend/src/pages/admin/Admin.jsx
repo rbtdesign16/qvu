@@ -20,6 +20,10 @@ const Admin = (props) => {
     };
     
     const deleteDatasource = (indx) => {
+        let ds = datasources[indx];
+        if (window.confirm("delete datasource " + ds.datasourceName + "?")) {
+            
+        }
         
     };
     
@@ -32,6 +36,10 @@ const Admin = (props) => {
     };
     
     const deleteRole = (indx) => {
+        let r = authData.allRoles[indx];
+        if (window.confirm("delete role " + r.name+ "?")) {
+            
+        }
         
     };
     
@@ -44,49 +52,110 @@ const Admin = (props) => {
     };
     
     const deleteUser = (indx) => {
+       let u = authData.allUsers[indx];
+        if (window.confirm("delete user " + u.userId + "?")) {
+            
+        }
         
     };
 
     const getDatasourcesConfig = () => {
         return {
             title: "Datasources",
-            width: "400px",
+            width: "300px",
             height: "500px",
             addTitle: "Add datasource",
-            canAdd: true,
+            editTitle: "Edit datasource",
+            delTitle: "Delete datasource",
             onAdd: addDatasource,
             onEdit: editDatasource,
             onDelete: deleteDatasource,
-            data: datasources
+            data: datasources,
+            labelStyle: {
+                width: "85px"
+            },
+            fieldStyle: {
+                width: "100px"
+            },
+            displayConfig: [
+                {
+                    label: "Name:",
+                    field: "datasourceName"
+                },
+                {
+                    label: "Description: ",
+                    field: "description"
+                }
+            ]
         };
     };
     
     const getRolesConfig = () => {
-        return {
+        let retval = {
             title: "Roles",
-            width: "150px",
+            width: "300px",
             height: "500px",
             addTitle: "Add role",
-            canAdd: authData.canAddUsersAndRoles,
-            onAdd: addRole,
-            onEdit: editRole,
-            onDelete: deleteRole,
+            editTitle: "Edit role",
+            delTitle: "Delete role",
+            labelStyle: {
+                width: "85px"
+            },
+            fieldStyle: {
+                width: "100px"
+            },
+            displayConfig: [
+                {
+                    label: "Name:",
+                    field: "name"
+                },
+                {
+                    label: "Description:",
+                    field: "description"
+                }
+            ],
             data: authData.allRoles
         };
+        
+        if (authData.canAddUsersAndRoles) {
+            retval.onAdd = addRole;
+            retval.onEdit = editRole;
+            retval.onDelete = deleteRole;
+        }
+        
+        return retval;
     };
     
     const getUsersConfig = () => {
-        return {
+        let retval = {
             title: "Users",
-            width: "200px",
+            width: "300px",
             height: "500px",
             addTitle: "Add user",
-            canAdd: authData.canAddUsersAndRoles,
-            onAdd: addUser,
-            onEdit: editUser,
-            onDelete: deleteUser,
+            editTitle: "Edit user",
+            delTitle: "Delete user",
+            labelStyle: {
+                width: "85px"
+            },
+            fieldStyle: {
+                width: "100px"
+            },
+            displayConfig: [
+                {
+                    label: "User ID:",
+                    field: "userId"
+                }
+            ],
             data: authData.allUsers
         };
+        
+        if (authData.canAddUsersAndRoles) {
+            retval.onAdd = addUser;
+            retval.onEdit = editUser;
+            retval.onDelete = deleteUser;
+        }
+
+        return retval;
     };
     
     return (

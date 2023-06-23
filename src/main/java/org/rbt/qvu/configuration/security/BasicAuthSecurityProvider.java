@@ -5,12 +5,9 @@
 package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.Config;
@@ -20,6 +17,7 @@ import org.rbt.qvu.client.utils.RoleInformation;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.util.Constants;
+import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +40,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
     @Autowired
     private Config config;
-    
+
     private String authenticatorClass;
 
     private Map<String, UserInformation> userMap = new HashMap<>();
@@ -81,7 +79,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 throw new Exception("usename and password required");
             }
 
-            
             QvuAuthenticationService service = config.getSecurityConfig().getAuthenticatorService();
             if (service != null) {
                 retval = authenticateWithClass(service, name, password);
@@ -132,15 +129,22 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         Authentication retval = null;
         UserInformation uinfo = userMap.get(name);
 
-        if (password.trim().equals(getUserPassword(uinfo.getAttributes()))) {
-            List<SimpleGrantedAuthority> gal = new ArrayList<>();
-            List<String> roles = uinfo.getRoles();
-            if (roles != null) {
-                gal.addAll(toGrantedAuthority(roles));
-            }
+        String storedPassword = getUserPassword(uinfo.getAttributes());
+        if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
+            // passwords are stored as md5 hashed strinfs
+            String hashedPassword = Helper.toMd5Hash(password);
 
-            retval = new UsernamePasswordAuthenticationToken(name, password, gal);
+            if (storedPassword.equals(hashedPassword)) {
+                List<SimpleGrantedAuthority> gal = new ArrayList<>();
+                List<String> userRoles = uinfo.getRoles();
+                if (userRoles != null) {
+                    gal.addAll(toGrantedAuthority(userRoles));
+                }
+
+                retval = new UsernamePasswordAuthenticationToken(name, password, gal);
+            }
         }
+        
         return retval;
     }
 

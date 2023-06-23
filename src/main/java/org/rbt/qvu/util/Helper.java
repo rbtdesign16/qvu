@@ -4,15 +4,12 @@
  */
 package org.rbt.qvu.util;
 
-import com.google.gson.Gson;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,5 +45,11 @@ public class Helper {
         }
 
         return retval;
+    }
+    
+    public static String toMd5Hash(String input) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(input.getBytes());
+        return new String(md.digest());
     }
 }

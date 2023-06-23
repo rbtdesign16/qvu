@@ -10,7 +10,7 @@
     },
     {
       "databaseType": "Oracle",
-      "datasourceName": "oraclehr",
+      "datasourceName": "oraclesh",
       "url": "jdbc:oracle:thin:@localhost:1521:xe",
       "driver": "oracle.jdbc.OracleDriver",
       "username": "SH",

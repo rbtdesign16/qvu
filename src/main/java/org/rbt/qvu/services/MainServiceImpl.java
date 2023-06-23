@@ -18,6 +18,7 @@ import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
+import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +99,7 @@ public class MainServiceImpl implements MainService {
             }
         } else if (config.getSecurityConfig().isBasic()) {
             retval.setCurrentUser(user);
+            retval.getAllRoles().addAll(Constants.PREDEFINED_ROLES);
             retval.setAllRoles(config.getSecurityConfig().getBasicConfiguration().getRoles());
             retval.setAllUsers(config.getSecurityConfig().getBasicConfiguration().getUsers());
         }

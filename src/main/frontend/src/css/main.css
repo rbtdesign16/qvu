@@ -41,8 +41,6 @@ body {
     font-size: var(--default-label-font-size);
 }
 
-
-
 @keyframes spinner {
   to {transform: rotate(360deg);}
 }
@@ -104,20 +102,30 @@ body {
     height: 100%;
     background: var(--default-background-color);
     color: var(--default-font-color);
+    position: absolute;
+    margin-top: 30px;
+    top: var(--header-height)
 }
 
 .tab-container {
     width: 100%;
-    position: fixed;
-    top: 31px;
-    height: calc (100% - 50px);
+    margin-top: 5px;
+    height: calc(100% - 60px);
+    position: absolute;
+    overflow: hidden;
+}
+
+
+.tab-content {
+    height: calc(100% - 60px);
+    position: relative;
+    overflow: auto;
 }
 
 img {
     padding: 0;
     margin: 0;
 }
-
 
 .info-message {
     background: var(--info-message-background-color);
@@ -163,3 +171,37 @@ img {
     padding: 2px;
     font-size: var(--message-header-font-size);
 }
+
+.admin-tab {
+    position: absolute;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 400px 150px 250px;
+    gap: 10px;   
+    padding-left: 16px;
+    height: 500px;
+}
+
+.object-array-panel {
+    overflow: hidden;
+    height: 100%;
+    border: solid 1px var(--default-border-color);
+    border-radius: 5px;
+}
+
+.object-array-panel .title {
+    text-align: left;
+    font-size: var(--default-title-font-size);
+    font-weight: var(--default-title-font-weight);
+    color: var(--default-title-font-color);
+    width: 100%;
+    padding: 2px;
+    border-bottom: solid 1px var(--default-border-color);
+        
+}
+
+.object-array-panel .data-container {
+    overflow: auto;
+    height: calc(100% - 25px);
+}
+

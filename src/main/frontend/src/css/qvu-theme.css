@@ -6,6 +6,10 @@
     --default-label-font-size: 10pt;
     --default-label-font-weight: 600;
     --default-label-font-color: darkslategray;
+    --default-border-color: darkslategray;
+    --default-title-font-size: 14pt;
+    --default-title-font-weight: 500;
+    --default-title-font-color: darkslategray;
 
     --header-background: linear-gradient(90deg, rgba(0,245,255,1) 0%, rgba(66,209,226,1) 0%, rgba(12,22,87,1) 100%, rgba(0,0,0,1) 100%);;
     

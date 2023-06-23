@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
-import { Tabs, Tab }
-from "react-bootstrap";
+import { Tabs, Tab } from "react-bootstrap";
 import Header from "../widgets/Header";
 import Footer from "../widgets/Footer";
 import Admin from "./admin/Admin";
@@ -44,7 +43,7 @@ const Home = (props) => {
         if (authData) {
             return (
                     <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                        { isAdministrator(authData) && <Tab eventKey="adm" title="Admin">
+                        { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">
                             <Admin/>
                         </Tab> }
                         { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">

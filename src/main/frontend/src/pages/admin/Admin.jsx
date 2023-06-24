@@ -210,6 +210,7 @@ const Admin = (props) => {
         data: authData.allRoles
     };
 
+
     const usersConfig = {
         title: "Users",
         width: "300px",
@@ -242,6 +243,7 @@ const Admin = (props) => {
     const saveDatasource = (ds) => {
     };
     
+  
     return (
         <div className="admin-tab">
             <EditObjectModal config={editModal}/>

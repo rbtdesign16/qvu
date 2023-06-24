@@ -4,7 +4,7 @@ import useAuth from "../../context/AuthContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
-import EditDatasource from "./EditDatasource";
+import EditObjectModal from "../../widgets/EditObjectModal";
 import { confirm } from "../../utils/helper";
 
 import {INFO, WARN, ERROR} from "../../utils/helper";
@@ -13,19 +13,113 @@ const Admin = (props) => {
     const {authData} = useAuth();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources} = useDataHandler();
-    const [showEdit, setShowEdit] = useState({show: false, datasource: {}});
+    const [editModal, setEditModal] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
             okFunc();
         }
     }
+    
+    const getDatasourceEntryConfig = () => {
+        return [
+        {
+            label: "Database Type:",
+            name: "databaseType",
+            type: "select",
+            options: ["MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"],
+            key: true
+        },
+        {
+            label: "Name:",
+            name: "datasourceName",
+            type: "input",
+            key: true
+        },
+        {
+            label: "Description:",
+            name: "description",
+            type: "input"
+        },
+        {
+            label: "JDBC Url:",
+            name: "url",
+            type: "input",
+            required: true
+        },
+        {
+            label: "JDBC Driver:",
+            name: "driver",
+            type: "input",
+            required: true
+        },
+        {
+            label: "User Name:",
+            name: "username",
+            type: "input",
+            required: true
+        },
+        {
+            label: "Password:",
+            name: "password",
+            type: "password",
+            required: true
+        },
+        {
+            label: "Connection Timeout:",
+            name: "connectionTimeout",
+            type: "integer"
+        },
+        {
+            label: "Idle Timeout:",
+            name: "idleTimeout",
+            type: "integer"
+        },
+        {
+            label: "Max Life Time:",
+            name: "maxLifeTime",
+            type: "integer"
+        },
+        {
+            label: "Max Pool Size:",
+            name: "maxPoolSize",
+            type: "integer"
+        }];
+     }
+    
     const addDatasource = () => {
-        setShowEdit({show: true, datasource: {}});
+        const dataObject = {};
+    
+        let cfg = {
+            show: true,
+            newObject: true,
+            title: "Create new datasource",
+            labelWidth: "150px",
+            fieldWidth: "200px",
+            cancel: hideEdit,
+            save: saveDatasource,
+            dataObject: dataObject,
+            entryConfig: getDatasourceEntryConfig()
+        };
+        
+        setEditModal(cfg);
     };
 
     const editDatasource = (indx) => {
-        setShowEdit({show: true, datasource: {...datasources[indx]}});
+        const dataObject = {...datasources[indx]};
+        let cfg = {
+            show: true,
+            newObject: false,
+            labelWidth: "150px",
+            fieldWidth: "200px",
+            title: "Update datasource " + datasources[indx].datasourceName,
+            cancel: hideEdit,
+            save: saveDatasource,
+            dataObject: dataObject,
+            entryConfig: getDatasourceEntryConfig()
+        };
+        
+        setEditModal(cfg);
     };
 
     const deleteDatasource = (indx) => {
@@ -151,7 +245,7 @@ const Admin = (props) => {
     };
 
     const hideEdit = () => {
-        setShowEdit({show: false, datasource: {}});
+        setEditModal({show: false});
     };
 
     const saveDatasource = (ds) => {
@@ -159,7 +253,7 @@ const Admin = (props) => {
     
     return (
         <div className="admin-tab">
-            <EditDatasource show={showEdit.show} datasource={showEdit.datasource} onSave={saveDatasource} onCancel={hideEdit}/>
+            <EditObjectModal config={editModal}/>
             <EditableDataList listConfig={datasourcesConfig}/>
             <EditableDataList listConfig={rolesConfig}/>
             <EditableDataList listConfig={usersConfig}/>

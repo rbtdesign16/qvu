@@ -253,3 +253,13 @@ img {
     border-top: solid 1px var(--default-border-color);
     border-bottom: solid 2px var(--default-border-color);
 }
+
+.entrygrid-150-200 {
+    display: grid;
+    grid-template-columns: 150px 200px;
+    margin: 5px;
+}
+
+.entrygrid-150-200 input[type=number] {
+    width: 100px;
+}

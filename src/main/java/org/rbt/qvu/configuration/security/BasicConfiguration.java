@@ -6,6 +6,7 @@ package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.RoleInformation;
 import org.rbt.qvu.client.utils.UserInformation;
 
@@ -42,6 +43,21 @@ public class BasicConfiguration {
         this.roles = roles;
     }
     
+    public UserInformation findUser(String userId) {
+        UserInformation retval = null;
+        
+        if (StringUtils.isNotEmpty(userId)) {
+            for (UserInformation u : users) {
+                if (userId.equalsIgnoreCase(u.getUserId())) {
+                    retval = u;
+                    break;
+                }
+            }
+        }
+        
+        return retval;
+    }
     
+
     
 }

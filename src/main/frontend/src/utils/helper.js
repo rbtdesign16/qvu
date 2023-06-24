@@ -46,6 +46,7 @@ export const userHasRole = (authData, role) => {
 }
 
 export const isAdministrator = (authData) => {
+    console.log("------->" + JSON.stringify(authData));
     return userHasRole(authData, ADMINISTRATOR_ROLE)
 }
 

@@ -14,7 +14,7 @@ import PropTypes from "prop-types";
 import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/helper"
 
 
-const Home = (props) => {
+        const Home = (props) => {
     const {copyright, version} = props;
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
@@ -27,7 +27,7 @@ const Home = (props) => {
     useEffect(() => {
         initializeDataHandler();
     }, [datasources]);
-    
+
     const getDefaultActiveTabKey = () => {
         if (isAdministrator(authData)) {
             return "adm";
@@ -37,22 +37,29 @@ const Home = (props) => {
             return "rdsgn";
         }
     }
-    
+
+    const hasTabAcccess = () => {
+        return isAdministrator(authData) || isQueryDesigner(authData) || isReportDesigner(authData);
+    };
+
     const getBody = () => {
         if (authData) {
-            return (
-                    <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                        { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">
-                            <Admin/>
-                        </Tab> }
-                        { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">
-                            <QueryDesign/>
-                        </Tab>}
-                        { isReportDesigner(authData) && <Tab eventKey="rdsgn" title="Report Design">
-                            <ReportDesign/>
-                        </Tab>}
-                    </Tabs>);
-
+            if (hasTabAcccess()) {
+                return (
+                        <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+                            { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">
+                                <Admin/>
+                            </Tab> }
+                            { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">
+                                <QueryDesign/>
+                            </Tab>}
+                            { isReportDesigner(authData) && <Tab eventKey="rdsgn" title="Report Design">
+                                <ReportDesign/>
+                            </Tab>}
+                        </Tabs>);
+            } else {
+                return <Splash image="logo.png" imageWidth="120" message="Qvu"/>
+            }
         } else {
             return <Splash image="logo.png" imageWidth="120" message="Initializing..."/>
         }

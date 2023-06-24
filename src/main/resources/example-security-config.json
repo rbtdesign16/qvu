@@ -1,5 +1,4 @@
 {
-    "authenticatorServiceClassName": "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator",
 
     "samlConfiguration": {
         "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
@@ -23,7 +22,7 @@
                         "value": "John Doe"
                     }, {
                         "name": "password",
-                        "value": "21232f297a57a5a743894a0e4a801fc3"
+                        "value": "F6FDFFE48C908DEB0F4C3BD36C032E72"
                     }
                 ],
                 "roles": [
@@ -36,7 +35,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "098f6bcd4621d373cade4e832627b4f6"
+                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
                     }
                 ],
                 "roles": [
@@ -48,7 +47,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "098f6bcd4621d373cade4e832627b4f6"
+                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
                     }
                 ],
                 "roles": [
@@ -61,7 +60,7 @@
                 "attributes": [
                     {
                         "name": "password",
-                        "value": "098f6bcd4621d373cade4e832627b4f6"
+                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
                     }
                 ],
                 "roles": [

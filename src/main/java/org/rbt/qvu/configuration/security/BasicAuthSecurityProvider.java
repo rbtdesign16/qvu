@@ -86,9 +86,9 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 retval = authenticateFromProperties(name, password);
             }
 
-            LOG.debug("user " + name + " authenticated=" + retval.isAuthenticated());
+            LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
         } catch (Exception ex) {
-            throw new AuthenticationServiceException(ex.toString());
+            throw new AuthenticationServiceException(ex.toString(), ex);
         }
 
         return retval;
@@ -133,15 +133,8 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
             // passwords are stored as md5 hashed strinfs
             String hashedPassword = Helper.toMd5Hash(password);
-
             if (storedPassword.equals(hashedPassword)) {
-                List<SimpleGrantedAuthority> gal = new ArrayList<>();
-                List<String> userRoles = uinfo.getRoles();
-                if (userRoles != null) {
-                    gal.addAll(toGrantedAuthority(userRoles));
-                }
-
-                retval = new UsernamePasswordAuthenticationToken(name, password, gal);
+                retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
             }
         }
         
@@ -154,7 +147,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         if (in != null) {
             for (String s : in) {
                 retval.add(new SimpleGrantedAuthority(s));
-
             }
         }
 

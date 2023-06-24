@@ -40,7 +40,7 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private Config config;
-    
+
     Gson gson = new Gson();
 
     private Set<String> predefinedRoles = new HashSet<>();
@@ -48,7 +48,7 @@ public class MainServiceImpl implements MainService {
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
-        
+
         // load up a set for predfined roles to check
         // for duplicates when loading external roles
         predefinedRoles.addAll(Arrays.asList(SecurityConfiguration.PREDEFINED_ROLES));
@@ -68,27 +68,10 @@ public class MainServiceImpl implements MainService {
     public AuthData loadAuthData() throws Exception {
         AuthData retval = new AuthData();
 
-        UserInformation user = new UserInformation();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        user.setUserId(auth.getName());
-        for (GrantedAuthority ga : auth.getAuthorities()) {
-            String role = ga.getAuthority();
-            
-            if (!predefinedRoles.contains(role.toLowerCase())) {
-                user.getRoles().add(ga.getAuthority());
-            }
-        }
-
-        if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
-            loadUserAttributes(user, ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-        } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
-            loadUserAttributes(user, ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-        }
 
         QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
 
-        retval.setCurrentUser(user);
         if (authService != null) {
             retval.getAllRoles().addAll(authService.getAllRoles());
             retval.getAllUsers().addAll(authService.getAllUsers());
@@ -98,13 +81,30 @@ public class MainServiceImpl implements MainService {
                 retval.setCurrentUser(u);
             }
         } else if (config.getSecurityConfig().isBasic()) {
-            retval.setCurrentUser(user);
+            retval.setCurrentUser(config.getSecurityConfig().getBasicConfiguration().findUser(auth.getName()));
             retval.getAllRoles().addAll(Constants.PREDEFINED_ROLES);
             retval.setAllRoles(config.getSecurityConfig().getBasicConfiguration().getRoles());
             retval.setAllUsers(config.getSecurityConfig().getBasicConfiguration().getUsers());
         }
-        
+
         retval.setCanCreateUsersAndRoles(config.getSecurityConfig().canAddUsersAndRoles());
+
+        if (retval.getCurrentUser() != null) {
+            for (GrantedAuthority ga : auth.getAuthorities()) {
+                String role = ga.getAuthority();
+
+                if (!predefinedRoles.contains(role.toLowerCase())) {
+                    retval.getCurrentUser().getRoles().add(ga.getAuthority());
+                }
+            }
+
+            if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
+                loadUserAttributes(retval.getCurrentUser(), ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+            } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
+                loadUserAttributes(retval.getCurrentUser(), ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+            }
+
+        }
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));

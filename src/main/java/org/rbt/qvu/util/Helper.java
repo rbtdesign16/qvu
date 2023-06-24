@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.util;
 
+import jakarta.xml.bind.DatatypeConverter;
 import java.io.FileInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class Helper {
     
     public static String toMd5Hash(String input) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(input.getBytes());
-        return new String(md.digest());
+        md.update(input.getBytes("UTF-8"));
+        return  DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
     }
 }

@@ -19,7 +19,7 @@ const Admin = (props) => {
         if (await confirm(message)) {
             okFunc();
         }
-    }
+    };
     
     const getDatasourceEntryConfig = () => {
         return [
@@ -85,8 +85,43 @@ const Admin = (props) => {
             name: "maxPoolSize",
             type: "integer"
         }];
-     }
+     };
     
+    const getRoleEntryConfig = () => {
+        return [
+        {
+            label: "Name:",
+            name: "name",
+            type: "input",
+            key: true
+        },
+        {
+            label: "Description:",
+            name: "description",
+            type: "input"
+        }];
+     }
+
+    const getUserEntryConfig = () => {
+        return [
+        {
+            label: "User ID:",
+            name: "userId",
+            type: "input",
+            key: true
+        },
+        {
+            label: "First Name:",
+            name: "firstName",
+            type: "input"
+        },
+        {
+            label: "Last Name:",
+            name: "lastName",
+            type: "input"
+        }];
+     };
+
     const getDatasourceConfig = (title, isNew, dataObject) => {
         return {
             show: true,
@@ -101,10 +136,40 @@ const Admin = (props) => {
             buttons: [{
                 text: "test",
                 className: "btn btn-primary",
-                onClick: () => {alert("test")}
+                onClick: () => {alert("test");}
                 }]
         };
-    }
+    };
+    
+    const getRoleConfig = (title, isNew, dataObject) => {
+        return {
+            show: true,
+            newObject: isNew,
+            title: title,
+            labelWidth: "100px",
+            fieldWidth: "150px",
+            cancel: hideEdit,
+            save: saveRole,
+            dataObject: dataObject,
+            entryConfig: getRoleEntryConfig()
+        };
+    };
+    
+    
+    const getUserConfig = (title, isNew, dataObject) => {
+        return {
+            show: true,
+            newObject: isNew,
+            title: title,
+            labelWidth: "150px",
+            fieldWidth: "200px",
+            cancel: hideEdit,
+            save: saveUser,
+            dataObject: dataObject,
+            entryConfig: getUserEntryConfig()
+        };
+    };
+    
     const addDatasource = () => {
          setEditModal(getDatasourceConfig("Create new datasource", true, {}));
     };
@@ -117,15 +182,15 @@ const Admin = (props) => {
         let ds = datasources[indx];
         if (handleOnClick("delete datasource " + ds.datasourceName + "?", () => alert("do delete"))) {
         }
-
     };
 
     const addRole = () => {
-
+         setEditModal(getRoleConfig("Create new role", true, {}));
     };
 
     const editRole = (indx) => {
-
+        let r = authData.allRoles[indx];
+        setEditModal(getRoleConfig("Update role " + r.name, true, {...r}));
     };
 
     const deleteRole = (indx) => {
@@ -137,11 +202,12 @@ const Admin = (props) => {
     };
 
     const addUser = () => {
-
+         setEditModal(getUserConfig("Create new user", true, {}));
     };
 
     const editUser = (indx) => {
-
+        let u = authData.allUsers[indx];
+        setEditModal(getUserConfig("Update user " + u.userId, true, {...u}));
     };
 
     const deleteUser = (indx) => {
@@ -188,9 +254,9 @@ const Admin = (props) => {
         addTitle: "Add role",
         editTitle: "Edit role",
         delTitle: "Delete role",
-        onAdd: authData.canAddUsersAndRoles ? addRole : null,
-        onEdit: authData.canAddUsersAndRoles ? editRole : null,
-        onDelete: authData.canAddUsersAndRoles ? deleteRole : null,
+        onAdd: authData.allowUserRoleEdit ? addRole : null,
+        onEdit: authData.allowUserRoleEdit ? editRole : null,
+        onDelete: authData.allowUserRoleEdit ? deleteRole : null,
         labelStyle: {
             width: "85px"
         },
@@ -218,9 +284,9 @@ const Admin = (props) => {
         addTitle: "Add user",
         editTitle: "Edit user",
         delTitle: "Delete user",
-        onAdd: authData.canAddUsersAndRoles ? addUser : null,
-        onEdit: authData.canAddUsersAndRoles ? editUser : null,
-        onDelete: authData.canAddUsersAndRoles ? deleteUser : null,
+        onAdd: authData.allowUserRoleEdit ? addUser : null,
+        onEdit: authData.allowUserRoleEdit ? editUser : null,
+        onDelete: authData.allowUserRoleEdit ? deleteUser : null,
         labelStyle: {
             width: "85px"
         },
@@ -242,7 +308,12 @@ const Admin = (props) => {
 
     const saveDatasource = (ds) => {
     };
-    
+
+    const saveRole = (r) => {
+    };
+
+    const saveUser = (u) => {
+    };
   
     return (
         <div className="admin-tab">

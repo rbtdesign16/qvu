@@ -85,9 +85,8 @@ public class MainServiceImpl implements MainService {
             retval.getAllRoles().addAll(Constants.PREDEFINED_ROLES);
             retval.setAllRoles(config.getSecurityConfig().getBasicConfiguration().getRoles());
             retval.setAllUsers(config.getSecurityConfig().getBasicConfiguration().getUsers());
+            retval.setAllowUserRoleEdit(true);
         }
-
-        retval.setCanCreateUsersAndRoles(config.getSecurityConfig().canAddUsersAndRoles());
 
         if (retval.getCurrentUser() != null) {
             for (GrantedAuthority ga : auth.getAuthorities()) {

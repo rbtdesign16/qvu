@@ -17,7 +17,7 @@ public class AuthData {
     private List<RoleInformation> allRoles = new ArrayList<>();
     private List<UserInformation> allUsers = new ArrayList<>();
     private UserInformation currentUser;
-    private boolean canCreateUsersAndRoles;
+    private boolean allowUserRoleEdit;
 
     public List<RoleInformation> getAllRoles() {
         return allRoles;
@@ -43,13 +43,13 @@ public class AuthData {
         this.currentUser = currentUser;
     }
 
-    public boolean isCanCreateUsersAndRoles() {
-        return canCreateUsersAndRoles;
+    public boolean isAllowUserRoleEdit() {
+        return allowUserRoleEdit;
     }
 
-    public void setCanCreateUsersAndRoles(boolean canCreateUsersAndRoles) {
-        this.canCreateUsersAndRoles = canCreateUsersAndRoles;
+    public void setAllowUserRoleEdit(boolean allowUserRoleEdit) {
+        this.allowUserRoleEdit = allowUserRoleEdit;
     }
-    
+
     
 }

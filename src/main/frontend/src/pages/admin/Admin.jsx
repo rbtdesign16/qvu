@@ -87,39 +87,30 @@ const Admin = (props) => {
         }];
      }
     
-    const addDatasource = () => {
-        const dataObject = {};
-    
-        let cfg = {
+    const getDatasourceConfig = (title, isNew, dataObject) => {
+        return {
             show: true,
-            newObject: true,
-            title: "Create new datasource",
+            newObject: isNew,
+            title: title,
             labelWidth: "150px",
             fieldWidth: "200px",
             cancel: hideEdit,
             save: saveDatasource,
             dataObject: dataObject,
-            entryConfig: getDatasourceEntryConfig()
+            entryConfig: getDatasourceEntryConfig(),
+            buttons: [{
+                text: "test",
+                className: "btn btn-primary",
+                onClick: () => {alert("test")}
+                }]
         };
-        
-        setEditModal(cfg);
+    }
+    const addDatasource = () => {
+         setEditModal(getDatasourceConfig("Create new datasource", true, {}));
     };
 
     const editDatasource = (indx) => {
-        const dataObject = {...datasources[indx]};
-        let cfg = {
-            show: true,
-            newObject: false,
-            labelWidth: "150px",
-            fieldWidth: "200px",
-            title: "Update datasource " + datasources[indx].datasourceName,
-            cancel: hideEdit,
-            save: saveDatasource,
-            dataObject: dataObject,
-            entryConfig: getDatasourceEntryConfig()
-        };
-        
-        setEditModal(cfg);
+        setEditModal(getDatasourceConfig("Update datasource " + datasources[indx].datasourceName, false, {...datasources[indx]}));
     };
 
     const deleteDatasource = (indx) => {

@@ -25,16 +25,11 @@ const EditObjectModal = (props) => {
           <Modal.Title>{config.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <div><EntryPanel 
-            labelWidth={config.labelWidth} 
-            fieldWidth={config.fieldWidth} 
-            entryConfig={config.entryConfig} 
-            dataObject={config.dataObject} 
-            newObject={config.newObject}/></div>
+        <div><EntryPanel config={config}/></div>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => config.cancel()}>Cancel</Button>
-          <Button className='button-l' bsStyle="primary" onClick={() => config.save(config.dataObject)}>{getOkLabel()}</Button>
+          <Button size="sm" onClick={() => config.cancel()}>Cancel</Button>
+          <Button size="sm" variant="primary" onClick={() => config.save(config.dataObject)}>{getOkLabel()}</Button>
         </Modal.Footer>
       </Modal>
     </div>

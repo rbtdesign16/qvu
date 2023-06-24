@@ -1,7 +1,6 @@
 import React from "react";
-import { CgAdd } from 'react-icons/cg';
-import { FaEdit } from 'react-icons/fa';
-import { AiFillDelete } from 'react-icons/ai';
+import { CiEdit } from 'react-icons/ci';
+import { MdOutlineDeleteForever, MdOutlineAddBox } from 'react-icons/md';
 import PropTypes from "prop-types";
 
 const EditableDataList = (props) => {
@@ -30,9 +29,9 @@ const EditableDataList = (props) => {
     };
 
     const getButtons = (indx) => {
-        return <div className="icon-btn-bar">
-            {listConfig.onEdit && <FaEdit className="icon cobaltBlue" size={iconSize} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
-            {listConfig.onDelete && <AiFillDelete className="icon crimson" size={iconSize} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
+        return <div className="btn-bar tb-border platinum-b">
+            {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={iconSize} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
+            {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={iconSize} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
         </div>;
     };
 
@@ -54,7 +53,7 @@ const EditableDataList = (props) => {
                 <div className="title">
                     <span>{listConfig.title}</span>
                     {listConfig.onAdd &&
-                            <span style={{float: "right"}}><CgAdd size={iconSize} title={listConfig.addTitle} className="icon cloverGreen" onClick={listConfig.onAdd}/></span>
+                            <span style={{float: "right"}}><MdOutlineAddBox size={iconSize} title={listConfig.addTitle} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
                     }
                 </div>
                 <div className="data-container">

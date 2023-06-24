@@ -1,5 +1,6 @@
 @import "qvu-theme.css";
 @import "bootstrap/dist/css/bootstrap.min.css";
+@import "colors.css";
 
 
 html {
@@ -202,33 +203,18 @@ img {
     height: calc(100% - 25px);
 }
 
-.icon {
+.icon-s {
     cursor: pointer;
-    padding: 3px;
+    padding: 2px;
+    width: 20px;
 }
 
-.green {
-    color: green;
+.icon-m {
+    cursor: pointer;
+    padding: 2px;
+    width: 35px;
 }
 
-.cloverGreen {
-    color: #3EA055;
-}
-.red {
-    color: red;
-}
-
-.blue {
-    color: blue;
-}
-
-.cobaltBlue {
-    color: #0020C2;
-}
-
-.crimson {
-    color: crimson;
-}
 
 .label {
     text-align: right;
@@ -244,14 +230,18 @@ img {
     padding-left: 5px;
 }
 
-.icon-btn-bar {
+
+.btn-bar {
     display: inline-block;
     text-align: right;
-    height: var(--header-height);
     width: 100%;
     padding-right: 5px;
+}
+
+.tb-border {
     border-top: solid 1px var(--default-border-color);
-    border-bottom: solid 2px var(--default-border-color);
+    border-bottom: solid 1px var(--default-border-color);
+
 }
 
 .entrygrid-150-200 {

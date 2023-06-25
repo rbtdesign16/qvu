@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button"
 import PropTypes from "prop-types";
 
 const EntryPanel = (props) => {
-    const {entryConfig, dataObject, newObject, buttons} = props.config;
+    const {entryConfig, dataObject, newObject, buttons, idPrefix} = props.config;
 
     
     const loadOptions = (curval, options) => {
@@ -30,21 +30,22 @@ const EntryPanel = (props) => {
         if (c.key && !newObject) {
             return dataObject[c.name];
         } else {
+            let id = idPrefix + c.name;
             switch (c.type) {
                 case "input":
-                    return <input name={c.name} type="text" size={30} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id} type="text" size={30} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "password":
-                    return <input name={c.name} type="password" size={12} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="password" size={12} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "select":
-                    return <select name={c.name} onChange={e => onChange(e)}>{loadOptions(dataObject[c.name], c.options)}</select>;
+                    return <select name={c.name}  id={id} onChange={e => onChange(e)}>{loadOptions(dataObject[c.name], c.options)}</select>;
                 case "integer":
-                    return <input name={c.name} type="number" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
                 case "date":
-                    return <input name={c.name} type="date" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
                 case "checkbox":
-                    return <input name={c.name} type="checkbox" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
                 case "textarea":
-                    return <textarea name={c.name} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
             }
         }
     };
@@ -58,13 +59,14 @@ const EntryPanel = (props) => {
     
     const loadEntryFields = () => {
         return entryConfig.map(c => {
-            return <div className="entrygrid-150-200"><div className="label">{c.label}</div><div className="display-field">{getEntryField(c)}</div></div>;
+            return <div className="entrygrid-150-200"><div className="label">{c.required && <span className="red-f">*</span>}{c.label}</div><div className="display-field">{getEntryField(c)}</div></div>;
         });
     };
     
     return (
             <div className="entry-panel">
                 { loadEntryFields() }
+                <div><span className="red-f">*</span>indicates required field</div>
                 {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
             </div>);
     };

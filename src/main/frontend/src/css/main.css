@@ -253,3 +253,7 @@ img {
 .entrygrid-150-200 input[type=number] {
     width: 100px;
 }
+
+#emo-error-msg {
+    color: crimson;
+}

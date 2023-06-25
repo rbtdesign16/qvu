@@ -10,6 +10,8 @@ import {
     WARN, 
     ERROR,
     SUCCESS,
+    DEFAULT_SUCCESS_MESSAGE,
+    DEFAULT_ERROR_MESSAGE,
     confirm, 
     isEmpty, 
     setFieldError, 
@@ -352,10 +354,10 @@ const Admin = (props) => {
                 updateJsonArray("datasourceName", config.dataObject, newDatasources);
                 setDatasources(newDatasources);
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Datasource saved", "Success");
+                showMessage(SUCCESS, "Datasource saved", DEFAULT_SUCCESS_MESSAGE);
                 
             } else {
-                showMessage(ERROR, res.message, "Error");
+                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
             }
 
         } else {

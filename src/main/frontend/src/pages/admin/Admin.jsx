@@ -5,14 +5,19 @@ import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
-import { confirm, 
+import {
+    INFO, 
+    WARN, 
+    ERROR,
+    SUCCESS,
+    confirm, 
     isEmpty, 
     setFieldError, 
     setErrorMessage, 
     checkEntryFields,
     updateJsonArray} from "../../utils/helper";
 
-import {INFO, WARN, ERROR} from "../../utils/helper";
+import {saveDatasource} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -140,7 +145,7 @@ const Admin = (props) => {
             labelWidth: "150px",
             fieldWidth: "200px",
             cancel: hideEdit,
-            save: saveDatasource,
+            save: saveModifiedDatasource,
             dataObject: dataObject,
             entryConfig: getDatasourceEntryConfig(),
             buttons: [{
@@ -192,7 +197,7 @@ const Admin = (props) => {
         setEditModal(getDatasourceConfig("Update datasource " + datasources[indx].datasourceName, false, {...datasources[indx]}));
     };
 
-    const deleteDatasource = (indx) => {
+    const deleteDatasource = async (indx) => {
         let ds = datasources[indx];
         if (handleOnClick("delete datasource " + ds.datasourceName + "?", () => alert("do delete"))) {
             let indx = datasources.findIndex((cds) => ds.datasourceName === ds.datasourceName);
@@ -335,15 +340,23 @@ const Admin = (props) => {
     };
 
    
-    const saveDatasource = (config) => {
+    const saveModifiedDatasource = async (config) => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            setErrorMessage(config.idPrefix, "");
-            let newDatasources = [...datasources];
-            updateJsonArray("datasourceName", config.dataObject, newDatasources);
-            setDatasources(newDatasources)
-            setEditModal({show: false});
+            showMessage(INFO, "Saving datasource...", "Saving", true);
+            let res = await saveDatasource(config.dataObject);
+            if (!res.error) {
+                setErrorMessage(config.idPrefix, "");
+                let newDatasources = [...datasources];
+                updateJsonArray("datasourceName", config.dataObject, newDatasources);
+                setDatasources(newDatasources);
+                setEditModal({show: false});
+                showMessage(SUCCESS, "Datasource saved", "Success");
+                
+            } else {
+                showMessage(ERROR, res.message, "Error");
+            }
 
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
@@ -355,9 +368,10 @@ const Admin = (props) => {
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");
+            
             let newRoles = [... authData.allRoles];
             updateJsonArray("name", config.dataObject, newRoles);
-            setAUthData({...authData, allRoles: newRoles});
+            setAuthData({...authData, allRoles: newRoles});
             setEditModal({show: false});
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");

@@ -20,7 +20,7 @@ public class Constants {
     public static final String BASIC_SECURITY_TYPE = "basic";
     public static final String OIDC_SECURITY_TYPE = "oidc";
     public static final String SAML_SECURITY_TYPE = "saml";
-
+    public static final String DEFAULT_ROLE_ATTRIBUTE_NAME = "role";
     public static final String PASSWORD_ATTRIBUTE_NAME = "password";
 
     

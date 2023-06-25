@@ -5,12 +5,17 @@
 package org.rbt.qvu.util;
 
 import jakarta.xml.bind.DatatypeConverter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author rbtuc
  */
 public class Helper {
-
+    public static final SimpleDateFormat TS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static Logger LOG = LoggerFactory.getLogger(Helper.class);
 
     public static Properties loadProperties(String fileName) {
@@ -53,4 +58,5 @@ public class Helper {
         md.update(input.getBytes("UTF-8"));
         return  DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
     }
+    
 }

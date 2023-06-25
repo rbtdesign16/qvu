@@ -32,7 +32,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
@@ -43,8 +42,6 @@ import org.springframework.security.saml2.provider.service.registration.InMemory
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @Configuration
 @EnableWebSecurity
@@ -64,11 +61,6 @@ public class SecurityConfig {
 
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
-
-    @Bean
-    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
-    }
 
     @Bean("basicmgr")
     @DependsOn("config")
@@ -130,6 +122,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .authenticationManager(basicAuthManager(http))
+                .csrf(csrf -> csrf.disable())
                 .httpBasic(withDefaults());
         return http.build();
     }
@@ -138,10 +131,11 @@ public class SecurityConfig {
     @DependsOn("samlrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
     public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in samlFilterChain()");
+        LOG.debug("in samlFilterChain() - ");
         http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
                 .saml2Login(withDefaults());
         return http.build();
     }
@@ -153,8 +147,8 @@ public class SecurityConfig {
         LOG.debug("in oauthFilterChain()");
         http
                 .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated()
-                )
+                .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable())
                 .oauth2Login(withDefaults());
         return http.build();
     }

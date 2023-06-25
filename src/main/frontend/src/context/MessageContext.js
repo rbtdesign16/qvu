@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
+import {SUCCESS} from "../utils/helper";
+
 export const MessageContext = createContext();
 
 export const MessageProvider = ({ children }) => {
@@ -10,6 +12,9 @@ export const MessageProvider = ({ children }) => {
     }
     
     const showMessage = (type, message, title = null, showSpinner = false, withBackdrop = false) => {
+        if (type === SUCCESS) {
+            setTimeout(hideMessage(), 5000);
+        }
         setMessageInfo({show: true, type: type, message: message, title: title, showSpinner: showSpinner, backdrop: withBackdrop});
     }
 

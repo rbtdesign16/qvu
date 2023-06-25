@@ -6,6 +6,7 @@ package org.rbt.qvu.configuration.security;
 
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
+import org.rbt.qvu.util.Constants;
 
 /**
  *
@@ -16,15 +17,9 @@ public class SecurityConfiguration {
     public  static final String TYPE_OIDC = "oidc";
     public  static final String TYPE_BASIC = "basic";
     
-    public static final String[] PREDEFINED_ROLES = {
-        "administrator",
-        "query designer",
-        "report designer",
-        "user"
-    };
-    
     private String authenticatorServiceClassName;
     private String securityType;
+    private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
@@ -86,6 +81,14 @@ public class SecurityConfiguration {
     
     public boolean isBasic() {
         return TYPE_BASIC.equals(this.securityType);
+    }
+
+    public String getRoleAttributeName() {
+        return roleAttributeName;
+    }
+
+    public void setRoleAttributeName(String roleAttributeName) {
+        this.roleAttributeName = roleAttributeName;
     }
     
 }

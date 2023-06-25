@@ -27,6 +27,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -86,7 +88,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 retval = authenticateFromProperties(name, password);
             }
 
-            LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
+             LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
         } catch (Exception ex) {
             throw new AuthenticationServiceException(ex.toString(), ex);
         }

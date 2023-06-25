@@ -27,8 +27,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,7 +56,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             LOG.info("authenticatorClass=" + authenticatorClass);
 
             // if no authenticator service then load from config file
-            if (securityConfig.getAuthenticatorService() == null) {
+            if (securityConfig.isFileBasedSecurity()) {
                 for (UserInformation uinfo : securityConfig.getBasicConfiguration().getUsers()) {
                     userMap.put(uinfo.getUserId(), uinfo);
                 }
@@ -82,12 +80,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             }
 
             QvuAuthenticationService service = config.getSecurityConfig().getAuthenticatorService();
-            if (service != null) {
-                retval = authenticateWithClass(service, name, password);
-            } else {
+            
+            if (config.getSecurityConfig().isFileBasedSecurity()) {
                 retval = authenticateFromProperties(name, password);
+            } else if (service != null)  {
+                retval = authenticateWithClass(service, name, password);
             }
-
              LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
         } catch (Exception ex) {
             throw new AuthenticationServiceException(ex.toString(), ex);

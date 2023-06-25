@@ -4,6 +4,8 @@
  */
 package org.rbt.qvu;
 
+import com.nimbusds.oauth2.sdk.token.AccessToken;
+import jakarta.servlet.http.HttpServletRequest;
 import org.rbt.qvu.configuration.Config;
 import java.io.File;
 import java.io.InputStream;
@@ -14,12 +16,8 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbt.qvu.configuration.security.OidcConfiguration;
 import org.rbt.qvu.configuration.security.SamlConfiguration;
@@ -31,27 +29,26 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 @EnableWebSecurity
@@ -125,6 +122,7 @@ public class SecurityConfig {
 
     }
 
+
     @Bean
     @DependsOn("basicmgr")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
@@ -150,40 +148,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private GrantedAuthoritiesMapper userAuthoritiesMapper() {
-        return (authorities) -> {
-            Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
-            authorities.forEach(authority -> {
-                 if (OidcUserAuthority.class.isInstance(authority)) {
-                    OidcUserAuthority oidcUserAuthority = (OidcUserAuthority)authority;
-
-                    OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
-                    
-                    String roleName = userInfo.getClaimAsString("role");
-                    if (StringUtils.isNotEmpty(roleName)){
-                         mappedAuthorities.add(new SimpleGrantedAuthority(roleName));
-                    }
-                } else if (OAuth2UserAuthority.class.isInstance(authority)) {
-                    OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority)authority;
-                    Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
-                    
-                    for (String s : userAttributes.keySet()) {
-                        LOG.error("------->1=" + s);
-                    }
-                    if (userAttributes.containsKey("role")){
-                        String roleName = (String)userAttributes.get("role");
-                        mappedAuthorities.add(new SimpleGrantedAuthority(roleName));
-                    }
-                } else {
-                    LOG.error("----------->2=" + authority.getClass().getName());
-                }
-            });
-
-            return mappedAuthorities;
-        };
-    }
-    
+   
     @Bean
     @DependsOn("oauthrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
@@ -193,8 +158,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
-                .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.userAuthoritiesMapper(this.userAuthoritiesMapper())));
-        return http.build();
+                .oauth2Login(withDefaults());
+          return http.build();
     }
 
     private PrivateKey getPrivateKey(String keyFile) throws Exception {

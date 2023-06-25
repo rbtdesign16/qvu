@@ -14,6 +14,10 @@ import org.rbt.qvu.client.utils.UserInformation;
  * @author rbtuc
  */
 public class AuthData {
+    private String administratorRole;
+    private String queryDesignerRole;
+    private String reportDesignerRole;
+    private String userRole;
     private List<RoleInformation> allRoles = new ArrayList<>();
     private List<UserInformation> allUsers = new ArrayList<>();
     private UserInformation currentUser;
@@ -49,6 +53,38 @@ public class AuthData {
 
     public void setAllowUserRoleEdit(boolean allowUserRoleEdit) {
         this.allowUserRoleEdit = allowUserRoleEdit;
+    }
+
+    public String getAdministratorRole() {
+        return administratorRole;
+    }
+
+    public void setAdministratorRole(String administratorRole) {
+        this.administratorRole = administratorRole;
+    }
+
+    public String getQueryDesignerRole() {
+        return queryDesignerRole;
+    }
+
+    public void setQueryDesignerRole(String queryDesignerRole) {
+        this.queryDesignerRole = queryDesignerRole;
+    }
+
+    public String getReportDesignerRole() {
+        return reportDesignerRole;
+    }
+
+    public void setReportDesignerRole(String reportDesignerRole) {
+        this.reportDesignerRole = reportDesignerRole;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 
     

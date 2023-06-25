@@ -23,6 +23,11 @@ public class Constants {
     public static final String DEFAULT_ROLE_ATTRIBUTE_NAME = "role";
     public static final String PASSWORD_ATTRIBUTE_NAME = "password";
 
+    public static final String DEFAULT_ADMINISTRATOR_ROLE = "administrator";
+    public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
+    public static final String DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
+    public static final String DEFAULT_USER_ROLE = "user";
+    
     
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";

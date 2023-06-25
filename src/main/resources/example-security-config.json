@@ -1,5 +1,8 @@
 {
-
+    "administratorRole": "administrator",
+    "queryDesignerRole": "query designer",
+    "reportDesignerRole": "report designer",
+    "userRole": "user",
     "samlConfiguration": {
         "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
         "signAssertions": true,
@@ -31,7 +34,7 @@
                 ]
             },
             {
-                "userId": "tester1",
+                "userId": "tester",
                 "attributes": [
                     {
                         "name": "password",
@@ -39,40 +42,17 @@
                     }
                 ],
                 "roles": [
-                    "user"
-                ]
-            },
-            {
-                "userId": "tester2",
-                "attributes": [
-                    {
-                        "name": "password",
-                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
-                    }
-                ],
-                "roles": [
+                    "user",
                     "administrator",
-                    "user"
-                ]
-            },
-            {
-                "userId": "tester3",
-                "attributes": [
-                    {
-                        "name": "password",
-                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
-                    }
-                ],
-                "roles": [
-                    "query designer",
-                    "report designer"
+                    "report designer",
+                    "query designer"
                 ]
             }
         ],
         "roles": [
             {
                 "name": "tester",
-                "description": "rester role"
+                "description": "tester role"
             },
             {
                 "name": "qa",

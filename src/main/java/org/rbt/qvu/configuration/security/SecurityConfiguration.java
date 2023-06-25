@@ -13,17 +13,21 @@ import org.rbt.qvu.util.Constants;
  * @author rbtuc
  */
 public class SecurityConfiguration {
-    public  static final String TYPE_SAML = "saml";
-    public  static final String TYPE_OIDC = "oidc";
-    public  static final String TYPE_BASIC = "basic";
     
-    private String authenticatorServiceClassName;
+    private String authenticatorServiceClassName = "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator";
     private String securityType;
     private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
+    private boolean fileBasedSecurity = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
-
+    private String administratorRole = Constants.DEFAULT_ADMINISTRATOR_ROLE;
+    private String queryDesignerRole = Constants.DEFAULT_QUERY_DESIGNER_ROLE;
+    private String reportDesignerRole = Constants.DEFAULT_REPORT_DESIGNER_ROLE;
+    private String userRole = Constants.DEFAULT_USER_ROLE;
+    
+    
+    
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
     }
@@ -80,7 +84,7 @@ public class SecurityConfiguration {
     }
     
     public boolean isBasic() {
-        return TYPE_BASIC.equals(this.securityType);
+        return Constants.BASIC_SECURITY_TYPE.equals(this.securityType);
     }
 
     public String getRoleAttributeName() {
@@ -90,5 +94,46 @@ public class SecurityConfiguration {
     public void setRoleAttributeName(String roleAttributeName) {
         this.roleAttributeName = roleAttributeName;
     }
+
+    public boolean isFileBasedSecurity() {
+        return fileBasedSecurity;
+    }
+
+    public void setFileBasedSecurity(boolean fileBasedSecurity) {
+        this.fileBasedSecurity = fileBasedSecurity;
+    }
+
+    public String getAdministratorRole() {
+        return administratorRole;
+    }
+
+    public void setAdministratorRole(String administratorRole) {
+        this.administratorRole = administratorRole;
+    }
+
+    public String getQueryDesignerRole() {
+        return queryDesignerRole;
+    }
+
+    public void setQueryDesignerRole(String queryDesignerRole) {
+        this.queryDesignerRole = queryDesignerRole;
+    }
+
+    public String getReportDesignerRole() {
+        return reportDesignerRole;
+    }
+
+    public void setReportDesignerRole(String reportDesignerRole) {
+        this.reportDesignerRole = reportDesignerRole;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+    
     
 }

@@ -13,8 +13,8 @@ export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";
 export const INFO = "info";
-
-export const ERROR_BACKGROUND_COLOR = "pink"
+export const SUCCESS_MESSAGE_TIMEOUT = 5000;
+export const ERROR_BACKGROUND_COLOR = "pink";
 
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";

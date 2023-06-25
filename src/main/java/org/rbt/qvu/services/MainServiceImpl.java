@@ -187,6 +187,7 @@ public class MainServiceImpl implements MainService {
             retval.setError(true);
             retval.setMessage(ex.toString());
         }
+        
         return retval;
     }
 

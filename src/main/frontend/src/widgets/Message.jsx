@@ -10,28 +10,33 @@ import {
     INFO,
     SUCCESS,
     WARN,
-    ERROR
+    ERROR,
+    SUCCESS_MESSAGE_TIMEOUT
+    
 } from "../utils/helper";
 
 
 const Message = (props) => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
 
+    let myTimeout;
+    
     const onHide = () => {
+        myTimeout = null;
         hideMessage();
-    }
+    };
 
     const getClassName = () => {
         return messageInfo.type + "-message";
-    }
+    };
 
     const getMessage = () => {
         if (messageInfo.showSpinner) {
-            return <div><span className="spinner"/><span style={{marginLeft: "34px"}}>{messageInfo.message}</span></div>
+            return <div><span className="spinner"/><span style={{marginLeft: "34px"}}>{messageInfo.message}</span></div>;
         } else {
-            return <div>{messageInfo.message}</div>
+            return <div>{messageInfo.message}</div>;
         }
-    }
+    };
 
     const getTitle = () => {
         if (messageInfo.title) {
@@ -41,13 +46,22 @@ const Message = (props) => {
         } else {
             return messageInfo.type;
         }
-    }
+    };
+    
+    const onEntered = () => {
+        if (messageInfo.type === SUCCESS) {
+            myTimeout = setTimeout(onHide, SUCCESS_MESSAGE_TIMEOUT);
+        } else if (myTimeout) {
+            clearTimeout(myTimeout);
+        }
+    };
     
     return (
             <Modal
                 show={messageInfo.show}
                 size="sm"
                 onHide={onHide}
+                onEntered={onEntered}
                 contentClassName={getClassName()}
                 backdrop={messageInfo.backdrop}
                 id="message-popup"
@@ -61,6 +75,6 @@ const Message = (props) => {
                 </Modal.Header>
                 <Modal.Body bsPrefix="message-body">{getMessage()}</Modal.Body>
             </Modal>);
-}
+};
 
 export default Message;

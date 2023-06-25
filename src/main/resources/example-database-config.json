@@ -3,7 +3,7 @@
     {
       "databaseType": "Oracle",
       "datasourceName": "oraclehr",
-      "description": "test",
+      "description": "test - new description 12345 ",
       "url": "jdbc:oracle:thin:@localhost:1521:xe",
       "driver": "oracle.jdbc.OracleDriver",
       "username": "HR",

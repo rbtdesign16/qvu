@@ -14,6 +14,8 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.rbt.qvu.configuration.security.BasicAuthSecurityProvider;
@@ -32,10 +34,20 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer.UserInfoEndpointConfig;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
@@ -140,7 +152,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-   
     @Bean
     @DependsOn("oauthrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
@@ -150,7 +161,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
-                .oauth2Login(withDefaults());
+                .oauth2Login(withDefaults());        
         return http.build();
     }
 

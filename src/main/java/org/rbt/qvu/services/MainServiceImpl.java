@@ -8,11 +8,13 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -62,17 +64,16 @@ public class MainServiceImpl implements MainService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("authetication=" + auth);
+        }
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             String userId = auth.getName();
-            String lastName = null;
-            String firstName = null;
             if (auth.getPrincipal() instanceof DefaultOAuth2User) {
                 DefaultOAuth2User oauser = (DefaultOAuth2User) auth.getPrincipal();
                 if (StringUtils.isNotEmpty(oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME))) {
                     userId = oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
                 }
-                
-                
             }
             
             QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
@@ -84,45 +85,44 @@ public class MainServiceImpl implements MainService {
 
             // users and roles are defined via json
             if (config.getSecurityConfig().isFileBasedSecurity()) {
-                retval.getAllRoles().addAll(Constants.PREDEFINED_ROLES);
+                retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
                 retval.setAllRoles(config.getSecurityConfig().getBasicConfiguration().getRoles());
-            } else if (authService != null) { // if we have a service defined we will try to loaf from there
+            } else if (authService != null){ // if we have a service defined we will try to loaf from there
                 retval.getAllRoles().addAll(authService.getAllRoles());
                 retval.getAllUsers().addAll(authService.getAllUsers());
             }
 
             // if we have users loaded try to find user based
             // on incoming user id
-            for (UserInformation u : retval.getAllUsers()) {
-                if (userId.equalsIgnoreCase(u.getUserId())) {
-                    retval.setCurrentUser(u);
-                    break;
+            if (StringUtils.isNotEmpty(userId)) {
+                for (UserInformation u : retval.getAllUsers()) {
+                    if (userId.equalsIgnoreCase(u.getUserId())) {
+                        retval.setCurrentUser(u);
+                        break;
+                    }
+                }
+                if (retval.getCurrentUser() == null) {
+                    UserInformation user = new UserInformation();
+                    user.setUserId(userId);
+                    retval.setCurrentUser(user);
+
+                    // only allow users and roles to be edited if we are loading
+                    // from json file
+                    retval.setAllowUserRoleEdit(config.getSecurityConfig().isFileBasedSecurity());
+                }
+
+                if (retval.getCurrentUser() != null) {
+                    if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
+                        loadUserAttributes(retval.getCurrentUser(), ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+                    } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
+                        loadUserAttributes(retval.getCurrentUser(), ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
+                    }
                 }
             }
-
-            if (retval.getCurrentUser() == null) {
-                UserInformation user = new UserInformation();
-                user.setUserId(userId);
-                retval.setCurrentUser(user);
-
-                // only allow users and roles to be edited if we are loading
-                // from json file
-                retval.setAllowUserRoleEdit(config.getSecurityConfig().isFileBasedSecurity());
-            }
-
-            if (retval.getCurrentUser() != null) {
-                if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
-                    loadUserAttributes(retval.getCurrentUser(), ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-                } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
-                    loadUserAttributes(retval.getCurrentUser(), ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-                }
-            }
-
-            LOG.error("---->" + gson.toJson(retval.getCurrentUser(), UserInformation.class));
-
+            
             if (LOG.isDebugEnabled()) {
-                //   LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
-            }
+                LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
+             }
         }
 
         return retval;
@@ -149,14 +149,51 @@ public class MainServiceImpl implements MainService {
     }
 
 
+    private boolean isRealmAccess(String att) {
+        boolean retval = false;
+
+        if (StringUtils.isNotEmpty(att)) {
+            retval = Constants.OAUTH2_CLAIM_ATTRIBUTE_REAL_ACCESS.equalsIgnoreCase(att.toLowerCase());
+        }
+
+        return retval;
+    }
     private boolean isRoleAttribute(String att) {
         boolean retval = false;
 
         if (StringUtils.isNotEmpty(att)) {
-            retval = (att.toLowerCase().startsWith("role_")
+            retval = (att.toLowerCase().startsWith(Constants.ROLE_PREFIX)
                     || att.equalsIgnoreCase(config.getSecurityConfig().getRoleAttributeName()));
         }
 
+        return retval;
+    }
+    
+    private List<String> getRolesFromRealmAccess(String in) {
+        List <String> retval = new ArrayList<>();
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("realm_access=" + in);
+        }
+        
+        if (StringUtils.isNotEmpty(in)) {
+            int pos = in.indexOf("[");
+            int pos2 = in.lastIndexOf("]");
+            
+            if (pos < pos2) {
+                String roleString = in.substring(pos + 1, pos2);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("realm_accces roles=" + roleString);
+                }
+                
+                StringTokenizer st = new StringTokenizer(roleString, ",");
+                
+                while (st.hasMoreTokens()) {
+                    retval.add(st.nextToken().trim());
+                }
+            }
+         }
+        
         return retval;
     }
     
@@ -166,7 +203,7 @@ public class MainServiceImpl implements MainService {
         if (StringUtils.isNotEmpty(in)) {
             if (in.toLowerCase().startsWith(Constants.ROLE_PREFIX)) {
                 retval = in.substring(Constants.ROLE_PREFIX.length());
-            } 
+            }
         }
         
         return retval;
@@ -194,7 +231,6 @@ public class MainServiceImpl implements MainService {
     }
 
     private void loadUserAttributes(UserInformation user, Map attributes) {
-        LOG.error("---->att=" + attributes);
         for (Object o : attributes.keySet()) {
             Object val = attributes.get(o);
             if (val != null) {
@@ -203,8 +239,10 @@ public class MainServiceImpl implements MainService {
                     int indx = 0;
                     for (Object o2 : (Collection) val) {
                         String val2 = o2.toString();
-                        if (isRoleAttribute(att)) {
-                           user.getRoles().add(formatRoleAttribute(val2));
+                        if (isRealmAccess(att)) {
+                            user.getRoles().addAll(getRolesFromRealmAccess(val2));
+                        } else if (isRoleAttribute(att)) {
+                            user.getRoles().add(formatRoleAttribute(val2));
                         } else {
                             String attName = formatAttributeName(att);
                             
@@ -229,7 +267,9 @@ public class MainServiceImpl implements MainService {
                     } else if (isFirstNameAttribute(att)) {
                         user.setFirstName(val.toString());
                     } else {
-                        if (isRoleAttribute(att)) {
+                        if (isRealmAccess(att)) {
+                            user.getRoles().addAll(getRolesFromRealmAccess(val.toString()));
+                        } else if (isRoleAttribute(att)) {
                             user.getRoles().add(formatRoleAttribute(val.toString()));
                         } else {
                             user.getAttributes().add(new UserAttribute(formatAttributeName(att), val.toString()));

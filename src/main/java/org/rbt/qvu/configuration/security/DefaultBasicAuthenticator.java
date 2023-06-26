@@ -53,7 +53,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         ui.setFirstName("John");
         ui.setLastName("Doe");
         ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "admin"));
-        ui.getRoles().addAll(Arrays.asList(Constants.PREDEFINED_ROLE_NAMES));
+    //    ui.getRoles().addAll(Arrays.asList(Constants.DEFAULT_ROLE_NAMES));
         
         retval.add(ui);
                 
@@ -62,8 +62,8 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         ui.setFirstName("Joe");
         ui.setLastName("Blow");
         ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "test"));
-        ui.getRoles().add("user");
-        ui.getRoles().add("report designer");
+   //     ui.getRoles().add("user");
+   //     ui.getRoles().add("report designer");
         
         retval.add(ui);
         
@@ -72,7 +72,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
 
     @Override
     public List<RoleInformation> getAllRoles() {
-        return Constants.PREDEFINED_ROLES;
+        return Constants.DEFAULT_ROLES;
     }
 
     private UserInformation findUser(String userId) {

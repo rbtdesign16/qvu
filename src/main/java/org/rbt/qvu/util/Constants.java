@@ -40,8 +40,9 @@ public class Constants {
     public static final String ROLE_PREFIX = "role_";
     public static final String SAML_FIRST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4.42";
     public static final String SAML_LAST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4";
+    public static final String OAUTH2_CLAIM_ATTRIBUTE_REAL_ACCESS = "realm_access";
 
-    public static final String[] PREDEFINED_ROLE_NAMES = {
+    public static final String[] DEFAULT_ROLE_NAMES = {
         "administrator",
         "query designer",
         "report designer",
@@ -62,18 +63,18 @@ public class Constants {
     };
 
             
-    public static final List<RoleInformation> PREDEFINED_ROLES = new ArrayList<>();
+    public static final List<RoleInformation> DEFAULT_ROLES = new ArrayList<>();
     public static final Set<String> LAST_NAME_ATTRIBUTES= new HashSet<>();
     public static final Set<String> FIRST_NAME_ATTRIBUTES = new HashSet<>();
 
     static {
         LAST_NAME_ATTRIBUTES.addAll(Arrays.asList(LAST_NAME_ATTRIBUE_NAMES));
         FIRST_NAME_ATTRIBUTES.addAll(Arrays.asList(FIRST_NAME_ATTRIBUE_NAMES));
-        for (String roleName : PREDEFINED_ROLE_NAMES) {
+        for (String roleName : DEFAULT_ROLE_NAMES) {
             RoleInformation ri = new RoleInformation();
             ri.setName(roleName);
             ri.setDescription("qvu " + roleName);
-            PREDEFINED_ROLES.add(ri);
+            DEFAULT_ROLES.add(ri);
         }
     }
 }

@@ -50,14 +50,18 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         List<UserInformation> retval = new ArrayList<>();
         UserInformation ui = new UserInformation();
         ui.setUserId("admin");
+        ui.setFirstName("John");
+        ui.setLastName("Doe");
         ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "admin"));
         ui.getRoles().addAll(Arrays.asList(Constants.PREDEFINED_ROLE_NAMES));
         
         retval.add(ui);
                 
         ui = new UserInformation();
-        ui.setUserId("user");
-        ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "user"));
+        ui.setUserId("tester");
+        ui.setFirstName("Joe");
+        ui.setLastName("Blow");
+        ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "test"));
         ui.getRoles().add("user");
         ui.getRoles().add("report designer");
         
@@ -81,5 +85,25 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
             }
         }
         return retval;
+    }
+
+    @Override
+    public int saveUser(UserInformation user) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int saveRole(RoleInformation role) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int deleteUser(String userId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int deleteRole(String roleName) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

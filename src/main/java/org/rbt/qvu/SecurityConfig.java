@@ -4,8 +4,6 @@
  */
 package org.rbt.qvu;
 
-import com.nimbusds.oauth2.sdk.token.AccessToken;
-import jakarta.servlet.http.HttpServletRequest;
 import org.rbt.qvu.configuration.Config;
 import java.io.File;
 import java.io.InputStream;
@@ -29,8 +27,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -46,9 +42,6 @@ import org.springframework.security.saml2.provider.service.registration.InMemory
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 @EnableWebSecurity
@@ -122,7 +115,6 @@ public class SecurityConfig {
 
     }
 
-
     @Bean
     @DependsOn("basicmgr")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
@@ -159,7 +151,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .oauth2Login(withDefaults());
-          return http.build();
+        return http.build();
     }
 
     private PrivateKey getPrivateKey(String keyFile) throws Exception {

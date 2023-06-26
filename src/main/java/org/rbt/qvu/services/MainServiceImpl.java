@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
@@ -64,23 +63,25 @@ public class MainServiceImpl implements MainService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
-            String userName = auth.getName();
+            String userId = auth.getName();
+            String lastName = null;
+            String firstName = null;
             if (auth.getPrincipal() instanceof DefaultOAuth2User) {
-                DefaultOAuth2User oauser = (DefaultOAuth2User)auth.getPrincipal();
+                DefaultOAuth2User oauser = (DefaultOAuth2User) auth.getPrincipal();
                 if (StringUtils.isNotEmpty(oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME))) {
-                    userName = oauser.getAttribute(oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
-                    LOG.error("----->cerd=" + auth.getCredentials());
-       //             AccessToken.Access access = accessToken.getRealmAccess();
- //Set<String> roles = access.getRoles();
-                 }
+                    userId = oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
+                }
+                
+                
             }
-             QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
+            
+            QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
 
             retval.setAdministratorRole(config.getSecurityConfig().getAdministratorRole());
             retval.setQueryDesignerRole(config.getSecurityConfig().getQueryDesignerRole());
             retval.setReportDesignerRole(config.getSecurityConfig().getReportDesignerRole());
             retval.setUserRole(config.getSecurityConfig().getUserRole());
-            
+
             // users and roles are defined via json
             if (config.getSecurityConfig().isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(Constants.PREDEFINED_ROLES);
@@ -93,7 +94,7 @@ public class MainServiceImpl implements MainService {
             // if we have users loaded try to find user based
             // on incoming user id
             for (UserInformation u : retval.getAllUsers()) {
-                if (userName.equalsIgnoreCase(u.getUserId())) {
+                if (userId.equalsIgnoreCase(u.getUserId())) {
                     retval.setCurrentUser(u);
                     break;
                 }
@@ -101,16 +102,12 @@ public class MainServiceImpl implements MainService {
 
             if (retval.getCurrentUser() == null) {
                 UserInformation user = new UserInformation();
-                user.setUserId(userName);
+                user.setUserId(userId);
                 retval.setCurrentUser(user);
-                
+
                 // only allow users and roles to be edited if we are loading
                 // from json file
                 retval.setAllowUserRoleEdit(config.getSecurityConfig().isFileBasedSecurity());
-                
-                for (GrantedAuthority ga : auth.getAuthorities()) {
-                    retval.getCurrentUser().getRoles().add(ga.getAuthority());
-                }
             }
 
             if (retval.getCurrentUser() != null) {
@@ -120,26 +117,71 @@ public class MainServiceImpl implements MainService {
                     loadUserAttributes(retval.getCurrentUser(), ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
                 }
             }
-            
+
             LOG.error("---->" + gson.toJson(retval.getCurrentUser(), UserInformation.class));
 
             if (LOG.isDebugEnabled()) {
-             //   LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
+                //   LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
             }
         }
 
         return retval;
     }
-    
+
+    private boolean isFirstNameAttribute(String att) {
+        boolean retval = false;
+
+        if (StringUtils.isNotEmpty(att)) {
+            retval = Constants.FIRST_NAME_ATTRIBUTES.contains(att.toLowerCase());
+        }
+
+        return retval;
+    }
+
+    private boolean isLastNameAttribute(String att) {
+        boolean retval = false;
+
+        if (StringUtils.isNotEmpty(att)) {
+            retval = Constants.LAST_NAME_ATTRIBUTES.contains(att.toLowerCase());
+        }
+
+        return retval;
+    }
+
+
     private boolean isRoleAttribute(String att) {
         boolean retval = false;
-        
+
         if (StringUtils.isNotEmpty(att)) {
-            retval = (att.toLowerCase().startsWith("role_") 
-                 || att.equalsIgnoreCase(config.getSecurityConfig().getRoleAttributeName()));
+            retval = (att.toLowerCase().startsWith("role_")
+                    || att.equalsIgnoreCase(config.getSecurityConfig().getRoleAttributeName()));
         }
-    
+
         return retval;
+    }
+    
+    private String formatRoleAttribute(String in) {
+        String retval = in;
+        
+        if (StringUtils.isNotEmpty(in)) {
+            if (in.toLowerCase().startsWith(Constants.ROLE_PREFIX)) {
+                retval = in.substring(Constants.ROLE_PREFIX.length());
+            } 
+        }
+        
+        return retval;
+    }
+    
+    private String formatAttributeName(String in) {
+        String retval = in;
+        if (StringUtils.isNotEmpty(in)) {
+            if (Constants.SAML_FIRST_NAME_ATTRIBUTE_KEY.equals(in)) {
+                retval = "first_name";
+            } else if (Constants.SAML_LAST_NAME_ATTRIBUTE_KEY.equals(in)) {
+                retval = "last_name";
+            } 
+        }
+         return retval;
     }
 
     @Override
@@ -152,6 +194,7 @@ public class MainServiceImpl implements MainService {
     }
 
     private void loadUserAttributes(UserInformation user, Map attributes) {
+        LOG.error("---->att=" + attributes);
         for (Object o : attributes.keySet()) {
             Object val = attributes.get(o);
             if (val != null) {
@@ -161,31 +204,36 @@ public class MainServiceImpl implements MainService {
                     for (Object o2 : (Collection) val) {
                         String val2 = o2.toString();
                         if (isRoleAttribute(att)) {
-                            LOG.error("------>" + att + "=" + val2);
-                            if (val2.toLowerCase().startsWith("role_")) {
-                                val2 = val2.substring(5);
-                            } 
-                            user.getRoles().add(val2);
+                           user.getRoles().add(formatRoleAttribute(val2));
                         } else {
-                            if (indx == 0) {
-                                user.getAttributes().add(new UserAttribute(att, val2));
+                            String attName = formatAttributeName(att);
+                            
+                            if (isLastNameAttribute(att)) {
+                                user.setLastName(val2);
+                            } else if (isFirstNameAttribute(attName)) {
+                                user.setFirstName(val2);
                             } else {
-                                user.getAttributes().add(new UserAttribute(att + indx, val2));
+                                if (indx == 0) {
+                                    user.getAttributes().add(new UserAttribute(formatAttributeName(att), val2));
+                                } else {
+                                    user.getAttributes().add(new UserAttribute(formatAttributeName(att) + indx, val2));
+                                }
                             }
 
                             indx++;
                         }
                     }
                 } else {
-                    if (isRoleAttribute(att)) {
-                        String val2 = val.toString();
-                        LOG.error("------>" + att + "=" + val2);
-                        if (val2.toLowerCase().startsWith("role_")) {
-                            val2 = val2.substring(5);
-                        } 
-                        user.getRoles().add(val2);
-                    } else {       
-                        user.getAttributes().add(new UserAttribute(att, val.toString()));
+                    if (isLastNameAttribute(att)) {
+                        user.setLastName(val.toString());
+                    } else if (isFirstNameAttribute(att)) {
+                        user.setFirstName(val.toString());
+                    } else {
+                        if (isRoleAttribute(att)) {
+                            user.getRoles().add(formatRoleAttribute(val.toString()));
+                        } else {
+                            user.getAttributes().add(new UserAttribute(formatAttributeName(att), val.toString()));
+                        }
                     }
                 }
             }

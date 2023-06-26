@@ -326,12 +326,20 @@ const Admin = (props) => {
             width: "85px"
         },
         fieldStyle: {
-            width: "100px"
+            width: "120px"
         },
         displayConfig: [
             {
                 label: "User ID:",
                 field: "userId"
+            },
+{
+                label: "First Name:",
+                field: "firstName"
+            },
+            {
+                label: "Last Name:",
+                field: "lastName"
             }
         ],
         data: authData.allUsers

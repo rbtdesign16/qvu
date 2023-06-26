@@ -5,14 +5,19 @@
 package org.rbt.qvu.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.rbt.qvu.client.utils.RoleInformation;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 
 /**
  *
  * @author rbtuc
  */
 public class Constants {
+
     // environment variables for ecternal config 
     public static final String SECURITY_TYPE_PROPERTY = "QVU_SECURITY_TYPE";
 
@@ -27,26 +32,48 @@ public class Constants {
     public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
     public static final String DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
     public static final String DEFAULT_USER_ROLE = "user";
-    
-    
+
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";
     public static final String NONE = "none";
-    
-   public static final String[] PREDEFINED_ROLE_NAMES = {
-        "administrator", 
-        "query designer", 
+
+    public static final String ROLE_PREFIX = "role_";
+    public static final String SAML_FIRST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4.42";
+    public static final String SAML_LAST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4";
+
+    public static final String[] PREDEFINED_ROLE_NAMES = {
+        "administrator",
+        "query designer",
         "report designer",
         "user"};
-   
-   public static final List<RoleInformation> PREDEFINED_ROLES = new ArrayList<>();
-   
-   static {
-       for (String roleName : PREDEFINED_ROLE_NAMES) {
-           RoleInformation ri = new RoleInformation();
-           ri.setName(roleName);
-           ri.setDescription("qvu " + roleName);
-           PREDEFINED_ROLES.add(ri);
-       }
-   }
+
+    public static final String[] LAST_NAME_ATTRIBUE_NAMES = {
+        "last_name", 
+        "lastName", 
+        SAML_LAST_NAME_ATTRIBUTE_KEY,
+        StandardClaimNames.FAMILY_NAME
+    };
+    
+    public static final String[] FIRST_NAME_ATTRIBUE_NAMES = {
+        "first_name", 
+        "firstName", 
+        SAML_FIRST_NAME_ATTRIBUTE_KEY,
+        StandardClaimNames.GIVEN_NAME
+    };
+
+            
+    public static final List<RoleInformation> PREDEFINED_ROLES = new ArrayList<>();
+    public static final Set<String> LAST_NAME_ATTRIBUTES= new HashSet<>();
+    public static final Set<String> FIRST_NAME_ATTRIBUTES = new HashSet<>();
+
+    static {
+        LAST_NAME_ATTRIBUTES.addAll(Arrays.asList(LAST_NAME_ATTRIBUE_NAMES));
+        FIRST_NAME_ATTRIBUTES.addAll(Arrays.asList(FIRST_NAME_ATTRIBUE_NAMES));
+        for (String roleName : PREDEFINED_ROLE_NAMES) {
+            RoleInformation ri = new RoleInformation();
+            ri.setName(roleName);
+            ri.setDescription("qvu " + roleName);
+            PREDEFINED_ROLES.add(ri);
+        }
+    }
 }

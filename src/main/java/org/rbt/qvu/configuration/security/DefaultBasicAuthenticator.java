@@ -5,12 +5,12 @@
 package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.client.utils.AuthenticationException;
 import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.util.Constants;
@@ -88,22 +88,22 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     }
 
     @Override
-    public int saveUser(UserInformation user) {
+    public int saveUser(UserInformation user)  throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int saveRole(RoleInformation role) {
+    public int saveRole(RoleInformation role)  throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int deleteUser(String userId) {
+    public int deleteUser(String userId) throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int deleteRole(String roleName) {
+    public int deleteRole(String roleName) throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

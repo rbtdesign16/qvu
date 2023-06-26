@@ -4,7 +4,6 @@
     "reportDesignerRole": "report designer",
     "userRole": "user",
     "allowServiceSave": false,
-    "fileBasedSecurity": true,
     "samlConfiguration": {
         "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
         "signAssertions": true,

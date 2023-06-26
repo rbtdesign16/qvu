@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.configuration.Config;
@@ -276,6 +277,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public SaveResult saveRole(RoleInformation role) {
         SaveResult retval = new SaveResult();
+            try {
+                config.getSecurityConfig().getAuthenticatorService().saveRole(role);
+            } catch (Exception ex) {
+                retval.setError(true);
+                retval.setMessage(ex.toString());
+            }
 
         return retval;
 
@@ -284,6 +291,14 @@ public class MainServiceImpl implements MainService {
     @Override
     public SaveResult deleteRole(String roleName) {
         SaveResult retval = new SaveResult();
+        if (config.getSecurityConfig().isAllowServiceSave()) {
+            try {
+                config.getSecurityConfig().getAuthenticatorService().deleteRole(roleName);
+            } catch (Exception ex) {
+                retval.setError(true);
+                retval.setMessage(ex.toString());
+            }
+        }
 
         return retval;
 
@@ -292,6 +307,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public SaveResult saveUser(UserInformation user) {
         SaveResult retval = new SaveResult();
+            try {
+                config.getSecurityConfig().getAuthenticatorService().saveUser(user);
+            } catch (Exception ex) {
+                retval.setError(true);
+                retval.setMessage(ex.toString());
+            }
 
         return retval;
 
@@ -300,6 +321,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public SaveResult deleteUser(String userId) {
         SaveResult retval = new SaveResult();
+            try {
+                config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
+            } catch (Exception ex) {
+                retval.setError(true);
+                retval.setMessage(ex.toString());
+            }
 
         return retval;
 

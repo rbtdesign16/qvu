@@ -18,6 +18,7 @@ public class SecurityConfiguration {
     private String securityType;
     private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
     private boolean fileBasedSecurity = false;
+    private boolean allowServiceSave = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
@@ -72,7 +73,7 @@ public class SecurityConfiguration {
     }
     
     public boolean canAddUsersAndRoles() {
-        return (isBasic() && StringUtils.isEmpty(this.authenticatorServiceClassName));
+        return (isBasic() || isAllowServiceSave());
     }
 
     public String getSecurityType() {
@@ -134,6 +135,18 @@ public class SecurityConfiguration {
     public void setUserRole(String userRole) {
         this.userRole = userRole;
     }
-    
-    
+
+    public boolean isAllowServiceSave() {
+        boolean retval = StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;
+        
+        System.out.println("----------->" + retval);
+        
+        return retval;
+    }
+
+    public void setAllowServiceSave(boolean allowServiceSave) {
+        this.allowServiceSave = allowServiceSave;
+    }
+
+   
 }

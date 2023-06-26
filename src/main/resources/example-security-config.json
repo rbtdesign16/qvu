@@ -3,6 +3,7 @@
     "queryDesignerRole": "query designer",
     "reportDesignerRole": "report designer",
     "userRole": "user",
+    "allowServiceSave": true,
     "samlConfiguration": {
         "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
         "signAssertions": true,

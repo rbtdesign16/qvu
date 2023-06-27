@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.Role;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 
 /**
@@ -63,7 +63,7 @@ public class Constants {
     };
 
             
-    public static final List<RoleInformation> DEFAULT_ROLES = new ArrayList<>();
+    public static final List<Role> DEFAULT_ROLES = new ArrayList<>();
     public static final Set<String> LAST_NAME_ATTRIBUTES= new HashSet<>();
     public static final Set<String> FIRST_NAME_ATTRIBUTES = new HashSet<>();
 
@@ -71,7 +71,7 @@ public class Constants {
         LAST_NAME_ATTRIBUTES.addAll(Arrays.asList(LAST_NAME_ATTRIBUE_NAMES));
         FIRST_NAME_ATTRIBUTES.addAll(Arrays.asList(FIRST_NAME_ATTRIBUE_NAMES));
         for (String roleName : DEFAULT_ROLE_NAMES) {
-            RoleInformation ri = new RoleInformation();
+            Role ri = new Role();
             ri.setName(roleName);
             ri.setDescription("qvu " + roleName);
             DEFAULT_ROLES.add(ri);

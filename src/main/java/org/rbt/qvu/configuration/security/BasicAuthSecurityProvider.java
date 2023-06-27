@@ -5,6 +5,7 @@
 package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +13,9 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.SecurityConfig;
-import org.rbt.qvu.client.utils.QvuAuthenticationService;
-import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.UserAttribute;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.rbt.qvu.client.utils.SecurityService;
 
 /**
  *
@@ -43,9 +44,9 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
     private String authenticatorClass;
 
-    private Map<String, UserInformation> userMap = new HashMap<>();
-    private List<RoleInformation> roles = new ArrayList<>();
-    private List<UserInformation> users = new ArrayList<>();
+    private Map<String, User> userMap = new HashMap<>();
+    private List<Role> roles = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     @PostConstruct
     private void init() {
@@ -57,7 +58,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
             // if no authenticator service then load from config file
             if (securityConfig.isFileBasedSecurity()) {
-                for (UserInformation uinfo : securityConfig.getBasicConfiguration().getUsers()) {
+                for (User uinfo : securityConfig.getBasicConfiguration().getUsers()) {
                     userMap.put(uinfo.getUserId(), uinfo);
                 }
             }
@@ -79,7 +80,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 throw new Exception("usename and password required");
             }
 
-            QvuAuthenticationService service = config.getSecurityConfig().getAuthenticatorService();
+            SecurityService service = config.getSecurityConfig().getAuthenticatorService();
             
             if (config.getSecurityConfig().isFileBasedSecurity()) {
                 retval = authenticateFromProperties(name, password);
@@ -99,17 +100,17 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         return true;
     }
 
-    private Authentication authenticateWithClass(QvuAuthenticationService service, String name, String password) throws Exception {
+    private Authentication authenticateWithClass(SecurityService service, String name, String password) throws Exception {
         Authentication retval = null;
         if (service.authenticate(name, password)) {
-            UserInformation uinfo = service.getUserInformation(name);
+            User uinfo = service.getUser(name);
             retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
         }
 
         return retval;
     }
 
-    private String getUserPassword(List<UserAttribute> attributes) {
+    private String getUserPassword(Collection<UserAttribute> attributes) {
         String retval = null;
 
         if (attributes != null) {
@@ -127,7 +128,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     private Authentication authenticateFromProperties(String name, String password) throws Exception {
         LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
-        UserInformation uinfo = userMap.get(name);
+        User uinfo = userMap.get(name);
 
         String storedPassword = getUserPassword(uinfo.getAttributes());
         if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
@@ -141,7 +142,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         return retval;
     }
 
-    private List<SimpleGrantedAuthority> toGrantedAuthority(List<String> in) {
+    private List<SimpleGrantedAuthority> toGrantedAuthority(Collection<String> in) {
         List<SimpleGrantedAuthority> retval = new ArrayList<>();
 
         if (in != null) {

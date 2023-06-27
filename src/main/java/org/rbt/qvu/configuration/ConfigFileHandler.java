@@ -16,12 +16,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import org.rbt.qvu.client.utils.RoleInformation;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.OperationResult;
+import org.rbt.qvu.client.utils.Role;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
-import org.rbt.qvu.dto.SaveResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +52,8 @@ public class ConfigFileHandler {
         return retval;
     }
 
-    public SaveResult saveDatasource(DataSourceConfiguration datasource) {
-        SaveResult retval = new SaveResult();
+    public OperationResult saveDatasource(DataSourceConfiguration datasource) {
+        OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
             File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
@@ -91,15 +91,15 @@ public class ConfigFileHandler {
                 config.setDatasourcesConfig(datasources);
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;
     }
 
-     public SaveResult deleteDatasource(String datasourceName) {
-        SaveResult retval = new SaveResult();
+     public OperationResult deleteDatasource(String datasourceName) {
+        OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
             File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
@@ -129,16 +129,16 @@ public class ConfigFileHandler {
                 }
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;
 
     }
 
-    public SaveResult saveRole(RoleInformation role) {
-        SaveResult retval = new SaveResult();
+    public OperationResult saveRole(Role role) {
+        OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
             File f = new File(config.getAppConfig().getSecurityConfigurationFile());
@@ -148,9 +148,9 @@ public class ConfigFileHandler {
 
                 if (securityConfig != null) {
                     int indx = -1;
-                    List<RoleInformation> roles = securityConfig.getBasicConfiguration().getRoles();
+                    List<Role> roles = securityConfig.getBasicConfiguration().getRoles();
                     for (int i = 0; i < roles.size(); ++i) {
-                        RoleInformation r = roles.get(i);
+                        Role r = roles.get(i);
                         if (r.getName().equalsIgnoreCase(role.getName())) {
                             indx = i;
                             break;
@@ -163,9 +163,9 @@ public class ConfigFileHandler {
                         roles.add(role);
                     }
                     
-                    Collections.sort(roles, new Comparator<RoleInformation>() {
+                    Collections.sort(roles, new Comparator<Role>() {
                         @Override
-                        public int compare(RoleInformation o1, RoleInformation o2) {
+                        public int compare(Role o1, Role o2) {
                             return o1.getName().compareTo(o2.getName());
                             
                         }
@@ -185,15 +185,15 @@ public class ConfigFileHandler {
                 }
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;
     }
 
-    public SaveResult deleteRole(String roleName) {
-        SaveResult retval = new SaveResult();
+    public OperationResult deleteRole(String roleName) {
+        OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
             File f = new File(config.getAppConfig().getSecurityConfigurationFile());
@@ -202,9 +202,9 @@ public class ConfigFileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    Iterator<RoleInformation> it = securityConfig.getBasicConfiguration().getRoles().iterator();
+                    Iterator<Role> it = securityConfig.getBasicConfiguration().getRoles().iterator();
                     while (it.hasNext()) {
-                        RoleInformation r = it.next();
+                        Role r = it.next();
                         if (r.getName().equalsIgnoreCase(roleName)) {
                             it.remove();
                             break;
@@ -223,16 +223,16 @@ public class ConfigFileHandler {
                 }
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;
 
     }
 
-    public SaveResult saveUser(UserInformation user) {
-        SaveResult retval = new SaveResult();
+    public OperationResult saveUser(User user) {
+        OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
             File f = new File(config.getAppConfig().getSecurityConfigurationFile());
@@ -242,9 +242,9 @@ public class ConfigFileHandler {
 
                 if (securityConfig != null) {
                     int indx = -1;
-                    List<UserInformation> users = securityConfig.getBasicConfiguration().getUsers();
+                    List<User> users = securityConfig.getBasicConfiguration().getUsers();
                     for (int i = 0; i < users.size(); ++i) {
-                        UserInformation u = users.get(i);
+                        User u = users.get(i);
                         if (u.getUserId().equalsIgnoreCase(user.getUserId())) {
                             indx = i;
                             break;
@@ -257,9 +257,9 @@ public class ConfigFileHandler {
                         users.add(user);
                     }
                     
-                    Collections.sort(users, new Comparator<UserInformation>() {
+                    Collections.sort(users, new Comparator<User>() {
                         @Override
-                        public int compare(UserInformation o1, UserInformation o2) {
+                        public int compare(User o1, User o2) {
                             return o1.getUserId().compareTo(o2.getUserId());
                          }
                         
@@ -278,15 +278,15 @@ public class ConfigFileHandler {
                 }
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;
     }
 
-    public SaveResult deleteUser(String userId) {
-        SaveResult retval = new SaveResult();
+    public OperationResult deleteUser(String userId) {
+        OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
             File f = new File(config.getAppConfig().getSecurityConfigurationFile());
@@ -295,9 +295,9 @@ public class ConfigFileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    Iterator<UserInformation> it = securityConfig.getBasicConfiguration().getUsers().iterator();
+                    Iterator<User> it = securityConfig.getBasicConfiguration().getUsers().iterator();
                     while (it.hasNext()) {
-                        UserInformation u = it.next();
+                        User u = it.next();
                         if (u.getUserId().equalsIgnoreCase(userId)) {
                             it.remove();
                             break;
@@ -316,8 +316,8 @@ public class ConfigFileHandler {
                 }
             }
         } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setError(ex);
         }
 
         return retval;

@@ -5,8 +5,8 @@
 package org.rbt.qvu.configuration.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.util.Constants;
+import org.rbt.qvu.client.utils.SecurityService;
 
 /**
  *
@@ -61,12 +61,12 @@ public class SecurityConfiguration {
         this.authenticatorServiceClassName = authenticatorServiceClassName;
     }
     
-    public QvuAuthenticationService getAuthenticatorService() throws Exception {
-        QvuAuthenticationService retval = null;
+    public SecurityService getAuthenticatorService() throws Exception {
+        SecurityService retval = null;
         if (StringUtils.isNotEmpty(authenticatorServiceClassName)) {
             Class c = Class.forName(authenticatorServiceClassName);
-            if (QvuAuthenticationService.class.isAssignableFrom(c)) {
-                retval = (QvuAuthenticationService)c.getDeclaredConstructor().newInstance();
+            if (SecurityService.class.isAssignableFrom(c)) {
+                retval = (SecurityService)c.getDeclaredConstructor().newInstance();
             }
         }
         return retval;

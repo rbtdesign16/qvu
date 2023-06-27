@@ -7,16 +7,15 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.client.utils.QvuAuthenticationService;
-import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.OperationResult;
+import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.UserAttribute;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.configuration.ConfigFileHandler;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
-import org.rbt.qvu.dto.SaveResult;
 import org.rbt.qvu.util.AuthHelper;
 import static org.rbt.qvu.util.AuthHelper.isFirstNameAttribute;
 import static org.rbt.qvu.util.AuthHelper.isLastNameAttribute;
@@ -32,9 +31,11 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
+import org.rbt.qvu.client.utils.SecurityService;
 
 @Service
 public class MainServiceImpl implements MainService {
+
     private static Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
     @Autowired
@@ -42,9 +43,9 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private Config config;
-    
+
     @Autowired
-    private ConfigFileHandler configFileHandler;   
+    private ConfigFileHandler configFileHandler;
 
     @PostConstruct
     private void init() {
@@ -70,7 +71,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
 
-            QvuAuthenticationService authService = config.getSecurityConfig().getAuthenticatorService();
+            SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
             retval.setAdministratorRole(scfg.getAdministratorRole());
             retval.setQueryDesignerRole(scfg.getQueryDesignerRole());
@@ -90,14 +91,14 @@ public class MainServiceImpl implements MainService {
             // if we have users loaded try to find user based
             // on incoming user id
             if (StringUtils.isNotEmpty(userId)) {
-                for (UserInformation u : retval.getAllUsers()) {
+                for (User u : retval.getAllUsers()) {
                     if (userId.equalsIgnoreCase(u.getUserId())) {
                         retval.setCurrentUser(u);
                         break;
                     }
                 }
                 if (retval.getCurrentUser() == null) {
-                    UserInformation user = new UserInformation();
+                    User user = new User();
                     user.setUserId(userId);
                     retval.setCurrentUser(user);
                 }
@@ -112,7 +113,7 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
-            
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
             }
@@ -121,8 +122,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    
-    private void loadUserAttributes(UserInformation user, Map attributes) {
+    private void loadUserAttributes(User user, Map attributes) {
         for (Object o : attributes.keySet()) {
             Object val = attributes.get(o);
             if (val != null) {
@@ -171,87 +171,87 @@ public class MainServiceImpl implements MainService {
             }
         }
     }
-    
+
     @Override
     public List<DataSourceConfiguration> loadDatasources() {
         return configFileHandler.loadDatasources();
     }
 
     @Override
-    public SaveResult saveDatasource(DataSourceConfiguration datasource) {
+    public OperationResult saveDatasource(DataSourceConfiguration datasource) {
         return configFileHandler.saveDatasource(datasource);
     }
 
     @Override
-    public SaveResult deleteDatasource(String datasourceName) {
+    public OperationResult deleteDatasource(String datasourceName) {
         return configFileHandler.deleteDatasource(datasourceName);
     }
 
     @Override
-    public SaveResult saveRole(RoleInformation role) {
-        SaveResult retval = new SaveResult();
+    public OperationResult saveRole(Role role) {
+        OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
-                config.getSecurityConfig().getAuthenticatorService().saveRole(role);
+                retval = config.getSecurityConfig().getAuthenticatorService().saveRole(role);
             } catch (Exception ex) {
-                retval.setError(true);
-                retval.setMessage(ex.toString());
+                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+                retval.setError(ex);
             }
         } else {
             retval = configFileHandler.saveRole(role);
         }
-        
+
         return retval;
     }
-    
+
     @Override
-    public SaveResult deleteRole(String roleName) {
-        SaveResult retval = new SaveResult();
+    public OperationResult deleteRole(String roleName) {
+        OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
-                config.getSecurityConfig().getAuthenticatorService().deleteRole(roleName);
+                retval = config.getSecurityConfig().getAuthenticatorService().deleteRole(roleName);
             } catch (Exception ex) {
-                retval.setError(true);
-                retval.setMessage(ex.toString());
+                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+                retval.setError(ex);
             }
         } else {
             retval = configFileHandler.deleteRole(roleName);
         }
-        
+
         return retval;
     }
 
     @Override
-    public SaveResult saveUser(UserInformation user) {
-        SaveResult retval = new SaveResult();
+    public OperationResult saveUser(User user) {
+        OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
-                config.getSecurityConfig().getAuthenticatorService().saveUser(user);
+                retval = config.getSecurityConfig().getAuthenticatorService().saveUser(user);
             } catch (Exception ex) {
-                retval.setError(true);
-                retval.setMessage(ex.toString());
+                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+                retval.setError(ex);
             }
         } else {
             retval = configFileHandler.saveUser(user);
         }
-        
+
         return retval;
     }
 
     @Override
-    public SaveResult deleteUser(String userId) {
-        SaveResult retval = new SaveResult();
+    public OperationResult deleteUser(String userId) {
+        OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
-                config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
+                retval = config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
             } catch (Exception ex) {
-                retval.setError(true);
-                retval.setMessage(ex.toString());
+                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+                retval.setError(ex);
             }
         } else {
             retval = configFileHandler.deleteUser(userId);
         }
-        
+
         return retval;
     }
 }

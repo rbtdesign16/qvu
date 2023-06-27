@@ -6,8 +6,8 @@ package org.rbt.qvu.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.rbt.qvu.client.utils.RoleInformation;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.Role;
+import org.rbt.qvu.client.utils.User;
 
 /**
  *
@@ -18,32 +18,32 @@ public class AuthData {
     private String queryDesignerRole;
     private String reportDesignerRole;
     private String userRole;
-    private List<RoleInformation> allRoles = new ArrayList<>();
-    private List<UserInformation> allUsers = new ArrayList<>();
-    private UserInformation currentUser;
+    private List<Role> allRoles = new ArrayList<>();
+    private List<User> allUsers = new ArrayList<>();
+    private User currentUser;
     private boolean allowUserRoleEdit;
 
-    public List<RoleInformation> getAllRoles() {
+    public List<Role> getAllRoles() {
         return allRoles;
     }
 
-    public void setAllRoles(List<RoleInformation> allRoles) {
+    public void setAllRoles(List<Role> allRoles) {
         this.allRoles = allRoles;
     }
 
-    public List<UserInformation> getAllUsers() {
+    public List<User> getAllUsers() {
         return allUsers;
     }
 
-    public void setAllUsers(List<UserInformation> allUsers) {
+    public void setAllUsers(List<User> allUsers) {
         this.allUsers = allUsers;
     }
 
-    public UserInformation getCurrentUser() {
+    public User getCurrentUser() {
         return currentUser;
     }
 
-    public void setCurrentUser(UserInformation currentUser) {
+    public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
     }
 

@@ -6,22 +6,24 @@ package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.rbt.qvu.client.utils.QvuAuthenticationService;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.client.utils.AuthenticationException;
-import org.rbt.qvu.client.utils.RoleInformation;
+import org.rbt.qvu.client.utils.DeleteException;
+import org.rbt.qvu.client.utils.OperationResult;
+import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.rbt.qvu.client.utils.SecurityService;
 
 /**
  *
  * @author rbtuc
  */
-public class DefaultBasicAuthenticator implements QvuAuthenticationService {
+public class DefaultBasicAuthenticator implements SecurityService {
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
    
     private static final String ADMIN = "admin";
@@ -41,14 +43,14 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     }
 
     @Override
-    public UserInformation getUserInformation(String userId) {
+    public User getUser(String userId) {
         return findUser(userId);
     }
 
     @Override
-    public List<UserInformation> getAllUsers() {
-        List<UserInformation> retval = new ArrayList<>();
-        UserInformation ui = new UserInformation();
+    public List<User> getAllUsers() {
+        List<User> retval = new ArrayList<>();
+        User ui = new User();
         ui.setUserId("admin");
         ui.setFirstName("John");
         ui.setLastName("Doe");
@@ -57,7 +59,7 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
         
         retval.add(ui);
                 
-        ui = new UserInformation();
+        ui = new User();
         ui.setUserId("tester");
         ui.setFirstName("Joe");
         ui.setLastName("Blow");
@@ -71,14 +73,14 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     }
 
     @Override
-    public List<RoleInformation> getAllRoles() {
+    public List<Role> getAllRoles() {
         return Constants.DEFAULT_ROLES;
     }
 
-    private UserInformation findUser(String userId) {
-        UserInformation retval = null;
-        List<UserInformation> users = getAllUsers();
-        for (UserInformation u : users) {
+    private User findUser(String userId) {
+        User retval = null;
+        List<User> users = getAllUsers();
+        for (User u : users) {
             if (userId.equalsIgnoreCase(u.getUserId())) {
                 retval = u;
                 break;
@@ -88,22 +90,22 @@ public class DefaultBasicAuthenticator implements QvuAuthenticationService {
     }
 
     @Override
-    public int saveUser(UserInformation user)  throws SaveException {
+    public OperationResult saveUser(User user)  throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int saveRole(RoleInformation role)  throws SaveException {
+    public OperationResult saveRole(Role role)  throws SaveException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int deleteUser(String userId) throws SaveException {
+    public OperationResult deleteUser(String userId) throws DeleteException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
-    public int deleteRole(String roleName) throws SaveException {
+    public OperationResult deleteRole(String roleName) throws DeleteException {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

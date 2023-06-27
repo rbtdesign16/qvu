@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.rbt.qvu.client.utils.RoleInformation;
-import org.rbt.qvu.client.utils.UserInformation;
+import org.rbt.qvu.client.utils.OperationResult;
+import org.rbt.qvu.client.utils.Role;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
-import org.rbt.qvu.dto.SaveResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,37 +58,37 @@ public class MainController {
     }
     
     @PostMapping("api/v1/auth/role/save")
-    public SaveResult saveRole(@RequestBody RoleInformation role) {
+    public OperationResult saveRole(@RequestBody Role role) {
         LOG.debug("in saveRole()");
         return service.saveRole(role);
     }
     
     @DeleteMapping("api/v1/auth/role/{roleName}")
-    public SaveResult deleteRole(@PathVariable String roleName) {
+    public OperationResult deleteRole(@PathVariable String roleName) {
         LOG.debug("in deleteRole(" + roleName + ")");
         return service.deleteRole(roleName);
     }
     
     @PostMapping("api/v1/auth/user/save")
-    public SaveResult saveUser(@RequestBody UserInformation user) {
+    public OperationResult saveUser(@RequestBody User user) {
         LOG.debug("in saveUser()");
         return service.saveUser(user);
     }
     
     @DeleteMapping("api/v1/auth/user/{userId}")
-    public SaveResult deleteUser(@PathVariable String userId) {
+    public OperationResult deleteUser(@PathVariable String userId) {
         LOG.debug("in deleteUser(" + userId + ")");
         return service.deleteUser(userId);
     }
     
     @PostMapping("api/v1/db/datasource/save")
-    public SaveResult saveDatasource(@RequestBody DataSourceConfiguration datasource) {
+    public OperationResult saveDatasource(@RequestBody DataSourceConfiguration datasource) {
         LOG.debug("in saveDatasource()");
         return service.saveDatasource(datasource);
     }
     
     @DeleteMapping("api/v1/db/datasources/{datasourceName}")
-    public SaveResult deleteDatasource(@PathVariable String datasourceName) {
+    public OperationResult deleteDatasource(@PathVariable String datasourceName) {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");
         return service.deleteDatasource(datasourceName);
     }

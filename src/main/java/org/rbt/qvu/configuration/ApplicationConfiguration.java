@@ -4,17 +4,25 @@
  */
 package org.rbt.qvu.configuration;
 
+import java.io.File;
+
 /**
  *
  * @author rbtuc
  */
 public class ApplicationConfiguration {
     private String securityType;
-    private String queryDocumentsFolder;
-    private String reportDocumentsFolder;
-    private String securityConfigurationFile;
-    private String databaseConfigurationFile;
+    private String repositoryFolder;
 
+    public String getRepositoryFolder() {
+        return repositoryFolder;
+    }
+
+    public void setRepositoryFolder(String repositoryFolder) {
+        this.repositoryFolder = repositoryFolder;
+    }
+
+    
     public String getSecurityType() {
         return securityType;
     }
@@ -24,36 +32,19 @@ public class ApplicationConfiguration {
     }
 
     public String getQueryDocumentsFolder() {
-        return queryDocumentsFolder;
-    }
-
-    public void setQueryDocumentsFolder(String queryDocumentsFolder) {
-        this.queryDocumentsFolder = queryDocumentsFolder;
+        return repositoryFolder + File.separator + "query-documents";
     }
 
     public String getReportDocumentsFolder() {
-        return reportDocumentsFolder;
-    }
-
-    public void setReportDocumentsFolder(String reportDocumentsFolder) {
-        this.reportDocumentsFolder = reportDocumentsFolder;
+        return repositoryFolder + File.separator + "report-documents";
     }
 
     public String getSecurityConfigurationFile() {
-        return securityConfigurationFile;
+        return repositoryFolder + File.separator + "config" + File.separator + "security.json";
     }
 
-    public void setSecurityConfigurationFile(String securityConfigurationFile) {
-        this.securityConfigurationFile = securityConfigurationFile;
+    public String getDatasourceConfigurationFile() {
+        return repositoryFolder + File.separator + "config" + File.separator + "datasource.json";
     }
 
-    public String getDatabaseConfigurationFile() {
-        return databaseConfigurationFile;
-    }
-
-    public void setDatabaseConfigurationFile(String databaseConfigurationFile) {
-        this.databaseConfigurationFile = databaseConfigurationFile;
-    }
-    
-    
 }

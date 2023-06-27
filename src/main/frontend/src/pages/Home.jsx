@@ -10,11 +10,12 @@ import Splash from "../widgets/Splash"
 import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
+import InitialSetup from "./InitialSetup";
 import PropTypes from "prop-types";
 import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/helper"
 
 
-        const Home = (props) => {
+const Home = (props) => {
     const {copyright, version} = props;
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
@@ -36,7 +37,7 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
         } else if (isReportDesigner(authData)) {
             return "rdsgn";
         }
-    }
+    };
 
     const hasTabAcccess = () => {
         return isAdministrator(authData) || isQueryDesigner(authData) || isReportDesigner(authData);
@@ -44,7 +45,9 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
 
     const getBody = () => {
         if (authData) {
-            if (hasTabAcccess()) {
+            if (authData.initialSetupRequired) {
+                return <InitialSetup/>;
+            } else if (hasTabAcccess()) {
                 return (
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">

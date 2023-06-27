@@ -1,0 +1,54 @@
+{
+    "fileBasedSecurity": true,
+    "samlConfiguration": {
+        "idpUrl": "",
+        "signAssertions": true,
+        "spEntityId": "",
+        "signingCertFileName": "",
+        "signingKeyFileName": ""
+    },
+    "oidcConfiguration": {
+        "issuerLocationUrl": "",
+        "clientId": "",
+        "clientSecret": ""
+    },
+
+    "basicConfiguration": {
+        "users": [{
+                "userId": "admin",
+                "password": "F6FDFFE48C908DEB0F4C3BD36C032E72",
+                "attributes": [],
+                "roles": [
+                    "user",
+                    "administrator",
+                    "report designer",
+                    "query designer"
+                ]
+            },
+            {
+                "userId": "user",
+                "password": "5CC32E366C87C4CB49E4309B75F57D64",
+                "attributes": [],
+                "roles": [
+                    "user",
+                    "report designer",
+                    "query designer"
+                ]
+            }
+        ],
+        "roles": [
+            {
+                "name": "administrator",
+                "description": "adminsitrator role"
+            },
+            {
+                "name": "query designer",
+                "description": "query designer role"
+            },
+            {
+                "name": "report designer",
+                "description": "report designer role"
+            }
+        ]
+    }
+}

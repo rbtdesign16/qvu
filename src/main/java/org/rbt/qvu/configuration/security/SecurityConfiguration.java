@@ -13,8 +13,7 @@ import org.rbt.qvu.client.utils.SecurityService;
  * @author rbtuc
  */
 public class SecurityConfiguration {
-    
-    private String authenticatorServiceClassName = "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator";
+    private String authenticatorServiceClassName;
     private String securityType;
     private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
     private boolean fileBasedSecurity = false;
@@ -22,12 +21,6 @@ public class SecurityConfiguration {
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
-    private String administratorRole = Constants.DEFAULT_ADMINISTRATOR_ROLE;
-    private String queryDesignerRole = Constants.DEFAULT_QUERY_DESIGNER_ROLE;
-    private String reportDesignerRole = Constants.DEFAULT_REPORT_DESIGNER_ROLE;
-    private String userRole = Constants.DEFAULT_USER_ROLE;
-    
-    
     
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
@@ -104,37 +97,6 @@ public class SecurityConfiguration {
         this.fileBasedSecurity = fileBasedSecurity;
     }
 
-    public String getAdministratorRole() {
-        return administratorRole;
-    }
-
-    public void setAdministratorRole(String administratorRole) {
-        this.administratorRole = administratorRole;
-    }
-
-    public String getQueryDesignerRole() {
-        return queryDesignerRole;
-    }
-
-    public void setQueryDesignerRole(String queryDesignerRole) {
-        this.queryDesignerRole = queryDesignerRole;
-    }
-
-    public String getReportDesignerRole() {
-        return reportDesignerRole;
-    }
-
-    public void setReportDesignerRole(String reportDesignerRole) {
-        this.reportDesignerRole = reportDesignerRole;
-    }
-
-    public String getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(String userRole) {
-        this.userRole = userRole;
-    }
 
     public boolean isAllowServiceSave() {
         return StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;

@@ -6,9 +6,12 @@ package org.rbt.qvu.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nimbusds.jose.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
@@ -59,7 +62,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
-            File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
+            File f = new File(config.getAppConfig().getDatasourceConfigurationFile());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
@@ -111,7 +114,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
-            File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
+            File f = new File(config.getAppConfig().getDatasourceConfigurationFile());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);

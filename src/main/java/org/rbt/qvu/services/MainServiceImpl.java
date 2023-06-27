@@ -65,6 +65,8 @@ public class MainServiceImpl implements MainService {
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             String userId = auth.getName();
             SecurityConfiguration scfg = config.getSecurityConfig();
+            LOG.error("------------------>a");
+            retval.setInitialSetupRequired(config.isInitialSetupRequired());
             if (auth.getPrincipal() instanceof DefaultOAuth2User) {
                 DefaultOAuth2User oauser = (DefaultOAuth2User) auth.getPrincipal();
                 if (StringUtils.isNotEmpty(oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME))) {
@@ -73,11 +75,6 @@ public class MainServiceImpl implements MainService {
             }
 
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
-
-            retval.setAdministratorRole(scfg.getAdministratorRole());
-            retval.setQueryDesignerRole(scfg.getQueryDesignerRole());
-            retval.setReportDesignerRole(scfg.getReportDesignerRole());
-            retval.setUserRole(scfg.getUserRole());
 
             // users and roles are defined via json
             if (scfg.isFileBasedSecurity()) {

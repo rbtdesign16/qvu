@@ -8,3 +8,4 @@ src/main/frontend/yarn-error.log*
 src/main/frontend/yarn.lock
 src/main/frontend/package-lock.json
 **/.DS_Store
+.mvn/

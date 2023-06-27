@@ -22,6 +22,7 @@ public class AuthData {
     private List<User> allUsers = new ArrayList<>();
     private User currentUser;
     private boolean allowUserRoleEdit;
+    private boolean initialSetupRequired;
 
     public List<Role> getAllRoles() {
         return allRoles;
@@ -85,6 +86,14 @@ public class AuthData {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public boolean isInitialSetupRequired() {
+        return initialSetupRequired;
+    }
+
+    public void setInitialSetupRequired(boolean initialSetupRequired) {
+        this.initialSetupRequired = initialSetupRequired;
     }
 
     

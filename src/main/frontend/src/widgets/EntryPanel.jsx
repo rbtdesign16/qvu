@@ -48,6 +48,8 @@ const EntryPanel = (props) => {
                     return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "textarea":
                     return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
+                case "file":
+                    return <input name={c.name}  type="file" id={id} size="40" onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
             }
         }
     };

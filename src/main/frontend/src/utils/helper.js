@@ -56,15 +56,15 @@ export const userHasRole = (authData, role) => {
 };
 
 export const isAdministrator = (authData) => {
-    return userHasRole(authData, authData.administratorRole);
+    return userHasRole(authData, ADMINISTRATOR_ROLE);
 };
 
 export const isQueryDesigner = (authData) => {
-    return userHasRole(authData, authData.queryDesignerRole);
+    return userHasRole(authData, QUERY_DESIGNER_ROLE);
 };
 
 export const isReportDesigner = (authData) => {
-    return userHasRole(authData, authData.reportDesignerRole);
+    return userHasRole(authData, REPORT_DESIGNER_ROLE);
 };
 
 export const setFieldError = (pre, fname) => {

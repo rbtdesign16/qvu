@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.configuration.security;
 
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,9 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.User;
-import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,27 +109,16 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         return retval;
     }
 
-    private String getUserPassword(Collection<UserAttribute> attributes) {
-        String retval = null;
-
-        if (attributes != null) {
-            for (UserAttribute attr : attributes) {
-                if (Constants.PASSWORD_ATTRIBUTE_NAME.equalsIgnoreCase(attr.getName())) {
-                    retval = attr.getValue();
-                    break;
-                }
-            }
-        }
-
-        return retval;
-    }
-
     private Authentication authenticateFromProperties(String name, String password) throws Exception {
         LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
         User uinfo = userMap.get(name);
 
-        String storedPassword = getUserPassword(uinfo.getAttributes());
+        new Gson().toJson(uinfo);
+        String storedPassword = uinfo.getPassword();
+        LOG.info("password=[" + password + "]");
+        LOG.info("hpassword=[" + Helper.toMd5Hash(password) + "]");
+        LOG.info("spassword=[" + uinfo.getPassword() + "]");
         if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
             // passwords are stored as md5 hashed strinfs
             String hashedPassword = Helper.toMd5Hash(password);

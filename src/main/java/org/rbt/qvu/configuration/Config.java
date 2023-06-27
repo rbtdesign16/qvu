@@ -20,36 +20,48 @@ import org.springframework.stereotype.Component;
  */
 @Component("config")
 public class Config {
-
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("#{environment.QVU_SECURITY_TYPE}")
+    //  @Value("#{environment.QVU_SECURITY_TYPE:basic}")
+    @Value("#{systemProperties['environment.QVU_SECURITY_TYPE'] ?: 'basic'}")
     private String securityType;
 
-    @Value("#{environment.QVU_CONFIG_FILE}")
+//    @Value("#{environment.QVU_CONFIG_FILE:-}")
+    @Value("#{systemProperties['environment.QVU_CONFIG_FILE'] ?: '-'}")
     private String applicationConfigFile;
 
     private ApplicationConfiguration appConfig;
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
 
+    private boolean initialSetupRequired = false;
     @PostConstruct
     private void init() {
         LOG.info(" in Config.ini()");
         LOG.info("applicationConfigFile=" + applicationConfigFile);
         try {
-            appConfig = ConfigBuilder.build(applicationConfigFile, ApplicationConfiguration.class);
+            // indicates initial setup required
+            if ("-".equals(applicationConfigFile)) {
+                initialSetupRequired = true;
+                LOG.info("inital setup required");
+                appConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-application-configuration.json"), ApplicationConfiguration.class);
+                securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
+                datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
+            } else {
+                appConfig = ConfigBuilder.build(applicationConfigFile, ApplicationConfiguration.class);
+                securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
+                securityConfig.setSecurityType(securityType);
+                appConfig.setSecurityType(securityType);
+                datasourcesConfig = ConfigBuilder.build(appConfig.getDatasourceConfigurationFile(), DataSourcesConfiguration.class);
+            }
             System.setProperty(Constants.SECURITY_TYPE_PROPERTY, appConfig.getSecurityType());
-            securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
-            securityConfig.setSecurityType(securityType);
-            appConfig.setSecurityType(securityType);
-            datasourcesConfig = ConfigBuilder.build(appConfig.getDatabaseConfigurationFile(), DataSourcesConfiguration.class);
-            
+
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
 
     }
+
     public ApplicationConfiguration getAppConfig() {
         return appConfig;
     }
@@ -73,4 +85,18 @@ public class Config {
     public synchronized void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
         this.datasourcesConfig = datasourcesConfig;
     }
+
+    public String getSecurityType() {
+        return securityType;
+    }
+
+    public String getApplicationConfigFile() {
+        return applicationConfigFile;
+    }
+
+    public boolean isInitialSetupRequired() {
+        return initialSetupRequired;
+    }
+    
+    
 }

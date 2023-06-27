@@ -62,11 +62,6 @@
         "name": "qa",
         "description": "qa role",
         "newRecord": false
-      },
-      {
-        "name": "trtrtrt",
-        "description": "hfhfhfh",
-        "newRecord": true
       }
     ]
   },

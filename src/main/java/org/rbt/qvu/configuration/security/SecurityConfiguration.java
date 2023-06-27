@@ -137,11 +137,7 @@ public class SecurityConfiguration {
     }
 
     public boolean isAllowServiceSave() {
-        boolean retval = StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;
-        
-        System.out.println("----------->" + retval);
-        
-        return retval;
+        return StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;
     }
 
     public void setAllowServiceSave(boolean allowServiceSave) {

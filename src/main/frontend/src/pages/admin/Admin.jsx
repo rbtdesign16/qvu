@@ -6,28 +6,28 @@ import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import {
-    INFO, 
-    WARN, 
-    ERROR,
-    SUCCESS,
-    DEFAULT_SUCCESS_TITLE,
-    DEFAULT_ERROR_TITLE,
-    confirm, 
-    isEmpty, 
-    setFieldError, 
-    setErrorMessage, 
-    checkEntryFields,
-    updateJsonArray} from "../../utils/helper";
+INFO,
+        WARN,
+        ERROR,
+        SUCCESS,
+        DEFAULT_SUCCESS_TITLE,
+        DEFAULT_ERROR_TITLE,
+        confirm,
+        isEmpty,
+        setFieldError,
+        setErrorMessage,
+        checkEntryFields,
+        updateJsonArray} from "../../utils/helper";
 
 import {
-    saveDatasource, 
-    saveUser, 
-    saveRole, 
-    deleteDatasource, 
-    deleteRole, 
-    deleteUser,
-    loadDatasources,
-    SUCCESS_CODE} from "../../utils/apiHelper";
+saveDatasource,
+        saveUser,
+        saveRole,
+        deleteDatasource,
+        deleteRole,
+        deleteUser,
+        loadDatasources,
+        loadAuth} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -143,17 +143,17 @@ const Admin = (props) => {
                 label: "Last Name:",
                 name: "lastName",
                 type: "input"
-            },{
+            }, {
                 label: "Email:",
                 name: "email",
                 type: "email",
                 validator: {type: "email"}
             }];
-        
+
         if (isnew) {
             retval.splice(1, 0, {label: "Password:", name: "password", type: "password", required: true, validator: {type: "password"}});
         }
-        
+
         return retval;
     };
 
@@ -219,18 +219,19 @@ const Admin = (props) => {
     };
 
     const deleteSelectedDatasource = (indx) => {
-        let ds = datasources[indx];
-        
+        const ds = datasources[indx];
+
         const okFunc = async () => {
-            let res = deleteDatasource(ds.datasourceName);
-             if (!res.errorCode) {
-                showMessage(SUCCESS, "Datasource " + ds.datasourceName + " deleted", DEFAULT_SUCCESS_TITLE);
+            showMessage(INFO, "Deleting datasource" + ds.datasourceName + "...", "Deleting", true);
+            let res = await deleteDatasource(ds.datasourceName);
+            if (!res.errorCode) {
                 setDatasources(await loadDatasources());
+                showMessage(SUCCESS, "Datasource " + ds.datasourceName + " deleted", DEFAULT_SUCCESS_TITLE);
             } else {
                 showMessage(ERROR, "Failed to delete datasource " + ds.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
             }
         };
-        
+
         handleOnClick("delete datasource " + ds.datasourceName + "?", okFunc);
     };
 
@@ -244,20 +245,20 @@ const Admin = (props) => {
     };
 
     const deleteSelectedRole = async (indx) => {
-        let r = authData.allRoles[indx];
-        if (window.confirm("delete role " + r.name + "?", "Cancel")) {
-            showMessage(INFO, "Deleting role" + r.name+ "...", null, true);
+        const r = authData.allRoles[indx];
+        const okFunc = async () => {
+            showMessage(INFO, "Deleting role" + r.name + "...", null, true);
             let res = await deleteRole(r.name);
-            
+
             if (!res.errorCode) {
-                setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
-                setEditModal({show: false});
-                showMessage(SUCCESS, "Deleted rolw " + r.name, DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, "Deleted role " + r.name, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to delete role " + r.name+ " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, "Failed to delete role " + r.name + " " + res.message, DEFAULT_ERROR_TITLE);
             }
-        }
+        };
+
+        handleOnClick("delete role " + r.name + "?", okFunc);
     };
 
     const addUser = () => {
@@ -270,20 +271,20 @@ const Admin = (props) => {
     };
 
     const deleteSelectedUser = async (indx) => {
-        let u = authData.allUsers[indx];
-        if (window.confirm("delete user " + u.userId + "?", "Cancel")) {
-            showMessage(INFO, "Deleting user" + u.userId + "...", "Deleting", true);
+        const u = authData.allUsers[indx];
+        const okFunc = async () => {
+            showMessage(INFO, "Deleting user" + u.userId + "...", null, true);
             let res = await deleteUser(u.userId);
-            
+
             if (!res.errorCode) {
-                setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
-                setEditModal({show: false});
                 showMessage(SUCCESS, "Deleted user " + u.userId, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to delete user " + u.userId+ " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, "Failed to delete user " + u.userId + " " + res.message, DEFAULT_ERROR_TITLE);
             }
-        }
+        };
+
+        handleOnClick("delete user " + u.name + "?", okFunc);
     };
 
     const datasourcesConfig = {
@@ -366,7 +367,7 @@ const Admin = (props) => {
                 label: "User ID:",
                 field: "userId"
             },
-{
+            {
                 label: "First Name:",
                 field: "firstName"
             },
@@ -382,7 +383,7 @@ const Admin = (props) => {
         setEditModal({show: false});
     };
 
-   
+
     const saveModifiedDatasource = async (config) => {
         let ok = checkEntryFields(config);
 
@@ -394,9 +395,9 @@ const Admin = (props) => {
                 setDatasources(await loadDatasources());
                 setEditModal({show: false});
                 showMessage(SUCCESS, "Datasource " + config.dataObject.datasourceName + " saved", DEFAULT_SUCCESS_TITLE);
-                
+
             } else {
-                showMessage(ERROR, "Failed to save datasource " + config.dataObject.datasourceName + " " + res.message , DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, "Failed to save datasource " + config.dataObject.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
             }
 
         } else {
@@ -405,7 +406,7 @@ const Admin = (props) => {
     };
 
     const saveModifiedRole = async (config) => {
-       let ok = checkEntryFields(config);
+        let ok = checkEntryFields(config);
 
         if (ok) {
             showMessage(INFO, "Saving role " + config.dataObject.name + "...", null, true);
@@ -416,7 +417,7 @@ const Admin = (props) => {
                 setEditModal({show: false});
                 showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to save role " + config.dataObject.name+ " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, "Failed to save role " + config.dataObject.name + " " + res.message, DEFAULT_ERROR_TITLE);
             }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
@@ -424,7 +425,7 @@ const Admin = (props) => {
     };
 
     const saveModifiedUser = async (config) => {
-       let ok = checkEntryFields(config);
+        let ok = checkEntryFields(config);
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");

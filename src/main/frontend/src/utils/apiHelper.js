@@ -36,10 +36,15 @@ export const getApiURL = () => {
 
 
 export const loadAuth = async() => {
-    let res = await axios.get(getApiURL() + "/auth/data/load");
+    try {
+        let res = await axios.get(getApiURL() + "/auth/data/load");
 
-    if (res) {
-        return res.data;
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+
     }
 };
 
@@ -94,7 +99,7 @@ export const saveRole = async (r) => {
 export const deleteRole = async (rname) => {
 
     try {
-        let res = await axios.delete(getApiURL() + "/auth/roles/" + rname);
+        let res = await axios.delete(getApiURL() + "/auth/role/" + rname);
         if (res) {
             return res.data;
         }

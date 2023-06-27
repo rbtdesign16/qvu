@@ -20,14 +20,15 @@ INFO,
         updateJsonArray} from "../../utils/helper";
 
 import {
-saveDatasource,
+        saveDatasource,
         saveUser,
         saveRole,
         deleteDatasource,
         deleteRole,
         deleteUser,
         loadDatasources,
-        loadAuth} from "../../utils/apiHelper";
+        loadAuth,
+        formatErrorResponse} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -254,7 +255,7 @@ const Admin = (props) => {
                 setAuthData(await loadAuth());
                 showMessage(SUCCESS, "Deleted role " + r.name, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to delete role " + r.name + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to delete role " + r.name), DEFAULT_ERROR_TITLE);
             }
         };
 
@@ -280,7 +281,7 @@ const Admin = (props) => {
                 setAuthData(await loadAuth());
                 showMessage(SUCCESS, "Deleted user " + u.userId, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to delete user " + u.userId + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to delete user " + u.userId ), DEFAULT_ERROR_TITLE);
             }
         };
 
@@ -397,7 +398,7 @@ const Admin = (props) => {
                 showMessage(SUCCESS, "Datasource " + config.dataObject.datasourceName + " saved", DEFAULT_SUCCESS_TITLE);
 
             } else {
-                showMessage(ERROR, "Failed to save datasource " + config.dataObject.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to save datasource: " + config.dataObject.datasourceName), DEFAULT_ERROR_TITLE);
             }
 
         } else {
@@ -417,7 +418,7 @@ const Admin = (props) => {
                 setEditModal({show: false});
                 showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to save role " + config.dataObject.name + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to save role: " + config.dataObject.name), DEFAULT_ERROR_TITLE);
             }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
@@ -437,7 +438,7 @@ const Admin = (props) => {
                 setEditModal({show: false});
                 showMessage(SUCCESS, "User " + config.dataObject.userId + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to save user " + config.dataObject.userId + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to save user: " + config.dataObject.userId), DEFAULT_ERROR_TITLE);
             }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");

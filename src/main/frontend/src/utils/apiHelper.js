@@ -112,6 +112,7 @@ export const saveUser = async (u) => {
 
     try {
         let res = await axios.post(getApiURL() + "/auth/user/save", u, hconfig);
+
         if (res) {
             return res.data;
         }
@@ -131,3 +132,18 @@ export const deleteUser = async (uid) => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
+
+
+export const formatErrorResponse = (errorResult, prefix) => {
+    let retval ="";
+    
+    if (prefix) {
+        retval += prefix;
+    }
+    
+    if (errorResult.message) {
+        retval += " " + errorResult.message;
+    }
+    
+    return retval;
+}

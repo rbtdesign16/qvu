@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
+import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
@@ -34,17 +35,18 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ConfigFileHandler {
+
     private static Logger LOG = LoggerFactory.getLogger(ConfigFileHandler.class);
-    
+
     @Autowired
     private Config config;
 
     Gson gson = new Gson();
-    
+
     public Gson getGson() {
         return gson;
     }
-    
+
     public List<DataSourceConfiguration> loadDatasources() {
         List<DataSourceConfiguration> retval = config.getDatasourcesConfig().getDatasources();
         if (LOG.isDebugEnabled()) {
@@ -73,7 +75,13 @@ public class ConfigFileHandler {
                     }
 
                     if (indx > -1) {
-                        datasources.getDatasources().set(indx, datasource);
+                        if (datasource.isNewDatasource()) {
+                            retval.setErrorCode(OperationResult.RECORD_EXISTS);
+                            retval.setMessage("datasource " + datasource.getDatasourceName() + " already exists");
+                            throw new SaveException(retval);
+                        } else {
+                            datasources.getDatasources().set(indx, datasource);
+                        }
                     } else {
                         datasources.getDatasources().add(datasource);
                     }
@@ -86,18 +94,20 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(datasources).getBytes());
                 }
-                
+
                 config.setDatasourcesConfig(datasources);
             }
+        } catch (SaveException ex) {
+            retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
-       }
+        }
 
         return retval;
     }
 
-     public OperationResult deleteDatasource(String datasourceName) {
+    public OperationResult deleteDatasource(String datasourceName) {
         OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
@@ -124,7 +134,7 @@ public class ConfigFileHandler {
                     fos.write(myGson.toJson(datasources).getBytes());
                     config.setDatasourcesConfig(datasources);
                     retval.setErrorCode(OperationResult.SUCCESS);
-                } 
+                }
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -156,18 +166,24 @@ public class ConfigFileHandler {
                     }
 
                     if (indx > -1) {
-                        roles.set(indx, role);
+                        if (role.isNewRecord()) {
+                            retval.setErrorCode(OperationResult.RECORD_EXISTS);
+                            retval.setMessage("role " + role.getName() + " already exists");
+                            throw new SaveException(retval);
+                        } else {
+                            roles.set(indx, role);
+                        }
                     } else {
                         roles.add(role);
                     }
-                    
+
                     Collections.sort(roles, new Comparator<Role>() {
                         @Override
                         public int compare(Role o1, Role o2) {
                             return o1.getName().compareTo(o2.getName());
-                            
+
                         }
-                        
+
                     });
                 }
             }
@@ -178,8 +194,10 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } 
+                }
             }
+        } catch (SaveException ex) {
+            retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
@@ -214,7 +232,7 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } 
+                }
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -248,17 +266,23 @@ public class ConfigFileHandler {
                     // store hashed password
                     user.setPassword(Helper.toMd5Hash(user.getPassword()));
                     if (indx > -1) {
-                        users.set(indx, user);
+                        if (user.isNewRecord()) {
+                            retval.setErrorCode(OperationResult.RECORD_EXISTS);
+                            retval.setMessage("user " + user.getUserId() + " already exists");
+                            throw new SaveException(retval);
+                        } else {
+                            users.set(indx, user);
+                        }
                     } else {
                         users.add(user);
                     }
-                    
+
                     Collections.sort(users, new Comparator<User>() {
                         @Override
                         public int compare(User o1, User o2) {
                             return o1.getUserId().compareTo(o2.getUserId());
-                         }
-                        
+                        }
+
                     });
                 }
             }
@@ -271,6 +295,8 @@ public class ConfigFileHandler {
                     config.setSecurityConfig(securityConfig);
                 }
             }
+        } catch (SaveException ex) {
+            retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
@@ -314,5 +340,5 @@ public class ConfigFileHandler {
 
         return retval;
     }
-   
+
 }

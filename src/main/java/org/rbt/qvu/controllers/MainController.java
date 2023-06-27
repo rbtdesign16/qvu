@@ -71,7 +71,6 @@ public class MainController {
     
     @PostMapping("api/v1/auth/user/save")
     public OperationResult saveUser(@RequestBody User user) {
-        LOG.debug("in saveUser()");
         return service.saveUser(user);
     }
     

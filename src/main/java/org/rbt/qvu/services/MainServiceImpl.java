@@ -115,6 +115,8 @@ public class MainServiceImpl implements MainService {
 
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
+            // make sure we do not populate password
+            retval.getCurrentUser().setPassword(null);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
             }

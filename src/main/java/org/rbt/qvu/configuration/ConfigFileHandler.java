@@ -245,6 +245,8 @@ public class ConfigFileHandler {
                         }
                     }
 
+                    // store hashed password
+                    user.setPassword(Helper.toMd5Hash(user.getPassword()));
                     if (indx > -1) {
                         users.set(indx, user);
                     } else {

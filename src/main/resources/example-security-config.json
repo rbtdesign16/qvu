@@ -1,70 +1,77 @@
 {
-    "administratorRole": "administrator",
-    "queryDesignerRole": "query designer",
-    "reportDesignerRole": "report designer",
-    "userRole": "user",
-    "allowServiceSave": false,
-    "fileBasedSecurity": true,
-    "samlConfiguration": {
-        "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
-        "signAssertions": true,
-        "spEntityId": "http://localhost:8080/realms/qvu-realm",
-        "signingCertFileName": "c:/dev/certs/rsa_cert.pem",
-        "signingKeyFileName": "c:/dev/certs/private.key"
-    },
-    "oidcConfiguration": {
-        "issuerLocationUrl": "http://localhost:8080/realms/qvu-realm",
-        "clientId": "qvu-oauth",
-        "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
-    },
-
-    "basicConfiguration": {
-        "users": [{
-                "userId": "admin",
-                "firstName": "John",
-                "lastName": "Doe",
-                "attributes": [
-                    {
-                        "name": "password",
-                        "value": "F6FDFFE48C908DEB0F4C3BD36C032E72"
-                    }
-                ],
-                "roles": [
-                    "administrator",
-                    "query designer"
-                ]
-            },
-            {
-                "userId": "tester",
-                "firstName": "Joe",
-                "lastName": "Blow",
-                "attributes": [
-                    {
-                        "name": "password",
-                        "value": "05A671C66AEFEA124CC08B76EA6D30BB"
-                    }
-                ],
-                "roles": [
-                    "user",
-                    "administrator",
-                    "report designer",
-                    "query designer"
-                ]
-            }
+  "authenticatorServiceClassName": "org.rbt.qvu.configuration.security.DefaultBasicAuthenticator",
+  "roleAttributeName": "role",
+  "fileBasedSecurity": true,
+  "allowServiceSave": false,
+  "samlConfiguration": {
+    "idpUrl": "http://localhost:8080/realms/qvu-realm/protocol/saml/descriptor",
+    "signAssertions": true,
+    "spEntityId": "http://localhost:8080/realms/qvu-realm",
+    "signingCertFileName": "c:/dev/certs/rsa_cert.pem",
+    "signingKeyFileName": "c:/dev/certs/private.key"
+  },
+  "oidcConfiguration": {
+    "issuerLocationUrl": "http://localhost:8080/realms/qvu-realm",
+    "clientId": "qvu-oauth",
+    "clientSecret": "94zAXNg9sCuS6ofesI7f31Rlkc1JUPHW"
+  },
+  "basicConfiguration": {
+    "users": [
+      {
+        "userId": "admin",
+        "lastName": "Doe",
+        "firstName": "John",
+        "newRecord": false,
+        "attributes": [
+          {
+            "name": "password",
+            "value": "F6FDFFE48C908DEB0F4C3BD36C032E72"
+          }
         ],
         "roles": [
-            {
-                "name": "tester",
-                "description": "tester role"
-            },
-            {
-                "name": "qa",
-                "description": "qa role"
-            },
-            {
-                "name": "developer",
-                "description": "developer role"
-            }
+          "administrator",
+          "query designer"
         ]
-    }
+      },
+      {
+        "userId": "tester",
+        "lastName": "Blow",
+        "firstName": "Joe",
+        "newRecord": false,
+        "attributes": [
+          {
+            "name": "password",
+            "value": "05A671C66AEFEA124CC08B76EA6D30BB"
+          }
+        ],
+        "roles": [
+          "user",
+          "administrator",
+          "report designer",
+          "query designer"
+        ]
+      }
+    ],
+    "roles": [
+      {
+        "name": "developer",
+        "description": "developer role",
+        "newRecord": false
+      },
+      {
+        "name": "qa",
+        "description": "qa role",
+        "newRecord": false
+      },
+      {
+        "name": "tester",
+        "description": "tester rolexxx",
+        "newRecord": false
+      }
+    ]
+  },
+  "administratorRole": "administrator",
+  "queryDesignerRole": "query designer",
+  "reportDesignerRole": "report designer",
+  "userRole": "user"
 }

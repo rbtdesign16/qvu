@@ -87,7 +87,7 @@ public class MainController {
         return service.saveDatasource(datasource);
     }
     
-    @DeleteMapping("api/v1/db/datasources/{datasourceName}")
+    @DeleteMapping("api/v1/db/datasource/{datasourceName}")
     public OperationResult deleteDatasource(@PathVariable String datasourceName) {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");
         return service.deleteDatasource(datasourceName);

@@ -32,6 +32,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.util.Helper;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -194,8 +195,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = config.getSecurityConfig().getAuthenticatorService().saveRole(role);
             } catch (Exception ex) {
-                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-                retval.setError(ex);
+                Helper.populateResultError(retval, ex);
             }
         } else {
             retval = configFileHandler.saveRole(role);
@@ -211,8 +211,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = config.getSecurityConfig().getAuthenticatorService().deleteRole(roleName);
             } catch (Exception ex) {
-                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-                retval.setError(ex);
+                Helper.populateResultError(retval, ex);
             }
         } else {
             retval = configFileHandler.deleteRole(roleName);
@@ -228,8 +227,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = config.getSecurityConfig().getAuthenticatorService().saveUser(user);
             } catch (Exception ex) {
-                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-                retval.setError(ex);
+                Helper.populateResultError(retval, ex);
             }
         } else {
             retval = configFileHandler.saveUser(user);
@@ -245,8 +243,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
             } catch (Exception ex) {
-                retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-                retval.setError(ex);
+                Helper.populateResultError(retval, ex);
             }
         } else {
             retval = configFileHandler.deleteUser(userId);

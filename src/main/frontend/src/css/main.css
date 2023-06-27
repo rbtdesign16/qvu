@@ -142,8 +142,8 @@ img {
 }
 
 .error-message {
-    background: var(--warn-message-background-color);
-    color: var(--warn-message-text-color);
+    background: var(--error-message-background-color);
+    color: var(--error-message-text-color);
 }
 
 .message-header {

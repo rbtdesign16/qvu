@@ -14,9 +14,9 @@ export const ERROR = "error";
 export const WARN = "warn";
 export const INFO = "info";
 export const SUCCESS_MESSAGE_TIMEOUT = 5000;
-export const DEFAULT_SUCCESS_MESSAGE = "Success";
-export const DEFAULT_ERROR_MESSAGE = "Error";
-export const DEFAULT_WARN_MESSAGE = "Warning";
+export const DEFAULT_SUCCESS_TITLE = "Success";
+export const DEFAULT_ERROR_TITLE = "Error";
+export const DEFAULT_WARN_TITLE = "Warning";
 
 export const ERROR_BACKGROUND_COLOR = "pink";
 

@@ -1,5 +1,12 @@
 import axios from "axios";
 
+export const SUCCESS_CODE = 0;
+export const RECORD_EXISTS_CODE = 1;
+export const EXISTING_RECORD_UPDATED_CODE = 2;
+export const RECORD_NOT_FOUND_CODE = 3;
+export const UNEXPECTED_EXCEPTION_CODE = 4;
+
+
 const hconfig = {
     headers: {
         "Content-Type": "application/json"
@@ -37,57 +44,85 @@ export const loadAuth = async() => {
 };
 
 export const loadDatasources = async () => {
-    let res = await axios.get(getApiURL() + "/db/datasources/load");
+    try {
+        let res = await axios.get(getApiURL() + "/db/datasources/load");
 
-    if (res) {
-        return res.data;
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const saveDatasource = async (ds) => {
-    let res = await axios.post(getApiURL() + "/db/datasource/save", ds, hconfig);
+    try {
+        let res = await axios.post(getApiURL() + "/db/datasource/save", ds, hconfig);
 
-    if (res) {
-        return res.data;
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const deleteDatasource = async (dsname) => {
-    let res = await axios.delete(getApiURL() + "/db/datasource/" + dsname);
 
-    if (res) {
-        return res.data;
+    try {
+        let res = await axios.delete(getApiURL() + "/db/datasource/" + dsname);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const saveRole = async (r) => {
-    let res = await axios.post(getApiURL() + "/auth/role/save", r, hconfig);
 
-    if (res) {
-        return res.data;
+    try {
+        let res = await axios.post(getApiURL() + "/auth/role/save", r, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const deleteRole = async (rname) => {
-    let res = await axios.delete(getApiURL() + "/auth/roles/" + rname);
 
-    if (res) {
-        return res.data;
+    try {
+        let res = await axios.delete(getApiURL() + "/auth/roles/" + rname);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const saveUser = async (u) => {
-    let res = await axios.post(getApiURL() + "/auth/user/save", u, hconfig);
 
-    if (res) {
-        return res.data;
+    try {
+        let res = await axios.post(getApiURL() + "/auth/user/save", u, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };
 
 export const deleteUser = async (uid) => {
-    let res = await axios.delete(getApiURL() + "/auth/user/" + uid);
+    try {
+        let res = await axios.delete(getApiURL() + "/auth/user/" + uid);
 
-    if (res) {
-        return res.data;
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
     }
 };

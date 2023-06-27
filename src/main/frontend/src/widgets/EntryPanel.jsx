@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button"
 import PropTypes from "prop-types";
 
 const EntryPanel = (props) => {
-    const {entryConfig, dataObject, newObject, buttons, idPrefix} = props.config;
+    const {entryConfig, dataObject, buttons, idPrefix} = props.config;
 
     
     const loadOptions = (curval, options) => {
@@ -27,7 +27,7 @@ const EntryPanel = (props) => {
     };
     
     const getEntryField = (c) => {
-        if (c.key && !newObject) {
+        if (c.key && !dataObject.newRecord) {
             return dataObject[c.name];
         } else {
             let id = idPrefix + c.name;
@@ -39,13 +39,15 @@ const EntryPanel = (props) => {
                 case "select":
                     return <select name={c.name}  id={id} onChange={e => onChange(e)}>{loadOptions(dataObject[c.name], c.options)}</select>;
                 case "integer":
-                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "date":
-                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
+                case "email":
+                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "checkbox":
-                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
                 case "textarea":
-                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={newObject[c.name]}/>;
+                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name]}/>;
             }
         }
     };

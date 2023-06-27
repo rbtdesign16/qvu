@@ -22,6 +22,7 @@ import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
+import org.rbt.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,16 +85,14 @@ public class ConfigFileHandler {
 
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(datasources).getBytes());
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
                 }
                 
                 config.setDatasourcesConfig(datasources);
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
-        }
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+       }
 
         return retval;
     }
@@ -124,13 +123,12 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(datasources).getBytes());
                     config.setDatasourcesConfig(datasources);
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
-                }
+                    retval.setErrorCode(OperationResult.SUCCESS);
+                } 
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
         return retval;
@@ -180,13 +178,11 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
-                }
+                } 
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
         return retval;
@@ -218,13 +214,11 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
-                }
+                } 
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
         return retval;
@@ -273,13 +267,11 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
                 }
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
         return retval;
@@ -311,13 +303,11 @@ public class ConfigFileHandler {
                     Gson myGson = new GsonBuilder().setPrettyPrinting().create();
                     fos.write(myGson.toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
                 }
             }
         } catch (Exception ex) {
-            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            retval.setError(ex);
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
         return retval;

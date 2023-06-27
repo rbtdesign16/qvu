@@ -10,8 +10,8 @@ import {
     WARN, 
     ERROR,
     SUCCESS,
-    DEFAULT_SUCCESS_MESSAGE,
-    DEFAULT_ERROR_MESSAGE,
+    DEFAULT_SUCCESS_TITLE,
+    DEFAULT_ERROR_TITLE,
     confirm, 
     isEmpty, 
     setFieldError, 
@@ -19,7 +19,15 @@ import {
     checkEntryFields,
     updateJsonArray} from "../../utils/helper";
 
-import {saveDatasource, saveUser, saveRole} from "../../utils/apiHelper";
+import {
+    saveDatasource, 
+    saveUser, 
+    saveRole, 
+    deleteDatasource, 
+    deleteRole, 
+    deleteUser,
+    loadDatasources,
+    SUCCESS_CODE} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -39,7 +47,7 @@ const Admin = (props) => {
                 label: "Database Type:",
                 name: "databaseType",
                 type: "select",
-                options: ["MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"],
+                options: ["", "MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"],
                 key: true,
                 required: true
             },
@@ -115,10 +123,10 @@ const Admin = (props) => {
                 name: "description",
                 type: "input"
             }];
-    }
+    };
 
-    const getUserEntryConfig = () => {
-        return [
+    const getUserEntryConfig = (isnew) => {
+        let retval = [
             {
                 label: "User ID:",
                 name: "userId",
@@ -135,19 +143,30 @@ const Admin = (props) => {
                 label: "Last Name:",
                 name: "lastName",
                 type: "input"
+            },{
+                label: "Email:",
+                name: "email",
+                type: "email",
+                validator: {type: "email"}
             }];
+        
+        if (isnew) {
+            retval.splice(1, 0, {label: "Password:", name: "password", type: "password", required: true, validator: {type: "password"}});
+        }
+        
+        return retval;
     };
 
-    const getDatasourceConfig = (title, isNew, dataObject) => {
+    const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
             show: true,
-            newObject: isNew,
             title: title,
             labelWidth: "150px",
             fieldWidth: "200px",
             cancel: hideEdit,
             save: saveModifiedDatasource,
+            delete: deleteSelectedDatasource,
             dataObject: dataObject,
             entryConfig: getDatasourceEntryConfig(),
             buttons: [{
@@ -160,95 +179,109 @@ const Admin = (props) => {
         };
     };
 
-    const getRoleConfig = (title, isNew, dataObject) => {
+    const getRoleConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
             show: true,
-            newObject: isNew,
             title: title,
             labelWidth: "100px",
             fieldWidth: "150px",
             cancel: hideEdit,
-            save: saveRole,
+            save: saveModifiedRole,
+            delete: deleteSelectedRole,
             dataObject: dataObject,
             entryConfig: getRoleEntryConfig()
         };
     };
 
 
-    const getUserConfig = (title, isNew, dataObject) => {
+    const getUserConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
             show: true,
-            newObject: isNew,
             title: title,
             labelWidth: "150px",
             fieldWidth: "200px",
             cancel: hideEdit,
-            save: saveUser,
+            save: saveModifiedUser,
+            delete: deleteSelectedUser,
             dataObject: dataObject,
-            entryConfig: getUserEntryConfig()
+            entryConfig: getUserEntryConfig(dataObject.newRecord)
         };
     };
 
     const addDatasource = () => {
-        setEditModal(getDatasourceConfig("Create new datasource", true, {}));
+        setEditModal(getDatasourceConfig("Create new datasource", {newRecord: true}));
     };
 
     const editDatasource = (indx) => {
-        setEditModal(getDatasourceConfig("Update datasource " + datasources[indx].datasourceName, false, {...datasources[indx]}));
+        setEditModal(getDatasourceConfig("Update datasource " + datasources[indx].datasourceName, {...datasources[indx]}));
     };
 
-    const deleteDatasource = async (indx) => {
+    const deleteSelectedDatasource = (indx) => {
         let ds = datasources[indx];
-        if (handleOnClick("delete datasource " + ds.datasourceName + "?", () => alert("do delete"))) {
-            let indx = datasources.findIndex((cds) => ds.datasourceName === ds.datasourceName);
-            let newDatasouces = [...datasources];
-            if (indx > -1) { 
-                newDatasources.splice(indx, 1); 
-                setDatasources(newDatasources);
+        
+        const okFunc = async () => {
+            let res = deleteDatasource(ds.datasourceName);
+             if (!res.errorCode) {
+                showMessage(SUCCESS, "Datasource " + ds.datasourceName + " deleted", DEFAULT_SUCCESS_TITLE);
+                setDatasources(await loadDatasources());
+            } else {
+                showMessage(ERROR, "Failed to delete datasource " + ds.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
             }
-        }
+        };
+        
+        handleOnClick("delete datasource " + ds.datasourceName + "?", okFunc);
     };
 
     const addRole = () => {
-        setEditModal(getRoleConfig("Create new role", true, {}));
+        setEditModal(getRoleConfig("Create new role", {newRecord: true}));
     };
 
     const editRole = (indx) => {
         let r = authData.allRoles[indx];
-        setEditModal(getRoleConfig("Update role " + r.name, false, {...r}));
+        setEditModal(getRoleConfig("Update role " + r.name, {...r}));
     };
 
-    const deleteRole = (indx) => {
+    const deleteSelectedRole = async (indx) => {
         let r = authData.allRoles[indx];
         if (window.confirm("delete role " + r.name + "?", "Cancel")) {
-            let newRoles = [...authData.allRoles];
-            let indx = newRoles.findIndex((cr) => cr.name === r.name);
-            if (indx > -1) { 
-                newRoles.splice(indx, 1); 
-                setAuthData({...authData, allRoles: newRoles});
+            showMessage(INFO, "Deleting role" + r.name+ "...", null, true);
+            let res = await deleteRole(r.name);
+            
+            if (!res.errorCode) {
+                setErrorMessage(config.idPrefix, "");
+                setAuthData(await loadAuth());
+                setEditModal({show: false});
+                showMessage(SUCCESS, "Deleted rolw " + r.name, DEFAULT_SUCCESS_TITLE);
+            } else {
+                showMessage(ERROR, "Failed to delete role " + r.name+ " " + res.message, DEFAULT_ERROR_TITLE);
             }
         }
     };
 
     const addUser = () => {
-        setEditModal(getUserConfig("Create new user", true, {}));
+        setEditModal(getUserConfig("Create new user", {newRecord: true}));
     };
 
     const editUser = (indx) => {
         let u = authData.allUsers[indx];
-        setEditModal(getUserConfig("Update user " + u.userId, false, {...u}));
+        setEditModal(getUserConfig("Update user " + u.userId, {...u}));
     };
 
-    const deleteUser = (indx) => {
+    const deleteSelectedUser = async (indx) => {
         let u = authData.allUsers[indx];
         if (window.confirm("delete user " + u.userId + "?", "Cancel")) {
-            let newUsers = [...authData.allUsers];
-            let indx = newUsers.findIndex((cu) => cu.userId === u.userId);
-            if (indx > -1) { 
-                newUsers.splice(indx, 1); 
-                setAuthData({...authData, allUsers: newUsers})
+            showMessage(INFO, "Deleting user" + u.userId + "...", "Deleting", true);
+            let res = await deleteUser(u.userId);
+            
+            if (!res.errorCode) {
+                setErrorMessage(config.idPrefix, "");
+                setAuthData(await loadAuth());
+                setEditModal({show: false});
+                showMessage(SUCCESS, "Deleted user " + u.userId, DEFAULT_SUCCESS_TITLE);
+            } else {
+                showMessage(ERROR, "Failed to delete user " + u.userId+ " " + res.message, DEFAULT_ERROR_TITLE);
             }
         }
     };
@@ -262,7 +295,7 @@ const Admin = (props) => {
         delTitle: "Delete datasource",
         onAdd: addDatasource,
         onEdit: editDatasource,
-        onDelete: deleteDatasource,
+        onDelete: deleteSelectedDatasource,
         data: datasources,
         labelStyle: {
             width: "85px"
@@ -291,7 +324,7 @@ const Admin = (props) => {
         delTitle: "Delete role",
         onAdd: authData.allowUserRoleEdit ? addRole : null,
         onEdit: authData.allowUserRoleEdit ? editRole : null,
-        onDelete: authData.allowUserRoleEdit ? deleteRole : null,
+        onDelete: authData.allowUserRoleEdit ? deleteSelectedRole : null,
         labelStyle: {
             width: "85px"
         },
@@ -321,7 +354,7 @@ const Admin = (props) => {
         delTitle: "Delete user",
         onAdd: authData.allowUserRoleEdit ? addUser : null,
         onEdit: authData.allowUserRoleEdit ? editUser : null,
-        onDelete: authData.allowUserRoleEdit ? deleteUser : null,
+        onDelete: authData.allowUserRoleEdit ? deleteSelectedUser : null,
         labelStyle: {
             width: "85px"
         },
@@ -354,19 +387,16 @@ const Admin = (props) => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, "Saving datasource...", "Saving", true);
-            config.dataObject.newDatasource = config.dataObject.newObject;
+            showMessage(INFO, "Saving datasource" + config.dataObject.datasourceName + "...", "Saving", true);
             let res = await saveDatasource(config.dataObject);
-            if (!res.error) {
+            if (!res.errorCode) {
                 setErrorMessage(config.idPrefix, "");
-                let newDatasources = [...datasources];
-                updateJsonArray("datasourceName", config.dataObject, newDatasources);
-                setDatasources(newDatasources);
+                setDatasources(await loadDatasources());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Datasource saved", DEFAULT_SUCCESS_MESSAGE);
+                showMessage(SUCCESS, "Datasource " + config.dataObject.datasourceName + " saved", DEFAULT_SUCCESS_TITLE);
                 
             } else {
-                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
+                showMessage(ERROR, "Failed to save datasource " + config.dataObject.datasourceName + " " + res.message , DEFAULT_ERROR_TITLE);
             }
 
         } else {
@@ -374,46 +404,39 @@ const Admin = (props) => {
         }
     };
 
-    const saveRole = async (config) => {
+    const saveModifiedRole = async (config) => {
        let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, "Saving role...", "Saving", true);
-            config.dataObject.newRole = config.dataObject.newObject;
+            showMessage(INFO, "Saving role " + config.dataObject.name + "...", null, true);
             let res = await saveRole(config.dataObject);
-            if (!res.error) {
+            if (!res.errorCode) {
                 setErrorMessage(config.idPrefix, "");
-
-                let newRoles = [... authData.allRoles];
-                config.dataObject.newRole = config.dataObject.newObject;
-                updateJsonArray("name", config.dataObject, newRoles);
-                setAuthData({...authData, allRoles: newRoles});
+                setAuthData(await loadAuth());
                 setEditModal({show: false});
+                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
+                showMessage(ERROR, "Failed to save role " + config.dataObject.name+ " " + res.message, DEFAULT_ERROR_TITLE);
             }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
         }
     };
 
-    const saveUser = async (config) => {
+    const saveModifiedUser = async (config) => {
        let ok = checkEntryFields(config);
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");
-            showMessage(INFO, "Saving user...", "Saving", true);
-            config.dataObject.newUser = config.dataObject.newObject;
+            showMessage(INFO, "Saving user " + config.dataObject.userId + "...", null, true);
             let res = await saveUser(config.dataObject);
-            if (!res.error) {
+            if (!res.errorCode) {
                 setErrorMessage(config.idPrefix, "");
-                let newUsers = [...authData.allUsers]
-                config.dataObject.newUser = config.dataObject.newObject;
-                updateJsonArray("userId", config.dataObject,newUsers );
-                setAuthData({...authData, allUsers: newUsers});
+                setAuthData(await loadAuth());
                 setEditModal({show: false});
+                showMessage(SUCCESS, "User " + config.dataObject.userId + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
+                showMessage(ERROR, "Failed to save user " + config.dataObject.userId + " " + res.message, DEFAULT_ERROR_TITLE);
             }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");

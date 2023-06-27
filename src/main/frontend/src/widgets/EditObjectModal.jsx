@@ -13,8 +13,13 @@ const EditObjectModal = (props) => {
     const {config} = props;
 
     const getOkLabel = () => {
-        return config.new ? "Create" : "Update";
+        if (config.dataObject) {
+            return config.dataObject.newRecord ? "Create" : "Update";
+        } else {
+            return "Create";
+        }
     };
+    
 
     return (
             <div className="static-modal">
@@ -38,7 +43,7 @@ const EditObjectModal = (props) => {
 };
 
 EditObjectModal.propTypes = {
-    config: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired
 };
 
 export default EditObjectModal;

@@ -3,11 +3,12 @@
     {
       "databaseType": "Oracle",
       "datasourceName": "oraclehr",
-      "description": "test - new",
+      "description": "rrrrrrrrrrr",
       "url": "jdbc:oracle:thin:@localhost:1521:xe",
       "driver": "oracle.jdbc.OracleDriver",
       "username": "HR",
       "password": "admin",
+      "newDatasource": false,
       "status": "offline"
     },
     {
@@ -17,6 +18,7 @@
       "driver": "oracle.jdbc.OracleDriver",
       "username": "SH",
       "password": "admin",
+      "newDatasource": false,
       "status": "offline"
     }
   ]

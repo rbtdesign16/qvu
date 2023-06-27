@@ -5,18 +5,15 @@
 package org.rbt.qvu.util;
 
 import jakarta.xml.bind.DatatypeConverter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.client.utils.OperationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +54,11 @@ public class Helper {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(input.getBytes("UTF-8"));
         return  DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
+    }
+    
+    public static void populateResultError(OperationResult res, Throwable t) {
+        res.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+        res.setMessage(t.toString());
     }
     
 }

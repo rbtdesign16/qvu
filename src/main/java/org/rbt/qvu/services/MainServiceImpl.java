@@ -1,15 +1,6 @@
 package org.rbt.qvu.services;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +9,11 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.QvuAuthenticationService;
 import org.rbt.qvu.client.utils.RoleInformation;
-import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.UserInformation;
 import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigFileHandler;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
-import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.SaveResult;
@@ -45,7 +35,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MainServiceImpl implements MainService {
-
     private static Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
     @Autowired
@@ -53,8 +42,9 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private Config config;
-
-    Gson gson = new Gson();
+    
+    @Autowired
+    private ConfigFileHandler configFileHandler;   
 
     @PostConstruct
     private void init() {
@@ -91,6 +81,7 @@ public class MainServiceImpl implements MainService {
             if (scfg.isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
                 retval.setAllRoles(scfg.getBasicConfiguration().getRoles());
+                retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
             } else if (authService != null) { // if we have a service defined we will try to loaf from there
                 retval.getAllRoles().addAll(authService.getAllRoles());
                 retval.getAllUsers().addAll(authService.getAllUsers());
@@ -123,22 +114,14 @@ public class MainServiceImpl implements MainService {
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
             
             if (LOG.isDebugEnabled()) {
-                LOG.debug("AuthData: " + gson.toJson(retval, AuthData.class));
+                LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
             }
         }
 
         return retval;
     }
 
-    @Override
-    public List<DataSourceConfiguration> loadDatasources() {
-        List<DataSourceConfiguration> retval = config.getDatasourcesConfig().getDatasources();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
-        }
-        return retval;
-    }
-
+    
     private void loadUserAttributes(UserInformation user, Map attributes) {
         for (Object o : attributes.keySet()) {
             Object val = attributes.get(o);
@@ -188,106 +171,39 @@ public class MainServiceImpl implements MainService {
             }
         }
     }
+    
+    @Override
+    public List<DataSourceConfiguration> loadDatasources() {
+        return configFileHandler.loadDatasources();
+    }
 
     @Override
     public SaveResult saveDatasource(DataSourceConfiguration datasource) {
-        SaveResult retval = new SaveResult();
-        DataSourcesConfiguration datasources = null;
-        try {
-            File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
-            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-                byte[] bytes = fis.readAllBytes();
-                datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
-
-                if (datasources != null) {
-                    int indx = -1;
-                    for (int i = 0; i < datasources.getDatasources().size(); ++i) {
-                        DataSourceConfiguration ds = datasources.getDatasources().get(i);
-                        if (ds.getDatasourceName().equalsIgnoreCase(datasource.getDatasourceName())) {
-                            indx = i;
-                            break;
-                        }
-                    }
-
-                    if (indx > -1) {
-                        datasources.getDatasources().set(indx, datasource);
-                    } else {
-                        datasources.getDatasources().add(datasource);
-                    }
-                }
-            }
-
-            if (datasources != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(datasources).getBytes());
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
-                }
-            }
-        } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
-        }
-
-        return retval;
+        return configFileHandler.saveDatasource(datasource);
     }
 
     @Override
     public SaveResult deleteDatasource(String datasourceName) {
-        SaveResult retval = new SaveResult();
-        DataSourcesConfiguration datasources = null;
-        try {
-            File f = new File(config.getAppConfig().getDatabaseConfigurationFile());
-            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-                byte[] bytes = fis.readAllBytes();
-                datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
-
-                if (datasources != null) {
-                    Iterator<DataSourceConfiguration> it = datasources.getDatasources().iterator();
-                    while (it.hasNext()) {
-                        DataSourceConfiguration ds = it.next();
-                        if (ds.getDatasourceName().equalsIgnoreCase(datasourceName)) {
-                            it.remove();
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (datasources != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(datasources).getBytes());
-                } catch (Exception ex) {
-                    LOG.error(ex.toString(), ex);
-                }
-            }
-        } catch (Exception ex) {
-            retval.setError(true);
-            retval.setMessage(ex.toString());
-        }
-
-        return retval;
-
+        return configFileHandler.deleteDatasource(datasourceName);
     }
 
     @Override
     public SaveResult saveRole(RoleInformation role) {
         SaveResult retval = new SaveResult();
+        if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
                 config.getSecurityConfig().getAuthenticatorService().saveRole(role);
             } catch (Exception ex) {
                 retval.setError(true);
                 retval.setMessage(ex.toString());
             }
-
+        } else {
+            retval = configFileHandler.saveRole(role);
+        }
+        
         return retval;
-
     }
-
+    
     @Override
     public SaveResult deleteRole(String roleName) {
         SaveResult retval = new SaveResult();
@@ -298,37 +214,44 @@ public class MainServiceImpl implements MainService {
                 retval.setError(true);
                 retval.setMessage(ex.toString());
             }
+        } else {
+            retval = configFileHandler.deleteRole(roleName);
         }
-
+        
         return retval;
-
     }
 
     @Override
     public SaveResult saveUser(UserInformation user) {
         SaveResult retval = new SaveResult();
+        if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
                 config.getSecurityConfig().getAuthenticatorService().saveUser(user);
             } catch (Exception ex) {
                 retval.setError(true);
                 retval.setMessage(ex.toString());
             }
-
+        } else {
+            retval = configFileHandler.saveUser(user);
+        }
+        
         return retval;
-
     }
 
     @Override
     public SaveResult deleteUser(String userId) {
         SaveResult retval = new SaveResult();
+        if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
                 config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
             } catch (Exception ex) {
                 retval.setError(true);
                 retval.setMessage(ex.toString());
             }
-
+        } else {
+            retval = configFileHandler.deleteUser(userId);
+        }
+        
         return retval;
-
     }
 }

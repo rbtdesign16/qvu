@@ -61,7 +61,7 @@ public class Config {
         return securityConfig;
     }
 
-    public void setSecurityConfig(SecurityConfiguration securityConfig) {
+    public synchronized void setSecurityConfig(SecurityConfiguration securityConfig) {
         this.securityConfig = securityConfig;
     }
 
@@ -69,7 +69,7 @@ public class Config {
         return datasourcesConfig;
     }
 
-    public void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
+    public synchronized void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
         this.datasourcesConfig = datasourcesConfig;
     }
 }

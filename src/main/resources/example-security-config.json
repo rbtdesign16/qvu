@@ -21,11 +21,10 @@
     "basicConfiguration": {
         "users": [{
                 "userId": "admin",
+                "firstName": "John",
+                "lastName": "Doe",
                 "attributes": [
                     {
-                        "name": "name",
-                        "value": "John Doe"
-                    }, {
                         "name": "password",
                         "value": "F6FDFFE48C908DEB0F4C3BD36C032E72"
                     }
@@ -37,6 +36,8 @@
             },
             {
                 "userId": "tester",
+                "firstName": "Joe",
+                "lastName": "Blow",
                 "attributes": [
                     {
                         "name": "password",

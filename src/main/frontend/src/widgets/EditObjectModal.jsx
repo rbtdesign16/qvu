@@ -9,7 +9,7 @@ import Form from 'react-bootstrap/Form';
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel"
 
-        const EditObjectModal = (props) => {
+const EditObjectModal = (props) => {
     const {config} = props;
 
     const getOkLabel = () => {

@@ -22,6 +22,7 @@ public class DataSourceConfiguration {
     private Long idleTimeout;
     private Long maxLifeTime;
     private Integer maxPoolSize;
+    private boolean newDatasource;
     private String status = Constants.OFFLINE;
 
 
@@ -119,6 +120,14 @@ public class DataSourceConfiguration {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isNewDatasource() {
+        return newDatasource;
+    }
+
+    public void setNewDatasource(boolean newDatasource) {
+        this.newDatasource = newDatasource;
     }
     
     

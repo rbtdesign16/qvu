@@ -44,6 +44,7 @@ public class Config {
             securityConfig.setSecurityType(securityType);
             appConfig.setSecurityType(securityType);
             datasourcesConfig = ConfigBuilder.build(appConfig.getDatabaseConfigurationFile(), DataSourcesConfiguration.class);
+            
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }

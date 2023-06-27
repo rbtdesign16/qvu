@@ -19,7 +19,7 @@ import {
     checkEntryFields,
     updateJsonArray} from "../../utils/helper";
 
-import {saveDatasource} from "../../utils/apiHelper";
+import {saveDatasource, saveUser, saveRole} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -355,6 +355,7 @@ const Admin = (props) => {
 
         if (ok) {
             showMessage(INFO, "Saving datasource...", "Saving", true);
+            config.dataObject.newDatasource = config.dataObject.newObject;
             let res = await saveDatasource(config.dataObject);
             if (!res.error) {
                 setErrorMessage(config.idPrefix, "");
@@ -373,30 +374,47 @@ const Admin = (props) => {
         }
     };
 
-    const saveRole = (config) => {
+    const saveRole = async (config) => {
        let ok = checkEntryFields(config);
 
         if (ok) {
-            setErrorMessage(config.idPrefix, "");
-            
-            let newRoles = [... authData.allRoles];
-            updateJsonArray("name", config.dataObject, newRoles);
-            setAuthData({...authData, allRoles: newRoles});
-            setEditModal({show: false});
+            showMessage(INFO, "Saving role...", "Saving", true);
+            config.dataObject.newRole = config.dataObject.newObject;
+            let res = await saveRole(config.dataObject);
+            if (!res.error) {
+                setErrorMessage(config.idPrefix, "");
+
+                let newRoles = [... authData.allRoles];
+                config.dataObject.newRole = config.dataObject.newObject;
+                updateJsonArray("name", config.dataObject, newRoles);
+                setAuthData({...authData, allRoles: newRoles});
+                setEditModal({show: false});
+            } else {
+                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
+            }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
         }
     };
 
-    const saveUser = (config) => {
+    const saveUser = async (config) => {
        let ok = checkEntryFields(config);
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");
-            let newUsers = [...authData.allUsers]
-            updateJsonArray("userId", config.dataObject,newUsers );
-            setAuthData({...authData, allUsers: newUsers});
-            setEditModal({show: false});
+            showMessage(INFO, "Saving user...", "Saving", true);
+            config.dataObject.newUser = config.dataObject.newObject;
+            let res = await saveUser(config.dataObject);
+            if (!res.error) {
+                setErrorMessage(config.idPrefix, "");
+                let newUsers = [...authData.allUsers]
+                config.dataObject.newUser = config.dataObject.newObject;
+                updateJsonArray("userId", config.dataObject,newUsers );
+                setAuthData({...authData, allUsers: newUsers});
+                setEditModal({show: false});
+            } else {
+                showMessage(ERROR, res.message, DEFAULT_ERROR_MESSAGE);
+            }
         } else {
             setErrorMessage(config.idPrefix, "please complete all required entries");
         }

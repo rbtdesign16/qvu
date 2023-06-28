@@ -5,14 +5,18 @@
 package org.rbt.qvu.configuration.security;
 
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author rbtuc
  */
 public class SecurityConfiguration {
+    private static Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
     private String authenticatorServiceClassName;
     private String securityType;
     private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
@@ -106,5 +110,11 @@ public class SecurityConfiguration {
         this.allowServiceSave = allowServiceSave;
     }
 
+    public void postConstruct() {
+        LOG.debug("in SecurityConfiguration.postConstruct()");
+        if (basicConfiguration != null) {
+            basicConfiguration.postConstruct();
+        }
+    }
    
 }

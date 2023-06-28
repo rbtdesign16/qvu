@@ -15,6 +15,7 @@ import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
+import org.rbt.qvu.util.AuthHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,10 +44,12 @@ public class MainController {
         AuthData retval = null;
         try {
             retval = service.loadAuthData();
+            // make sure we do not send password across the wire
+            AuthHelper.removePasswords(retval);
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
-        
+ 
         return retval;
     }
     

@@ -7,13 +7,11 @@ package org.rbt.qvu.configuration.security;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.Config;
-import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.Helper;
@@ -28,6 +26,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.util.RoleComparator;
+import org.rbt.qvu.util.UserComparator;
 
 /**
  *
@@ -36,14 +36,13 @@ import org.rbt.qvu.client.utils.SecurityService;
 @Component
 public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
-    private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+    private static Logger LOG = LoggerFactory.getLogger(BasicAuthSecurityProvider.class);
 
     @Autowired
     private Config config;
 
     private String authenticatorClass;
 
-    private Map<String, User> userMap = new HashMap<>();
     private List<Role> roles = new ArrayList<>();
     private List<User> users = new ArrayList<>();
 
@@ -57,10 +56,15 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
             // if no authenticator service then load from config file
             if (securityConfig.isFileBasedSecurity()) {
-                for (User uinfo : securityConfig.getBasicConfiguration().getUsers()) {
-                    userMap.put(uinfo.getUserId(), uinfo);
-                }
+                users = securityConfig.getBasicConfiguration().getUsers();
+                roles = securityConfig.getBasicConfiguration().getRoles();
+            } else if (securityConfig.getAuthenticatorService() != null) {
+                users = securityConfig.getAuthenticatorService().getAllUsers();
+                roles = securityConfig.getAuthenticatorService().getAllRoles();
             }
+
+            Collections.sort(users, new UserComparator());
+            Collections.sort(roles, new RoleComparator());
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
@@ -80,13 +84,13 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             }
 
             SecurityService service = config.getSecurityConfig().getAuthenticatorService();
-            
+
             if (config.getSecurityConfig().isFileBasedSecurity()) {
                 retval = authenticateFromProperties(name, password);
-            } else if (service != null)  {
+            } else if (service != null) {
                 retval = authenticateWithClass(service, name, password);
             }
-             LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
+            LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
         } catch (Exception ex) {
             throw new AuthenticationServiceException(ex.toString(), ex);
         }
@@ -95,7 +99,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> authentication) {
+    public boolean supports(Class<? extends Object> authentication) {
         return true;
     }
 
@@ -103,7 +107,9 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         Authentication retval = null;
         if (service.authenticate(name, password)) {
             User uinfo = service.getUser(name);
-            retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
+            if (uinfo != null) {
+                retval = new UsernamePasswordAuthenticationToken(uinfo, password, toGrantedAuthority(uinfo.getRoles()));
+            }
         }
 
         return retval;
@@ -112,18 +118,18 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     private Authentication authenticateFromProperties(String name, String password) throws Exception {
         LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
-        User uinfo = userMap.get(name);
-
-        new Gson().toJson(uinfo);
-        String storedPassword = uinfo.getPassword();
-        if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
-            // passwords are stored as md5 hashed strinfs
-            String hashedPassword = Helper.toMd5Hash(password);
-            if (storedPassword.equals(hashedPassword)) {
-                retval = new UsernamePasswordAuthenticationToken(name, password, toGrantedAuthority(uinfo.getRoles()));
+        User uinfo = config.getSecurityConfig().getBasicConfiguration().findUser(name);
+        if (uinfo != null) {
+            String storedPassword = uinfo.getPassword();
+            if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
+                // passwords are stored as md5 hashed strinfs
+                String hashedPassword = Helper.toMd5Hash(password);
+                if (storedPassword.equals(hashedPassword)) {
+                    retval = new UsernamePasswordAuthenticationToken(uinfo, password, toGrantedAuthority(uinfo.getRoles()));
+                }
             }
         }
-        
+
         return retval;
     }
 

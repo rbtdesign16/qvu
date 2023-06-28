@@ -6,12 +6,9 @@ package org.rbt.qvu.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nimbusds.jose.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.ArrayList;
@@ -27,8 +24,10 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.util.Helper;
+import org.rbt.qvu.util.UserComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -256,37 +255,23 @@ public class ConfigFileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    int indx = -1;
-                    List<User> users = securityConfig.getBasicConfiguration().getUsers();
-                    for (int i = 0; i < users.size(); ++i) {
-                        User u = users.get(i);
-                        if (u.getUserId().equalsIgnoreCase(user.getUserId())) {
-                            indx = i;
-                            break;
-                        }
-                    }
-
-                    // store hashed password
-                    user.setPassword(Helper.toMd5Hash(user.getPassword()));
-                    if (indx > -1) {
+                    User curuser = securityConfig.getBasicConfiguration().findUser(user.getUserId());
+                    if (curuser != null) {
                         if (user.isNewRecord()) {
                             retval.setErrorCode(OperationResult.RECORD_EXISTS);
                             retval.setMessage("user " + user.getUserId() + " already exists");
                             throw new SaveException(retval);
                         } else {
-                            users.set(indx, user);
+                            //  need to add password back since we do not send to client
+                            user.setPassword(curuser.getPassword());
+                            BeanUtils.copyProperties(user, curuser, "password");
                         }
                     } else {
-                        users.add(user);
+                        user.setPassword(Helper.toMd5Hash(user.getPassword()));
+                        securityConfig.getBasicConfiguration().getUsers().add(user);
                     }
 
-                    Collections.sort(users, new Comparator<User>() {
-                        @Override
-                        public int compare(User o1, User o2) {
-                            return o1.getUserId().compareTo(o2.getUserId());
-                        }
-
-                    });
+                    Collections.sort(securityConfig.getBasicConfiguration().getUsers(), new UserComparator());
                 }
             }
 

@@ -5,6 +5,7 @@
 package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.client.utils.AuthenticationException;
@@ -54,18 +55,19 @@ public class DefaultBasicAuthenticator implements SecurityService {
         ui.setUserId("admin");
         ui.setFirstName("John");
         ui.setLastName("Doe");
-        ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "admin"));
-    //    ui.getRoles().addAll(Arrays.asList(Constants.DEFAULT_ROLE_NAMES));
+        ui.setPassword("F6FDFFE48C908DEB0F4C3BD36C032E72");
+        ui.getRoles().addAll(Arrays.asList(Constants.DEFAULT_ROLE_NAMES));
         
         retval.add(ui);
                 
         ui = new User();
-        ui.setUserId("tester");
+        ui.setUserId("user");
         ui.setFirstName("Joe");
         ui.setLastName("Blow");
-        ui.getAttributes().add(new UserAttribute(Constants.PASSWORD_ATTRIBUTE_NAME, "test"));
-   //     ui.getRoles().add("user");
-   //     ui.getRoles().add("report designer");
+        ui.setPassword("5CC32E366C87C4CB49E4309B75F57D64");
+        ui.getRoles().add(Constants.DEFAULT_USER_ROLE);
+        ui.getRoles().add(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
+        ui.getRoles().add(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
         
         retval.add(ui);
         

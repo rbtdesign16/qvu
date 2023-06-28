@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
+import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.services.MainServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 /**
  *
@@ -118,4 +121,20 @@ public class AuthHelper {
         }
          return retval;
     }
+    
+    public static void removePasswords(AuthData auth) {
+        User u = new User();
+        BeanUtils.copyProperties(auth.getCurrentUser(), u, "password");
+        auth.setCurrentUser(u);
+        
+        List<User> users = new ArrayList<>();
+        for (User user : auth.getAllUsers()) {
+            u = new User();
+            BeanUtils.copyProperties(user, u, "password");
+            users.add(u);
+        }
+        
+        auth.setAllUsers(users);
+    }
+
 }

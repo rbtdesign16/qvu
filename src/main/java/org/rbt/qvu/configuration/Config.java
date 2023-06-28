@@ -55,6 +55,8 @@ public class Config {
                 datasourcesConfig = ConfigBuilder.build(appConfig.getDatasourceConfigurationFile(), DataSourcesConfiguration.class);
             }
             System.setProperty(Constants.SECURITY_TYPE_PROPERTY, appConfig.getSecurityType());
+            
+            securityConfig.postConstruct();
 
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

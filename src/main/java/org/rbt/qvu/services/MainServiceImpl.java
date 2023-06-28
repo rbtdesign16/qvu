@@ -33,6 +33,7 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.util.Helper;
+import org.springframework.beans.BeanUtils;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -53,6 +54,7 @@ public class MainServiceImpl implements MainService {
         LOG.info("in MainServiceImpl.init()");
     }
 
+    
     @Override
     public AuthData loadAuthData() throws Exception {
         AuthData retval = new AuthData();
@@ -111,8 +113,6 @@ public class MainServiceImpl implements MainService {
 
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
-            // make sure we do not populate password
-            retval.getCurrentUser().setPassword(null);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
             }

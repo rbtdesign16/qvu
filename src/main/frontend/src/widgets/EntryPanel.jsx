@@ -1,9 +1,10 @@
 import React, {useState} from "react";
 import Button from "react-bootstrap/Button"
+import { MdHelpOutline } from 'react-icons/md';
 import PropTypes from "prop-types";
 
 const EntryPanel = (props) => {
-    const {entryConfig, dataObject, buttons, idPrefix, changeHook, gridClass} = props.config;
+    const {entryConfig, dataObject, buttons, idPrefix, changeHandler, gridClass} = props.config;
 
     const loadOptions = (curval, options) => {
         return options.map((o) => {
@@ -16,8 +17,8 @@ const EntryPanel = (props) => {
     };
     
     const onChange = (e) => {
-        if (changeHook) {
-            changeHook(e);
+        if (changeHandler) {
+            changeHandler(e);
         } else {
             if (e.target.options) {
                 dataObject[e.target.name] = e.target.options[e.target.selectedIndex].value;
@@ -59,10 +60,10 @@ const EntryPanel = (props) => {
     
     const loadButtons = () => {
         return buttons.map(b => {
-            return  <Button size="sm" onClick={() => b.onClick()}>{b.text}</Button>
+            return  <Button size="sm" onClick={() => b.onClick()}>{b.text}</Button>;
 
         });
-    }
+    };
     
     const getGridClass = () => {
         if (gridClass) {
@@ -70,11 +71,14 @@ const EntryPanel = (props) => {
         } else {
             return "entrygrid-150-200";
         }
-    }
+    };
+    
     const loadEntryFields = () => {
+        
+    console.log("------->" + JSON.stringify(entryConfig));
         return entryConfig.map(c => {
             return <div className={getGridClass()}>
-                <div className="label">{c.required && <span className="red-f">*</span>}{c.label}</div>
+                <div className="label">{c.showHelp && <MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/>} {c.required && <span className="red-f">*</span>}{c.label}</div>
                 <div className="display-field">{getEntryField(c)}</div>
             </div>;
         });
@@ -89,7 +93,7 @@ const EntryPanel = (props) => {
     };
 
 EntryPanel.propTypes = {
-    config: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired
 };
 
 export default EntryPanel;

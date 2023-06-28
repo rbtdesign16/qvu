@@ -4,6 +4,7 @@ import EntryPanel from "../widgets/EntryPanel";
 import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
+import {INFO} from "../utils//helper";
 
 const InitialSetup = (props) => {
     const {authData} = useAuth();
@@ -16,10 +17,16 @@ const InitialSetup = (props) => {
         securityServiceClass: ""
     });
 
+    const showHelp = (txt) => {
+        showMessage(INFO, txt, "Help");
+    };
+
     const entryConfig1 = [{
             label: "Repository Folder:",
             name: "repository",
             type: "input",
+            showHelp: showHelp,
+            helpText: "The root folder location where Qvu configuration files and document artifacts will be stored",
             required: true
         },
         {
@@ -39,9 +46,12 @@ const InitialSetup = (props) => {
         {
             label: "Custom Security Class:",
             name: "securityServiceClass",
-            type: "input"
+            type: "input",
+            showHelp: showHelp,
+            helpText: "To enable custom authetication/security processing implement interface org.rbt.client.utils.Security service and put class name here."
 
         }];
+    
     
     const onCancel = () => {
         setData({
@@ -71,7 +81,7 @@ const InitialSetup = (props) => {
             dataObject: data,
             idPrefix: "init",
             gridClass: "entrygrid-175-225",
-            changeHook: onDataChange};
+            changeHandler: onDataChange};
     };
     
     const saveSetup = () => {

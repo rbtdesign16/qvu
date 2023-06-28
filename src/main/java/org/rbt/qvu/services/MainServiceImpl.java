@@ -65,7 +65,6 @@ public class MainServiceImpl implements MainService {
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             String userId = auth.getName();
             SecurityConfiguration scfg = config.getSecurityConfig();
-            LOG.error("------------------>a");
             retval.setInitialSetupRequired(config.isInitialSetupRequired());
             if (auth.getPrincipal() instanceof DefaultOAuth2User) {
                 DefaultOAuth2User oauser = (DefaultOAuth2User) auth.getPrincipal();

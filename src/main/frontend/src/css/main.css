@@ -42,20 +42,22 @@ body {
 }
 
 @keyframes spinner {
-  to {transform: rotate(360deg);}
+    to {
+        transform: rotate(360deg);
+    }
 }
- 
+
 .spinner:before {
-  content: '';
-  box-sizing: border-box;
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  margin-top: -5px;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-  border-top-color: #07d;
-  animation: spinner .8s linear infinite;
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin-top: -5px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    border-top-color: #07d;
+    animation: spinner .8s linear infinite;
 }
 
 .footer {
@@ -235,7 +237,11 @@ img {
     display: inline-block;
     text-align: right;
     width: 100%;
-    padding-right: 5px;
+    padding: 5px;
+}
+
+.bord-top {
+    border-top: solid 1px var(--default-border-color);
 }
 
 .tb-border {
@@ -254,6 +260,25 @@ img {
     width: 100px;
 }
 
+.entrygrid-175-225 {
+    display: grid;
+    grid-template-columns: 175px 225px;
+    margin: 5px;
+}
+
 #emo-error-msg {
     color: crimson;
+}
+
+#init-error-msg {
+    color: crimson;
+}
+
+.initial-setup {
+    border: 1px solid var(--default-border-color);
+    border-radius: 3px;
+    margin-left: 10%;
+    margin-top: 5%;
+    padding: 5px;
+    width: 700px;
 }

@@ -1,5 +1,4 @@
 import React, {useContext, useState} from "react";
-import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel";
 import useAuth from "../context/AuthContext";
@@ -7,22 +6,20 @@ import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
 
 const InitialSetup = (props) => {
-const {authData, setAuthData} = useAuth();
-        const {messageInfo, showMessage, hideMessage} = useMessage();
-        const {setDatasources} = useDataHandler();
-        
-        const navigate = useNavigate ();
+    const {authData} = useAuth();
+    const {messageInfo, showMessage, hideMessage} = useMessage();
+    const {setDatasources} = useDataHandler();
+    const [data, setData] = useState({
+        repository: "",
+        adminPassword: "",
+        securityType: "basic",
+        securityServiceClass: ""
+    });
 
-        const data = {
-            repository: "",
-            adminPassword: "",
-            securityType: "basic"
-        };
-        
-        const entryConfig1 = [{
+    const entryConfig1 = [{
             label: "Repository Folder:",
             name: "repository",
-            type: "file",
+            type: "input",
             required: true
         },
         {
@@ -33,33 +30,68 @@ const {authData, setAuthData} = useAuth();
             required: true
         },
         {
-            label: "Admin Password:",
+            label: "New Admin Password:",
             name: "adminPassword",
-            type: "password"
+            type: "password",
+            required: true
+
+        },
+        {
+            label: "Custom Security Class:",
+            name: "securityServiceClass",
+            type: "input"
+
         }];
     
-        const config1 = {
+    const onCancel = () => {
+        setData({
+            repository: "",
+            adminPassword: "",
+            securityType: "basic",
+            securityServiceClass: ""
+        });
+    };
+    
+    const onDataChange = (e) => {
+        let d = {...data};
+        if (e.target.options) {
+           d[e.target.name] = e.target.options[e.target.selectedIndex].value;
+        } else if (e.target.type === "checkbox") {
+            d[e.target.name] = e.target.checked;
+        } else {
+            d[e.target.name] = e.target.value;
+        }
+        
+        setData(d);
+    };
+    
+    const getConfig1 = () => {
+        return {
             entryConfig: entryConfig1,
             dataObject: data,
-            idPrefix: "init"
-        };
-        
-        const saveSetup = () => {
-            
-        };
-        
-        const canSave = () => {
-            return data.repository && data.securityType && data.adminPassword;
-        };
-        
-        return (
-                <div className="initial-setup">
-                    <div className="title">Qvu Initial Setup</div>
-                    <div><EntryPanel config={config1}/></div>
-                    <div id="init-error-msg"></div>
-                        <Button size="sm" onClick={() => navidate("/")}>Cancel</Button>
-                        <Button size="sm" variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
-                </div>);
+            idPrefix: "init",
+            gridClass: "entrygrid-175-225",
+            changeHook: onDataChange};
     };
+    
+    const saveSetup = () => {
+    };
+    
+    const canSave = () => {
+        return data.repository && data.securityType && data.adminPassword;
+    };
+    
+    return (
+            <div className="initial-setup">
+                <div className="title">Qvu Initial Setup</div>
+                <div><EntryPanel config={getConfig1()}/></div>
+                <div id="init-error-msg"></div>
+                <div className="btn-bar bord-top">
+                    <Button size="sm" onClick={() => onCancel()}>Cancel</Button>
+                    &nbsp;&nbsp;&nbsp;
+                    <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
+                </div>
+            </div>);
+};
 
-    export default InitialSetup;
+export default InitialSetup;

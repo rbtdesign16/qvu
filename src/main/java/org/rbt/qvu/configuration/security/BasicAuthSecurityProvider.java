@@ -116,9 +116,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
         new Gson().toJson(uinfo);
         String storedPassword = uinfo.getPassword();
-        LOG.info("password=[" + password + "]");
-        LOG.info("hpassword=[" + Helper.toMd5Hash(password) + "]");
-        LOG.info("spassword=[" + uinfo.getPassword() + "]");
         if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
             // passwords are stored as md5 hashed strinfs
             String hashedPassword = Helper.toMd5Hash(password);

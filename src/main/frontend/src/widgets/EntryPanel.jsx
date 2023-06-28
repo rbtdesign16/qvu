@@ -29,31 +29,36 @@ const EntryPanel = (props) => {
             }
         }
     };
-    
-    const getEntryField = (c) => {
+
+    const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
             return dataObject[c.name];
         } else {
             let id = idPrefix + c.name;
+            if (!c.style) {
+                c.style = {};
+            }
             switch (c.type) {
                 case "input":
-                    return <input name={c.name} id={id} type="text" size={30} onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id} type="text" size={30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} value={dataObject[c.name]}/>;
                 case "password":
-                    return <input name={c.name} id={id}  type="password" size={12} onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="password" size={12} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} value={dataObject[c.name]}/>;
                 case "select":
-                    return <select name={c.name}  id={id} onChange={e => onChange(e)}>{loadOptions(dataObject[c.name], c.options)}</select>;
-                case "integer":
-                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <select name={c.name}  id={id} onChange={e => onChange(e)} style={c.style} disabled={c.disabled} >{loadOptions(dataObject[c.name], c.options)}</select>;
+                case "number":
+                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
                 case "date":
-                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "email":
-                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} value={dataObject[c.name]} style={c.style} disabled={c.disabled}/>;
                 case "checkbox":
-                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} checked={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "textarea":
-                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
                 case "file":
-                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                case "label":
+                    return <span className="read-only-data" style={c.style} >{c.text}</span>;
             }
         }
     };
@@ -73,13 +78,37 @@ const EntryPanel = (props) => {
         }
     };
     
+    const getLabel = (c) => {
+        if (c.type === "checkbox") {
+            if (c.showHelp) {
+                return <div style={{textAlign: "right", verticalAlign: "middle"}}><MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/></div>;
+            } else {
+                return <div/>;
+            }
+        } else {
+            if (c.showHelp) {
+                return  <div className="label">
+                    <MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/>
+                    {c.required && <span className="red-f">*</span>}{c.label}</div>;
+            } else {
+               return <div className="label">{c.required && <span className="red-f">*</span>}{c.label}</div>;                   
+            }
+        }
+    };
+    
+    const getEntry = (c) => {
+        if (c.type === "checkbox") {
+            return <div className="display-field">{getInputField(c)}&nbsp;&nbsp;{c.label}</div>;
+        } else {
+            return <div className="display-field">{getInputField(c)}</div>;
+        }    
+    };
+    
     const loadEntryFields = () => {
-        
-    console.log("------->" + JSON.stringify(entryConfig));
         return entryConfig.map(c => {
             return <div className={getGridClass()}>
-                <div className="label">{c.showHelp && <MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/>} {c.required && <span className="red-f">*</span>}{c.label}</div>
-                <div className="display-field">{getEntryField(c)}</div>
+                { getLabel(c) }
+                { getEntry(c) }
             </div>;
         });
     };

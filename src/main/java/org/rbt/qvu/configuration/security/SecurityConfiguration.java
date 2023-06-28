@@ -5,7 +5,6 @@
 package org.rbt.qvu.configuration.security;
 
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.slf4j.Logger;

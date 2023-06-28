@@ -96,17 +96,17 @@ const Admin = (props) => {
             {
                 label: "Idle Timeout:",
                 name: "idleTimeout",
-                type: "integer"
+                type: "number"
             },
             {
                 label: "Max Life Time:",
                 name: "maxLifeTime",
-                type: "integer"
+                type: "number"
             },
             {
                 label: "Max Pool Size:",
                 name: "maxPoolSize",
-                type: "integer"
+                type: "number"
             }];
     };
 

@@ -31,7 +31,7 @@ const EditObjectModal = (props) => {
                         <Modal.Title>{config.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div><EntryPanel config={config}/><div id="emo-error-msg"></div></div>
+                        <div><EntryPanel config={config}/><div className="modal-error-msg" id={config.idPrefix + "error-msg"}></div></div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => config.cancel()}>Cancel</Button>

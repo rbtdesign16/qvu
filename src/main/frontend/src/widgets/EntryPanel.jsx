@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import Button from "react-bootstrap/Button"
 import { MdHelpOutline } from 'react-icons/md';
+import { SMALL_ICON_SIZE } from "../utils/helper"
 import PropTypes from "prop-types";
 
 const EntryPanel = (props) => {
@@ -40,23 +41,23 @@ const EntryPanel = (props) => {
             }
             switch (c.type) {
                 case "input":
-                    return <input name={c.name} id={id} type="text" size={30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id} type="text" size={30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name]}/>;
                 case "password":
-                    return <input name={c.name} id={id}  type="password" size={12} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} value={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id}  type="password" size={12} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name]}/>;
                 case "select":
                     return <select name={c.name}  id={id} onChange={e => onChange(e)} style={c.style} disabled={c.disabled} >{loadOptions(dataObject[c.name], c.options)}</select>;
                 case "number":
-                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
+                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
                 case "date":
-                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "email":
-                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} value={dataObject[c.name]} style={c.style} disabled={c.disabled}/>;
+                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} style={c.style} disabled={c.disabled}/>;
                 case "checkbox":
                     return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} checked={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "textarea":
-                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
+                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
                 case "file":
-                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "label":
                     return <span className="read-only-data" style={c.style} >{c.text}</span>;
                 case "button":
@@ -83,14 +84,14 @@ const EntryPanel = (props) => {
     const getLabel = (c) => {
         if (c.type === "checkbox") {
             if (c.showHelp) {
-                return <div style={{textAlign: "right", verticalAlign: "middle"}}><MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/></div>;
+                return <div style={{textAlign: "right", verticalAlign: "middle"}}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/></div>;
             } else {
                 return <div/>;
             }
         } else {
             if (c.showHelp) {
                 return  <div className="label">
-                    <MdHelpOutline className="icon-s" size={20} onClick={(e) => c.showHelp(c.helpText)}/>
+                    <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/>&nbsp;&nbsp;
                     {c.required && <span className="red-f">*</span>}{c.label}</div>;
             } else {
                return <div className="label">{c.required && <span className="red-f">*</span>}{c.label}</div>;                   
@@ -102,11 +103,11 @@ const EntryPanel = (props) => {
         return entries.map(e => {
             return <span style={{paddingLeft: "10px"}}>{getInputField(e)}</span>;
         });
-    }
+    };
     
     const getEntry = (c) => {
         if (c.type === "checkbox") {
-            return <div className="display-field">{getInputField(c)}&nbsp;&nbsp;{c.label}</div>;
+            return <div className="display-field">{getInputField(c)}<label htmlFor={idPrefix + c.name} style={{paddingLeft: "3px", cursor: "pointer"}}>{c.label}</label></div>;
         } else {
             return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
         }    
@@ -121,10 +122,19 @@ const EntryPanel = (props) => {
         });
     };
     
+    
+    const haveRequiredFields = () => {
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].required) {
+                return true;
+            }
+        }
+    };
+    
     return (
             <div>
                 { loadEntryFields() }
-                <div><span className="red-f">*</span>indicates required field</div>
+                {haveRequiredFields() && <div><span className="red-f">*</span>indicates required field</div>}
                 {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
             </div>);
     };

@@ -35,8 +35,9 @@ const InitialSetup = (props) => {
         setEditModal({show: false});
     };
 
-    const saveBasicConfiguratione = (config) => {
+    const saveBasicConfiguration = (config) => {
         setData({...data, securityConfiguration: null, oidcConfiguration: null, fileBasedSecurity: config.dataObject.fileBaseSecurity});
+        hideEdit();
     };
 
     const getBasicSecurityConfig = () => {
@@ -47,7 +48,7 @@ const InitialSetup = (props) => {
             labelWidth: "100px",
             fieldWidth: "150px",
             cancel: hideEdit,
-            save: saveBasicConfiguratione,
+            save: saveBasicConfiguration,
             dataObject: {fileBasedSecurity: false},
             entryConfig: [{
                     label: "Use File Based Security",
@@ -60,20 +61,25 @@ const InitialSetup = (props) => {
         };
     };
 
-    const saveSamlConfiguratione = (config) => {
-        setData({...data, fileBasedSecurity: false, oidcConfiguration: null, samlConfiguration: config.dataObject});
+    const saveSamlConfiguration = (config) => {
+        let ok = checkEntryFields(config);
+
+        if (ok) {
+            setData({...data, fileBasedSecurity: false, oidcConfiguration: null, samlConfiguration: config.dataObject});
+            hideEdit();
+        } else {
+            setErrorMessage(config.idPrefix, "Please complete all required entries");
+        }
     };
 
     const getSamlSecurityConfig = () => {
         return {
-            idPrefix: "bsc-",
+            idPrefix: "smlc-",
             show: true,
             title: "SAML Configuration",
-            labelWidth: "100px",
-            fieldWidth: "150px",
-            gridClass: "entrygrid-200-425",
+            gridClass: "entrygrid-150-425",
             cancel: hideEdit,
-            save: saveSamlConfiguratione,
+            save: saveSamlConfiguration,
             dataObject: {
                 idpUrl: "",
                 signAssertions: false,
@@ -85,20 +91,22 @@ const InitialSetup = (props) => {
                     label: "IDP URL",
                     name: "idpUrl",
                     type: "input",
+                    required: true,
                     showHelp: showHelp,
                     helpText: "Identity provider URL"
-                },
-                {
-                    label: "Sign Assertions",
-                    name: "signAssertions",
-                    type: "checkbox"
                 },
                 {
                     label: "SP Entity ID",
                     name: "spEntityId",
                     type: "input",
+                    required: true,
                     showHelp: showHelp,
                     helpText: "Service provider entity id"
+                },
+                {
+                    label: "Sign Assertions",
+                    name: "signAssertions",
+                    type: "checkbox"
                 },
                 {
                     label: "Signing Cert File",
@@ -117,20 +125,26 @@ const InitialSetup = (props) => {
         };
     };
 
-    const saveOidcConfiguratione = (config) => {
-        setData({...data, fileBasedSecurity: false, oidcConfiguration: config.data, samlConfiguration: null});
+    const saveOidcConfiguration = (config) => {
+        let ok = checkEntryFields(config);
+        if (ok) {
+            setData({...data, fileBasedSecurity: false, oidcConfiguration: config.data, samlConfiguration: null});
+            hideEdit();
+        } else {
+            setErrorMessage(config.idPrefix, "Please complete all required entries");
+        }
     };
 
     const getOidcSecurityConfig = () => {
         return {
-            idPrefix: "bsc-",
+            idPrefix: "oic-",
             show: true,
             title: "OIDC Configuration",
             labelWidth: "100px",
             fieldWidth: "150px",
             gridClass: "entrygrid-200-425",
             cancel: hideEdit,
-            save: saveOidcConfiguratione,
+            save: saveOidcConfiguration,
             dataObject: {
                 issuerLocationUrl: "",
                 clientId: "",
@@ -140,12 +154,15 @@ const InitialSetup = (props) => {
                     label: "Issuer Location URL",
                     name: "issuerLocationUrl",
                     type: "input",
+                    required: true,
                     showHelp: showHelp,
                     helpText: "Issuer Location URL"
                 },
                 {
                     label: "Client ID",
                     name: "clientId",
+                    type: "input",
+                    required: true,
                     showHelp: showHelp,
                     helpText: "Issuer Location URL"
                 },
@@ -153,6 +170,7 @@ const InitialSetup = (props) => {
                     label: "Client Secret",
                     name: "clientSecret",
                     type: "input",
+                    required: true,
                     showHelp: showHelp,
                     helpText: "Client Secret"
                 }]

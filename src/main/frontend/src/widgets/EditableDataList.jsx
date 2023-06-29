@@ -1,11 +1,11 @@
 import React from "react";
 import { CiEdit } from 'react-icons/ci';
 import { MdOutlineDeleteForever, MdOutlineAddBox } from 'react-icons/md';
+import { SMALL_ICON_SIZE } from "../utils/helper";
 import PropTypes from "prop-types";
 
 const EditableDataList = (props) => {
     const {listConfig} = props;
-    const iconSize = "25px";
 
     const getEditTitle = (indx) => {
         return listConfig.editTitle + " " + listConfig.data[indx][listConfig.displayConfig[0].field];
@@ -30,8 +30,8 @@ const EditableDataList = (props) => {
 
     const getButtons = (indx) => {
         return <div className="btn-bar tb-border platinum-b">
-            {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={iconSize} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
-            {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={iconSize} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
+            {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
+            {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
         </div>;
     };
 
@@ -53,7 +53,7 @@ const EditableDataList = (props) => {
                 <div className="title">
                     <span>{listConfig.title}</span>
                     {listConfig.onAdd &&
-                            <span style={{float: "right"}}><MdOutlineAddBox size={iconSize} title={listConfig.addTitle} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
+                            <span style={{float: "right"}}><MdOutlineAddBox size={SMALL_ICON_SIZE} title={listConfig.addTitle} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
                     }
                 </div>
                 <div className="data-container">

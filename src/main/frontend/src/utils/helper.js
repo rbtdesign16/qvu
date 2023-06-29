@@ -19,6 +19,7 @@ export const DEFAULT_ERROR_TITLE = "Error";
 export const DEFAULT_WARN_TITLE = "Warning";
 
 export const ERROR_BACKGROUND_COLOR = "pink";
+export const EEROR_TEXT_COLOR = "crimson";
 
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";
@@ -32,6 +33,8 @@ export const TYPE_EMAIL = "email";
 export const SECURITY_TYPE_BASIC = "basic";
 export const SECURITY_TYPE_SAML = "saml";
 export const SECURITY_TYPE_OIDC = "oidc";
+
+export const SMALL_ICON_SIZE = 18;
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;

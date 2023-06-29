@@ -12,8 +12,8 @@ html {
 body {
     font-family: "Roboto", sans-serif;
     font-size: var(--default-font-sz);
-    background-color: var(--default-background-color);
     color: var(--default-font-color);
+    background-color: var(--default-background-color);
     height: 100%;
     width: 100%;
 }
@@ -207,30 +207,26 @@ img {
 
 .icon-s {
     cursor: pointer;
-    padding: 2px;
-    margin-bottom: 5px;
-    width: 20px;
 }
 
 .icon-m {
     cursor: pointer;
-    padding: 2px;
-    margin-bottom: 5px;
-    width: 35px;
 }
-
 
 .label {
     text-align: right;
     padding-right: 5px;
-    display: inline-block;
+    display: flex;
     font-size: var(--default-label-font-size);
     font-weight: var(--default-label-font-weight);
     color: var(--default-label-font-color);
+    align-items: center;
+    justify-content: right;
 }
 
 .display-field {
-    display: inline-block;
+    display: flex;
+    align-items: center;
     padding-left: 5px;
     font-size: var(--default-font-size);
     color: var(--default-font-color);
@@ -264,18 +260,21 @@ img {
     width: 100px;
 }
 
+.entrygrid-150-425 {
+    display: grid;
+    grid-template-columns: 150px 425px;
+    margin: 5px;
+}
+
 .entrygrid-200-425 {
     display: grid;
     grid-template-columns: 200px 425px;
     margin: 5px;
 }
 
-#emo-error-msg {
+.modal-error-msg {
     color: crimson;
-}
-
-#init-error-msg {
-    color: crimson;
+    text-align: center;
 }
 
 .initial-setup {

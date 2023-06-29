@@ -6,6 +6,7 @@ import Admin from "./admin/Admin";
 import QueryDesign from "./querydesign/QueryDesign";
 import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
+import Help from "../widgets/Help"
 import Splash from "../widgets/Splash"
 import useLang from "../context/LangContext";
 import useAuth from "../context/AuthContext";
@@ -72,6 +73,7 @@ const Home = (props) => {
     return (
             <div className="home">
                 <Message/>
+                <Help/>
                 <Header version={version}/>
                 <div className="tab-container">
                     { getBody() }

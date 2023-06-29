@@ -26,7 +26,7 @@ const useLang = () => {
     const context = useContext(LangContext);
 
     if (context === undefined) {
-        throw new Error("useMessage must be used within an MessageProvider");
+        throw new Error("useLang must be used within an LangProvider");
     }
     return context;
 };

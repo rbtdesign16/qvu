@@ -5,19 +5,21 @@ import useAuth from "../context/AuthContext";
 import useLang from "../context/LangContext";
 import EditObjectModal from "../widgets/EditObjectModal";
 import useMessage from "../context/MessageContext";
+import useHelp from "../context/HelpContext"
 import {
-INFO,
-        checkEntryFields,
-        setErrorMessage,
-        SECURITY_TYPE_BASIC,
-        SECURITY_TYPE_SAML,
-        SECURITY_TYPE_OIDC
-        } from "../utils/helper";
+    INFO,
+    checkEntryFields,
+    setErrorMessage,
+    SECURITY_TYPE_BASIC,
+    SECURITY_TYPE_SAML,
+    SECURITY_TYPE_OIDC
+    } from "../utils/helper";
 
 const InitialSetup = (props) => {
     const {authData} = useAuth();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
+    const {showHelp} = useHelp();
     const [editModal, setEditModal] = useState({show: false});
 
     const [data, setData] = useState({
@@ -29,8 +31,8 @@ const InitialSetup = (props) => {
         allowServiceSave: false
     });
 
-    const showHelp = (txt) => {
-        showMessage(INFO, txt, getText("Help"));
+    const showHelpMessage = (txt) => {
+        showHelp(getText(txt));
     };
 
     const hideEdit = () => {
@@ -57,7 +59,7 @@ const InitialSetup = (props) => {
                     name: "allowServiceSave",
                     type: "checkbox",
                     style: {verticalAlign: "middle"},
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("allowServiceSave-help")
                 }]
         };
@@ -94,7 +96,7 @@ const InitialSetup = (props) => {
                     name: "idpUrl",
                     type: "input",
                     required: true,
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("idpUrl-help")
                 },
                 {
@@ -102,7 +104,7 @@ const InitialSetup = (props) => {
                     name: "spEntityId",
                     type: "input",
                     required: true,
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("spEntityId-help")
                 },
                 {
@@ -114,14 +116,14 @@ const InitialSetup = (props) => {
                     label: getText("Signing Cert File"),
                     name: "signingCertFileName",
                     type: "input",
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("signingCertFileName-help")
                 },
                 {
                     label: getText("Signing Key File"),
                     name: "signingKeyFileName",
                     type: "input",
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("signingKeyFileName-help")
                 }]
         };
@@ -157,7 +159,7 @@ const InitialSetup = (props) => {
                     name: "issuerLocationUrl",
                     type: "input",
                     required: true,
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("issuerLocationUrl-help")
                 },
                 {
@@ -165,7 +167,7 @@ const InitialSetup = (props) => {
                     name: "clientId",
                     type: "input",
                     required: true,
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("clientId-help")
                 },
                 {
@@ -173,7 +175,7 @@ const InitialSetup = (props) => {
                     name: "clientSecret",
                     type: "input",
                     required: true,
-                    showHelp: showHelp,
+                    showHelp: showHelpMessage,
                     helpText: getText("clientSecret-help")
                 }]
         };
@@ -185,7 +187,7 @@ const InitialSetup = (props) => {
             name: "repository",
             style: {width: "100%"},
             type: "input",
-            showHelp: showHelp,
+            showHelp: showHelpMessage,
             helpText: getText("repository-help"),
             required: true
         },
@@ -224,7 +226,7 @@ const InitialSetup = (props) => {
             name: "securityServiceClass",
             type: "input",
             style: {width: "100%"},
-            showHelp: showHelp,
+            showHelp: showHelpMessage,
             helpText: getText("securityServiceClass-help")
 
         },
@@ -233,7 +235,7 @@ const InitialSetup = (props) => {
             name: "allowServiceSave",
             type: "checkbox",
             style: {verticalAlign: "middle"},
-            showHelp: showHelp,
+            showHelp: showHelpMessage,
             disabled: true,
             helpText: getText("allowServiceSave-help")
         }];

@@ -19,7 +19,8 @@ export const DEFAULT_ERROR_TITLE = "Error";
 export const DEFAULT_WARN_TITLE = "Warning";
 
 export const ERROR_BACKGROUND_COLOR = "pink";
-export const EEROR_TEXT_COLOR = "crimson";
+export const ERROR_TEXT_COLOR = "crimson";
+export const SUCCESS_TEXT_COLOR = "crimson";
 
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";

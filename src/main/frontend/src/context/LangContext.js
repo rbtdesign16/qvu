@@ -1,18 +1,24 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext }
+from "react";
 
 export const LangContext = createContext();
 
-export const LangProvider = ({ children }) => {
+export const LangProvider = ({ children }
+) => {
     const [lang, setLang] = useState({});
 
     const getText = (textKey, addText = "") => {
-        if (lang[textKey]) {
-            return lang[textKey] + addText;
-        } else {
-            return textKey + addText;
+        try {
+            if (lang && lang[textKey]) {
+                return lang[textKey] + addText;
+            } else {
+                return textKey + addText;
+            }
+        } catch (e) {
+            return textKey;
         }
     };
-    
+
     return (
             <LangContext.Provider
                 value={{lang, setLang, getText}}>

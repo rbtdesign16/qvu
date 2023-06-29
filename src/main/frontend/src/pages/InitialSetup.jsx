@@ -12,10 +12,12 @@ import {
     setErrorMessage,
     SECURITY_TYPE_BASIC,
     SECURITY_TYPE_SAML,
-    SECURITY_TYPE_OIDC
-    } from "../utils/helper";
+    SECURITY_TYPE_OIDC,
+    ERROR_TEXT_COLOR,
+    SUCCESS_TEXT_COLOR
+} from "../utils/helper";
 
-const InitialSetup = (props) => {
+const InitialSetup = () => {
     const {authData} = useAuth();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
@@ -181,8 +183,8 @@ const InitialSetup = (props) => {
         };
     };
 
-
-    const entryConfig1 = [{
+    const getEntryConfig = () => {
+        return [{
             label: getText("Repository Folder:"),
             name: "repository",
             style: {width: "100%"},
@@ -198,10 +200,17 @@ const InitialSetup = (props) => {
             options: ["basic", "saml", "oidc"],
             entryConfig: [{
                     label: getText("Configure Security"),
+                    name: "stb1",
                     type: "button",
                     onClick: (c) => {
                         showSecurityConfig(data.securityType);
                     }
+                },
+                {
+                    type: "label",
+                    name: "stl1",
+                    style: getSecurityConfigLabelStyle(),
+                    text: getSecurityConfigLabelText()
                 }]
 
         },
@@ -239,6 +248,7 @@ const InitialSetup = (props) => {
             disabled: true,
             helpText: getText("allowServiceSave-help")
         }];
+    };
 
     const showSecurityConfig = (type) => {
         switch (type) {
@@ -296,9 +306,9 @@ const InitialSetup = (props) => {
         setData(d);
     };
 
-    const getConfig1 = () => {
+    const getConfig = () => {
         return {
-            entryConfig: entryConfig1,
+            entryConfig: getEntryConfig(),
             dataObject: data,
             idPrefix: "init-",
             gridClass: "entrygrid-200-425",
@@ -306,7 +316,7 @@ const InitialSetup = (props) => {
     };
 
     const saveSetup = () => {
-        let cfg = getConfig1();
+        let cfg = getConfig();
         if (checkEntryFields(cfg)) {
             alert("good entries");
         } else {
@@ -314,16 +324,107 @@ const InitialSetup = (props) => {
         }
     };
 
+    const checkSamlData = () => {
+        let retval = false;
+
+        if (data.samlConfiguration) {
+            let ok = true;
+
+            let entryConfig = getSamlSecurityConfig().entryConfig;
+            for (let i = 0; i < entryConfig.length; ++i) {
+                if (!data.samlConfiguration[entryConfig[i].name]) {
+                    ok = false;
+                    break;
+                }
+            }
+
+            retval = ok;
+        }
+
+        return retval;
+    };
+
+    const checkOidcData = () => {
+        let retval = false;
+
+        if (data.oidcConfiguration) {
+            let ok = true;
+
+            let entryConfig = getOidcSecurityConfig().entryConfig;
+            for (let i = 0; i < entryConfig.length; ++i) {
+                if (!data.oidcConfiguration[entryConfig[i].name]) {
+                    ok = false;
+                    break;
+                }
+            }
+
+            retval = ok;
+        }
+
+        return retval;
+    };
+    const getSecurityConfigLabelStyle = () => {
+        switch (data.securityType) {
+            case SECURITY_TYPE_SAML:
+                if (checkSamlData()) {
+                    return {color: SUCCESS_TEXT_COLOR};
+                } else {
+                    return {color: ERROR_TEXT_COLOR};
+                }
+            case SECURITY_TYPE_OIDC:
+                if (checkOidcData()) {
+                    return {color: SUCCESS_TEXT_COLOR};
+                } else {
+                    return {color: ERROR_TEXT_COLOR};
+                }
+            case SECURITY_TYPE_BASIC:
+                return "";
+        }
+    };
+    
+    const getSecurityConfigLabelText = () => {
+        switch (data.securityType) {
+            case SECURITY_TYPE_SAML:
+                if (checkSamlData()) {
+                    return getText("configuration complete");
+                } else {
+                    return getText("configuration incomplete");
+                }
+            case SECURITY_TYPE_OIDC:
+                if (checkOidcData()) {
+                    return getText("configuration complete");
+                } else {
+                    return getText("configuration incomplete");
+                }
+            case SECURITY_TYPE_BASIC:
+                return "";
+        }
+    };
+    
     const canSave = () => {
-        return data.repository && data.securityType && data.adminPassword;
+        let retval = false;
+        if (data.repository && data.securityType && data.adminPassword) {
+            switch (data.securityType) {
+                case SECURITY_TYPE_SAML:
+                    retval = checkSamlData();
+                    break;
+                case SECURITY_TYPE_OIDC:
+                    retval = checkOidcData();
+                    break;
+                case SECURITY_TYPE_BASIC:
+                    retval = true;
+                    break;
+            }
+        }
+
+        return retval;
     };
 
     return (
             <div className="initial-setup">
                 <EditObjectModal config={editModal}/>
-            
                 <div className="title">Qvu Initial Setup</div>
-                <div><EntryPanel config={getConfig1()}/></div>
+                <div><EntryPanel config={getConfig()}/></div>
                 <div id="init-error-msg"></div>
                 <div className="btn-bar bord-top">
                     <Button size="sm" onClick={() => onCancel()}>Cancel</Button>

@@ -81,6 +81,8 @@
         "?": "?",
         "Help": "Help",
         "password-validation-msg": "8 characters minimum, mixed case, at leat 1 special character",
-        "Initializing...": "Initializing..."
+        "Initializing...": "Initializing...",
+        "configuration complete": "configuration complete",
+        "configuration incomplete": "configuration incomplete"
      }
 }

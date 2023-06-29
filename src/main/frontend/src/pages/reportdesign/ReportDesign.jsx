@@ -5,7 +5,7 @@
 import React from "react";
 import { Tabs, Tab }from "react-bootstrap";
 
-const ReportDesign = (props) => {
+const ReportDesign = () => {
     return (
             <div>
                 report design

@@ -32,7 +32,7 @@ saveDatasource,
         formatErrorResponse,
         testDatasource} from "../../utils/apiHelper";
 
-const Admin = (props) => {
+const Admin = () => {
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();

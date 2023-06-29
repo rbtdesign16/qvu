@@ -16,7 +16,7 @@ import {
 } from "../utils/helper";
 
 
-const Message = (props) => {
+const Message = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
 
     let myTimeout;

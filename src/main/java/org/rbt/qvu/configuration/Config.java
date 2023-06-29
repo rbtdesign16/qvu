@@ -5,12 +5,13 @@
 package org.rbt.qvu.configuration;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
+import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,41 +25,38 @@ import org.springframework.stereotype.Component;
 public class Config {
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    //  @Value("#{environment.QVU_SECURITY_TYPE:basic}")
-    @Value("#{systemProperties['environment.QVU_SECURITY_TYPE'] ?: 'basic'}")
-    private String securityType;
+    @Value("${force.init:false}")
+    private boolean forceInit;
 
-//    @Value("#{environment.QVU_CONFIG_FILE:-}")
-    @Value("#{systemProperties['environment.QVU_CONFIG_FILE'] ?: '-'}")
-    private String applicationConfigFile;
+    @Value("${repository.folder:-}")
+    private String repositoryFolder;
 
     private ApplicationConfiguration appConfig;
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
-    private String langResources;
-    private boolean initialSetupRequired = false;
-    
+    private Map<String, Map<String, String>> langResources = new HashMap<>();
+    private boolean initialSetupRequired;
+
     @PostConstruct
     private void init() {
         LOG.info(" in Config.ini()");
-        LOG.info("applicationConfigFile=" + applicationConfigFile);
+        LOG.info("repositoryFolder=" + repositoryFolder);
         try {
             // indicates initial setup required
-            if ("-".equals(applicationConfigFile)) {
+            if ("-".equals(repositoryFolder) || forceInit) {
                 initialSetupRequired = true;
                 LOG.info("inital setup required");
                 appConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-application-configuration.json"), ApplicationConfiguration.class);
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
-                langResources = IOUtils.toString(getClass().getResourceAsStream("/initial-language.json"), "UTF-8");
+                langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
-                appConfig = ConfigBuilder.build(applicationConfigFile, ApplicationConfiguration.class);
-                langResources = FileUtils.readFileToString(new File(appConfig.getLanguageFile()), "UTF-8");
+                appConfig = ConfigBuilder.build(repositoryFolder + File.separator + Constants.APPLICATION_CONFIG_FILE_NAME, ApplicationConfiguration.class);
+                langResources = ConfigBuilder.build(getClass().getResourceAsStream(appConfig.getLanguageFile()), langResources.getClass());
                 securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
-                securityConfig.setSecurityType(securityType);
                 datasourcesConfig = ConfigBuilder.build(appConfig.getDatasourceConfigurationFile(), DataSourcesConfiguration.class);
             }
-            
+
             securityConfig.postConstruct();
 
         } catch (Exception ex) {
@@ -71,39 +69,39 @@ public class Config {
         return appConfig;
     }
 
-    public void setAppConfig(ApplicationConfiguration appConfig) {
-        this.appConfig = appConfig;
-    }
-
     public SecurityConfiguration getSecurityConfig() {
         return securityConfig;
-    }
-
-    public synchronized void setSecurityConfig(SecurityConfiguration securityConfig) {
-        this.securityConfig = securityConfig;
     }
 
     public DataSourcesConfiguration getDatasourcesConfig() {
         return datasourcesConfig;
     }
 
-    public synchronized void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
-        this.datasourcesConfig = datasourcesConfig;
-    }
-
     public String getSecurityType() {
-        return securityType;
+        return securityConfig.getSecurityType();
     }
 
-    public String getApplicationConfigFile() {
-        return applicationConfigFile;
+    public Map<String, Map<String, String>> getLangResources() {
+        return langResources;
+    }
+
+    public String getRepositoryFolder() {
+        return repositoryFolder;
     }
 
     public boolean isInitialSetupRequired() {
         return initialSetupRequired;
     }
 
-    public String getLangResources() {
-        return langResources;
+    public void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
+        this.datasourcesConfig = datasourcesConfig;
+    }
+
+    public void setAppConfig(ApplicationConfiguration appConfig) {
+        this.appConfig = appConfig;
+    }
+
+    public void setSecurityConfig(SecurityConfiguration securityConfig) {
+        this.securityConfig = securityConfig;
     }
 }

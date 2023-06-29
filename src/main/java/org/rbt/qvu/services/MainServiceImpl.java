@@ -1,13 +1,11 @@
 package org.rbt.qvu.services;
 
-import java.io.File;
 import java.util.Collection;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
@@ -252,10 +250,16 @@ public class MainServiceImpl implements MainService {
     }
     
     @Override
-    public String loadLang() {
-        String retval = config.getLangResources();
+    public String loadLang(String langkey) {
+        String retval = "";
+        Map<String, String> langMap = config.getLangResources().get(langkey);
+        if (langMap == null) {
+            retval = configFileHandler.getGson(true).toJson(config.getLangResources().get(Constants.DEFAULT_LANGUAGE_KEY));
+        }  else {
+            retval = configFileHandler.getGson(true).toJson(langMap);
+        }
         
-        LOG.debug("Language File: " + configFileHandler.getGson(true).toJson(retval));
+        LOG.debug("Language File: " + retval);
         
         return retval;
     }

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
         if (!authData) {
             // load the lnguare resource
-            setLang(await loadLang());
+            setLang(await loadLang(navigator.language));
             setAuthData(await loadAuth());
         }
     }

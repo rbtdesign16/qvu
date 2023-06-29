@@ -5,6 +5,7 @@
 package org.rbt.qvu.configuration;
 
 import java.io.File;
+import org.rbt.qvu.util.Constants;
 
 /**
  *
@@ -40,14 +41,14 @@ public class ApplicationConfiguration {
     }
 
     public String getSecurityConfigurationFile() {
-        return repositoryFolder + File.separator + "config" + File.separator + "security.json";
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.SECURITY_CONFIG_FILE_NAME;
     }
 
     public String getDatasourceConfigurationFile() {
-        return repositoryFolder + File.separator + "config" + File.separator + "datasource.json";
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.DATASOURCES_CONFIG_FILE_NAME;
     }
 
     public String getLanguageFile() {
-        return repositoryFolder + File.separator + "config" + File.separator + "language.json";
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.LANGUAGE_FILE_NAME;
     }
 }

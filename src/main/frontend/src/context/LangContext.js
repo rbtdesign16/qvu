@@ -6,8 +6,8 @@ export const LangProvider = ({ children }) => {
     const [lang, setLang] = useState({});
 
     const getText = (textKey, addText = "") => {
-        if (lang[navigator.language] && lang[navigator.language][textKey]) {
-            return lang[navigator.language][textKey] + addText;
+        if (lang[textKey]) {
+            return lang[textKey] + addText;
         } else {
             return textKey + addText;
         }

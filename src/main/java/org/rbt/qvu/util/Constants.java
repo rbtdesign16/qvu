@@ -25,9 +25,9 @@ public class Constants {
     public static final String BASIC_SECURITY_TYPE = "basic";
     public static final String OIDC_SECURITY_TYPE = "oidc";
     public static final String SAML_SECURITY_TYPE = "saml";
+    
+    
     public static final String DEFAULT_ROLE_ATTRIBUTE_NAME = "role";
-    public static final String PASSWORD_ATTRIBUTE_NAME = "password";
-
     public static final String DEFAULT_ADMINISTRATOR_ROLE = "administrator";
     public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
     public static final String DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
@@ -42,7 +42,13 @@ public class Constants {
     public static final String SAML_LAST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4";
     public static final String OAUTH2_CLAIM_ATTRIBUTE_REAL_ACCESS = "realm_access";
 
-    public static final String[] DEFAULT_ROLE_NAMES = {
+    public static final String APPLICATION_CONFIG_FILE_NAME = "qvu-application.json";
+    public static final String SECURITY_CONFIG_FILE_NAME = "qvu-security.json";
+    public static final String DATASOURCES_CONFIG_FILE_NAME = "qvu-datasources.json";
+    public static final String LANGUAGE_FILE_NAME = "qvu-language.json";
+    public static final String DEFAULT_LANGUAGE_KEY = "en-US";
+
+            public static final String[] DEFAULT_ROLE_NAMES = {
         "administrator",
         "query designer",
         "report designer",

@@ -95,10 +95,10 @@ public class MainController {
         return service.deleteDatasource(datasourceName);
     }
     
-    @GetMapping("api/v1/lang/load")
-    public String loadLang() {
-        LOG.debug("in loadLang()");
+    @GetMapping("api/v1/lang/{langkey}load")
+    public String loadLang(@PathVariable String langkey) {
+        LOG.debug("in loadLang(" + langkey + ")");
         
-        return service.loadLang();
+        return service.loadLang(langkey);
     }
 }

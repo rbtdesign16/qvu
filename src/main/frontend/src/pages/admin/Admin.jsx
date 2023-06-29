@@ -20,7 +20,7 @@ INFO,
         updateJsonArray} from "../../utils/helper";
 
 import {
-        saveDatasource,
+saveDatasource,
         saveUser,
         saveRole,
         deleteDatasource,
@@ -28,7 +28,8 @@ import {
         deleteUser,
         loadDatasources,
         loadAuth,
-        formatErrorResponse} from "../../utils/apiHelper";
+        formatErrorResponse,
+        testDatasource} from "../../utils/apiHelper";
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
@@ -174,7 +175,12 @@ const Admin = (props) => {
                     text: "test",
                     className: "btn btn-primary",
                     onClick: () => {
-                        alert("test");
+                        showMessage(INFO, "Attempting to connect...", null, true);
+                        if (testDatasource(dataObject)) {
+                            showMessage(SUCCESS, "Successfully connected to datasoure " + dataObject.datasourceName, DEFAULT_SUCCESS_TITLE);
+                        } else {
+                            showMessage(ERROR, "Connection failed to datasoure " + dataObject.datasourceName, DEFAULT_ERROR_TITLE);
+                        }
                     }
                 }]
         };
@@ -210,6 +216,7 @@ const Admin = (props) => {
             entryConfig: getUserEntryConfig(dataObject.newRecord)
         };
     };
+
 
     const addDatasource = () => {
         setEditModal(getDatasourceConfig("Create new datasource", {newRecord: true}));
@@ -281,7 +288,7 @@ const Admin = (props) => {
                 setAuthData(await loadAuth());
                 showMessage(SUCCESS, "Deleted user " + u.userId, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to delete user " + u.userId ), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, "Failed to delete user " + u.userId), DEFAULT_ERROR_TITLE);
             }
         };
 

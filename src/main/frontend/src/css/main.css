@@ -288,5 +288,9 @@ img {
 }
 
 .read-only-data {
-    color: var(-default-title-font-color);
+    color: var(--default-title-font-color);
+}
+
+select {
+    height: 30px;
 }

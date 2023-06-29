@@ -27,6 +27,11 @@ export const REPORT_DESIGNER_ROLE = "report designer";
 export const TYPE_PASSWORD = "password";
 export const TYPE_DATE = "date";
 export const TYPE_NUMBER = "number";
+export const TYPE_EMAIL = "email";
+
+export const SECURITY_TYPE_BASIC = "basic";
+export const SECURITY_TYPE_SAML = "saml";
+export const SECURITY_TYPE_OIDC = "oidc";
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
@@ -104,8 +109,14 @@ export const checkEntryFields = (config) => {
                         retval = false;
                     }
                     break;
-                case TYPE_PASSWORD:
+                case TYPE_NUMBER:
                     if (!isValidNumber(config.dataObject[config.entryConfig[i].name], config.entryConfig[i].validator)) {
+                        setFieldError(config.idPrefix, config.entryConfig[i].name);
+                        retval = false;
+                    }
+                    break;
+                case TYPE_EMAIL:
+                    if (!isValidEmail(config.dataObject[config.entryConfig[i].name], config.entryConfig[i].validator)) {
                         setFieldError(config.idPrefix, config.entryConfig[i].name);
                         retval = false;
                     }
@@ -118,8 +129,6 @@ export const checkEntryFields = (config) => {
 };
 
 export const isValidPassword = (password, validator) => {
-               console.log("---------------->p=" + password);
- 
      if (password && (password.length > 8)) {
         if (password.toLowerCase() !== password) {
             for (let i = 0; i < SPECIAL_CHARACTERS.length; ++i) {
@@ -133,12 +142,45 @@ export const isValidPassword = (password, validator) => {
     return false;
 };
 
+
 export const isValidDate = (date, validator) => {
-    
+     if (!isEmpty(date) && !isNan(new Date.parse('date'))) {
+        if (validator) {
+            if (validator.min && validator.max) {
+                return ((validator.min.getTime() <= date.getTime() && validator.max.getTime() >= date.getTime()));
+            } else if (validator.min) {
+                return date.getTime() >= validator.min.getTime()
+            } else if (validator.max) {
+                return date.getTime() <= validator.max.getTime();
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
 };
 
 export const isValidNumber = (number, validator) => {
-    
+    if (number && !isNan(number)) {
+       if (validator) {
+            if (validator.min && validator.max) {
+                return ((validator.min <= number && validator.max >= number));
+            } else if (validator.min) {
+                return number >= validator.min.getTime();
+            } else if (validator.max) {
+                return number <= validator.max.getTime();
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+};
+
+export const isValidEmail = (email, validator) => {
+    return (email && email.includes("@") && email.includes("."));
 };
 
 export const updateJsonArray = (fieldName, newRec,  data) => {

@@ -59,6 +59,8 @@ const EntryPanel = (props) => {
                     return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} value={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "label":
                     return <span className="read-only-data" style={c.style} >{c.text}</span>;
+                case "button":
+                    return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
             }
         }
     };
@@ -96,11 +98,17 @@ const EntryPanel = (props) => {
         }
     };
     
+    const getChildEntries = (entries) => {
+        return entries.map(e => {
+            return <span style={{paddingLeft: "10px"}}>{getInputField(e)}</span>;
+        });
+    }
+    
     const getEntry = (c) => {
         if (c.type === "checkbox") {
             return <div className="display-field">{getInputField(c)}&nbsp;&nbsp;{c.label}</div>;
         } else {
-            return <div className="display-field">{getInputField(c)}</div>;
+            return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
         }    
     };
     

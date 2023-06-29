@@ -2,14 +2,22 @@ import React, {useContext, useState} from "react";
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel";
 import useAuth from "../context/AuthContext";
-import useDataHandler from "../context/DataHandlerContext";
+import EditObjectModal from "../widgets/EditObjectModal";
 import useMessage from "../context/MessageContext";
-import {INFO, checkEntryFields, setErrorMessage} from "../utils/helper";
+import {
+INFO,
+        checkEntryFields,
+        setErrorMessage,
+        SECURITY_TYPE_BASIC,
+        SECURITY_TYPE_SAML,
+        SECURITY_TYPE_OIDC
+        } from "../utils/helper";
 
 const InitialSetup = (props) => {
     const {authData} = useAuth();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {setDatasources} = useDataHandler();
+    const [editModal, setEditModal] = useState({show: false});
+
     const [data, setData] = useState({
         repository: "",
         adminPassword: "",
@@ -21,6 +29,134 @@ const InitialSetup = (props) => {
 
     const showHelp = (txt) => {
         showMessage(INFO, txt, "Help");
+    };
+
+    const hideEdit = () => {
+        setEditModal({show: false});
+    };
+
+    const saveBasicConfiguratione = (config) => {
+        setData({...data, securityConfiguration: null, oidcConfiguration: null, fileBasedSecurity: config.dataObject.fileBaseSecurity});
+    };
+
+    const getBasicSecurityConfig = () => {
+        return {
+            idPrefix: "bsc-",
+            show: true,
+            title: "Basic Configuration",
+            labelWidth: "100px",
+            fieldWidth: "150px",
+            cancel: hideEdit,
+            save: saveBasicConfiguratione,
+            dataObject: {fileBasedSecurity: false},
+            entryConfig: [{
+                    label: "Use File Based Security",
+                    name: "allowServiceSave",
+                    type: "checkbox",
+                    style: {verticalAlign: "middle"},
+                    showHelp: showHelp,
+                    helpText: "If check, security information such as users and roles will be stored on locally as JSON files"
+                }]
+        };
+    };
+
+    const saveSamlConfiguratione = (config) => {
+        setData({...data, fileBasedSecurity: false, oidcConfiguration: null, samlConfiguration: config.dataObject});
+    };
+
+    const getSamlSecurityConfig = () => {
+        return {
+            idPrefix: "bsc-",
+            show: true,
+            title: "SAML Configuration",
+            labelWidth: "100px",
+            fieldWidth: "150px",
+            gridClass: "entrygrid-200-425",
+            cancel: hideEdit,
+            save: saveSamlConfiguratione,
+            dataObject: {
+                idpUrl: "",
+                signAssertions: false,
+                spEntityId: "",
+                signingCertFileName: "",
+                signingKeyFileName: ""
+            },
+            entryConfig: [{
+                    label: "IDP URL",
+                    name: "idpUrl",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Identity provider URL"
+                },
+                {
+                    label: "Sign Assertions",
+                    name: "signAssertions",
+                    type: "checkbox"
+                },
+                {
+                    label: "SP Entity ID",
+                    name: "spEntityId",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Service provider entity id"
+                },
+                {
+                    label: "Signing Cert File",
+                    name: "signingCertFileName",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Path to signing cert file"
+                },
+                {
+                    label: "Signing Key File",
+                    name: "signingKeyFileName",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Path to signing key file"
+                }]
+        };
+    };
+
+    const saveOidcConfiguratione = (config) => {
+        setData({...data, fileBasedSecurity: false, oidcConfiguration: config.data, samlConfiguration: null});
+    };
+
+    const getOidcSecurityConfig = () => {
+        return {
+            idPrefix: "bsc-",
+            show: true,
+            title: "OIDC Configuration",
+            labelWidth: "100px",
+            fieldWidth: "150px",
+            gridClass: "entrygrid-200-425",
+            cancel: hideEdit,
+            save: saveOidcConfiguratione,
+            dataObject: {
+                issuerLocationUrl: "",
+                clientId: "",
+                clientSecret: ""
+            },
+            entryConfig: [{
+                    label: "Issuer Location URL",
+                    name: "issuerLocationUrl",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Issuer Location URL"
+                },
+                {
+                    label: "Client ID",
+                    name: "clientId",
+                    showHelp: showHelp,
+                    helpText: "Issuer Location URL"
+                },
+                {
+                    label: "Client Secret",
+                    name: "clientSecret",
+                    type: "input",
+                    showHelp: showHelp,
+                    helpText: "Client Secret"
+                }]
+        };
     };
 
 
@@ -38,15 +174,14 @@ const InitialSetup = (props) => {
             name: "securityType",
             type: "select",
             options: ["basic", "saml", "oidc"],
-            required: true
-        },
-        {
-            label: "File Based Security",
-            name: "fileBasedSecurity",
-            type: "checkbox",
-            style: {verticalAlign: "middle"},
-            showHelp: showHelp,
-            helpText: "If checked, user and role information will be handled via local json files",
+            entryConfig: [{
+                    label: "Configure Security",
+                    type: "button",
+                    onClick: (c) => {
+                        showSecurityConfig(data.securityType);
+                    }
+                }]
+
         },
         {
             label: "New Admin Password:",
@@ -80,9 +215,22 @@ const InitialSetup = (props) => {
             style: {verticalAlign: "middle"},
             showHelp: showHelp,
             disabled: true,
-            helpText: "If a custom security service is configured then checking this will allow the service to save and delete users and roles",
+            helpText: "If a custom security service is configured then checking this will allow the service to save and delete users and roles"
         }];
 
+    const showSecurityConfig = (type) => {
+        switch (type) {
+            case SECURITY_TYPE_BASIC:
+                setEditModal(getBasicSecurityConfig());
+                break;
+            case SECURITY_TYPE_SAML:
+                setEditModal(getSamlSecurityConfig());
+                break;
+            case SECURITY_TYPE_OIDC:
+                setEditModal(getOidcSecurityConfig());
+                break;
+        }
+    };
 
     const onCancel = () => {
         setData({
@@ -140,7 +288,7 @@ const InitialSetup = (props) => {
         if (checkEntryFields(cfg)) {
             alert("good entries");
         } else {
-            setErrorMessage(cfg.idPrefix, "Please ensure valid data is entered in highlighted fields")
+            setErrorMessage(cfg.idPrefix, "Please ensure valid data is entered in highlighted fields");
         }
     };
 
@@ -150,6 +298,8 @@ const InitialSetup = (props) => {
 
     return (
             <div className="initial-setup">
+                <EditObjectModal config={editModal}/>
+            
                 <div className="title">Qvu Initial Setup</div>
                 <div><EntryPanel config={getConfig1()}/></div>
                 <div id="init-error-msg"></div>

@@ -72,6 +72,18 @@ export const saveDatasource = async (ds) => {
     }
 };
 
+export const testDatasource = async (ds) => {
+    try {
+        let res = await axios.post(getApiURL() + "/db/datasource/rest", ds, hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 export const deleteDatasource = async (dsname) => {
 
     try {

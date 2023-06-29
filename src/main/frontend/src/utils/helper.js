@@ -8,7 +8,7 @@ export function confirm(confirmation, options = {}) {
     return defaultConfirmation({confirmation, ...options});
 }
 
-export const  SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^"< "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
+export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^"< "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
 export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";

@@ -1,11 +1,13 @@
 package org.rbt.qvu.services;
 
+import java.io.File;
 import java.util.Collection;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
@@ -33,7 +35,6 @@ import org.springframework.security.saml2.provider.service.authentication.Saml2A
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.util.Helper;
-import org.springframework.beans.BeanUtils;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -247,6 +248,15 @@ public class MainServiceImpl implements MainService {
             retval = configFileHandler.deleteUser(userId);
         }
 
+        return retval;
+    }
+    
+    @Override
+    public String loadLang() {
+        String retval = config.getLangResources();
+        
+        LOG.debug("Language File: " + configFileHandler.getGson(true).toJson(retval));
+        
         return retval;
     }
 }

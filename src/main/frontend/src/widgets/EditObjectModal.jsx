@@ -8,13 +8,15 @@ import Modal from "react-bootstrap/Modal";
 import Form from 'react-bootstrap/Form';
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel"
+import useLang from "../context/LangContext";
 
 const EditObjectModal = (props) => {
     const {config} = props;
+    const {getText} = useLang();
 
     const getOkLabel = () => {
         if (config.dataObject) {
-            return config.dataObject.newRecord ? "Create" : "Update";
+            return config.dataObject.newRecord ? getText("Create") : getText("Update");
         } else {
             return "Create";
         }

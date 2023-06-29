@@ -20,4 +20,6 @@ public interface MainService {
 
     public OperationResult saveUser(User user);
     public OperationResult deleteUser(String userId);
+    
+    public String loadLang();
 }

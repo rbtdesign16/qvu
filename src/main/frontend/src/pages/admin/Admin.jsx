@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from "react";
 import { Tabs, Tab }from "react-bootstrap";
 import useAuth from "../../context/AuthContext";
+import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import EditableDataList from "../../widgets/EditableDataList"
@@ -33,6 +34,7 @@ saveDatasource,
 
 const Admin = (props) => {
     const {authData, setAuthData} = useAuth();
+    const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
@@ -46,7 +48,7 @@ const Admin = (props) => {
     const getDatasourceEntryConfig = () => {
         return [
             {
-                label: "Database Type:",
+                label: getText("Database Type:"),
                 name: "databaseType",
                 type: "select",
                 options: ["", "MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"],
@@ -54,58 +56,58 @@ const Admin = (props) => {
                 required: true
             },
             {
-                label: "Name:",
+                label: getText("Name:"),
                 name: "datasourceName",
                 type: "input",
                 key: true,
                 required: true
             },
             {
-                label: "Description:",
+                label: getText("Description:"),
                 name: "description",
                 type: "input"
             },
             {
-                label: "JDBC Url:",
+                label: getText("JDBC Url:"),
                 name: "url",
                 type: "input",
                 required: true
             },
             {
-                label: "JDBC Driver:",
+                label: getText("JDBC Driver:"),
                 name: "driver",
                 type: "input",
                 required: true
             },
             {
-                label: "User Name:",
+                label: getText("User Name:"),
                 name: "username",
                 type: "input",
                 required: true
             },
             {
-                label: "Password:",
+                label: getText("Password:"),
                 name: "password",
                 type: "password",
                 required: true
             },
             {
-                label: "Connection Timeout:",
+                label: getText("Connection Timeout:"),
                 name: "connectionTimeout",
                 type: "integer"
             },
             {
-                label: "Idle Timeout:",
+                label: getText("Idle Timeout:"),
                 name: "idleTimeout",
                 type: "number"
             },
             {
-                label: "Max Life Time:",
+                label: getText("Max Life Time:"),
                 name: "maxLifeTime",
                 type: "number"
             },
             {
-                label: "Max Pool Size:",
+                label: getText("Max Pool Size:"),
                 name: "maxPoolSize",
                 type: "number"
             }];
@@ -114,14 +116,14 @@ const Admin = (props) => {
     const getRoleEntryConfig = () => {
         return [
             {
-                label: "Name:",
+                label: getText("Name:"),
                 name: "name",
                 type: "input",
                 key: true,
                 required: true
             },
             {
-                label: "Description:",
+                label: getText("Description:"),
                 name: "description",
                 type: "input"
             }];
@@ -130,30 +132,30 @@ const Admin = (props) => {
     const getUserEntryConfig = (isnew) => {
         let retval = [
             {
-                label: "User ID:",
+                label: getText("User ID:"),
                 name: "userId",
                 type: "input",
                 required: true,
                 key: true
             },
             {
-                label: "First Name:",
+                label: getText("First Name:"),
                 name: "firstName",
                 type: "input"
             },
             {
-                label: "Last Name:",
+                label: getText("Last Name:"),
                 name: "lastName",
                 type: "input"
             }, {
-                label: "Email:",
+                label: getText("Email:"),
                 name: "email",
                 type: "email",
                 validator: {type: "email"}
             }];
 
         if (isnew) {
-            retval.splice(1, 0, {label: "Password:", name: "password", type: "password", required: true, validator: {type: "password"}});
+            retval.splice(1, 0, {label: getText("Password:"), name: "password", type: "password", required: true, validator: {type: "password"}});
         }
 
         return retval;
@@ -175,11 +177,11 @@ const Admin = (props) => {
                     text: "test",
                     className: "btn btn-primary",
                     onClick: () => {
-                        showMessage(INFO, "Attempting to connect...", null, true);
+                        showMessage(INFO, getText("Attempting to connect..."), null, true);
                         if (testDatasource(dataObject)) {
-                            showMessage(SUCCESS, "Successfully connected to datasoure " + dataObject.datasourceName, DEFAULT_SUCCESS_TITLE);
+                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName, DEFAULT_SUCCESS_TITLE);
                         } else {
-                            showMessage(ERROR, "Connection failed to datasoure " + dataObject.datasourceName, DEFAULT_ERROR_TITLE);
+                            showMessage(ERROR, getText("Connection failed to datasoure", " ") + dataObject.datasourceName, DEFAULT_ERROR_TITLE);
                         }
                     }
                 }]
@@ -219,80 +221,80 @@ const Admin = (props) => {
 
 
     const addDatasource = () => {
-        setEditModal(getDatasourceConfig("Create new datasource", {newRecord: true}));
+        setEditModal(getDatasourceConfig(getText("Create new datasource"), {newRecord: true}));
     };
 
     const editDatasource = (indx) => {
-        setEditModal(getDatasourceConfig("Update datasource " + datasources[indx].datasourceName, {...datasources[indx]}));
+        setEditModal(getDatasourceConfig(getText("Update datasource", " ") + datasources[indx].datasourceName, {...datasources[indx]}));
     };
 
     const deleteSelectedDatasource = (indx) => {
         const ds = datasources[indx];
 
         const okFunc = async () => {
-            showMessage(INFO, "Deleting datasource" + ds.datasourceName + "...", "Deleting", true);
+            showMessage(INFO, getText("Deleting datasource") + ds.datasourceName + "...", getText("Deleting"), true);
             let res = await deleteDatasource(ds.datasourceName);
             if (!res.errorCode) {
                 setDatasources(await loadDatasources());
-                showMessage(SUCCESS, "Datasource " + ds.datasourceName + " deleted", DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"), DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, "Failed to delete datasource " + ds.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
             }
         };
 
-        handleOnClick("delete datasource " + ds.datasourceName + "?", okFunc);
+        handleOnClick(getText("delete datasource", " ") + ds.datasourceName + "?", okFunc);
     };
 
     const addRole = () => {
-        setEditModal(getRoleConfig("Create new role", {newRecord: true}));
+        setEditModal(getRoleConfig(getText("Create new role"), {newRecord: true}));
     };
 
     const editRole = (indx) => {
         let r = authData.allRoles[indx];
-        setEditModal(getRoleConfig("Update role " + r.name, {...r}));
+        setEditModal(getRoleConfig(getText("Update role", " ") + r.name, {...r}));
     };
 
     const deleteSelectedRole = async (indx) => {
         const r = authData.allRoles[indx];
         const okFunc = async () => {
-            showMessage(INFO, "Deleting role" + r.name + "...", null, true);
+            showMessage(INFO, getText("Deleting role", " ") + r.name + "...", null, true);
             let res = await deleteRole(r.name);
 
             if (!res.errorCode) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, "Deleted role " + r.name, DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Deleted role", " ") + r.name, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to delete role " + r.name), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name), DEFAULT_ERROR_TITLE);
             }
         };
 
-        handleOnClick("delete role " + r.name + "?", okFunc);
+        handleOnClick(getText("delete role", " ") + r.name + getText("?"), okFunc);
     };
 
     const addUser = () => {
-        setEditModal(getUserConfig("Create new user", {newRecord: true}));
+        setEditModal(getUserConfig(getText("Create new user"), {newRecord: true}));
     };
 
     const editUser = (indx) => {
         let u = authData.allUsers[indx];
-        setEditModal(getUserConfig("Update user " + u.userId, {...u}));
+        setEditModal(getUserConfig(getText("Update user", " ") + u.userId, {...u}));
     };
 
     const deleteSelectedUser = async (indx) => {
         const u = authData.allUsers[indx];
         const okFunc = async () => {
-            showMessage(INFO, "Deleting user" + u.userId + "...", null, true);
+            showMessage(INFO, getText("Deleting user", " ") + u.userId + "...", null, true);
             let res = await deleteUser(u.userId);
 
             if (!res.errorCode) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, "Deleted user " + u.userId, DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId, DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to delete user " + u.userId), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId), DEFAULT_ERROR_TITLE);
             }
         };
 
-        handleOnClick("delete user " + u.name + "?", okFunc);
+        handleOnClick(getText("delete user", " ") + u.name + getText("?"), okFunc);
     };
 
     const datasourcesConfig = {
@@ -314,11 +316,11 @@ const Admin = (props) => {
         },
         displayConfig: [
             {
-                label: "Name:",
+                label: getText("Name:"),
                 field: "datasourceName"
             },
             {
-                label: "Description: ",
+                label: getText("Description:"),
                 field: "description"
             }
         ]
@@ -342,11 +344,11 @@ const Admin = (props) => {
         },
         displayConfig: [
             {
-                label: "Name:",
+                label: getText("Name:"),
                 field: "name"
             },
             {
-                label: "Description:",
+                label: getText("Description:"),
                 field: "description"
             }
         ],
@@ -372,15 +374,15 @@ const Admin = (props) => {
         },
         displayConfig: [
             {
-                label: "User ID:",
+                label: getText("User ID:"),
                 field: "userId"
             },
             {
-                label: "First Name:",
+                label: getText("First Name:"),
                 field: "firstName"
             },
             {
-                label: "Last Name:",
+                label: getText("Last Name:"),
                 field: "lastName"
             }
         ],
@@ -396,20 +398,20 @@ const Admin = (props) => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, "Saving datasource" + config.dataObject.datasourceName + "...", "Saving", true);
+            showMessage(INFO, getText("Saving datasource", " ") + config.dataObject.datasourceName + "...", getText("Saving"), true);
             let res = await saveDatasource(config.dataObject);
             if (!res.errorCode) {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(await loadDatasources());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Datasource " + config.dataObject.datasourceName + " saved", DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"), DEFAULT_SUCCESS_TITLE);
 
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to save datasource: " + config.dataObject.datasourceName), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName), DEFAULT_ERROR_TITLE);
             }
 
         } else {
-            setErrorMessage(config.idPrefix, "please complete all required entries");
+            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
 
@@ -425,10 +427,10 @@ const Admin = (props) => {
                 setEditModal({show: false});
                 showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to save role: " + config.dataObject.name), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name), DEFAULT_ERROR_TITLE);
             }
         } else {
-            setErrorMessage(config.idPrefix, "please complete all required entries");
+            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
 
@@ -443,12 +445,12 @@ const Admin = (props) => {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "User " + config.dataObject.userId + " saved", DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"), DEFAULT_SUCCESS_TITLE);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, "Failed to save user: " + config.dataObject.userId), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId), DEFAULT_ERROR_TITLE);
             }
         } else {
-            setErrorMessage(config.idPrefix, "please complete all required entries");
+            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
 

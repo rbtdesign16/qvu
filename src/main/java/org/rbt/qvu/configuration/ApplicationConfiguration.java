@@ -47,4 +47,7 @@ public class ApplicationConfiguration {
         return repositoryFolder + File.separator + "config" + File.separator + "datasource.json";
     }
 
+    public String getLanguageFile() {
+        return repositoryFolder + File.separator + "config" + File.separator + "language.json";
+    }
 }

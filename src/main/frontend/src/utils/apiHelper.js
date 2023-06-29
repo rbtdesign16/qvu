@@ -48,6 +48,19 @@ export const loadAuth = async() => {
     }
 };
 
+export const loadLang = async() => {
+    try {
+        let res = await axios.get(getApiURL() + "/lang/load");
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+
+    }
+};
+
 export const loadDatasources = async () => {
     try {
         let res = await axios.get(getApiURL() + "/db/datasources/load");

@@ -2,6 +2,7 @@ import React, {useContext, useState} from "react";
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel";
 import useAuth from "../context/AuthContext";
+import useLang from "../context/LangContext";
 import EditObjectModal from "../widgets/EditObjectModal";
 import useMessage from "../context/MessageContext";
 import {
@@ -15,6 +16,7 @@ INFO,
 
 const InitialSetup = (props) => {
     const {authData} = useAuth();
+    const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const [editModal, setEditModal] = useState({show: false});
 
@@ -28,7 +30,7 @@ const InitialSetup = (props) => {
     });
 
     const showHelp = (txt) => {
-        showMessage(INFO, txt, "Help");
+        showMessage(INFO, txt, getText("Help"));
     };
 
     const hideEdit = () => {
@@ -44,19 +46,19 @@ const InitialSetup = (props) => {
         return {
             idPrefix: "bsc-",
             show: true,
-            title: "Basic Configuration",
+            title: getText("Basic Configuration"),
             labelWidth: "100px",
             fieldWidth: "150px",
             cancel: hideEdit,
             save: saveBasicConfiguration,
             dataObject: {fileBasedSecurity: false},
             entryConfig: [{
-                    label: "Use File Based Security",
+                    label: getText("Use File Based Security"),
                     name: "allowServiceSave",
                     type: "checkbox",
                     style: {verticalAlign: "middle"},
                     showHelp: showHelp,
-                    helpText: "If check, security information such as users and roles will be stored on locally as JSON files"
+                    helpText: getText("allowServiceSave-help")
                 }]
         };
     };
@@ -68,7 +70,7 @@ const InitialSetup = (props) => {
             setData({...data, fileBasedSecurity: false, oidcConfiguration: null, samlConfiguration: config.dataObject});
             hideEdit();
         } else {
-            setErrorMessage(config.idPrefix, "Please complete all required entries");
+            setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
         }
     };
 
@@ -76,7 +78,7 @@ const InitialSetup = (props) => {
         return {
             idPrefix: "smlc-",
             show: true,
-            title: "SAML Configuration",
+            title: getText("SAML Configuration"),
             gridClass: "entrygrid-150-425",
             cancel: hideEdit,
             save: saveSamlConfiguration,
@@ -88,39 +90,39 @@ const InitialSetup = (props) => {
                 signingKeyFileName: ""
             },
             entryConfig: [{
-                    label: "IDP URL",
+                    label: getText("IDP URL"),
                     name: "idpUrl",
                     type: "input",
                     required: true,
                     showHelp: showHelp,
-                    helpText: "Identity provider URL"
+                    helpText: getText("idpUrl-help")
                 },
                 {
-                    label: "SP Entity ID",
+                    label: getText("SP Entity ID"),
                     name: "spEntityId",
                     type: "input",
                     required: true,
                     showHelp: showHelp,
-                    helpText: "Service provider entity id"
+                    helpText: getText("spEntityId-help")
                 },
                 {
-                    label: "Sign Assertions",
+                    label: getText("Sign Assertions"),
                     name: "signAssertions",
                     type: "checkbox"
                 },
                 {
-                    label: "Signing Cert File",
+                    label: getText("Signing Cert File"),
                     name: "signingCertFileName",
                     type: "input",
                     showHelp: showHelp,
-                    helpText: "Path to signing cert file"
+                    helpText: getText("signingCertFileName-help")
                 },
                 {
-                    label: "Signing Key File",
+                    label: getText("Signing Key File"),
                     name: "signingKeyFileName",
                     type: "input",
                     showHelp: showHelp,
-                    helpText: "Path to signing key file"
+                    helpText: getText("signingKeyFileName-help")
                 }]
         };
     };
@@ -131,7 +133,7 @@ const InitialSetup = (props) => {
             setData({...data, fileBasedSecurity: false, oidcConfiguration: config.data, samlConfiguration: null});
             hideEdit();
         } else {
-            setErrorMessage(config.idPrefix, "Please complete all required entries");
+            setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
         }
     };
 
@@ -139,7 +141,7 @@ const InitialSetup = (props) => {
         return {
             idPrefix: "oic-",
             show: true,
-            title: "OIDC Configuration",
+            title: getText("OIDC Configuration"),
             labelWidth: "100px",
             fieldWidth: "150px",
             gridClass: "entrygrid-200-425",
@@ -151,49 +153,49 @@ const InitialSetup = (props) => {
                 clientSecret: ""
             },
             entryConfig: [{
-                    label: "Issuer Location URL",
+                    label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
                     type: "input",
                     required: true,
                     showHelp: showHelp,
-                    helpText: "Issuer Location URL"
+                    helpText: getText("issuerLocationUrl-help")
                 },
                 {
-                    label: "Client ID",
+                    label: getText("Client ID"),
                     name: "clientId",
                     type: "input",
                     required: true,
                     showHelp: showHelp,
-                    helpText: "Issuer Location URL"
+                    helpText: getText("clientId-help")
                 },
                 {
-                    label: "Client Secret",
+                    label: getText("Client Secret"),
                     name: "clientSecret",
                     type: "input",
                     required: true,
                     showHelp: showHelp,
-                    helpText: "Client Secret"
+                    helpText: getText("clientSecret-help")
                 }]
         };
     };
 
 
     const entryConfig1 = [{
-            label: "Repository Folder:",
+            label: getText("Repository Folder:"),
             name: "repository",
             style: {width: "100%"},
             type: "input",
             showHelp: showHelp,
-            helpText: "The root folder location where Qvu configuration files and document artifacts will be stored",
+            helpText: getText("repository-help"),
             required: true
         },
         {
-            label: "Authentication Type:",
+            label: getText("Authentication Type:"),
             name: "securityType",
             type: "select",
             options: ["basic", "saml", "oidc"],
             entryConfig: [{
-                    label: "Configure Security",
+                    label: getText("Configure Security"),
                     type: "button",
                     onClick: (c) => {
                         showSecurityConfig(data.securityType);
@@ -202,7 +204,7 @@ const InitialSetup = (props) => {
 
         },
         {
-            label: "New Admin Password:",
+            label: getText("New Admin Password:"),
             name: "adminPassword",
             style: {width: "50%"},
             type: "password",
@@ -214,26 +216,26 @@ const InitialSetup = (props) => {
             label: "",
             type: "label",
             style: {width: "100%"},
-            text: "8 characters minimum, mixed case, at leat 1 special character",
+            text: getText("password-validation-msg"),
             name: "adminPassword"
         },
         {
-            label: "Custom Security Class:",
+            label: getText("Custom Security Class:"),
             name: "securityServiceClass",
             type: "input",
             style: {width: "100%"},
             showHelp: showHelp,
-            helpText: "To enable custom authetication/security processing implement interface org.rbt.client.utils.Security service and put class name here."
+            helpText: getText("securityServiceClass-help")
 
         },
         {
-            label: "Allow Custom Service Save",
+            label: getText("Allow Custom Service Save"),
             name: "allowServiceSave",
             type: "checkbox",
             style: {verticalAlign: "middle"},
             showHelp: showHelp,
             disabled: true,
-            helpText: "If a custom security service is configured then checking this will allow the service to save and delete users and roles"
+            helpText: getText("allowServiceSave-help")
         }];
 
     const showSecurityConfig = (type) => {
@@ -306,7 +308,7 @@ const InitialSetup = (props) => {
         if (checkEntryFields(cfg)) {
             alert("good entries");
         } else {
-            setErrorMessage(cfg.idPrefix, "Please ensure valid data is entered in highlighted fields");
+            setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));
         }
     };
 

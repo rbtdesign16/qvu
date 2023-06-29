@@ -94,4 +94,11 @@ public class MainController {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");
         return service.deleteDatasource(datasourceName);
     }
+    
+    @GetMapping("api/v1/lang/load")
+    public String loadLang() {
+        LOG.debug("in loadLang()");
+        
+        return service.loadLang();
+    }
 }

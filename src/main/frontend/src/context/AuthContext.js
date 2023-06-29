@@ -1,14 +1,18 @@
 import React, { useState, createContext, useContext } from "react";
-import {loadAuth} from "../utils/apiHelper";
+import useLang from "./LangContext";
+import {loadAuth, loadLang} from "../utils/apiHelper";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     // set up initial state and reducer
     const [authData, setAuthData] = useState(null);
-
+    const {setLang} = useLang();
+    
     const initializeAuth = async () => {
         if (!authData) {
+            // load the lnguare resource
+            setLang(await loadLang());
             setAuthData(await loadAuth());
         }
     }

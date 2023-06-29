@@ -4,11 +4,13 @@
  */
 package org.rbt.qvu.configuration;
 
+import java.io.File;
 import javax.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
-import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +35,9 @@ public class Config {
     private ApplicationConfiguration appConfig;
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
-
+    private String langResources;
     private boolean initialSetupRequired = false;
+    
     @PostConstruct
     private void init() {
         LOG.info(" in Config.ini()");
@@ -47,14 +50,14 @@ public class Config {
                 appConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-application-configuration.json"), ApplicationConfiguration.class);
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
+                langResources = IOUtils.toString(getClass().getResourceAsStream("/initial-language.json"), "UTF-8");
             } else {
                 appConfig = ConfigBuilder.build(applicationConfigFile, ApplicationConfiguration.class);
+                langResources = FileUtils.readFileToString(new File(appConfig.getLanguageFile()), "UTF-8");
                 securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
                 securityConfig.setSecurityType(securityType);
-                appConfig.setSecurityType(securityType);
                 datasourcesConfig = ConfigBuilder.build(appConfig.getDatasourceConfigurationFile(), DataSourcesConfiguration.class);
             }
-            System.setProperty(Constants.SECURITY_TYPE_PROPERTY, appConfig.getSecurityType());
             
             securityConfig.postConstruct();
 
@@ -99,6 +102,8 @@ public class Config {
     public boolean isInitialSetupRequired() {
         return initialSetupRequired;
     }
-    
-    
+
+    public String getLangResources() {
+        return langResources;
+    }
 }

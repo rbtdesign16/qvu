@@ -7,6 +7,7 @@ import QueryDesign from "./querydesign/QueryDesign";
 import ReportDesign from "./reportdesign/ReportDesign";
 import Message from "../widgets/Message"
 import Splash from "../widgets/Splash"
+import useLang from "../context/LangContext";
 import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
@@ -20,6 +21,7 @@ const Home = (props) => {
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
     const {showMessage, hideMessage} = useMessage();
+    const {getText} = useLang();
 
     useEffect(() => {
         initializeAuth();
@@ -64,7 +66,7 @@ const Home = (props) => {
                 return <Splash image="logo.png" imageWidth="120" message="Qvu"/>
             }
         } else {
-            return <Splash image="logo.png" imageWidth="120" message="Initializing..."/>
+            return <Splash image="logo.png" imageWidth="120" message={getText("Initializing...")}/>
         }
     }
     return (

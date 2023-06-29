@@ -37,16 +37,24 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ConfigFileHandler {
-
-    private static Logger LOG = LoggerFactory.getLogger(ConfigFileHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigFileHandler.class);
 
     @Autowired
     private Config config;
 
-    Gson gson = new Gson();
+    private final  Gson gson = new Gson();
+    private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public Gson getGson() {
-        return gson;
+        return getGson(false);
+    }
+
+    public Gson getGson(boolean pretty) {
+        if (pretty) {
+            return prettyJson;
+        } else {
+            return gson;
+        }
     }
 
     public List<DataSourceConfiguration> loadDatasources() {
@@ -92,9 +100,7 @@ public class ConfigFileHandler {
 
             if (datasources != null) {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(datasources).getBytes());
+                    fos.write(getGson(true).toJson(datasources).getBytes());
                 }
 
                 config.setDatasourcesConfig(datasources);
@@ -132,8 +138,7 @@ public class ConfigFileHandler {
 
             if (datasources != null) {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(datasources).getBytes());
+                    fos.write(getGson(true).toJson(datasources).getBytes());
                     config.setDatasourcesConfig(datasources);
                     retval.setErrorCode(OperationResult.SUCCESS);
                 }
@@ -192,9 +197,7 @@ public class ConfigFileHandler {
 
             if (securityConfig != null) {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(securityConfig).getBytes());
+                    fos.write(getGson(true).toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
                 }
             }
@@ -231,8 +234,7 @@ public class ConfigFileHandler {
 
             if (securityConfig != null) {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(securityConfig).getBytes());
+                    fos.write(getGson(true).toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
                 }
             }
@@ -316,8 +318,7 @@ public class ConfigFileHandler {
 
             if (securityConfig != null) {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(securityConfig).getBytes());
+                    fos.write(getGson(true).toJson(securityConfig).getBytes());
                     config.setSecurityConfig(securityConfig);
                 }
             }

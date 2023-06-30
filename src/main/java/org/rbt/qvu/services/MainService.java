@@ -7,6 +7,7 @@ import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
+import org.rbt.qvu.dto.InitialSetup;
 
 public interface MainService {
     public AuthData loadAuthData() throws Exception;
@@ -22,4 +23,8 @@ public interface MainService {
     public OperationResult deleteUser(String userId);
     
     public String loadLang(String langkey);
+    
+    public OperationResult doInitialSetup(InitialSetup initialSetup);
+    public boolean verifyRepositoryFolder(String folder);
+   
 }

@@ -5,7 +5,7 @@ import { SMALL_ICON_SIZE } from "../utils/helper"
 import PropTypes from "prop-types";
 
 const EntryPanel = (props) => {
-    const {entryConfig, dataObject, buttons, idPrefix, changeHandler, gridClass} = props.config;
+    const {entryConfig, dataObject, buttons, idPrefix, afterChange, gridClass} = props.config;
 
     const loadOptions = (curval, options) => {
         return options.map((o) => {
@@ -17,17 +17,17 @@ const EntryPanel = (props) => {
         });
     };
     
-    const onChange = (e) => {
-        if (changeHandler) {
-            changeHandler(e);
+    const onChange = (e, c) => {
+        if (e.target.options) {
+            dataObject[e.target.name] = e.target.options[e.target.selectedIndex].value;
+        } else if (e.target.type === "checkbox") {
+            dataObject[e.target.name] = e.target.checked;
         } else {
-            if (e.target.options) {
-                dataObject[e.target.name] = e.target.options[e.target.selectedIndex].value;
-            } else if (e.target.type === "checkbox") {
-                dataObject[e.target.name] = e.target.checked;
-            } else {
-                dataObject[e.target.name] = e.target.value;
-            }
+            dataObject[e.target.name] = e.target.value;
+        }
+
+        if (afterChange) {
+            afterChange(e);
         }
     };
 
@@ -53,7 +53,7 @@ const EntryPanel = (props) => {
                 case "email":
                     return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} style={c.style} disabled={c.disabled}/>;
                 case "checkbox":
-                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} checked={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                    return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultChecked={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "textarea":
                     return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
                 case "file":

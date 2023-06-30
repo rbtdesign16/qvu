@@ -83,6 +83,7 @@
         "password-validation-msg": "8 characters minimum, mixed case, at leat 1 special character",
         "Initializing...": "Initializing...",
         "configuration complete": "configuration complete",
-        "configuration incomplete": "configuration incomplete"
+        "configuration incomplete": "configuration incomplete",
+        "Invalid repository folder entered" : "Invalid repository folder entered"
      }
 }

@@ -8,14 +8,18 @@ import useMessage from "../context/MessageContext";
 import useHelp from "../context/HelpContext"
 import {
     INFO,
+    ERROR,
     checkEntryFields,
     setErrorMessage,
     SECURITY_TYPE_BASIC,
     SECURITY_TYPE_SAML,
     SECURITY_TYPE_OIDC,
     ERROR_TEXT_COLOR,
-    SUCCESS_TEXT_COLOR
+    SUCCESS_TEXT_COLOR,
+    DEFAULT_ERROR_TITLE
 } from "../utils/helper";
+
+import {verifyRepositoryFolder, doInitialSetup} from "../utils/apiHelper";
 
 const InitialSetup = () => {
     const {authData} = useAuth();
@@ -86,7 +90,7 @@ const InitialSetup = () => {
             gridClass: "entrygrid-150-425",
             cancel: hideEdit,
             save: saveSamlConfiguration,
-            dataObject: {
+            dataObject: data.samlConfiguration ? data.samlConfiguration : {
                 idpUrl: "",
                 signAssertions: false,
                 spEntityId: "",
@@ -112,7 +116,8 @@ const InitialSetup = () => {
                 {
                     label: getText("Sign Assertions"),
                     name: "signAssertions",
-                    type: "checkbox"
+                    type: "checkbox",
+                    afterChange: (e, cfg) => {cfg[3].required = cfg[4].required = e.target.checked;}
                 },
                 {
                     label: getText("Signing Cert File"),
@@ -134,7 +139,7 @@ const InitialSetup = () => {
     const saveOidcConfiguration = (config) => {
         let ok = checkEntryFields(config);
         if (ok) {
-            setData({...data, fileBasedSecurity: false, oidcConfiguration: config.data, samlConfiguration: null});
+            setData({...data, fileBasedSecurity: false, oidcConfiguration: config.dataObject, samlConfiguration: null});
             hideEdit();
         } else {
             setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
@@ -146,12 +151,10 @@ const InitialSetup = () => {
             idPrefix: "oic-",
             show: true,
             title: getText("OIDC Configuration"),
-            labelWidth: "100px",
-            fieldWidth: "150px",
             gridClass: "entrygrid-200-425",
             cancel: hideEdit,
             save: saveOidcConfiguration,
-            dataObject: {
+            dataObject: data.oidcConfiguration ? data.oidcConfiguration : {
                 issuerLocationUrl: "",
                 clientId: "",
                 clientSecret: ""
@@ -277,6 +280,7 @@ const InitialSetup = () => {
 
     const onDataChange = (e) => {
         let d = {...data};
+        /*
         if (e.target.options) {
             d[e.target.name] = e.target.options[e.target.selectedIndex].value;
         } else if (e.target.type === "checkbox") {
@@ -284,7 +288,9 @@ const InitialSetup = () => {
         } else {
             d[e.target.name] = e.target.value;
         }
+*/
 
+console.log("---->1");
         if (e.target.name === "securityType") {
             let el = document.getElementById("init-fileBasedSecurity");
             if (el) {
@@ -298,11 +304,13 @@ const InitialSetup = () => {
             if (el) {
                 el.disabled = !d[e.target.name];
                 if (el.disabled) {
+console.log("---->2");
                     d.allowServiceSave = el.checked = false;
                     el.disabled = true;
                 }
             }
-        }
+        } 
+        
         setData(d);
     };
 
@@ -312,13 +320,18 @@ const InitialSetup = () => {
             dataObject: data,
             idPrefix: "init-",
             gridClass: "entrygrid-200-425",
-            changeHandler: onDataChange};
+            afterChange: onDataChange};
     };
+    
 
-    const saveSetup = () => {
+    const saveSetup = async () => {
         let cfg = getConfig();
         if (checkEntryFields(cfg)) {
-            alert("good entries");
+            if (await verifyRepositoryFolder(cfg.repository)) {
+                let res = await doInitialSetup(cfg);
+            } else {
+                showMessage(ERROR, getText("Invalid repository folder entered"), DEFAULT_ERROR_TITLE);
+            }
         } else {
             setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));
         }
@@ -326,13 +339,12 @@ const InitialSetup = () => {
 
     const checkSamlData = () => {
         let retval = false;
-
         if (data.samlConfiguration) {
             let ok = true;
 
             let entryConfig = getSamlSecurityConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (!data.samlConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !data.samlConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -352,7 +364,7 @@ const InitialSetup = () => {
 
             let entryConfig = getOidcSecurityConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (!data.oidcConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !data.oidcConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }

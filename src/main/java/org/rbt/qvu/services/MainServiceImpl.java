@@ -1,5 +1,6 @@
 package org.rbt.qvu.services;
 
+import java.io.File;
 import java.util.Collection;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.util.Helper;
 
 @Service
@@ -263,4 +265,22 @@ public class MainServiceImpl implements MainService {
         
         return retval;
     }
+    
+    @Override
+    public OperationResult doInitialSetup(InitialSetup initialSetup) {
+        return null;
+    }
+
+    @Override
+    public boolean verifyRepositoryFolder(String folder) {
+        boolean retval = false;
+        
+        if (StringUtils.isNotEmpty(folder)) {
+            File f = new File(folder);
+            retval = f.exists() && f.isDirectory();
+        }
+        
+        return retval;
+    }
+
 }

@@ -134,7 +134,6 @@ export const deleteRole = async (rname) => {
 };
 
 export const saveUser = async (u) => {
-
     try {
         let res = await axios.post(getApiURL() + "/auth/user/save", u, hconfig);
 
@@ -149,6 +148,30 @@ export const saveUser = async (u) => {
 export const deleteUser = async (uid) => {
     try {
         let res = await axios.delete(getApiURL() + "/auth/user/" + uid);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
+export const verifyRepositoryFolder = async (f) => {
+    try {
+        let res = await axios.get(getApiURL() + "/repo/verify?folder=" + f);
+console.log("------>" + JSON.stringify(res));
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
+export const doInitialSetup = async (cfg) => {
+    try {
+        let res = await axios.post(getApiURL() + "/repo/initialize", cfg, hconfig);
 
         if (res) {
             return res.data;

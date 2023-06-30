@@ -20,17 +20,19 @@ import org.slf4j.LoggerFactory;
  */
 public class BasicConfiguration {
     private static Logger LOG = LoggerFactory.getLogger(BasicConfiguration.class);
-    private String authenticatorServiceClassName;
+    private String adminPassword;
+    private boolean fileBasedSecurity = false;
+
+    public boolean isFileBasedSecurity() {
+        return fileBasedSecurity;
+    }
+
+    public void setFileBasedSecurity(boolean fileBasedSecurity) {
+        this.fileBasedSecurity = fileBasedSecurity;
+    }
+
     private List<User> users = new ArrayList<>();
     private List<Role> roles = new ArrayList<>();
-
-    public String getAuthenticatorServiceClassName() {
-        return authenticatorServiceClassName;
-    }
-
-    public void setAuthenticatorServiceClassName(String authenticatorServiceClassName) {
-        this.authenticatorServiceClassName = authenticatorServiceClassName;
-    }
 
     public List<User> getUsers() {
         return users;
@@ -49,30 +51,30 @@ public class BasicConfiguration {
         this.roles = roles;
         Collections.sort(this.roles, new RoleComparator());
     }
-    
+
     public User findUser(String userId) {
         User retval = null;
         User u = new User();
         u.setUserId(userId);
         int indx = Collections.binarySearch(users, u, new UserComparator());
-        
+
         if (indx > -1) {
             retval = users.get(indx);
         }
-        
+
         return retval;
     }
-    
+
     public Role findName(String name) {
         Role retval = null;
         Role r = new Role();
         r.setName(name);
         int indx = Collections.binarySearch(roles, r, new RoleComparator());
-        
+
         if (indx > -1) {
             retval = roles.get(indx);
         }
-        
+
         return retval;
     }
 
@@ -81,4 +83,5 @@ public class BasicConfiguration {
         Collections.sort(this.roles, new RoleComparator());
         Collections.sort(this.users, new UserComparator());
     }
+
 }

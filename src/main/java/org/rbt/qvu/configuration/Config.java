@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
@@ -31,7 +32,6 @@ public class Config {
     @Value("${repository.folder:-}")
     private String repositoryFolder;
 
-    private ApplicationConfiguration appConfig;
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
     private Map<String, Map<String, String>> langResources = new HashMap<>();
@@ -46,15 +46,13 @@ public class Config {
             if ("-".equals(repositoryFolder) || forceInit) {
                 initialSetupRequired = true;
                 LOG.info("inital setup required");
-                appConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-application-configuration.json"), ApplicationConfiguration.class);
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
-                appConfig = ConfigBuilder.build(repositoryFolder + File.separator + Constants.APPLICATION_CONFIG_FILE_NAME, ApplicationConfiguration.class);
-                langResources = ConfigBuilder.build(getClass().getResourceAsStream(appConfig.getLanguageFile()), langResources.getClass());
-                securityConfig = ConfigBuilder.build(appConfig.getSecurityConfigurationFile(), SecurityConfiguration.class);
-                datasourcesConfig = ConfigBuilder.build(appConfig.getDatasourceConfigurationFile(), DataSourcesConfiguration.class);
+                langResources = ConfigBuilder.build(getClass().getResourceAsStream(getLanguageFileName()), langResources.getClass());
+                securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
+                datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
             }
 
             securityConfig.postConstruct();
@@ -65,8 +63,16 @@ public class Config {
 
     }
 
-    public ApplicationConfiguration getAppConfig() {
-        return appConfig;
+    public String getApplicationConfigFileName() {
+        return repositoryFolder + File.separator + Constants.APPLICATION_CONFIG_FILE_NAME;
+    }
+
+    public String getSecurityConfigurationFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.SECURITY_CONFIG_FILE_NAME;
+    }
+
+    public String getDatasourceConfigurationFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.DATASOURCES_CONFIG_FILE_NAME;
     }
 
     public SecurityConfiguration getSecurityConfig() {
@@ -97,11 +103,39 @@ public class Config {
         this.datasourcesConfig = datasourcesConfig;
     }
 
-    public void setAppConfig(ApplicationConfiguration appConfig) {
-        this.appConfig = appConfig;
-    }
-
-    public void setSecurityConfig(SecurityConfiguration securityConfig) {
+     public void setSecurityConfig(SecurityConfiguration securityConfig) {
         this.securityConfig = securityConfig;
     }
+
+    public String getLanguageText(String langKey, String textKey) {
+        String retval = textKey;
+        try {
+            Map<String, String> l = langResources.get(langKey);
+
+            if (l != null) {
+                retval = l.get(textKey);
+            }
+
+            if (StringUtils.isEmpty(retval)) {
+                retval = textKey;
+            }
+        } catch (Exception ex) {
+            LOG.warn(ex.toString(), ex);
+        }
+
+        return retval;
+    }
+
+    public String getQueryDocumentsFolder() {
+        return repositoryFolder + File.separator + "query-documents";
+    }
+
+    public String getReportDocumentsFolder() {
+        return repositoryFolder + File.separator + "report-documents";
+    }
+
+    public String getLanguageFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.LANGUAGE_FILE_NAME;
+    }
+
 }

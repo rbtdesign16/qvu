@@ -7,19 +7,19 @@ import EditObjectModal from "../widgets/EditObjectModal";
 import useMessage from "../context/MessageContext";
 import useHelp from "../context/HelpContext"
 import {
-    INFO,
-    ERROR,
-    checkEntryFields,
-    setErrorMessage,
-    SECURITY_TYPE_BASIC,
-    SECURITY_TYPE_SAML,
-    SECURITY_TYPE_OIDC,
-    ERROR_TEXT_COLOR,
-    SUCCESS_TEXT_COLOR,
-    DEFAULT_ERROR_TITLE
-} from "../utils/helper";
+INFO,
+        ERROR,
+        checkEntryFields,
+        setErrorMessage,
+        SECURITY_TYPE_BASIC,
+        SECURITY_TYPE_SAML,
+        SECURITY_TYPE_OIDC,
+        ERROR_TEXT_COLOR,
+        SUCCESS_TEXT_COLOR,
+        DEFAULT_ERROR_TITLE
+        } from "../utils/helper";
 
-import {verifyRepositoryFolder, doInitialSetup} from "../utils/apiHelper";
+import {verifyRepositoryFolder, doInitialSetup, isApiError} from "../utils/apiHelper";
 
 const InitialSetup = () => {
     const {authData} = useAuth();
@@ -27,7 +27,7 @@ const InitialSetup = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
     const [editModal, setEditModal] = useState({show: false});
-
+    const [toggle, setToggle] = useState(false);
     const [data, setData] = useState({
         repository: "",
         adminPassword: "",
@@ -46,28 +46,62 @@ const InitialSetup = () => {
     };
 
     const saveBasicConfiguration = (config) => {
-        setData({...data, securityConfiguration: null, oidcConfiguration: null, fileBasedSecurity: config.dataObject.fileBaseSecurity});
+        setData({...data, securityConfiguration: null, oidcConfiguration: null, basicConfiguration: config.dataObject});
         hideEdit();
     };
 
+    const onBasicDataChange = (e, cfg, dobj) => {
+        if (e.target.name === "fileBasedSecurity") {
+            cfg[1].disabled = !e.target.checked;
+            cfg[1].required = !cfg[1].disabled;
+            if (cfg[1].disabled) {
+                 let el = document.getElementById("bsc-adminPassword");
+                 if (el) {
+                    el.value = "";
+                }
+                dobj.adminPassword = "";
+            }
+            
+            return true;
+        }
+    }
+    
     const getBasicSecurityConfig = () => {
         return {
             idPrefix: "bsc-",
             show: true,
             title: getText("Basic Configuration"),
-            labelWidth: "100px",
-            fieldWidth: "150px",
             cancel: hideEdit,
+            gridClass: "entrygrid-200-425",
             save: saveBasicConfiguration,
-            dataObject: {fileBasedSecurity: false},
+            afterChange: onBasicDataChange,
+            dataObject: data.basicConfiguration ? data.basicConfiguration : { fileBasedSecurity: true, adminPassword: ""},
             entryConfig: [{
                     label: getText("Use File Based Security"),
-                    name: "allowServiceSave",
+                    name: "fileBasedSecurity",
                     type: "checkbox",
                     style: {verticalAlign: "middle"},
                     showHelp: showHelpMessage,
-                    helpText: getText("allowServiceSave-help")
-                }]
+                    helpText: getText("fileBasedSecurty-help")
+                },
+                {
+                    label: getText("Admin Password:"),
+                    name: "adminPassword",
+                    size: 25,
+                    type: "password",
+                    required: true,
+                    disabled: false,
+                    validator: {type: "password"},
+                    showHelp: showHelpMessage,
+                    helpText: getText("adminPassword-help")
+                },
+                {
+                    label: "",
+                    type: "label",
+                    style: {width: "50%"},
+                    text: getText("password-validation-msg"),
+                },
+            ]
         };
     };
 
@@ -75,21 +109,36 @@ const InitialSetup = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            setData({...data, fileBasedSecurity: false, oidcConfiguration: null, samlConfiguration: config.dataObject});
+            setData({...data, oidcConfiguration: null, samlConfiguration: config.dataObject});
             hideEdit();
         } else {
             setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
         }
     };
 
+    const onSamlDataChange = (e, cfg, dobj) => {
+        if (e.target.name === "signAssertions") {
+            cfg[3].required = cfg[4].required = e.target.checked;
+            cfg[3].disabled = cfg[4].disabled = !e.target.checked;
+            if (!e.target.checked) {
+                dobj.signingCertFileName = "";
+                dobj.signingKeyFileName = "";
+            }
+            return true;
+        }
+    };
+
+
     const getSamlSecurityConfig = () => {
         return {
             idPrefix: "smlc-",
             show: true,
             title: getText("SAML Configuration"),
-            gridClass: "entrygrid-150-425",
+            gridClass: "entrygrid-200-425",
             cancel: hideEdit,
             save: saveSamlConfiguration,
+            dlgsize: "lg",
+            afterChange: onSamlDataChange,
             dataObject: data.samlConfiguration ? data.samlConfiguration : {
                 idpUrl: "",
                 signAssertions: false,
@@ -101,6 +150,7 @@ const InitialSetup = () => {
                     label: getText("IDP URL"),
                     name: "idpUrl",
                     type: "input",
+                    size: 60,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("idpUrl-help")
@@ -109,6 +159,7 @@ const InitialSetup = () => {
                     label: getText("SP Entity ID"),
                     name: "spEntityId",
                     type: "input",
+                    size: 40,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("spEntityId-help")
@@ -117,12 +168,13 @@ const InitialSetup = () => {
                     label: getText("Sign Assertions"),
                     name: "signAssertions",
                     type: "checkbox",
-                    afterChange: (e, cfg) => {cfg[3].required = cfg[4].required = e.target.checked;}
                 },
                 {
                     label: getText("Signing Cert File"),
                     name: "signingCertFileName",
+                    disabled: true,
                     type: "input",
+                    size: 60,
                     showHelp: showHelpMessage,
                     helpText: getText("signingCertFileName-help")
                 },
@@ -130,6 +182,8 @@ const InitialSetup = () => {
                     label: getText("Signing Key File"),
                     name: "signingKeyFileName",
                     type: "input",
+                    size: 60,
+                    disabled: true,
                     showHelp: showHelpMessage,
                     helpText: getText("signingKeyFileName-help")
                 }]
@@ -150,6 +204,7 @@ const InitialSetup = () => {
         return {
             idPrefix: "oic-",
             show: true,
+            dlgsize: "lg",
             title: getText("OIDC Configuration"),
             gridClass: "entrygrid-200-425",
             cancel: hideEdit,
@@ -163,6 +218,7 @@ const InitialSetup = () => {
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
                     type: "input",
+                    size: 60,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("issuerLocationUrl-help")
@@ -171,6 +227,7 @@ const InitialSetup = () => {
                     label: getText("Client ID"),
                     name: "clientId",
                     type: "input",
+                    size: 40,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("clientId-help")
@@ -179,6 +236,7 @@ const InitialSetup = () => {
                     label: getText("Client Secret"),
                     name: "clientSecret",
                     type: "input",
+                    size: 50,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("clientSecret-help")
@@ -188,69 +246,53 @@ const InitialSetup = () => {
 
     const getEntryConfig = () => {
         return [{
-            label: getText("Repository Folder:"),
-            name: "repository",
-            style: {width: "100%"},
-            type: "input",
-            showHelp: showHelpMessage,
-            helpText: getText("repository-help"),
-            required: true
-        },
-        {
-            label: getText("Authentication Type:"),
-            name: "securityType",
-            type: "select",
-            options: ["basic", "saml", "oidc"],
-            entryConfig: [{
-                    label: getText("Configure Security"),
-                    name: "stb1",
-                    type: "button",
-                    onClick: (c) => {
-                        showSecurityConfig(data.securityType);
-                    }
-                },
-                {
-                    type: "label",
-                    name: "stl1",
-                    style: getSecurityConfigLabelStyle(),
-                    text: getSecurityConfigLabelText()
-                }]
+                label: getText("Repository Folder:"),
+                name: "repository",
+                style: {width: "100%"},
+                type: "input",
+                showHelp: showHelpMessage,
+                helpText: getText("repository-help"),
+                required: true
+            },
+            {
+                label: getText("Authentication Type:"),
+                name: "securityType",
+                type: "select",
+                options: ["basic", "saml", "oidc"],
+                entryConfig: [{
+                        label: getText("Configure Security"),
+                        name: "stb1",
+                        type: "button",
+                        onClick: (c) => {
+                            showSecurityConfig(data.securityType);
+                        }
+                    },
+                    {
+                        type: "label",
+                        name: "stl1",
+                        style: getSecurityConfigLabelStyle(),
+                        text: getSecurityConfigLabelText()
+                    }]
 
-        },
-        {
-            label: getText("New Admin Password:"),
-            name: "adminPassword",
-            style: {width: "50%"},
-            type: "password",
-            required: true,
-            validator: {type: "password"}
+            },
+            {
+                label: getText("Custom Security Class:"),
+                name: "securityServiceClass",
+                type: "input",
+                style: {width: "100%"},
+                showHelp: showHelpMessage,
+                helpText: getText("securityServiceClass-help")
 
-        },
-        {
-            label: "",
-            type: "label",
-            style: {width: "100%"},
-            text: getText("password-validation-msg"),
-            name: "adminPassword"
-        },
-        {
-            label: getText("Custom Security Class:"),
-            name: "securityServiceClass",
-            type: "input",
-            style: {width: "100%"},
-            showHelp: showHelpMessage,
-            helpText: getText("securityServiceClass-help")
-
-        },
-        {
-            label: getText("Allow Custom Service Save"),
-            name: "allowServiceSave",
-            type: "checkbox",
-            style: {verticalAlign: "middle"},
-            showHelp: showHelpMessage,
-            disabled: true,
-            helpText: getText("allowServiceSave-help")
-        }];
+            },
+            {
+                label: getText("Allow Custom Service Save"),
+                name: "allowServiceSave",
+                type: "checkbox",
+                style: {verticalAlign: "middle"},
+                showHelp: showHelpMessage,
+                disabled: true,
+                helpText: getText("allowServiceSave-help")
+            }];
     };
 
     const showSecurityConfig = (type) => {
@@ -278,40 +320,23 @@ const InitialSetup = () => {
         });
     };
 
-    const onDataChange = (e) => {
-        let d = {...data};
-        /*
-        if (e.target.options) {
-            d[e.target.name] = e.target.options[e.target.selectedIndex].value;
-        } else if (e.target.type === "checkbox") {
-            d[e.target.name] = e.target.checked;
-        } else {
-            d[e.target.name] = e.target.value;
-        }
-*/
-
-console.log("---->1");
+    const onDataChange = (e, cfg, dobj) => {
         if (e.target.name === "securityType") {
-            let el = document.getElementById("init-fileBasedSecurity");
-            if (el) {
-                el.disabled = (d[e.target.name] !== "basic");
-                if (el.disabled) {
-                    d.fileBasedSecurity = el.checked = false;
-                }
-            }
+            dobj.fileBasedSecurity = false;
+            return true;
         } else if (e.target.name === "securityServiceClass") {
-            let el = document.getElementById("init-allowServiceSave");
-            if (el) {
-                el.disabled = !d[e.target.name];
-                if (el.disabled) {
-console.log("---->2");
-                    d.allowServiceSave = el.checked = false;
-                    el.disabled = true;
+            cfg[5].disabled = !dobj.securityServiceClass;
+            dobj.allowServiceSave = !cfg[5].disabled;
+
+            if (!dobj.allowServiceSave) {
+                let el = document.getElementById("init-allowServiceSave");
+                if (el) {
+                    el.checked = false;
                 }
             }
-        } 
-        
-        setData(d);
+
+            return true;
+        }
     };
 
     const getConfig = () => {
@@ -320,17 +345,23 @@ console.log("---->2");
             dataObject: data,
             idPrefix: "init-",
             gridClass: "entrygrid-200-425",
+            lankKey: navigator.language,
             afterChange: onDataChange};
     };
-    
+
 
     const saveSetup = async () => {
         let cfg = getConfig();
         if (checkEntryFields(cfg)) {
-            if (await verifyRepositoryFolder(cfg.repository)) {
-                let res = await doInitialSetup(cfg);
-            } else {
-                showMessage(ERROR, getText("Invalid repository folder entered"), DEFAULT_ERROR_TITLE);
+            let res = await verifyRepositoryFolder(data.repository);
+            if (res) {
+                let res = await doInitialSetup(data);
+                if (isApiError(res)) {
+                    showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
+                } else {
+                }
+             } else {
+                showMessage(ERROR, getText("Invalid repository folder entered"), getText(DEFAULT_ERROR_TITLE));
             }
         } else {
             setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));
@@ -375,6 +406,19 @@ console.log("---->2");
 
         return retval;
     };
+    
+    const checkBasicData = () => {
+        let retval = false;
+
+        if (data.basicConfiguration) {
+            if (data.basiConfiguration.fileBasedSecurity) {
+                retval = data.adminPassword;
+            }
+        }
+
+        return retval;
+    };
+
     const getSecurityConfigLabelStyle = () => {
         switch (data.securityType) {
             case SECURITY_TYPE_SAML:
@@ -393,7 +437,7 @@ console.log("---->2");
                 return "";
         }
     };
-    
+
     const getSecurityConfigLabelText = () => {
         switch (data.securityType) {
             case SECURITY_TYPE_SAML:
@@ -412,10 +456,10 @@ console.log("---->2");
                 return "";
         }
     };
-    
+
     const canSave = () => {
         let retval = false;
-        if (data.repository && data.securityType && data.adminPassword) {
+        if (data.repository && data.securityType) {
             switch (data.securityType) {
                 case SECURITY_TYPE_SAML:
                     retval = checkSamlData();
@@ -424,7 +468,7 @@ console.log("---->2");
                     retval = checkOidcData();
                     break;
                 case SECURITY_TYPE_BASIC:
-                    retval = true;
+                    retval = checkBasicData();
                     break;
             }
         }
@@ -439,8 +483,6 @@ console.log("---->2");
                 <div><EntryPanel config={getConfig()}/></div>
                 <div id="init-error-msg"></div>
                 <div className="btn-bar bord-top">
-                    <Button size="sm" onClick={() => onCancel()}>Cancel</Button>
-                    &nbsp;&nbsp;&nbsp;
                     <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
                 </div>
             </div>);

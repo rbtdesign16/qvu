@@ -21,11 +21,12 @@ const EditObjectModal = (props) => {
             return "Create";
         }
     };
-    
+
 
     return (
             <div className="static-modal">
                 <Modal animation={false} 
+                       size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
                        backdrop={true} 
                        keyboard={true}>

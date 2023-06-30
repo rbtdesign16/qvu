@@ -19,7 +19,6 @@ public class SecurityConfiguration {
     private String authenticatorServiceClassName;
     private String securityType;
     private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
-    private boolean fileBasedSecurity = false;
     private boolean allowServiceSave = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
@@ -91,15 +90,6 @@ public class SecurityConfiguration {
     public void setRoleAttributeName(String roleAttributeName) {
         this.roleAttributeName = roleAttributeName;
     }
-
-    public boolean isFileBasedSecurity() {
-        return fileBasedSecurity;
-    }
-
-    public void setFileBasedSecurity(boolean fileBasedSecurity) {
-        this.fileBasedSecurity = fileBasedSecurity;
-    }
-
 
     public boolean isAllowServiceSave() {
         return StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;

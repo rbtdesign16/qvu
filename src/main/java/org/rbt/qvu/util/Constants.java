@@ -32,6 +32,8 @@ public class Constants {
     public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
     public static final String DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
     public static final String DEFAULT_USER_ROLE = "user";
+    
+    public static final String DEFAULT_ADMIN_USER = "admin";
 
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";

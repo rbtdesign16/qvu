@@ -47,7 +47,7 @@
         "Delete role": "Delete role",
         "Basic Configuration": "Basic Configuration",
         "Use File Based Security": "Use File Based Security",
-        "allowServiceSave-help": "If check, security information such as users and roles will be stored on locally as JSON files",
+        "fileBasedSecurity-help": "If check, security information such as users and roles will be stored on locally as JSON files",
         "SAML Configuration": "SAML Configuration",
         "IDP URL": "IDP URL",
         "idpUrl-help": "Identity provider URL",
@@ -80,10 +80,12 @@
         "Create": "Create",
         "?": "?",
         "Help": "Help",
-        "password-validation-msg": "8 characters minimum, mixed case, at leat 1 special character",
+        "password-validation-msg": "8 characters minimum, mixed case, at least 1 special character",
         "Initializing...": "Initializing...",
         "configuration complete": "configuration complete",
         "configuration incomplete": "configuration incomplete",
-        "Invalid repository folder entered" : "Invalid repository folder entered"
+        "Invalid repository folder entered" : "Invalid repository folder entered",
+        "Default admin user not found": "Default admin user not found",
+        "adminPassword-help": "If you are using file based security for authentication you will need to enter an admin password"
      }
 }

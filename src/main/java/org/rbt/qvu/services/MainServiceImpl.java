@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
+import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.Config;
@@ -33,6 +35,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.configuration.ConfigBuilder;
+import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.util.Helper;
 
@@ -55,7 +59,6 @@ public class MainServiceImpl implements MainService {
         LOG.info("in MainServiceImpl.init()");
     }
 
-    
     @Override
     public AuthData loadAuthData() throws Exception {
         AuthData retval = new AuthData();
@@ -79,7 +82,7 @@ public class MainServiceImpl implements MainService {
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
             // users and roles are defined via json
-            if (scfg.isFileBasedSecurity()) {
+            if (scfg.getBasicConfiguration().isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
                 retval.setAllRoles(scfg.getBasicConfiguration().getRoles());
                 retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
@@ -112,7 +115,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
 
-            retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
+            retval.setAllowUserRoleEdit(scfg.getBasicConfiguration().isFileBasedSecurity() || scfg.isAllowServiceSave());
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
@@ -250,36 +253,75 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     @Override
     public String loadLang(String langkey) {
         String retval = "";
         Map<String, String> langMap = config.getLangResources().get(langkey);
         if (langMap == null) {
             retval = configFileHandler.getGson(true).toJson(config.getLangResources().get(Constants.DEFAULT_LANGUAGE_KEY));
-        }  else {
+        } else {
             retval = configFileHandler.getGson(true).toJson(langMap);
         }
-        
+
         LOG.debug("Language File: " + retval);
-        
+
         return retval;
     }
-    
+
     @Override
     public OperationResult doInitialSetup(InitialSetup initialSetup) {
-        return null;
+        OperationResult retval = new OperationResult();
+        try {
+            File f = new File(initialSetup.getRepository() + File.separator + "config");
+
+            f.mkdirs();
+
+            SecurityConfiguration securityConfig = new SecurityConfiguration();
+            securityConfig.setSecurityType(initialSetup.getSecurityType());
+            securityConfig.setAllowServiceSave(initialSetup.isAllowServiceSave());
+            securityConfig.setAuthenticatorServiceClassName(initialSetup.getSecurityServiceClass());
+            switch (initialSetup.getSecurityType()) {
+                case Constants.SAML_SECURITY_TYPE ->
+                    securityConfig.setSamlConfiguration(initialSetup.getSamlConfiguration());
+                case Constants.OIDC_SECURITY_TYPE ->
+                    securityConfig.setOidcConfiguration(initialSetup.getOidcConfiguration());
+                case Constants.BASIC_SECURITY_TYPE ->
+                    securityConfig.setBasicConfiguration(getInitializedBasicConfig(initialSetup));
+            }
+
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
+            configFileHandler.saveSecurityConfig(securityConfig);
+
+        } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+    }
+
+    private BasicConfiguration getInitializedBasicConfig(InitialSetup initialSetup) throws Exception {
+        BasicConfiguration retval = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class).getBasicConfiguration();
+        User u = retval.findUser(Constants.DEFAULT_ADMIN_USER);
+
+        if (u != null) {
+            u.setPassword(Helper.toMd5Hash(initialSetup.getAdminPassword()));
+        } else {
+            throw new SaveException(config.getLanguageText(initialSetup.getLangKey(), "Default admin user not found"));
+        }
+
+        return retval;
     }
 
     @Override
     public boolean verifyRepositoryFolder(String folder) {
         boolean retval = false;
-        
+
         if (StringUtils.isNotEmpty(folder)) {
             File f = new File(folder);
             retval = f.exists() && f.isDirectory();
         }
-        
+
         return retval;
     }
 

@@ -42,7 +42,7 @@ public class ConfigFileHandler {
     @Autowired
     private Config config;
 
-    private final  Gson gson = new Gson();
+    private final Gson gson = new Gson();
     private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public Gson getGson() {
@@ -69,7 +69,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
-            File f = new File(config.getAppConfig().getDatasourceConfigurationFile());
+            File f = new File(config.getDatasourceConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
@@ -119,7 +119,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         DataSourcesConfiguration datasources = null;
         try {
-            File f = new File(config.getAppConfig().getDatasourceConfigurationFile());
+            File f = new File(config.getDatasourceConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
@@ -156,7 +156,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
-            File f = new File(config.getAppConfig().getSecurityConfigurationFile());
+            File f = new File(config.getSecurityConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
@@ -215,7 +215,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
-            File f = new File(config.getAppConfig().getSecurityConfigurationFile());
+            File f = new File(config.getSecurityConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
@@ -251,7 +251,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
-            File f = new File(config.getAppConfig().getSecurityConfigurationFile());
+            File f = new File(config.getSecurityConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
@@ -299,7 +299,7 @@ public class ConfigFileHandler {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
-            File f = new File(config.getAppConfig().getSecurityConfigurationFile());
+            File f = new File(config.getSecurityConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
@@ -324,6 +324,23 @@ public class ConfigFileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+    }
+
+    public OperationResult saveSecurityConfig(SecurityConfiguration securityConfig) {
+        OperationResult retval = new OperationResult();
+
+        try {
+            File f = new File(config.getSecurityConfigurationFileName());
+            try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                fos.write(getGson(true).toJson(securityConfig).getBytes());
+            }
+
+            config.setSecurityConfig(securityConfig);
+        } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }
 

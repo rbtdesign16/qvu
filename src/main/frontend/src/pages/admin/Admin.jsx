@@ -30,7 +30,9 @@ saveDatasource,
         loadDatasources,
         loadAuth,
         formatErrorResponse,
-        testDatasource} from "../../utils/apiHelper";
+        testDatasource,
+        isApiSuccess,
+        isApiError} from "../../utils/apiHelper";
 
 const Admin = () => {
     const {authData, setAuthData} = useAuth();
@@ -179,9 +181,9 @@ const Admin = () => {
                     onClick: () => {
                         showMessage(INFO, getText("Attempting to connect..."), null, true);
                         if (testDatasource(dataObject)) {
-                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName, DEFAULT_SUCCESS_TITLE);
+                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName, getText(DEFAULT_SUCCESS_TITLE));
                         } else {
-                            showMessage(ERROR, getText("Connection failed to datasoure", " ") + dataObject.datasourceName, DEFAULT_ERROR_TITLE);
+                            showMessage(ERROR, getText("Connection failed to datasoure", " ") + dataObject.datasourceName, getText(DEFAULT_ERROR_TITLE));
                         }
                     }
                 }]
@@ -234,11 +236,11 @@ const Admin = () => {
         const okFunc = async () => {
             showMessage(INFO, getText("Deleting datasource") + ds.datasourceName + "...", getText("Deleting"), true);
             let res = await deleteDatasource(ds.datasourceName);
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setDatasources(await loadDatasources());
-                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"), DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"), getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + res.message, DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + getText(res.message), getText(DEFAULT_ERROR_TITLE));
             }
         };
 
@@ -260,11 +262,11 @@ const Admin = () => {
             showMessage(INFO, getText("Deleting role", " ") + r.name + "...", null, true);
             let res = await deleteRole(r.name);
 
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted role", " ") + r.name, DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Deleted role", " ") + r.name, getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name), getText(DEFAULT_ERROR_TITLE));
             }
         };
 
@@ -286,11 +288,11 @@ const Admin = () => {
             showMessage(INFO, getText("Deleting user", " ") + u.userId + "...", null, true);
             let res = await deleteUser(u.userId);
 
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId, DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId, getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId), getText(DEFAULT_ERROR_TITLE));
             }
         };
 
@@ -400,14 +402,14 @@ const Admin = () => {
         if (ok) {
             showMessage(INFO, getText("Saving datasource", " ") + config.dataObject.datasourceName + "...", getText("Saving"), true);
             let res = await saveDatasource(config.dataObject);
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(await loadDatasources());
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"), DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"), getText(DEFAULT_SUCCESS_TITLE));
 
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName), getText(DEFAULT_ERROR_TITLE));
             }
 
         } else {
@@ -421,13 +423,13 @@ const Admin = () => {
         if (ok) {
             showMessage(INFO, "Saving role " + config.dataObject.name + "...", null, true);
             let res = await saveRole(config.dataObject);
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name), getText(DEFAULT_ERROR_TITLE));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
@@ -441,13 +443,13 @@ const Admin = () => {
             setErrorMessage(config.idPrefix, "");
             showMessage(INFO, "Saving user " + config.dataObject.userId + "...", null, true);
             let res = await saveUser(config.dataObject);
-            if (!res.errorCode) {
+            if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"), DEFAULT_SUCCESS_TITLE);
+                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"), getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId), DEFAULT_ERROR_TITLE);
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId),getText( DEFAULT_ERROR_TITLE));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));

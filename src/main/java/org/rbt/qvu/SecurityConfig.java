@@ -55,8 +55,8 @@ public class SecurityConfig {
     @PostConstruct
     private void init() {
         LOG.info("in SecurityConfig.init()");
-        LOG.info("security type: " + config.getAppConfig().getSecurityType());
-        LOG.info("security config file: " + config.getAppConfig().getSecurityConfigurationFile());
+        LOG.info("security type: " + config.getSecurityType());
+        LOG.info("security config file: " + config.getSecurityConfigurationFileName());
     }
 
     @Autowired

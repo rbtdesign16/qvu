@@ -4,7 +4,6 @@
  */
 package org.rbt.qvu.configuration.security;
 
-import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,11 +50,11 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         LOG.info("in BasicAuthSecurityProvider.init()");
         try {
             SecurityConfiguration securityConfig = config.getSecurityConfig();
-            authenticatorClass = securityConfig.getBasicConfiguration().getAuthenticatorServiceClassName();
+            authenticatorClass = securityConfig.getAuthenticatorServiceClassName();
             LOG.info("authenticatorClass=" + authenticatorClass);
 
             // if no authenticator service then load from config file
-            if (securityConfig.isFileBasedSecurity()) {
+            if (securityConfig.getBasicConfiguration().isFileBasedSecurity()) {
                 users = securityConfig.getBasicConfiguration().getUsers();
                 roles = securityConfig.getBasicConfiguration().getRoles();
             } else if (securityConfig.getAuthenticatorService() != null) {
@@ -85,7 +84,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
             SecurityService service = config.getSecurityConfig().getAuthenticatorService();
 
-            if (config.getSecurityConfig().isFileBasedSecurity()) {
+            if (config.getSecurityConfig().getBasicConfiguration().isFileBasedSecurity()) {
                 retval = authenticateFromProperties(name, password);
             } else if (service != null) {
                 retval = authenticateWithClass(service, name, password);

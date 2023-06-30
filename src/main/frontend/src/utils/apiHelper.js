@@ -50,7 +50,7 @@ export const loadAuth = async() => {
 
 export const loadLang = async() => {
     try {
-        let res = await axios.get(getApiURL() + "/lang/load");
+        let res = await axios.get(getApiURL() + "/lang/" + navigator.language + "/load");
 
         if (res) {
             return res.data;
@@ -160,7 +160,6 @@ export const deleteUser = async (uid) => {
 export const verifyRepositoryFolder = async (f) => {
     try {
         let res = await axios.get(getApiURL() + "/repo/verify?folder=" + f);
-console.log("------>" + JSON.stringify(res));
         if (res) {
             return res.data;
         }
@@ -171,6 +170,7 @@ console.log("------>" + JSON.stringify(res));
 
 export const doInitialSetup = async (cfg) => {
     try {
+        console.log("------------>doInitialSetup=" + JSON.stringify(cfg));
         let res = await axios.post(getApiURL() + "/repo/initialize", cfg, hconfig);
 
         if (res) {
@@ -194,4 +194,14 @@ export const formatErrorResponse = (errorResult, prefix) => {
     }
     
     return retval;
-}
+};
+
+export const isApiError = (res) => {
+    return !isApiSuccess(res);
+};
+
+export const isApiSuccess = (res) => {
+    return (res && (res.errorCode === 0));
+};
+
+

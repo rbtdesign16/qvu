@@ -19,7 +19,7 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 public class Constants {
 
     // environment variables for ecternal config 
-    public static final String SECURITY_TYPE_PROPERTY = "QVU_SECURITY_TYPE";
+    public static final String SECURITY_TYPE_PROPERTY = "security.type";
 
     // security authentication types supported
     public static final String BASIC_SECURITY_TYPE = "basic";
@@ -44,7 +44,6 @@ public class Constants {
     public static final String SAML_LAST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4";
     public static final String OAUTH2_CLAIM_ATTRIBUTE_REAL_ACCESS = "realm_access";
 
-    public static final String APPLICATION_CONFIG_FILE_NAME = "qvu-application.json";
     public static final String SECURITY_CONFIG_FILE_NAME = "qvu-security.json";
     public static final String DATASOURCES_CONFIG_FILE_NAME = "qvu-datasources.json";
     public static final String LANGUAGE_FILE_NAME = "qvu-language.json";

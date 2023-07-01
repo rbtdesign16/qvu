@@ -18,9 +18,9 @@ const EditableDataList = (props) => {
     const getDisplay = (cfg, rec) => {
         if (cfg) {
             return cfg.map(c => {
-                return <div className="name-value-display">
-                    <div className="label" style={listConfig.labelStyle}>{c.label}</div>
-                    <div className="display-field" style={listConfig.fieldStyle}>{rec[c.field]}</div>
+                return <div className={listConfig.className}>
+                    <div className="label" >{c.label}</div>
+                    <div className="display-field" >{rec[c.field]}</div>
                 </div>;
             });
         } else {

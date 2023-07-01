@@ -168,8 +168,6 @@ const Admin = () => {
             idPrefix: "emo-",
             show: true,
             title: title,
-            labelWidth: "150px",
-            fieldWidth: "200px",
             cancel: hideEdit,
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
@@ -195,8 +193,6 @@ const Admin = () => {
             idPrefix: "emo-",
             show: true,
             title: title,
-            labelWidth: "100px",
-            fieldWidth: "150px",
             cancel: hideEdit,
             save: saveModifiedRole,
             delete: deleteSelectedRole,
@@ -211,8 +207,6 @@ const Admin = () => {
             idPrefix: "emo-",
             show: true,
             title: title,
-            labelWidth: "150px",
-            fieldWidth: "200px",
             cancel: hideEdit,
             save: saveModifiedUser,
             delete: deleteSelectedUser,
@@ -306,16 +300,11 @@ const Admin = () => {
         addTitle: "Add datasource",
         editTitle: "Edit datasource",
         delTitle: "Delete datasource",
+        className: "entrygrid-100-150",
         onAdd: addDatasource,
         onEdit: editDatasource,
         onDelete: deleteSelectedDatasource,
         data: datasources,
-        labelStyle: {
-            width: "85px"
-        },
-        fieldStyle: {
-            width: "100px"
-        },
         displayConfig: [
             {
                 label: getText("Name:"),
@@ -332,18 +321,13 @@ const Admin = () => {
         title: "Roles",
         width: "300px",
         height: "500px",
+        className: "entrygrid-100-150",
         addTitle: "Add role",
         editTitle: "Edit role",
         delTitle: "Delete role",
         onAdd: authData.allowUserRoleEdit ? addRole : null,
         onEdit: authData.allowUserRoleEdit ? editRole : null,
         onDelete: authData.allowUserRoleEdit ? deleteSelectedRole : null,
-        labelStyle: {
-            width: "85px"
-        },
-        fieldStyle: {
-            width: "100px"
-        },
         displayConfig: [
             {
                 label: getText("Name:"),
@@ -365,15 +349,10 @@ const Admin = () => {
         addTitle: "Add user",
         editTitle: "Edit user",
         delTitle: "Delete user",
+        className: "entrygrid-100-150",
         onAdd: authData.allowUserRoleEdit ? addUser : null,
         onEdit: authData.allowUserRoleEdit ? editUser : null,
         onDelete: authData.allowUserRoleEdit ? deleteSelectedUser : null,
-        labelStyle: {
-            width: "85px"
-        },
-        fieldStyle: {
-            width: "120px"
-        },
         displayConfig: [
             {
                 label: getText("User ID:"),

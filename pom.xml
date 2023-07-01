@@ -156,6 +156,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <repository.folder>c:/dev/qvu</repository.folder>
+                        <security.type>saml</security.type>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.eirslett</groupId>

@@ -26,11 +26,15 @@ import org.springframework.stereotype.Component;
 public class Config {
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${force.init:false}")
+    @Value("#{systemProperties['force.init'] ?: false}")
     private boolean forceInit;
 
-    @Value("${repository.folder:-}")
+    @Value("#{systemProperties['repository.folder'] ?: '-'}")
     private String repositoryFolder;
+    
+    @Value("#{systemProperties['security.type']}")
+    private String securityType;
+
 
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -50,21 +54,16 @@ public class Config {
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
-                langResources = ConfigBuilder.build(getClass().getResourceAsStream(getLanguageFileName()), langResources.getClass());
+                langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
                 securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
             }
-
             securityConfig.postConstruct();
 
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
 
-    }
-
-    public String getApplicationConfigFileName() {
-        return repositoryFolder + File.separator + Constants.APPLICATION_CONFIG_FILE_NAME;
     }
 
     public String getSecurityConfigurationFileName() {

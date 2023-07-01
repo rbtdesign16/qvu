@@ -27,9 +27,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  * The type Main controller.
  */
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MainController {
-
     private static Logger LOG = LogManager.getLogger(MainController.class);
 
     @Autowired

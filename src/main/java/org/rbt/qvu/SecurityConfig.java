@@ -23,31 +23,30 @@ import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ClientRegistrations;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.ClientRegistrations;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Autowired
     private Config config;
@@ -55,13 +54,13 @@ public class SecurityConfig {
     @PostConstruct
     private void init() {
         LOG.info("in SecurityConfig.init()");
-        LOG.info("security type: " + config.getSecurityType());
+        LOG.info("security type: " + System.getProperty(Constants.SECURITY_TYPE_PROPERTY));
         LOG.info("security config file: " + config.getSecurityConfigurationFileName());
     }
 
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
-
+   
     @Bean("basicmgr")
     @DependsOn("config")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
@@ -82,7 +81,6 @@ public class SecurityConfig {
             final Saml2X509Credential credentials
                     = Saml2X509Credential.signing(getPrivateKey(samlConfig.getSigningKeyFileName()),
                             getCertificate(samlConfig.getSigningCertFileName()));
-
             relyingPartyRegistration = RelyingPartyRegistrations
                     .fromMetadataLocation(samlConfig.getIdpUrl())
                     .registrationId("qvusaml")

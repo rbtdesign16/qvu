@@ -195,6 +195,7 @@ public class MainServiceImpl implements MainService {
         OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
+                role.setNewRecord(false);
                 retval = config.getSecurityConfig().getAuthenticatorService().saveRole(role);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);
@@ -227,6 +228,7 @@ public class MainServiceImpl implements MainService {
         OperationResult retval = new OperationResult();
         if (config.getSecurityConfig().isAllowServiceSave()) {
             try {
+                user.setNewRecord(false);
                 retval = config.getSecurityConfig().getAuthenticatorService().saveUser(user);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);

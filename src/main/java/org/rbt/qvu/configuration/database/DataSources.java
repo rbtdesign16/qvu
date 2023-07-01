@@ -38,7 +38,6 @@ public class DataSources {
     @PostConstruct
     private void init() {
         LOG.info("in QvuDataSource.init()");
-        LOG.info("database config file: " + config.getDatasourceConfigurationFileName());
 
         try {
             loadDataSources();

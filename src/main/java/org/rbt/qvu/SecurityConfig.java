@@ -54,8 +54,6 @@ public class SecurityConfig {
     @PostConstruct
     private void init() {
         LOG.info("in SecurityConfig.init()");
-        LOG.info("security type: " + System.getProperty(Constants.SECURITY_TYPE_PROPERTY));
-        LOG.info("security config file: " + config.getSecurityConfigurationFileName());
     }
 
     @Autowired
@@ -65,6 +63,7 @@ public class SecurityConfig {
     @DependsOn("config")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
+        LOG.debug("in basicAuthManager()");
         AuthenticationManagerBuilder authenticationManagerBuilder
                 = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.authenticationProvider(basicAuthProvider);
@@ -99,10 +98,10 @@ public class SecurityConfig {
 
     }
 
-    @Bean("oauthrepo")
+    @Bean("oidcrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
-    ClientRegistrationRepository oauthRepository() throws Exception {
-        LOG.debug("in oauthRepository()");
+    ClientRegistrationRepository oidcRepository() throws Exception {
+        LOG.debug("in oidcRepository()");
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
                 .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
@@ -116,7 +115,8 @@ public class SecurityConfig {
     @Bean
     @DependsOn("basicmgr")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain basicFilterChain(HttpSecurity http) throws Exception {
+       LOG.debug("in basicFilterChain()");
         http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .authenticationManager(basicAuthManager(http))
@@ -129,7 +129,7 @@ public class SecurityConfig {
     @DependsOn("samlrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
     public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in samlFilterChain() - ");
+        LOG.debug("in samlFilterChain()");
         http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
@@ -139,10 +139,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    @DependsOn("oauthrepo")
+    @DependsOn("oidcrepo")
     @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
-    public SecurityFilterChain oauthFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in oauthFilterChain()");
+    public SecurityFilterChain oidcFilterChain(HttpSecurity http) throws Exception {
+        LOG.debug("in oidcFilterChain()");
         http
                 .authorizeHttpRequests(authorize -> authorize
                 .anyRequest().authenticated())

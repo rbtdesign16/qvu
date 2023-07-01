@@ -83,7 +83,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             }
 
             SecurityService service = config.getSecurityConfig().getAuthenticatorService();
-
             if (config.getSecurityConfig().getBasicConfiguration().isFileBasedSecurity()) {
                 retval = authenticateFromProperties(name, password);
             } else if (service != null) {
@@ -117,11 +116,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
     private Authentication authenticateFromProperties(String name, String password) throws Exception {
         LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
+
         User uinfo = config.getSecurityConfig().getBasicConfiguration().findUser(name);
         if (uinfo != null) {
             String storedPassword = uinfo.getPassword();
             if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
-                // passwords are stored as md5 hashed strinfs
+                // passwords are stored as md5 hashed strings
                 String hashedPassword = Helper.toMd5Hash(password);
                 if (storedPassword.equals(hashedPassword)) {
                     retval = new UsernamePasswordAuthenticationToken(uinfo, password, toGrantedAuthority(uinfo.getRoles()));

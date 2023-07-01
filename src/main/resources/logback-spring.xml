@@ -14,7 +14,7 @@
 
 
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${QVU_LOG_FOLDER}/qvu.log</file>
+        <file>${log.folder}/qvu.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>${QVU_LOG_FOLDER}/qvu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>5MB</maxFileSize>
@@ -36,7 +36,7 @@
         <appender-ref ref="ASYNC_FILE" />
     </root>
 
-    <logger name="org.rbt.qvu" level="${QVU_LOG_LEVEL:-INFO}" >
+    <logger name="org.rbt.qvu" level="${log.level:-INFO}" >
         <appender-ref ref="ASYNC_FILE" />
         <appender-ref ref="CONSOLE" />
     </logger>

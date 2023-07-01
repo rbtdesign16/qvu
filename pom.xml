@@ -159,7 +159,8 @@
                 <configuration>
                     <systemPropertyVariables>
                         <repository.folder>c:/dev/qvu</repository.folder>
-                        <security.type>saml</security.type>
+                        <security.type>basic</security.type>
+                        <log.folder>c:/dev/logs</log.folder>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

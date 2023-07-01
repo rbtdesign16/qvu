@@ -1,4 +1,8 @@
 {
+  "authenticatorServiceClassName": "",
+  "securityType": "basic",
+  "roleAttributeName": "role",
+  "allowServiceSave": false,
     "samlConfiguration": {
         "idpUrl": "",
         "signAssertions": true,

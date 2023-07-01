@@ -31,10 +31,9 @@ public class Config {
 
     @Value("#{systemProperties['repository.folder'] ?: '-'}")
     private String repositoryFolder;
-    
-    @Value("#{systemProperties['security.type']}")
-    private String securityType;
 
+    @Value("#{systemProperties['security.type'] ?: 'basic'}")
+    private String securityType;
 
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -43,21 +42,35 @@ public class Config {
 
     @PostConstruct
     private void init() {
-        LOG.info(" in Config.ini()");
-        LOG.info("repositoryFolder=" + repositoryFolder);
+        LOG.info(" in Config.init()");
         try {
+            initialSetupRequired = "-".equals(repositoryFolder) || forceInit;
+
             // indicates initial setup required
-            if ("-".equals(repositoryFolder) || forceInit) {
-                initialSetupRequired = true;
-                LOG.info("inital setup required");
+            if (initialSetupRequired) {
+                LOG.error("------->1");
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
+                LOG.error("------->2");
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
+                LOG.error("------->3");
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
+                LOG.error("------->4");
             } else {
                 langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
                 securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
+
             }
+            
+            if (securityConfig == null) {
+                throw new Exception("failed to load security configuration");
+            }
+
+            LOG.info("force.init=" + forceInit);
+            LOG.info("repository.folder=" + repositoryFolder);
+            LOG.info("security.type=" + securityType);
+            LOG.info("inital setup required: " + initialSetupRequired);
+            
             securityConfig.postConstruct();
 
         } catch (Exception ex) {
@@ -102,7 +115,7 @@ public class Config {
         this.datasourcesConfig = datasourcesConfig;
     }
 
-     public void setSecurityConfig(SecurityConfiguration securityConfig) {
+    public void setSecurityConfig(SecurityConfiguration securityConfig) {
         this.securityConfig = securityConfig;
     }
 

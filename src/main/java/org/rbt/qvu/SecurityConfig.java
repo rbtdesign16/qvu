@@ -58,10 +58,10 @@ public class SecurityConfig {
 
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
-   
+
     @Bean("basicmgr")
     @DependsOn("config")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE, matchIfMissing = true)
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
         LOG.debug("in basicAuthManager()");
         AuthenticationManagerBuilder authenticationManagerBuilder
@@ -114,9 +114,9 @@ public class SecurityConfig {
 
     @Bean
     @DependsOn("basicmgr")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE)
+    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE, matchIfMissing = true)
     public SecurityFilterChain basicFilterChain(HttpSecurity http) throws Exception {
-       LOG.debug("in basicFilterChain()");
+        LOG.debug("in basicFilterChain()");
         http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .authenticationManager(basicAuthManager(http))
@@ -147,7 +147,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
-                .oauth2Login(withDefaults());        
+                .oauth2Login(withDefaults());
         return http.build();
     }
 

@@ -157,9 +157,9 @@ export const deleteUser = async (uid) => {
     }
 };
 
-export const verifyRepositoryFolder = async (f) => {
+export const verifyInitialRepositoryFolder = async (f) => {
     try {
-        let res = await axios.get(getApiURL() + "/repo/verify?folder=" + f);
+        let res = await axios.get(getApiURL() + "/repo/init/verify?folder=" + f);
         if (res) {
             return res.data;
         }

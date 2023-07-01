@@ -48,13 +48,9 @@ public class Config {
 
             // indicates initial setup required
             if (initialSetupRequired) {
-                LOG.error("------->1");
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
-                LOG.error("------->2");
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
-                LOG.error("------->3");
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
-                LOG.error("------->4");
             } else {
                 langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
                 securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
@@ -150,4 +146,13 @@ public class Config {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.LANGUAGE_FILE_NAME;
     }
 
+    public void setRepositoryFolder(String repositoryFolder) {
+        this.repositoryFolder = repositoryFolder;
+    }
+
+    public void setSecurityType(String securityType) {
+        this.securityType = securityType;
+    }
+
+    
 }

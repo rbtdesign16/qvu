@@ -49,7 +49,7 @@ public class Constants {
     public static final String LANGUAGE_FILE_NAME = "qvu-language.json";
     public static final String DEFAULT_LANGUAGE_KEY = "en-US";
 
-            public static final String[] DEFAULT_ROLE_NAMES = {
+    public static final String[] DEFAULT_ROLE_NAMES = {
         "administrator",
         "query designer",
         "report designer",

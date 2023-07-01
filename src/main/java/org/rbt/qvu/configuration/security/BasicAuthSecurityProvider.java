@@ -61,7 +61,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 users = securityConfig.getAuthenticatorService().getAllUsers();
                 roles = securityConfig.getAuthenticatorService().getAllRoles();
             }
-
             Collections.sort(users, new UserComparator());
             Collections.sort(roles, new RoleComparator());
         } catch (Exception ex) {

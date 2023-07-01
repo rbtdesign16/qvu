@@ -19,7 +19,11 @@ INFO,
         DEFAULT_ERROR_TITLE
         } from "../utils/helper";
 
-import {verifyRepositoryFolder, doInitialSetup, isApiError} from "../utils/apiHelper";
+import {
+    verifyInitialRepositoryFolder, 
+    doInitialSetup, 
+    isApiError,
+    isApiSuccess} from "../utils/apiHelper";
 
 const InitialSetup = () => {
     const {authData} = useAuth();
@@ -353,15 +357,15 @@ const InitialSetup = () => {
     const saveSetup = async () => {
         let cfg = getConfig();
         if (checkEntryFields(cfg)) {
-            let res = await verifyRepositoryFolder(data.repository);
-            if (res) {
+            let res = await verifyInitialRepositoryFolder(data.repository);
+            if (isApiSuccess(res)) {
                 let res = await doInitialSetup(data);
                 if (isApiError(res)) {
                     showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
                 } else {
                 }
              } else {
-                showMessage(ERROR, getText("Invalid repository folder entered"), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
             }
         } else {
             setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));

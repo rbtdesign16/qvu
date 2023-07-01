@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.configuration.database;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class DataSourcesConfiguration {
     public static final String[] DATABASE_TYPES = {"MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"};
-    private List<DataSourceConfiguration> datasources;
+    private List<DataSourceConfiguration> datasources = new ArrayList<>();
 
     public List<DataSourceConfiguration> getDatasources() {
         return datasources;

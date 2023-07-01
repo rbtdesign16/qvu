@@ -38,6 +38,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 
 @Service
@@ -279,6 +280,8 @@ public class MainServiceImpl implements MainService {
 
             f.mkdirs();
 
+            config.setRepositoryFolder(initialSetup.getRepository());
+            config.setSecurityType(initialSetup.getSecurityType());
             SecurityConfiguration securityConfig = new SecurityConfiguration();
             securityConfig.setSecurityType(initialSetup.getSecurityType());
             securityConfig.setAllowServiceSave(initialSetup.isAllowServiceSave());
@@ -316,12 +319,21 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public boolean verifyRepositoryFolder(String folder) {
-        boolean retval = false;
+    public OperationResult verifyInitialRepositoryFolder(String folder) {
+        OperationResult retval = new OperationResult();
 
         if (StringUtils.isNotEmpty(folder)) {
             File f = new File(folder);
-            retval = f.exists() && f.isDirectory();
+            if (f.exists() && f.isDirectory()) {
+                File cfg = new File(f.getPath() + File.separator + "config");
+                if (cfg.exists()) {
+                    retval.setErrorCode(Errors.FOLDER_IS_NOT_EMPTY);
+                    retval.setMessage(Errors.getMessage(Errors.FOLDER_IS_NOT_EMPTY));
+                }
+            } else {
+                retval.setErrorCode(Errors.FOLDER_NOT_FOUND);
+                retval.setMessage(Errors.getMessage(Errors.FOLDER_NOT_FOUND));
+            }
         }
 
         return retval;

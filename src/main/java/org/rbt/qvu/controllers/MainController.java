@@ -102,10 +102,10 @@ public class MainController {
         return service.loadLang(langkey);
     }
 
-    @GetMapping("api/v1/repo/verify")
-    public boolean verifyRepositoryFolder(@RequestParam String folder) {
+    @GetMapping("api/v1/repo/init/verify")
+    public OperationResult verifyRepositoryFolder(@RequestParam String folder) {
         LOG.debug("in verifyRepositoryFolder(" + folder + ")");
-        return service.verifyRepositoryFolder(folder);
+        return service.verifyInitialRepositoryFolder(folder);
     }
 
     @PostMapping("api/v1/repo/initialize")

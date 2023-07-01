@@ -158,12 +158,15 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
+                        <!--
                         <repository.folder>c:/dev/qvu</repository.folder>
                         <security.type>basic</security.type>
+                                                -->
                         <log.folder>c:/dev/logs</log.folder>
+                        <log.level>DEBUG</log.level>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
+             </plugin>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>

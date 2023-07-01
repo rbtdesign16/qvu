@@ -25,6 +25,6 @@ public interface MainService {
     public String loadLang(String langkey);
     
     public OperationResult doInitialSetup(InitialSetup initialSetup);
-    public boolean verifyRepositoryFolder(String folder);
+    public OperationResult verifyInitialRepositoryFolder(String folder);
    
 }

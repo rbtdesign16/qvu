@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.configuration.database;
 
+import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
@@ -94,6 +95,7 @@ public class DataSources {
 
     public void loadDataSources() {
         DataSourcesConfiguration dsc = config.getDatasourcesConfig();
+        LOG.debug("datasources: " + new Gson().toJson(dsc, DataSourcesConfiguration.class));
 
         for (DataSourceConfiguration c : dsc.getDatasources()) {
             try {

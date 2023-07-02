@@ -1,31 +1,31 @@
 import React, {useContext, useState} from "react";
-import { useNavigate } from "react-router-dom";
-import Button from "react-bootstrap/Button"
+import Button from "react-bootstrap/Button";
 import EntryPanel from "../../widgets/EntryPanel";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import EditObjectModal from "../../widgets/EditObjectModal";
+import Splash from "../../widgets/Splash";
 import useMessage from "../../context/MessageContext";
-import useHelp from "../../context/HelpContext"
+import useHelp from "../../context/HelpContext";
 import {
-INFO,
-        ERROR,
-        checkEntryFields,
-        setErrorMessage,
-        SECURITY_TYPE_BASIC,
-        SECURITY_TYPE_SAML,
-        SECURITY_TYPE_OIDC,
-        ERROR_TEXT_COLOR,
-        SUCCESS_TEXT_COLOR,
-        DEFAULT_ERROR_TITLE,
-        replaceTokens
+    INFO,
+    ERROR,
+    checkEntryFields,
+    setErrorMessage,
+    SECURITY_TYPE_BASIC,
+    SECURITY_TYPE_SAML,
+    SECURITY_TYPE_OIDC,
+    ERROR_TEXT_COLOR,
+    SUCCESS_TEXT_COLOR,
+    DEFAULT_ERROR_TITLE,
+    replaceTokens
 } from "../../utils/helper";
 
 import {
-verifyInitialRepositoryFolder,
-        doInitialSetup,
-        isApiError,
-        isApiSuccess} from "../../utils/apiHelper";
+    verifyInitialRepositoryFolder,
+    doInitialSetup,
+    isApiError,
+    isApiSuccess} from "../../utils/apiHelper";
 
 const InitialSetup = () => {
     const {authData} = useAuth();
@@ -33,6 +33,7 @@ const InitialSetup = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
     const [editModal, setEditModal] = useState({show: false});
+    const [initComplete, setInitComplete] = useState(false);
     const [toggle, setToggle] = useState(false);
     const [data, setData] = useState({
         repository: "",
@@ -42,7 +43,6 @@ const InitialSetup = () => {
         fileBasedSecurity: true,
         allowServiceSave: false
     });
-    const navigate = useNavigate();
 
     const showHelpMessage = (txt) => {
         showHelp(getText(txt));
@@ -71,7 +71,7 @@ const InitialSetup = () => {
 
             return true;
         }
-    }
+    };
 
     const getBasicSecurityConfig = () => {
         return {
@@ -106,8 +106,8 @@ const InitialSetup = () => {
                     label: "",
                     type: "label",
                     style: {width: "50%"},
-                    text: getText("password-validation-msg"),
-                },
+                    text: getText("password-validation-msg")
+                }
             ]
         };
     };
@@ -174,7 +174,7 @@ const InitialSetup = () => {
                 {
                     label: getText("Sign Assertions"),
                     name: "signAssertions",
-                    type: "checkbox",
+                    type: "checkbox"
                 },
                 {
                     label: getText("Signing Cert File"),
@@ -367,7 +367,7 @@ const InitialSetup = () => {
                 if (isApiError(res)) {
                     showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
                 } else {
-                    navigate("/init-complete", {state: {message: replaceTokens(getText("repositoryInitializationSucces-msg"), [data.repository, data.securityType])}});
+                    setInitComplete(true);
                 }
             } else {
                 showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
@@ -485,16 +485,20 @@ const InitialSetup = () => {
         return retval;
     };
 
-    return (
-            <div className="initial-setup">
-                <EditObjectModal config={editModal}/>
-                <div className="title">{getText("Qvu Initial Setup")}</div>
-                <div><EntryPanel config={getConfig()}/></div>
-                <div id="init-error-msg"></div>
-                <div className="btn-bar bord-top">
-                    <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
-                </div>
-            </div>);
+    if (initComplete) {
+        return <Splash title={getText("Initialization Complete")} premessage={replaceTokens(getText("repositoryInitializationSucces-msg"), [data.repository, data.securityType])}/>;
+    } else {
+        return (
+                <div className="initial-setup">
+                    <EditObjectModal config={editModal}/>
+                    <div className="title">{getText("Qvu Initial Setup")}</div>
+                    <div><EntryPanel config={getConfig()}/></div>
+                    <div id="init-error-msg"></div>
+                    <div className="btn-bar bord-top">
+                        <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
+                    </div>
+                </div>);
+        }
 };
 
 export default InitialSetup;

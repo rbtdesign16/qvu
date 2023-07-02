@@ -95,6 +95,7 @@
         "errorCode4": "An unexpected error has occured = $1",
         "repositoryInitializationSucces-msg": "Qvu repository has been created. Please re-start the Qvu application and pass the repository location,\nsecurity type and desired log folder as system parameters like this:\n\njava -jar -Drepository.location=$1 -Dsecurity.type=$2 -Dlog.folder=<desired log folder> path/to/qvu.jar",
         "Qvu Initial Setup": "Qvu Initial Setup",
-        "indicates required field": "indicates required field"
+        "indicates required field": "indicates required field",
+        "Initialization Complete": "Initialization Complete"
     }
 }

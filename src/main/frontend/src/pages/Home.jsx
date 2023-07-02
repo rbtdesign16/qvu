@@ -64,12 +64,13 @@ const Home = (props) => {
                             </Tab>}
                         </Tabs>);
             } else {
-                return <Splash image="logo.png" imageWidth="120" message="Qvu"/>
+                return <Splash />;
             }
         } else {
-            return <Splash image="logo.png" imageWidth="120" message={getText("Initializing...")}/>
+            return <Splash message={getText("Initializing...")}/>;
         }
-    }
+    };
+    
     return (
             <div className="home">
                 <Message/>
@@ -80,7 +81,7 @@ const Home = (props) => {
                 </div>
                 <Footer copyright={copyright} authData={authData} />
             </div>);
-}
+};
 
 Home.propTypes = {
     version: PropTypes.string.isRequired,

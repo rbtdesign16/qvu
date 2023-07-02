@@ -1,11 +1,13 @@
 import React from "react";
 import { CiEdit } from 'react-icons/ci';
 import { MdOutlineDeleteForever, MdOutlineAddBox } from 'react-icons/md';
+import useLang from "../context/LangContext";
 import { SMALL_ICON_SIZE } from "../utils/helper";
 import PropTypes from "prop-types";
 
 const EditableDataList = (props) => {
     const {listConfig} = props;
+    const {getText} = useLang();
 
     const getEditTitle = (indx) => {
         return listConfig.editTitle + " " + listConfig.data[indx][listConfig.displayConfig[0].field];
@@ -33,7 +35,7 @@ const EditableDataList = (props) => {
     };
 
     const getButtons = (indx) => {
-        return <div className="btn-bar tb-border platinum-b">
+        return <div className="btn-bar tb-border">
             {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
             {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
         </div>;

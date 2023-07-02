@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import Button from "react-bootstrap/Button"
+import useLang from "../context/LangContext";
 import { MdHelpOutline } from 'react-icons/md';
 import { SMALL_ICON_SIZE } from "../utils/helper"
 import PropTypes from "prop-types";
@@ -7,6 +8,7 @@ import PropTypes from "prop-types";
 const EntryPanel = (props) => {
     const {entryConfig, dataObject, buttons, idPrefix, afterChange, gridClass} = props.config;
     const [toggle, setToggle] = useState(false);
+    const {getText} = useLang();
     const loadOptions = (curval, options) => {
         return options.map((o) => {
             if (curval === o) {
@@ -142,7 +144,7 @@ const EntryPanel = (props) => {
                 return (
                         <div>
                             { loadEntryFields() }
-                            {haveRequiredFields() && <div><span className="red-f">*</span>indicates required field</div>}
+                            {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
                             {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
                         </div>);
             };

@@ -12,7 +12,7 @@ import useLang from "../context/LangContext";
 import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
-import InitialSetup from "./InitialSetup";
+import InitialSetup from "./init/InitialSetup";
 import PropTypes from "prop-types";
 import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/helper"
 

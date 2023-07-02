@@ -1,11 +1,12 @@
 import React, {useContext, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button"
-import EntryPanel from "../widgets/EntryPanel";
-import useAuth from "../context/AuthContext";
-import useLang from "../context/LangContext";
-import EditObjectModal from "../widgets/EditObjectModal";
-import useMessage from "../context/MessageContext";
-import useHelp from "../context/HelpContext"
+import EntryPanel from "../../widgets/EntryPanel";
+import useAuth from "../../context/AuthContext";
+import useLang from "../../context/LangContext";
+import EditObjectModal from "../../widgets/EditObjectModal";
+import useMessage from "../../context/MessageContext";
+import useHelp from "../../context/HelpContext"
 import {
 INFO,
         ERROR,
@@ -16,14 +17,15 @@ INFO,
         SECURITY_TYPE_OIDC,
         ERROR_TEXT_COLOR,
         SUCCESS_TEXT_COLOR,
-        DEFAULT_ERROR_TITLE
-        } from "../utils/helper";
+        DEFAULT_ERROR_TITLE,
+        replaceTokens
+} from "../../utils/helper";
 
 import {
-    verifyInitialRepositoryFolder, 
-    doInitialSetup, 
-    isApiError,
-    isApiSuccess} from "../utils/apiHelper";
+verifyInitialRepositoryFolder,
+        doInitialSetup,
+        isApiError,
+        isApiSuccess} from "../../utils/apiHelper";
 
 const InitialSetup = () => {
     const {authData} = useAuth();
@@ -40,6 +42,7 @@ const InitialSetup = () => {
         fileBasedSecurity: true,
         allowServiceSave: false
     });
+    const navigate = useNavigate();
 
     const showHelpMessage = (txt) => {
         showHelp(getText(txt));
@@ -59,17 +62,17 @@ const InitialSetup = () => {
             cfg[1].disabled = !e.target.checked;
             cfg[1].required = !cfg[1].disabled;
             if (cfg[1].disabled) {
-                 let el = document.getElementById("bsc-adminPassword");
-                 if (el) {
+                let el = document.getElementById("bsc-adminPassword");
+                if (el) {
                     el.value = "";
                 }
                 dobj.adminPassword = "";
             }
-            
+
             return true;
         }
     }
-    
+
     const getBasicSecurityConfig = () => {
         return {
             idPrefix: "bsc-",
@@ -79,7 +82,7 @@ const InitialSetup = () => {
             gridClass: "entrygrid-200-425",
             save: saveBasicConfiguration,
             afterChange: onBasicDataChange,
-            dataObject: data.basicConfiguration ? data.basicConfiguration : { fileBasedSecurity: true, adminPassword: ""},
+            dataObject: data.basicConfiguration ? data.basicConfiguration : {fileBasedSecurity: true, adminPassword: ""},
             entryConfig: [{
                     label: getText("Use File Based Security"),
                     name: "fileBasedSecurity",
@@ -360,11 +363,13 @@ const InitialSetup = () => {
             let res = await verifyInitialRepositoryFolder(data.repository);
             if (isApiSuccess(res)) {
                 let res = await doInitialSetup(data);
+
                 if (isApiError(res)) {
                     showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
                 } else {
+                    navigate("/init-complete", {state: {message: replaceTokens(getText("repositoryInitializationSucces-msg"), [data.repository, data.securityType])}});
                 }
-             } else {
+            } else {
                 showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
             }
         } else {
@@ -410,7 +415,7 @@ const InitialSetup = () => {
 
         return retval;
     };
-    
+
     const checkBasicData = () => {
         let retval = false;
 
@@ -483,7 +488,7 @@ const InitialSetup = () => {
     return (
             <div className="initial-setup">
                 <EditObjectModal config={editModal}/>
-                <div className="title">Qvu Initial Setup</div>
+                <div className="title">{getText("Qvu Initial Setup")}</div>
                 <div><EntryPanel config={getConfig()}/></div>
                 <div id="init-error-msg"></div>
                 <div className="btn-bar bord-top">

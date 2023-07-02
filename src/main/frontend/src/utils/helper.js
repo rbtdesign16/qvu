@@ -8,7 +8,7 @@ export function confirm(confirmation, options = {}) {
     return defaultConfirmation({confirmation, ...options});
 }
 
-export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^"< "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
+export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^" < "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
 export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";
@@ -95,12 +95,12 @@ export const setErrorMessage = (pre, msg) => {
 
 export const checkEntryFields = (config) => {
     let retval = true;
-   for (let i = 0; i < config.entryConfig.length; ++i) {
+    for (let i = 0; i < config.entryConfig.length; ++i) {
         if (config.entryConfig[i].required && isEmpty(config.dataObject[config.entryConfig[i].name])) {
             setFieldError(config.idPrefix, config.entryConfig[i].name);
             retval = false;
         } else if (config.entryConfig[i].validator) {
-            switch(config.entryConfig[i].validator.type) {
+            switch (config.entryConfig[i].validator.type) {
                 case TYPE_PASSWORD:
                     if (!isValidPassword(config.dataObject[config.entryConfig[i].name], config.entryConfig[i].validator)) {
                         setFieldError(config.idPrefix, config.entryConfig[i].name);
@@ -133,22 +133,23 @@ export const checkEntryFields = (config) => {
 };
 
 export const isValidPassword = (password, validator) => {
-     if (password && (password.length > 8)) {
+    if (password && (password.length > 8)) {
         if (password.toLowerCase() !== password) {
-            for (let i = 0; i < SPECIAL_CHARACTERS.length; ++i) {
+            for (let i = 0;
+            i < SPECIAL_CHARACTERS.length; ++i) {
                 if (password.includes(SPECIAL_CHARACTERS[i])) {
                     return true;
                 }
             }
         }
     }
-    
+
     return false;
 };
 
 
 export const isValidDate = (date, validator) => {
-     if (!isEmpty(date) && !isNan(new Date.parse('date'))) {
+    if (!isEmpty(date) && !isNan(new Date.parse('date'))) {
         if (validator) {
             if (validator.min && validator.max) {
                 return ((validator.min.getTime() <= date.getTime() && validator.max.getTime() >= date.getTime()));
@@ -167,7 +168,7 @@ export const isValidDate = (date, validator) => {
 
 export const isValidNumber = (number, validator) => {
     if (number && !isNan(number)) {
-       if (validator) {
+        if (validator) {
             if (validator.min && validator.max) {
                 return ((validator.min <= number && validator.max >= number));
             } else if (validator.min) {
@@ -187,7 +188,7 @@ export const isValidEmail = (email, validator) => {
     return (email && email.includes("@") && email.includes("."));
 };
 
-export const updateJsonArray = (fieldName, newRec,  data) => {
+export const updateJsonArray = (fieldName, newRec, data) => {
     let indx = -1;
 
     if (data && newRec) {
@@ -197,4 +198,17 @@ export const updateJsonArray = (fieldName, newRec,  data) => {
         }
     }
 };
-    
+
+export const replaceTokens = (msg, tokens) => {
+    console.log("---->msg1=" + msg);
+    if (!tokens) {
+        return msg;
+    } else {
+        for (let i = 0; i < tokens.length; ++i) {
+            msg = msg.replace("$" + (i + 1), tokens[i]);
+        }
+    }
+
+        console.log("---->msg2=" + msg);
+return msg;
+}

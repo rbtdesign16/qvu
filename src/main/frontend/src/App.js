@@ -7,6 +7,7 @@ import {DataHandlerProvider} from "./context/DataHandlerContext";
 import {LangProvider} from "./context/LangContext";
 import {HelpProvider} from "./context/HelpContext";
 import Home from "./pages/Home";
+import InitializationComplete from "./pages/init/InitializationComplete";
 import appinfo from "./appinfo.json";
 
 import "./css/main.css";
@@ -22,6 +23,7 @@ const App = () => {
                                 <BrowserRouter>
                                     <Routes>
                                         <Route exact path="/" element={ < Home version = {appinfo.version} copyright = {appinfo.copyright} / > } />
+                                        <Route exact path="/init-complete" element={ < InitializationComplete / > } />
                                         <Route path="*" element={ < Home version = {appinfo.version} copyright = {appinfo.copyright} / > } />
                                     </Routes>
                                 </BrowserRouter>
@@ -30,6 +32,6 @@ const App = () => {
                     </HelpProvider>
                 </MessageProvider>
             </LangProvider>);
-                                        };
+};
 
-                                        export default App;
+export default App;

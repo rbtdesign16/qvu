@@ -15,7 +15,7 @@ const Confirmation = ({
   confirmation,
   show,
   proceed,
-  enableEscape = true,
+  enableEscape = true
 }) => {
   return (
     <div className="static-modal">

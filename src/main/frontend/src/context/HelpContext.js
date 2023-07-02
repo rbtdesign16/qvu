@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
+import {replaceTokens} from "../utils/helper";
 
 export const HelpContext = createContext();
 
@@ -10,8 +11,13 @@ export const HelpProvider = ({ children }) => {
         }
     };
     
-    const showHelp = (message) => {
-        setHelpInfo({show: true, message: message});
+    const showHelp = (message, tokens) => {
+        if (!tokens) {
+            setHelpInfo({show: true, message: message});
+        } else {
+            setHelpInfo({show: true, message: helper.replaceTokens(message, tokens)});
+        }
+                
     };
 
     return (

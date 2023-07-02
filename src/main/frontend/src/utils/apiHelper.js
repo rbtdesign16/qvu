@@ -170,7 +170,6 @@ export const verifyInitialRepositoryFolder = async (f) => {
 
 export const doInitialSetup = async (cfg) => {
     try {
-        console.log("------------>doInitialSetup=" + JSON.stringify(cfg));
         let res = await axios.post(getApiURL() + "/repo/initialize", cfg, hconfig);
 
         if (res) {

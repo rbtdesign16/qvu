@@ -83,7 +83,7 @@ public class MainServiceImpl implements MainService {
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
             // users and roles are defined via json
-            if (scfg.getBasicConfiguration().isFileBasedSecurity()) {
+            if (scfg.isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
                 retval.setAllRoles(scfg.getBasicConfiguration().getRoles());
                 retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
@@ -116,7 +116,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
 
-            retval.setAllowUserRoleEdit(scfg.getBasicConfiguration().isFileBasedSecurity() || scfg.isAllowServiceSave());
+            retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
@@ -297,7 +297,8 @@ public class MainServiceImpl implements MainService {
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             configFileHandler.saveSecurityConfig(securityConfig);
-
+            
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }

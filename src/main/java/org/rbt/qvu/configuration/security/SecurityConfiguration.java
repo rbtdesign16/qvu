@@ -106,4 +106,12 @@ public class SecurityConfiguration {
         }
     }
    
+    public boolean isFileBasedSecurity() {
+        boolean retval = false;
+        if (basicConfiguration != null) {
+            retval = basicConfiguration.isFileBasedSecurity();
+        }
+        
+        return retval;
+    }
 }

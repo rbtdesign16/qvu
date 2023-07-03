@@ -9,16 +9,14 @@ import {INFO, WARN, ERROR} from "../../utils/helper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 const QueryDesign = () => {
     return (
-            <div className="card">
-                <Splitter style={{height: '300px'}} className="mb-5">
-                    <SplitterPanel className="flex align-items-center justify-content-center">
+                <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
+                    <SplitterPanel size={25} className="flex align-items-center justify-content-center">
                         Panel 1
                     </SplitterPanel>
-                    <SplitterPanel className="flex align-items-center justify-content-center">
+                    <SplitterPanel size={75} className="flex align-items-center justify-content-center">
                         Panel 2
                     </SplitterPanel>
-                </Splitter>
-            </div>);
+                </Splitter>);
 
 };
 

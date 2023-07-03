@@ -1,5 +1,7 @@
 @import "qvu-theme.css";
 @import "bootstrap/dist/css/bootstrap.min.css";
+@import "primereact/resources/themes/lara-light-indigo/theme.css";
+@import "primereact/resources/primereact.css";
 @import "colors.css";
 
 
@@ -308,5 +310,6 @@ select {
     background: var(--info-message-background-color);
     color: var(--info-message-text-color);
 }
+
 
 

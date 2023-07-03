@@ -3,40 +3,23 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
 import React, { useState } from 'react';
-import SplitPane, { Pane } from 'split-pane-react';
 import { Tabs, Tab } from "react-bootstrap";
 import useMessage from "../../context/MessageContext";
 import {INFO, WARN, ERROR} from "../../utils/helper";
-import 'split-pane-react/esm/themes/default.css';
-
+import { Splitter, SplitterPanel } from 'primereact/splitter';
 const QueryDesign = () => {
-    const [sizes, setSizes] = useState([100, 'auto']);
-
-    const layoutCSS = {
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-    };
-
     return (
-            <div style={{height: 500}}>
-                <SplitPane
-                    split='vertical'
-                    sizes={sizes}
-                    onChange={setSizes}
-                    >
-                    <Pane minSize={25} maxSize='50%'>
-                        <div style={{...layoutCSS, background: '#ddd'}}>
-                            pane1
-                        </div>
-                    </Pane>
-                    <div style={{...layoutCSS, background: '#d5d7d9'}}>
-                        pane2
-                    </div>
-                </SplitPane>
-            </div>
-            );
+            <div className="card">
+                <Splitter style={{height: '300px'}} className="mb-5">
+                    <SplitterPanel className="flex align-items-center justify-content-center">
+                        Panel 1
+                    </SplitterPanel>
+                    <SplitterPanel className="flex align-items-center justify-content-center">
+                        Panel 2
+                    </SplitterPanel>
+                </Splitter>
+            </div>);
+
 };
 
 export default QueryDesign;

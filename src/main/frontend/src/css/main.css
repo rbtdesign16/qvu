@@ -215,6 +215,13 @@ img {
     cursor: pointer;
 }
 
+.label-l {
+    text-align: left;
+    font-size: var(--default-label-font-size);
+    font-weight: var(--default-label-font-weight);
+    color: var(--default-label-font-color);
+}
+
 .label {
     text-align: right;
     padding-right: 5px;
@@ -404,4 +411,14 @@ select {
   padding: 0;
   width: 1px;
   white-space: nowrap;
+}
+
+.ds-sel {
+    width: 100%;
+}
+
+.datasel-tree-cont {
+    border-top:  solid 1px var(--default-border-color);
+    margin-top: 3px;
+    overflow: auto;
 }

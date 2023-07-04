@@ -107,6 +107,7 @@
         "Delete datasource": "Delete datasource",
         "Delete user": "Delete user",
         "Delete role": "Delete role",
-        "Test Connection": "Test Connection"
+        "Test Connection": "Test Connection",
+        "Select a datasource":"Select a datasource"
     }
 }

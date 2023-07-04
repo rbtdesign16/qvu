@@ -118,7 +118,7 @@ export const  DataSelectTree = () => {
     };
 
     return (
-            <div>
+            <div className="datasel-tree-cont">
                 <div
                     className="visually-hidden"
                     ref={loadedAlertElement}

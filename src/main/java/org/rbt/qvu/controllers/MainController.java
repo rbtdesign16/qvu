@@ -90,6 +90,13 @@ public class MainController {
         return service.saveDatasource(datasource);
     }
 
+    @PostMapping("api/v1/db/datasource/test")
+    public OperationResult testDatasource(@RequestBody DataSourceConfiguration datasource) {
+        LOG.debug("in testDatasource()");
+        return service.testDatasource(datasource);
+    }
+
+
     @DeleteMapping("api/v1/db/datasource/{datasourceName}")
     public OperationResult deleteDatasource(@PathVariable String datasourceName) {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");

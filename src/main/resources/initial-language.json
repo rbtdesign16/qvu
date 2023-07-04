@@ -89,6 +89,7 @@
         "adminPassword-help": "If you are using file based security for authentication you will need to enter an admin password",
         "errorCode-1" : "Folder is not empty - please choose an empty folder",
         "errorCode-2": "Folder not found - please choose an existing folder",
+        "errorCode-3": "Database connection failed for $1 - $2",
         "errorCode1": "Specified $1 already exists",
         "errorCode2": "$1 updated",
         "errorCode3": "$1 not found",
@@ -105,6 +106,7 @@
         "Edit role": "Edit role",
         "Delete datasource": "Delete datasource",
         "Delete user": "Delete user",
-        "Delete role": "Delete role"
+        "Delete role": "Delete role",
+        "Test Connection": "Test Connection"
     }
 }

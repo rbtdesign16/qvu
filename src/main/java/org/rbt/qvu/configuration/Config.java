@@ -134,6 +134,20 @@ public class Config {
         return retval;
     }
 
+    public String getLanguageText(String langKey, String textKey, String replace) {
+        return getLanguageText(langKey, textKey, new String[] {replace});
+    }
+
+    public String getLanguageText(String langKey, String textKey, String[] replace) {
+        String retval = getLanguageText(langKey, textKey);
+        
+        for (int i = 0; i < replace.length; ++i) {
+            retval = retval.replace("$" + (i+1), replace[i]);
+        }
+        
+        return retval;
+    }
+
     public String getQueryDocumentsFolder() {
         return repositoryFolder + File.separator + "query-documents";
     }

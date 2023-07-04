@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.rbt.qvu.configuration.Config;
 import java.io.File;
 import java.io.InputStream;

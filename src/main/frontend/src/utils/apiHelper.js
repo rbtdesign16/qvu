@@ -87,7 +87,7 @@ export const saveDatasource = async (ds) => {
 
 export const testDatasource = async (ds) => {
     try {
-        let res = await axios.post(getApiURL() + "/db/datasource/rest", ds, hconfig);
+        let res = await axios.post(getApiURL() + "/db/datasource/test", ds, hconfig);
 
         if (res) {
             return res.data;

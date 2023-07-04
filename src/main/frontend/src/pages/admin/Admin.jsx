@@ -174,14 +174,15 @@ const Admin = () => {
             dataObject: dataObject,
             entryConfig: getDatasourceEntryConfig(),
             buttons: [{
-                    text: "test",
+                    text: getText("Test Connection"),
                     className: "btn btn-primary",
-                    onClick: () => {
+                    onClick: async () => {
                         showMessage(INFO, getText("Attempting to connect..."), null, true);
-                        if (testDatasource(dataObject)) {
+                        let res = await testDatasource(dataObject);
+                        if (isApiSuccess(res)) {
                             showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName, getText(DEFAULT_SUCCESS_TITLE));
                         } else {
-                            showMessage(ERROR, getText("Connection failed to datasoure", " ") + dataObject.datasourceName, getText(DEFAULT_ERROR_TITLE));
+                            showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
                         }
                     }
                 }]

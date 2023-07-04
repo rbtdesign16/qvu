@@ -15,6 +15,7 @@ public interface MainService {
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource);
     public OperationResult deleteDatasource(String datasourceName);
+    public OperationResult testDatasource(DataSourceConfiguration datasource);
 
     public OperationResult saveRole(Role role);
     public OperationResult deleteRole(String roleName);
@@ -26,5 +27,7 @@ public interface MainService {
     
     public OperationResult doInitialSetup(InitialSetup initialSetup);
     public OperationResult verifyInitialRepositoryFolder(String folder);
+    
+    
    
 }

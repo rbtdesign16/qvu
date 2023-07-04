@@ -1,6 +1,11 @@
 package org.rbt.qvu.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.Collection;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
@@ -38,6 +43,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 
@@ -51,6 +57,10 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private Config config;
+    
+    @Autowired
+    private HttpServletRequest request;
+
 
     @Autowired
     private ConfigFileHandler configFileHandler;
@@ -67,6 +77,7 @@ public class MainServiceImpl implements MainService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (LOG.isDebugEnabled()) {
+            LOG.debug("local=" + request.getLocale().toLanguageTag());
             LOG.debug("authetication=" + auth);
         }
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
@@ -187,6 +198,28 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
+    public OperationResult testDatasource(DataSourceConfiguration datasource) {
+        OperationResult retval = new OperationResult();
+
+        Connection conn = null;
+        ResultSet res = null;
+        try {
+            conn = DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(), datasource.getPassword());
+            DatabaseMetaData dmd = conn.getMetaData();
+            res = dmd.getSchemas();
+        } catch (Exception ex) {
+            retval.setErrorCode(Errors.DB_CONNECTION_FAILED);
+            retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(), 
+                    Errors.getMessage(Errors.DB_CONNECTION_FAILED), 
+                        new String[] {datasource.getDatasourceName(), ex.toString()}));
+        } finally {
+            DBHelper.closeConnection(conn, null, res);
+        }
+
+        return retval;
+    }
+
+    @Override
     public OperationResult deleteDatasource(String datasourceName) {
         return configFileHandler.deleteDatasource(datasourceName);
     }
@@ -297,7 +330,7 @@ public class MainServiceImpl implements MainService {
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             configFileHandler.saveSecurityConfig(securityConfig);
-            
+
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);

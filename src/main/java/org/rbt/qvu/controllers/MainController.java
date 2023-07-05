@@ -16,6 +16,7 @@ import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.util.AuthHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -121,4 +122,10 @@ public class MainController {
         return service.doInitialSetup(initialSetup);
     }
 
+    
+    @GetMapping("api/v1//db/datasource/{datasourceName}/tables")
+    public List<Table> getDatasourceTables(@RequestParam String datasourceName) {
+        LOG.debug("in getDatasourceTables(" + datasourceName + ")");
+        return service.getDatasourceTables(datasourceName);
+    }
 }

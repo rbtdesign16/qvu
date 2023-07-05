@@ -11,6 +11,7 @@ import useDataHandler from "../../context/DataHandlerContext";
 import {INFO, WARN, ERROR} from "../../utils/helper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
+import { getDatasourceTables } from "../../utils/apiHelper"
 
 const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
@@ -23,7 +24,7 @@ const QueryDesign = () => {
     };
 
     const onDatasourceChange = (e) => {
-        alert (e.target.options[e.target.selectedIndex].value);
+        let res = getDatasourceTables(e.target.options[e.target.selectedIndex].value);
     };
     
     return (

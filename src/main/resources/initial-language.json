@@ -108,6 +108,8 @@
         "Delete user": "Delete user",
         "Delete role": "Delete role",
         "Test Connection": "Test Connection",
-        "Select a datasource":"Select a datasource"
+        "Select a datasource":"Select a datasource",
+        "Required Roles:": "Required Roles:",
+        "Select roles...": "Select roles..."
     }
 }

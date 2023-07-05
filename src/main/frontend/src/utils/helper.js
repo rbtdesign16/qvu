@@ -200,7 +200,6 @@ export const updateJsonArray = (fieldName, newRec, data) => {
 };
 
 export const replaceTokens = (msg, tokens) => {
-    console.log("---->msg1=" + msg);
     if (!tokens) {
         return msg;
     } else {
@@ -208,7 +207,6 @@ export const replaceTokens = (msg, tokens) => {
             msg = msg.replace("$" + (i + 1), tokens[i]);
         }
     }
-
-        console.log("---->msg2=" + msg);
-return msg;
-}
+    
+    return msg;
+};

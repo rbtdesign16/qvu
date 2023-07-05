@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
@@ -373,4 +375,10 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    @Override
+    public List<Table> getDatasourceTables(String datasourceName) {
+        List <Table> retval = new ArrayList<>();
+        
+        return retval;
+    }
 }

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import Button from "react-bootstrap/Button"
 import useLang from "../context/LangContext";
+import { MultiSelect } from "react-multi-select-component";
 import { MdHelpOutline } from 'react-icons/md';
 import { SMALL_ICON_SIZE } from "../utils/helper"
 import PropTypes from "prop-types";
@@ -67,13 +68,20 @@ const EntryPanel = (props) => {
                     return <span className="read-only-data" style={c.style} >{c.text}</span>;
                 case "button":
                     return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
+                case "multiselect":
+                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} labeledBy={c.labledBy} />;
             }
         }
     };
+    
+    const onMultiSelectChange = (selections, c, dataObject) => {
+        c.setSelected(dataObject, selections); 
+        setToggle(!toggle); 
+    }
 
     const loadButtons = () => {
         return buttons.map(b => {
-            return  <Button  disabled={b.disabled} id={b.id} size="sm" onClick={() => b.onClick()}>{b.text}</Button>;
+            return  <Button  size="sm"  disabled={b.disabled} style={{marginLeft: "10px"}} onClick={() => b.onClick()}  id={b.id} >{b.text}</Button>;
 
         });
     };
@@ -113,44 +121,43 @@ const EntryPanel = (props) => {
     const getEntry = (c) => {
         if (c.type === "checkbox") {
             return <div className="display-field">{getInputField(c)}<label htmlFor={idPrefix + c.name} style={{paddingLeft: "3px", cursor: "pointer"}}>{c.label}</label></div>;
-                    } else {
-                        return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
-                    }
-                };
+        } else {
+            return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
+        }
+    };
 
-                const loadEntryFields = () => {
-                    return entryConfig.map(c => {
-                        if (!c.hide || !c.hide()) {
-                            return <div className={getGridClass()}>
-                                { getLabel(c) }
-                                { getEntry(c) }
-                            
-                            </div>;
-                        } else {
-                            return "";
-                        }
-                    });
-                };
+    const loadEntryFields = () => {
+        return entryConfig.map(c => {
+            if (!c.hide || !c.hide()) {
+                return <div className={getGridClass()}>
+                    { getLabel(c) }
+                    { getEntry(c) }
 
+                </div>;
+            } else {
+                return "";
+            }
+        });
+    };
 
-                const haveRequiredFields = () => {
-                    for (let i = 0; i < entryConfig.length; ++i) {
-                        if (entryConfig[i].required) {
-                            return true;
-                        }
-                    }
-                };
+    const haveRequiredFields = () => {
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].required) {
+                return true;
+            }
+        }
+    };
 
-                return (
-                        <div>
-                            { loadEntryFields() }
-                            {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
-                            {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
-                        </div>);
-            };
+    return (
+            <div>
+                { loadEntryFields() }
+                {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
+                {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
+            </div>);
+};
 
-            EntryPanel.propTypes = {
-                config: PropTypes.object.isRequired
-            };
+EntryPanel.propTypes = {
+    config: PropTypes.object.isRequired
+};
 
-            export default EntryPanel;
+export default EntryPanel;

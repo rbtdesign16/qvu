@@ -96,7 +96,7 @@ const Admin = () => {
             {
                 label: getText("Connection Timeout:"),
                 name: "connectionTimeout",
-                type: "integer"
+                type: "number"
             },
             {
                 label: getText("Idle Timeout:"),
@@ -112,6 +112,15 @@ const Admin = () => {
                 label: getText("Max Pool Size:"),
                 name: "maxPoolSize",
                 type: "number"
+            },
+            {
+                label: getText("Required Roles:"),
+                name: "requiredRoles",
+                type: "multiselect",
+                labledBy: getText("Select roles..."),
+                options: getAvailableRoles,
+                setSelected: setDatasourceRoles,
+                getSelected: getDatasourceRoles
             }];
     };
 
@@ -173,18 +182,50 @@ const Admin = () => {
                 }
             }
         }
-        
+
         return retval;
     };
-    
+
+    const setDatasourceRoles = (dataObject, selections) => {
+        if (selections) {
+            if (!dataObject.roles) {
+                dataObject.roles = [];
+            } else {
+                dataObject.roles.length = 0;
+            }
+            selections.map(s => dataObject.roles.push(s.value));
+        }
+    };
+
+    const getDatasourceRoles = (dataObject) => {
+        let retval = [];
+
+        if (dataObject.roles) {
+            dataObject.roles.map(r => retval.push({label: r, value: r}));
+        }
+
+        return retval;
+    };
+
+    const getAvailableRoles = () => {
+        let retval = [];
+
+        if (authData.allRoles) {
+            authData.allRoles.map(r => retval.push({label: r.name, value: r.name}));
+        }
+
+        return retval;
+    };
+
     const afterDatasourceChange = (e, listConfig, dataObject) => {
         let el = document.getElementById("testds");
-        
+
         if (el) {
             el.disabled = !canTestDatasource(listConfig, dataObject);
         }
+        
     }
-    
+
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -194,6 +235,7 @@ const Admin = () => {
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
+            gridClass: "entrygrid-200-425",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,
             buttons: [{
@@ -209,8 +251,7 @@ const Admin = () => {
                         } else {
                             showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
                         }
-                    }
-                }]
+                    }}]
         };
     };
 
@@ -454,7 +495,7 @@ const Admin = () => {
                 setEditModal({show: false});
                 showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"), getText(DEFAULT_SUCCESS_TITLE));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId),getText( DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId), getText(DEFAULT_ERROR_TITLE));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));

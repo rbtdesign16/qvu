@@ -8,6 +8,7 @@ import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.Table;
 
 public interface MainService {
     public AuthData loadAuthData() throws Exception;
@@ -27,6 +28,8 @@ public interface MainService {
     
     public OperationResult doInitialSetup(InitialSetup initialSetup);
     public OperationResult verifyInitialRepositoryFolder(String folder);
+    
+    public List<Table> getDatasourceTables(String datasourceName);
     
     
    

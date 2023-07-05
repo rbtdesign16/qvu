@@ -4,6 +4,8 @@
  */
 package org.rbt.qvu.configuration.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.rbt.qvu.util.Constants;
 
 /**
@@ -24,6 +26,7 @@ public class DataSourceConfiguration {
     private Integer maxPoolSize;
     private boolean newDatasource;
     private String status = Constants.OFFLINE;
+    private List<String> roles = new ArrayList<>();
 
 
     public String getDatabaseType() {
@@ -128,6 +131,14 @@ public class DataSourceConfiguration {
 
     public void setNewDatasource(boolean newDatasource) {
         this.newDatasource = newDatasource;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
     
     

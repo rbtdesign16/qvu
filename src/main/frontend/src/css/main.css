@@ -422,3 +422,8 @@ select {
     margin-top: 3px;
     overflow: auto;
 }
+
+.dropdown-heading {
+    height: 30px !important;
+    width: 225px !important;
+}

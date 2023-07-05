@@ -203,4 +203,16 @@ export const isApiSuccess = (res) => {
     return (res && (res.errorCode === 0));
 };
 
+export const getDatasourceTables = async (dsname) => {
+    try {
+        let res = await axios.get(getApiURL() + "/db/datasource/" + dsname + "/tables");
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 

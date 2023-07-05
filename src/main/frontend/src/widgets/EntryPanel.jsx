@@ -73,7 +73,7 @@ const EntryPanel = (props) => {
 
     const loadButtons = () => {
         return buttons.map(b => {
-            return  <Button size="sm" onClick={() => b.onClick()}>{b.text}</Button>;
+            return  <Button  disabled={b.disabled} id={b.id} size="sm" onClick={() => b.onClick()}>{b.text}</Button>;
 
         });
     };

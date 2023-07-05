@@ -163,6 +163,28 @@ const Admin = () => {
         return retval;
     };
 
+    const canTestDatasource = (listConfig, data) => {
+        let retval = true;
+        for (let i = 0; i < listConfig.length; ++i) {
+            if (listConfig[i].required) {
+                if (!data[listConfig[i].name]) {
+                    retval = false;
+                    break;
+                }
+            }
+        }
+        
+        return retval;
+    };
+    
+    const afterDatasourceChange = (e, listConfig, dataObject) => {
+        let el = document.getElementById("testds");
+        
+        if (el) {
+            el.disabled = !canTestDatasource(listConfig, dataObject);
+        }
+    }
+    
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -173,9 +195,12 @@ const Admin = () => {
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
             entryConfig: getDatasourceEntryConfig(),
+            afterChange: afterDatasourceChange,
             buttons: [{
+                    id: "testds",
                     text: getText("Test Connection"),
                     className: "btn btn-primary",
+                    disabled: true,
                     onClick: async () => {
                         showMessage(INFO, getText("Attempting to connect..."), null, true);
                         let res = await testDatasource(dataObject);

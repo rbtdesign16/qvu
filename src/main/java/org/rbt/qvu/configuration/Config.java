@@ -68,6 +68,7 @@ public class Config {
             LOG.info("inital setup required: " + initialSetupRequired);
             
             securityConfig.postConstruct();
+            datasourcesConfig.postConstruct();
 
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

@@ -16,7 +16,7 @@ public class Table {
     private String name;
     private String type;
     private String schema;
-    
+    private String pkName;
     private List<Column> columns = new ArrayList<>();
 
     public String getDatasource() {
@@ -58,6 +58,12 @@ public class Table {
     public void setSchema(String schema) {
         this.schema = schema;
     }
-    
-    
+
+    public String getPkName() {
+        return pkName;
+    }
+
+    public void setPkName(String pkName) {
+        this.pkName = pkName;
+    }
 }

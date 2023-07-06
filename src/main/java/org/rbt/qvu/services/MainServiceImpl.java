@@ -8,9 +8,12 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
@@ -43,6 +46,7 @@ import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
+import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.util.DBHelper;
@@ -58,14 +62,13 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private Config config;
-    
+
     @Autowired
     private HttpServletRequest request;
 
-
     @Autowired
     private ConfigFileHandler configFileHandler;
-    
+
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
@@ -210,9 +213,9 @@ public class MainServiceImpl implements MainService {
             res = dmd.getSchemas();
         } catch (Exception ex) {
             retval.setErrorCode(Errors.DB_CONNECTION_FAILED);
-            retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(), 
-                    Errors.getMessage(Errors.DB_CONNECTION_FAILED), 
-                        new String[] {datasource.getDatasourceName(), ex.toString()}));
+            retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(),
+                    Errors.getMessage(Errors.DB_CONNECTION_FAILED),
+                    new String[]{datasource.getDatasourceName(), ex.toString()}));
         } finally {
             DBHelper.closeConnection(conn, null, res);
         }
@@ -376,12 +379,12 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public List<Table> getDatasourceTables(String datasourceName) {
-        List <Table> retval = new ArrayList<>();
+        List<Table> retval = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
         try {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
-            
+
             if (ds != null) {
                 conn = qvuds.getConnection(datasourceName);
                 DatabaseMetaData dmd = conn.getMetaData();
@@ -394,21 +397,105 @@ public class MainServiceImpl implements MainService {
                     t.setSchema(res.getString(2));
                     t.setName(res.getString(3));
                     t.setType(res.getString(4));
+                    t.setColumns(getTableColumns(dmd, t));
+                    setIndexColumns(dmd, t);
+                    setPrimaryKeys(dmd, t);
                     retval.add(t);
                 }
             } else {
                 throw new Exception("Datasource " + datasourceName + " not found");
-            }    
-        }
-        catch (Exception ex) {
+            }
+        } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-        }
-        
-        finally {
+        } finally {
             DBHelper.closeConnection(conn, null, res);
         }
-                
-                
+
         return retval;
     }
+
+    private void setIndexColumns(DatabaseMetaData dmd, Table t) throws Exception {
+        ResultSet res = null;
+        Map<String, Column> cmap = new HashMap<>();
+        for (Column c : t.getColumns()) {
+            cmap.put(c.getName().toLowerCase(), c);
+        }
+        res = dmd.getPrimaryKeys(null, t.getSchema(), t.getName());
+
+        try {
+            res = dmd.getIndexInfo(null, t.getSchema(), t.getName(), false, true);
+
+            while (res.next()) {
+                String cname = res.getString(9);
+                if (StringUtils.isNotEmpty(cname)) {
+                    Column c = cmap.get(cname.toLowerCase());
+
+                    if (c != null) {
+                        c.setIndexed(true);
+                    }
+                }
+            }
+        } finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+    }
+
+    private void setPrimaryKeys(DatabaseMetaData dmd, Table t) throws Exception {
+        ResultSet res = null;
+
+        try {
+            Map<String, Column> cmap = new HashMap<>();
+            for (Column c : t.getColumns()) {
+                cmap.put(c.getName().toLowerCase(), c);
+            }
+            res = dmd.getPrimaryKeys(null, t.getSchema(), t.getName());
+
+            while (res.next()) {
+                if (StringUtils.isEmpty(t.getPkName())) {
+                    t.setPkName(res.getString(6));
+                }
+
+                String cname = res.getString(4).toLowerCase();
+                int indx = res.getInt(5);
+
+                Column c = cmap.get(cname);
+
+                if (c != null) {
+                    c.setPkIndex(indx);
+                }
+            }
+        } finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+    }
+
+    private List<Column> getTableColumns(DatabaseMetaData dmd, Table t) throws Exception {
+        List<Column> retval = new ArrayList<>();
+        ResultSet res = null;
+
+        try {
+            res = dmd.getColumns(null, t.getSchema(), t.getName(), "%");
+
+            while (res.next()) {
+                Column c = new Column();
+                c.setSchema(res.getString(2));
+                c.setTable(t.getName());
+                c.setName(res.getString(4));
+                c.setDataType(res.getInt(5));
+                c.setTypeName(res.getString(6));
+                c.setColumnSize(res.getInt(7));
+                c.setDecimalDigits(res.getInt(9));
+                c.setNullable(res.getInt(11) == DatabaseMetaData.columnNullable);
+                c.setDefaultValue(res.getString(13));
+
+                retval.add(c);
+            }
+
+        } finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+
+        return retval;
+    }
+
 }

@@ -17,7 +17,6 @@ import org.rbt.qvu.util.DBHelper;
 public class DataSourcesConfiguration {
     private static final Map<String, DataSourceConfiguration> DSMAP = new HashMap<>();
 
-
     private List<DataSourceConfiguration> datasources = new ArrayList<>();
 
     public List<DataSourceConfiguration> getDatasources() {
@@ -26,15 +25,22 @@ public class DataSourcesConfiguration {
 
     public void setDatasources(List<DataSourceConfiguration> datasources) {
         this.datasources = datasources;
+        loadDsMap();
+    }
+
+    public DataSourceConfiguration getDatasourceConfiguration(String name) {
+        return DSMAP.get(name);
+    }
+    
+    public void postConstruct() {
+        loadDsMap();
+    }
+    
+    private void loadDsMap() {
         DSMAP.clear();
 
         for (DataSourceConfiguration ds : datasources) {
             DSMAP.put(ds.getDatasourceName(), ds);
         }
     }
-
-    public DataSourceConfiguration getDatasourceConfiguration(String name) {
-        return DSMAP.get(name);
-    }
-
 }

@@ -114,6 +114,7 @@
         "Role(s) selected": "Role(s) selected",
         "Item(s) selected": "Item(s) selected",
         "Select...": "Select...",
-        "Schema:": "Schema"
+        "Schema:": "Schema",
+        "Loading datasource information": "Loading datasource information"
     }
 }

@@ -97,10 +97,13 @@ public class MainServiceImpl implements MainService {
 
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
+            
+            // always include the default role set
+            retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
+            
             // users and roles are defined via json
             if (scfg.isFileBasedSecurity()) {
-                retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
-                retval.setAllRoles(scfg.getBasicConfiguration().getRoles());
+                retval.getAllRoles().addAll(scfg.getBasicConfiguration().getRoles());
                 retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
             } else if (authService != null) { // if we have a service defined we will try to loaf from there
                 retval.getAllRoles().addAll(authService.getAllRoles());

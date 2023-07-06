@@ -246,8 +246,13 @@ const Admin = () => {
             el.disabled = !canTestDatasource(listConfig, dataObject);
         }
         
-    }
+    };
 
+    const isBaseRole = (indx) => {
+        let r = authData.allRoles[indx];
+        return r.baseRole;
+    }
+    
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -414,6 +419,7 @@ const Admin = () => {
         addTitle: getText("Add role"),
         editTitle: getText("Edit role"),
         delTitle: getText("Delete role"),
+        isReadOnly: isBaseRole,
         onAdd: authData.allowUserRoleEdit ? addRole : null,
         onEdit: authData.allowUserRoleEdit ? editRole : null,
         onDelete: authData.allowUserRoleEdit ? deleteSelectedRole : null,

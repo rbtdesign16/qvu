@@ -33,12 +33,20 @@ const EditableDataList = (props) => {
             return "";
         }
     };
+    
+    const isReadOnly = (indx) => {
+        return (listConfig.isReadOnly && listConfig.isReadOnly(indx));
+    }
 
     const getButtons = (indx) => {
-        return <div className="btn-bar tb-border">
-            {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
-            {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
-        </div>;
+        if (isReadOnly(indx)) {
+            return <div className="btn-bar tb-border"></div>;
+        } else {
+            return <div className="btn-bar tb-border">
+                {listConfig.onEdit && <CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
+                {listConfig.onDelete && <MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
+            </div>;
+        }
     };
 
     const loadPanels = () => {

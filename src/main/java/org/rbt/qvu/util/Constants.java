@@ -80,7 +80,8 @@ public class Constants {
         for (String roleName : DEFAULT_ROLE_NAMES) {
             Role ri = new Role();
             ri.setName(roleName);
-            ri.setDescription("qvu " + roleName);
+            ri.setDescription("base application role");
+            ri.setBaseRole(true);
             DEFAULT_ROLES.add(ri);
         }
     }

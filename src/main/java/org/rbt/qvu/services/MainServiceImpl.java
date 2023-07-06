@@ -2,13 +2,13 @@ package org.rbt.qvu.services;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.security.Principal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
@@ -52,6 +52,7 @@ import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
+import org.rbt.qvu.util.RoleComparator;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -110,6 +111,8 @@ public class MainServiceImpl implements MainService {
                 retval.getAllUsers().addAll(authService.getAllUsers());
             }
 
+            Collections.sort(retval.getAllRoles(), new RoleComparator());
+            
             // if we have users loaded try to find user based
             // on incoming user id
             if (StringUtils.isNotEmpty(userId)) {

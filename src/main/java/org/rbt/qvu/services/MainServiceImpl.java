@@ -51,8 +51,7 @@ import org.rbt.qvu.util.Helper;
 
 @Service
 public class MainServiceImpl implements MainService {
-
-    private static Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
     @Autowired
     private DataSources qvuds;
@@ -66,7 +65,7 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private ConfigFileHandler configFileHandler;
-
+    
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
@@ -378,7 +377,38 @@ public class MainServiceImpl implements MainService {
     @Override
     public List<Table> getDatasourceTables(String datasourceName) {
         List <Table> retval = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+        try {
+            DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
+            
+            if (ds != null) {
+                conn = qvuds.getConnection(datasourceName);
+                DatabaseMetaData dmd = conn.getMetaData();
+
+                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+
+                while (res.next()) {
+                    Table t = new Table();
+                    t.setDatasource(datasourceName);
+                    t.setSchema(res.getString(2));
+                    t.setName(res.getString(3));
+                    t.setType(res.getString(4));
+                    retval.add(t);
+                }
+            } else {
+                throw new Exception("Datasource " + datasourceName + " not found");
+            }    
+        }
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
         
+        finally {
+            DBHelper.closeConnection(conn, null, res);
+        }
+                
+                
         return retval;
     }
 }

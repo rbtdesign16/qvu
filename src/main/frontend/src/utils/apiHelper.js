@@ -205,7 +205,7 @@ export const isApiSuccess = (res) => {
 
 export const getDatasourceTables = async (dsname) => {
     try {
-        let res = await axios.get(getApiURL() + "/db/datasource/" + dsname + "/tables");
+        let res = await axios.get(getApiURL() + "/db/datasource/" + dsname + "/tables", hconfig);
 
         if (res) {
             return res.data;

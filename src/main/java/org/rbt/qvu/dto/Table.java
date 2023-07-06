@@ -15,6 +15,7 @@ public class Table {
     private String datasource;
     private String name;
     private String type;
+    private String schema;
     
     private List<Column> columns = new ArrayList<>();
 
@@ -48,6 +49,14 @@ public class Table {
 
     public void setColumns(List<Column> columns) {
         this.columns = columns;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
     
     

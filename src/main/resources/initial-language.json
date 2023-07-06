@@ -113,6 +113,7 @@
         "Select roles...": "Select roles...",
         "Role(s) selected": "Role(s) selected",
         "Item(s) selected": "Item(s) selected",
-        "Select...": "Select..."
+        "Select...": "Select...",
+        "Schema:": "Schema"
     }
 }

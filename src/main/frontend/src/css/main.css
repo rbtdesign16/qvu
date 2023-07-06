@@ -204,7 +204,7 @@ img {
 
 .editable-data-list .data-container {
     overflow: auto;
-    height: calc(100% - 25px);
+    height: calc(100% - 30px);
 }
 
 .icon-s {
@@ -277,6 +277,12 @@ img {
 .entrygrid-200-425 {
     display: grid;
     grid-template-columns: 200px 425px;
+    margin: 5px;
+}
+
+.entrygrid-175-425 {
+    display: grid;
+    grid-template-columns: 175px 425px;
     margin: 5px;
 }
 

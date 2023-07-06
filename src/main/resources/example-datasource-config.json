@@ -1,15 +1,16 @@
 {
-  "datasources": [
-    {
-      "databaseType": "Oracle",
-      "datasourceName": "oraclehr",
-      "description": "thia is an oracle datsource",
-      "url": "jdbc:oracle:thin:@localhost:1521:xe",
-      "driver": "oracle.jdbc.OracleDriver",
-      "username": "HR",
-      "password": "admin",
-      "newDatasource": false,
-      "status": "offline"
-    }
-  ]
+    "datasources": [
+        {
+            "databaseType": "Oracle",
+            "datasourceName": "oraclehr",
+            "description": "thia is an oracle datsource",
+            "url": "jdbc:oracle:thin:@localhost:1521:xe",
+            "driver": "oracle.jdbc.OracleDriver",
+            "username": "HR",
+            "schema": "HR",
+            "password": "admin",
+            "newDatasource": false,
+            "status": "offline"
+        }
+    ]
 }

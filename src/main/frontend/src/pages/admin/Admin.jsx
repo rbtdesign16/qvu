@@ -82,6 +82,12 @@ const Admin = () => {
                 required: true
             },
             {
+                label: getText("Schema:"),
+                name: "schema",
+                type: "input",
+                required: true
+            },
+            {
                 label: getText("User Name:"),
                 name: "username",
                 type: "input",
@@ -243,7 +249,7 @@ const Admin = () => {
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
-            gridClass: "entrygrid-200-425",
+            gridClass: "entrygrid-175-425",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,
             buttons: [{

@@ -18,6 +18,7 @@ public class DataSourceConfiguration {
     private String description;
     private String url;
     private String driver;
+    private String schema;
     private String username;
     private String password;
     private Long connectionTimeout;
@@ -140,6 +141,14 @@ public class DataSourceConfiguration {
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
     
-    
+
 }

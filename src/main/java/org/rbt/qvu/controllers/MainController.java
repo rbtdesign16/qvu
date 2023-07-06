@@ -123,8 +123,8 @@ public class MainController {
     }
 
     
-    @GetMapping("api/v1//db/datasource/{datasourceName}/tables")
-    public List<Table> getDatasourceTables(@RequestParam String datasourceName) {
+    @GetMapping("api/v1/db/datasource/{datasourceName}/tables")
+    public List<Table> getDatasourceTables(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTables(" + datasourceName + ")");
         return service.getDatasourceTables(datasourceName);
     }

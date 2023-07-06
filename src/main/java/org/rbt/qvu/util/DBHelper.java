@@ -13,6 +13,13 @@ import java.sql.Statement;
  * @author rbtuc
  */
 public class DBHelper {
+    public static final String[] TABLE_TYPES = {"TABLE", "VIEW"};
+    public static final String DB_TYPE_MYSQL = "MySQL";
+    public static final String DB_TYPE_SQLSERVER = "Microsoft SQL Server";
+    public static final String DB_TYPE_ORACLE = "Oracle";
+    public static final String DB_TYPE_POSTGRES = "PostgreSQL";
+    
+    
     public static void closeConnection(Connection conn, Statement stmt, ResultSet res) {
         if (res != null) {
             try {

@@ -6,13 +6,21 @@ package org.rbt.qvu.configuration.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.rbt.qvu.util.DBHelper;
 
 /**
  *
  * @author rbtuc
  */
 public class DataSourcesConfiguration {
-    public static final String[] DATABASE_TYPES = {"MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"};
+    
+    public static final String[] DATABASE_TYPES = {
+        DBHelper.DB_TYPE_MYSQL, 
+        DBHelper.DB_TYPE_SQLSERVER, 
+        DBHelper.DB_TYPE_ORACLE, 
+        DBHelper.DB_TYPE_POSTGRES
+    };
+    
     private List<DataSourceConfiguration> datasources = new ArrayList<>();
 
     public List<DataSourceConfiguration> getDatasources() {
@@ -23,5 +31,20 @@ public class DataSourcesConfiguration {
         this.datasources = datasources;
     }
     
+    public DataSourceConfiguration getDatasourceConfiguration(String name) {
+        DataSourceConfiguration retval = null;
+        
+        if (datasources != null) {
+            for (DataSourceConfiguration ds : datasources) {
+                if (name.equals(ds.getDatasourceName())) {
+                    retval = ds;
+                    break;
+                }
+            }
+        }
+        
+        return retval;
+    }
+        
     
 }

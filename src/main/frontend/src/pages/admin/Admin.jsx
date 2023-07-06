@@ -119,7 +119,8 @@ const Admin = () => {
                 type: "multiselect",
                 options: getAvailableRoles,
                 setSelected: setDatasourceRoles,
-                getSelected: getDatasourceRoles
+                getSelected: getDatasourceRoles,
+                valueRenderer: rolesValueRenderer
             }];
     };
 
@@ -170,7 +171,15 @@ const Admin = () => {
 
         return retval;
     };
-
+    
+    const rolesValueRenderer = (c, dataObject, selected, options) => {
+        if (selected.length > 0) {
+            return getText("Role(s) selected");
+        } else {
+            return getText("Select roles...");
+        }
+    }
+    
     const canTestDatasource = (listConfig, data) => {
         let retval = true;
         for (let i = 0; i < listConfig.length; ++i) {

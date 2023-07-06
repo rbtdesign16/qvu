@@ -109,7 +109,10 @@
         "Delete role": "Delete role",
         "Test Connection": "Test Connection",
         "Select a datasource":"Select a datasource",
-        "Required Roles:": "Required Roles:",
-        "Select roles...": "Select roles..."
+        "Role Access:": "Role Access:",
+        "Select roles...": "Select roles...",
+        "Role(s) selected": "Role(s) selected",
+        "Item(s) selected": "Item(s) selected",
+        "Select...": "Select..."
     }
 }

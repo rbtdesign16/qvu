@@ -69,15 +69,27 @@ const EntryPanel = (props) => {
                 case "button":
                     return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
                 case "multiselect":
-                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} labelledBy="this is a test"/>;
+                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
             }
         }
+    };
+    
+    const multiSelectValueRenderer = (c, dataOBject, selected, options) => {
+        if (c.valueRenderer) {
+            return c.valueRenderer(c, dataOBject, selected, options);
+        } else {
+            if (selected.length > 0) {
+                return getText("Item(s) selected");
+            } else {
+                getText("Select...");
+            }    
+        } 
     };
     
     const onMultiSelectChange = (selections, c, dataObject) => {
         c.setSelected(dataObject, selections); 
         setToggle(!toggle); 
-    }
+    };
 
     const loadButtons = () => {
         return buttons.map(b => {

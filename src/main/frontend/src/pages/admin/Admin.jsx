@@ -4,39 +4,41 @@ import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
+import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import {
-INFO,
-        WARN,
-        ERROR,
-        SUCCESS,
-        DEFAULT_SUCCESS_TITLE,
-        DEFAULT_ERROR_TITLE,
-        confirm,
-        isEmpty,
-        setFieldError,
-        setErrorMessage,
-        checkEntryFields,
-        updateJsonArray} from "../../utils/helper";
+    INFO,
+    WARN,
+    ERROR,
+    SUCCESS,
+    DEFAULT_SUCCESS_TITLE,
+    DEFAULT_ERROR_TITLE,
+    confirm,
+    isEmpty,
+    setFieldError,
+    setErrorMessage,
+    checkEntryFields,
+    updateJsonArray} from "../../utils/helper";
 
 import {
-saveDatasource,
-        saveUser,
-        saveRole,
-        deleteDatasource,
-        deleteRole,
-        deleteUser,
-        loadDatasources,
-        loadAuth,
-        formatErrorResponse,
-        testDatasource,
-        isApiSuccess,
-        isApiError} from "../../utils/apiHelper";
+    saveDatasource,
+    saveUser,
+    saveRole,
+    deleteDatasource,
+    deleteRole,
+    deleteUser,
+    loadDatasources,
+    loadAuth,
+    formatErrorResponse,
+    testDatasource,
+    isApiSuccess,
+    isApiError} from "../../utils/apiHelper";
 
 const Admin = () => {
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
+    const {showHelp} = useHelp();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
@@ -126,7 +128,9 @@ const Admin = () => {
                 options: getAvailableRoles,
                 setSelected: setDatasourceRoles,
                 getSelected: getDatasourceRoles,
-                valueRenderer: rolesValueRenderer
+                valueRenderer: rolesValueRenderer,
+                showHelp: showHelpMessage,
+                helpText: getText("datasourceRoles-help")
             }];
     };
 
@@ -178,6 +182,10 @@ const Admin = () => {
         return retval;
     };
     
+    const showHelpMessage = (txt) => {
+        showHelp(getText(txt));
+    };
+
     const rolesValueRenderer = (c, dataObject, selected, options) => {
         if (selected.length > 0) {
             return getText("Role(s) selected");

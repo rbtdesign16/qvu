@@ -69,7 +69,7 @@ const EntryPanel = (props) => {
                 case "button":
                     return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
                 case "multiselect":
-                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
+                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} hasSelectAll={c.hasSelectAll} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
             }
         }
     };

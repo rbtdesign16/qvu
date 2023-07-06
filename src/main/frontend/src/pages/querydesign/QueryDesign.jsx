@@ -8,7 +8,7 @@ import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
-import {INFO, WARN, ERROR} from "../../utils/helper";
+import {INFO, WARN, ERROR, hasRoleAccess} from "../../utils/helper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import { getDatasourceTables } from "../../utils/apiHelper"
@@ -21,7 +21,14 @@ const QueryDesign = () => {
 
     const loadDatasourceOptions = () => {
         if (datasources) {
-            return datasources.map(d => <option value={d.datasourceName}>{d.datasourceName}</option>);
+            return datasources.map(d => {
+                // handle accces by role if required
+                if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
+                    return <option value={d.datasourceName}>{d.datasourceName}</option>;
+                } else {
+                    return "";
+                }
+            });
         } else {
             return "";
         }

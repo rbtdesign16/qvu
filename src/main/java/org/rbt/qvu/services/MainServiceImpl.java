@@ -2,6 +2,7 @@ package org.rbt.qvu.services;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.security.Principal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -9,7 +10,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
@@ -496,6 +496,20 @@ public class MainServiceImpl implements MainService {
         }
 
         return retval;
+    }
+    
+    private Set<String> getCurrentUserRoles() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null) {
+            Object o = auth.getPrincipal();
+            
+            if (o != null) {
+                LOG.error("------>" + o.getClass().getName());
+            }
+        }
+        
+        return null;
     }
 
 }

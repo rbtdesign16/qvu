@@ -210,3 +210,24 @@ export const replaceTokens = (msg, tokens) => {
     
     return msg;
 };
+
+
+export const hasRoleAccess = (requiredRoles, userRoles) => {
+    let retval = false;
+    if (!requiredRoles || (requiredRoles.length === 0)) {
+        retval = true;
+    } else if (userRoles && (userRoles.length > 0)) {
+        let int =  intersection(requiredRoles, userRoles);
+        retval = (int && (int.length > 0));
+    }    
+    
+    return retval;
+};
+    
+export const intersection = (a, b) => {
+    if (a && a.length > 0 && b && b.length > 0) {
+        const setA = new Set(a);
+        return b.filter(value => setA.has(value));
+    }
+};
+    

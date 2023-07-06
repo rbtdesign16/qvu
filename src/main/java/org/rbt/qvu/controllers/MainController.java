@@ -18,6 +18,7 @@ import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.util.AuthHelper;
+import org.rbt.qvu.util.DBHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -127,5 +128,11 @@ public class MainController {
     public List<Table> getDatasourceTables(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTables(" + datasourceName + ")");
         return service.getDatasourceTables(datasourceName);
+    }
+    
+    @GetMapping("api/v1/db/types/load")
+    public String[] getDatabaseTypes() {
+        LOG.debug("in getDatabaseTypes()");
+        return DBHelper.DATABASE_TYPES;
     }
 }

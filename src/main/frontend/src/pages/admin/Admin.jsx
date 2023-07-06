@@ -38,7 +38,7 @@ const Admin = () => {
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {datasources, setDatasources} = useDataHandler();
+    const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
@@ -53,7 +53,7 @@ const Admin = () => {
                 label: getText("Database Type:"),
                 name: "databaseType",
                 type: "select",
-                options: ["", "MySQL", "Microsoft SQL Server", "Oracle", "PostgreSQL"],
+                options: databaseTypes,
                 key: true,
                 required: true
             },

@@ -73,6 +73,18 @@ export const loadDatasources = async () => {
     }
 };
 
+export const loadDatabaseTypes = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/db/types/load");
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 export const saveDatasource = async (ds) => {
     try {
         let res = await axios.post(getApiURL() + "/db/datasource/save", ds, hconfig);

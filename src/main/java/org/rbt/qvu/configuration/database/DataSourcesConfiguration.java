@@ -5,7 +5,9 @@
 package org.rbt.qvu.configuration.database;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.rbt.qvu.util.DBHelper;
 
 /**
@@ -13,14 +15,9 @@ import org.rbt.qvu.util.DBHelper;
  * @author rbtuc
  */
 public class DataSourcesConfiguration {
-    
-    public static final String[] DATABASE_TYPES = {
-        DBHelper.DB_TYPE_MYSQL, 
-        DBHelper.DB_TYPE_SQLSERVER, 
-        DBHelper.DB_TYPE_ORACLE, 
-        DBHelper.DB_TYPE_POSTGRES
-    };
-    
+    private static final Map<String, DataSourceConfiguration> DSMAP = new HashMap<>();
+
+
     private List<DataSourceConfiguration> datasources = new ArrayList<>();
 
     public List<DataSourceConfiguration> getDatasources() {
@@ -29,22 +26,15 @@ public class DataSourcesConfiguration {
 
     public void setDatasources(List<DataSourceConfiguration> datasources) {
         this.datasources = datasources;
-    }
-    
-    public DataSourceConfiguration getDatasourceConfiguration(String name) {
-        DataSourceConfiguration retval = null;
-        
-        if (datasources != null) {
-            for (DataSourceConfiguration ds : datasources) {
-                if (name.equals(ds.getDatasourceName())) {
-                    retval = ds;
-                    break;
-                }
-            }
+        DSMAP.clear();
+
+        for (DataSourceConfiguration ds : datasources) {
+            DSMAP.put(ds.getDatasourceName(), ds);
         }
-        
-        return retval;
     }
-        
-    
+
+    public DataSourceConfiguration getDatasourceConfiguration(String name) {
+        return DSMAP.get(name);
+    }
+
 }

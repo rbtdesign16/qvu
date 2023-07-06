@@ -1,21 +1,24 @@
 import React, { useState, createContext, useContext } from "react";
-import {loadDatasources} from "../utils/apiHelper";
+import {loadDatasources, loadDatabaseTypes} from "../utils/apiHelper";
 
 export const DataHandlerContext = createContext();
 
 export const DataHandlerProvider = ({ children }) => {
     // set up initial state and reducer
     const [datasources, setDatasources] = useState(null);
+    const [databaseTypes, setDatabaseTypes] = useState(null);
 
     const initializeDataHandler = async () => {
         if (!datasources) {
-            setDatasources(await loadDatasources());
+            let res = await Promise.all([loadDatasources(), loadDatabaseTypes()]);
+            setDatasources(res[0]);
+            setDatabaseTypes(res[1]);
         }
-    }
+    };
 
     return (
             <DataHandlerContext.Provider
-                value={{datasources, initializeDataHandler, setDatasources}}>
+                value={{datasources, databaseTypes, initializeDataHandler, setDatasources}}>
                 {children}
             </DataHandlerContext.Provider>
             );

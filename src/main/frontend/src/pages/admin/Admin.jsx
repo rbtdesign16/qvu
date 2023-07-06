@@ -114,10 +114,9 @@ const Admin = () => {
                 type: "number"
             },
             {
-                label: getText("Required Roles:"),
-                name: "requiredRoles",
+                label: getText("Role Access:"),
+                name: "roles",
                 type: "multiselect",
-                labledBy: getText("Select roles..."),
                 options: getAvailableRoles,
                 setSelected: setDatasourceRoles,
                 getSelected: getDatasourceRoles
@@ -242,7 +241,7 @@ const Admin = () => {
                     id: "testds",
                     text: getText("Test Connection"),
                     className: "btn btn-primary",
-                    disabled: true,
+                    disabled: dataObject.newRecord,
                     onClick: async () => {
                         showMessage(INFO, getText("Attempting to connect..."), null, true);
                         let res = await testDatasource(dataObject);

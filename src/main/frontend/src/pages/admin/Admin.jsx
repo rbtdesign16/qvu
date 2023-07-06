@@ -173,8 +173,17 @@ const Admin = () => {
                 name: "email",
                 type: "email",
                 validator: {type: "email"}
+            },
+            {
+                label: getText("Roles:"),
+                name: "roles",
+                type: "multiselect",
+                options: getAvailableRoles,
+                setSelected: setUserRoles,
+                getSelected: getUserRoles,
+                valueRenderer: rolesValueRenderer
             }];
-
+ 
         if (isnew) {
             retval.splice(1, 0, {label: getText("Password:"), name: "password", type: "password", required: true, validator: {type: "password"}});
         }
@@ -220,6 +229,27 @@ const Admin = () => {
     };
 
     const getDatasourceRoles = (dataObject) => {
+        let retval = [];
+
+        if (dataObject.roles) {
+            dataObject.roles.map(r => retval.push({label: r, value: r}));
+        }
+
+        return retval;
+    };
+    
+    const setUserRoles = (dataObject, selections) => {
+        if (selections) {
+            if (!dataObject.roles) {
+                dataObject.roles = [];
+            } else {
+                dataObject.roles.length = 0;
+            }
+            selections.map(s => dataObject.roles.push(s.value));
+        }
+    };
+
+    const getUserRoles = (dataObject) => {
         let retval = [];
 
         if (dataObject.roles) {

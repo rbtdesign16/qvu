@@ -1,0 +1,44 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+.entrygrid-150-200 {
+    display: grid;
+    grid-template-columns: 150px 200px;
+    margin: 5px;
+}
+
+.entrygrid-150-200 input[type=number] {
+    width: 100px;
+}
+
+.entrygrid-150-425 {
+    display: grid;
+    grid-template-columns: 150px 425px;
+    margin: 5px;
+}
+
+.entrygrid-200-425 {
+    display: grid;
+    grid-template-columns: 200px 425px;
+    margin: 5px;
+}
+
+.entrygrid-175-425 {
+    display: grid;
+    grid-template-columns: 175px 425px;
+    margin: 5px;
+}
+
+.entrygrid-100-150 {
+    display: grid;
+    grid-template-columns: 100px 150px;
+    margin: 5px;
+}
+
+.entrygrid-100-175 {
+    display: grid;
+    grid-template-columns: 100px 175px;
+    margin: 5px;
+}
+

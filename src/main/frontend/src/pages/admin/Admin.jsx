@@ -8,32 +8,32 @@ import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import {
-    INFO,
-    WARN,
-    ERROR,
-    SUCCESS,
-    DEFAULT_SUCCESS_TITLE,
-    DEFAULT_ERROR_TITLE,
-    confirm,
-    isEmpty,
-    setFieldError,
-    setErrorMessage,
-    checkEntryFields,
-    updateJsonArray} from "../../utils/helper";
+INFO,
+        WARN,
+        ERROR,
+        SUCCESS,
+        DEFAULT_SUCCESS_TITLE,
+        DEFAULT_ERROR_TITLE,
+        confirm,
+        isEmpty,
+        setFieldError,
+        setErrorMessage,
+        checkEntryFields,
+        updateJsonArray} from "../../utils/helper";
 
 import {
-    saveDatasource,
-    saveUser,
-    saveRole,
-    deleteDatasource,
-    deleteRole,
-    deleteUser,
-    loadDatasources,
-    loadAuth,
-    formatErrorResponse,
-    testDatasource,
-    isApiSuccess,
-    isApiError} from "../../utils/apiHelper";
+saveDatasource,
+        saveUser,
+        saveRole,
+        deleteDatasource,
+        deleteRole,
+        deleteUser,
+        loadDatasources,
+        loadAuth,
+        formatErrorResponse,
+        testDatasource,
+        isApiSuccess,
+        isApiError} from "../../utils/apiHelper";
 
 const Admin = () => {
     const {authData, setAuthData} = useAuth();
@@ -183,14 +183,14 @@ const Admin = () => {
                 getSelected: getUserRoles,
                 valueRenderer: rolesValueRenderer
             }];
- 
+
         if (isnew) {
             retval.splice(1, 0, {label: getText("Password:"), name: "password", type: "password", required: true, validator: {type: "password"}});
         }
 
         return retval;
     };
-    
+
     const showHelpMessage = (txt) => {
         showHelp(getText(txt));
     };
@@ -201,8 +201,8 @@ const Admin = () => {
         } else {
             return getText("Select roles...");
         }
-    }
-    
+    };
+
     const canTestDatasource = (listConfig, data) => {
         let retval = true;
         for (let i = 0; i < listConfig.length; ++i) {
@@ -237,7 +237,7 @@ const Admin = () => {
 
         return retval;
     };
-    
+
     const setUserRoles = (dataObject, selections) => {
         if (selections) {
             if (!dataObject.roles) {
@@ -271,18 +271,39 @@ const Admin = () => {
 
     const afterDatasourceChange = (e, listConfig, dataObject) => {
         let el = document.getElementById("testds");
+        let el2 = document.getElementById("taccess");
 
         if (el) {
             el.disabled = !canTestDatasource(listConfig, dataObject);
         }
+
         
+        if (el2) {
+           if (!el || el.disabled) {
+               el2.disabled = true;
+           } else {
+                el2.disabled = isDatasourceInaccessible(dataObject);
+           }
+       }
+
     };
 
     const isBaseRole = (indx) => {
         let r = authData.allRoles[indx];
         return r.baseRole;
-    }
-    
+    };
+
+    const isDatasourceInaccessible = async (dataObject) => {
+        let el = document.getElementById("taccess");
+        if (el) {
+            let res = await testDatasource(dataObject);
+            el.disabled = isApiError(res);
+        } else {
+            return true;
+        }
+                
+    };
+
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -295,7 +316,15 @@ const Admin = () => {
             gridClass: "entrygrid-175-425",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,
-            buttons: [{
+            buttons: [
+                {
+                    id: "taccess",
+                    text: getText("Table Access"),
+                    className: "btn",
+                    disabled: dataObject.newRecord,
+                    onClick: () => {}
+                },
+                {
                     id: "testds",
                     text: getText("Test Connection"),
                     className: "btn btn-primary",
@@ -419,12 +448,12 @@ const Admin = () => {
 
     const datasourcesConfig = {
         title: "Datasources",
-        width: "300px",
+        width: "325px",
         height: "500px",
         addTitle: getText("Add datasource"),
         editTitle: getText("Edit datasource"),
         delTitle: getText("Delete datasource"),
-        className: "entrygrid-100-150",
+        className: "entrygrid-100-175",
         onAdd: addDatasource,
         onEdit: editDatasource,
         onDelete: deleteSelectedDatasource,
@@ -443,9 +472,9 @@ const Admin = () => {
 
     const rolesConfig = {
         title: "Roles",
-        width: "300px",
+        width: "325px",
         height: "500px",
-        className: "entrygrid-100-150",
+        className: "entrygrid-100-175",
         addTitle: getText("Add role"),
         editTitle: getText("Edit role"),
         delTitle: getText("Delete role"),
@@ -469,12 +498,12 @@ const Admin = () => {
 
     const usersConfig = {
         title: "Users",
-        width: "300px",
+        width: "325px",
         height: "500px",
         addTitle: getText("Add user"),
         editTitle: getText("Edit user"),
         delTitle: getText("Delete user"),
-        className: "entrygrid-100-150",
+        className: "entrygrid-100-175",
         onAdd: authData.allowUserRoleEdit ? addUser : null,
         onEdit: authData.allowUserRoleEdit ? editUser : null,
         onDelete: authData.allowUserRoleEdit ? deleteSelectedUser : null,

@@ -3,6 +3,7 @@
 @import "primereact/resources/themes/lara-light-indigo/theme.css";
 @import "primereact/resources/primereact.css";
 @import "colors.css";
+@import "entrygrid.css";
 
 
 html {
@@ -211,8 +212,20 @@ img {
     cursor: pointer;
 }
 
+.icon-s-dis {
+    cursor: default;
+    filter: grayscale();
+    
+}
+
 .icon-m {
     cursor: pointer;
+}
+
+.icon-m-dis {
+    cursor: default;
+    filter: grayscale();
+    
 }
 
 .label-l {
@@ -258,39 +271,6 @@ img {
 
 }
 
-.entrygrid-150-200 {
-    display: grid;
-    grid-template-columns: 150px 200px;
-    margin: 5px;
-}
-
-.entrygrid-150-200 input[type=number] {
-    width: 100px;
-}
-
-.entrygrid-150-425 {
-    display: grid;
-    grid-template-columns: 150px 425px;
-    margin: 5px;
-}
-
-.entrygrid-200-425 {
-    display: grid;
-    grid-template-columns: 200px 425px;
-    margin: 5px;
-}
-
-.entrygrid-175-425 {
-    display: grid;
-    grid-template-columns: 175px 425px;
-    margin: 5px;
-}
-
-.entrygrid-100-150 {
-    display: grid;
-    grid-template-columns: 100px 150px;
-    margin: 5px;
-}
 
 .modal-error-msg {
     color: crimson;

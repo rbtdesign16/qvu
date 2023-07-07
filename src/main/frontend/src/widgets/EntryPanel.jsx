@@ -91,9 +91,19 @@ const EntryPanel = (props) => {
         setToggle(!toggle); 
     };
 
+    const isButtonDisabled = (b) => {
+        if (b.disabled) {
+            if (typeof b.disabled === "function") {
+                return b.disabled(dataObject);
+            } else {
+                return b.disabled;
+            }
+        }
+    };
+    
     const loadButtons = () => {
         return buttons.map(b => {
-            return  <Button  size="sm"  disabled={b.disabled} style={{marginLeft: "10px"}} onClick={() => b.onClick()}  id={b.id} >{b.text}</Button>;
+            return  <Button  size="sm"  disabled={isButtonDisabled(b)} style={{marginLeft: "10px"}} onClick={() => b.onClick()}  id={b.id} >{b.text}</Button>;
 
         });
     };

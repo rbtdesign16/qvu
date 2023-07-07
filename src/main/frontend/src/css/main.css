@@ -413,3 +413,8 @@ select {
     height: 30px !important;
     width: 225px !important;
 }
+
+.table-access {
+    left: 10%;
+    top: 10%;
+}

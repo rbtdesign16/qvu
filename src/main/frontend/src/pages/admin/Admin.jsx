@@ -7,7 +7,7 @@ import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
-import TableAccess from "./TableAccess";
+import TableAccess from "./TableAccessModal";
 import {
         INFO,
         WARN,
@@ -305,7 +305,21 @@ const Admin = () => {
         }
                 
     };
+    
+    const saveTableAccess = (dataObject) => {
+        hideTableAccess();
+    };
+    
+    const hideTableAccess = () => {
+        setTableAccess({show: false});
+    }
 
+    const showTableAccess = (dataObject) => {
+        setTableAccess({show: true, 
+            datasource: {...dataObject},
+            saveTableAccess: saveTableAccess,
+            hideTableAccess: hideTableAccess});
+    };
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -324,7 +338,7 @@ const Admin = () => {
                     text: getText("Table Access"),
                     className: "btn",
                     disabled: dataObject.newRecord,
-                    onClick: () => { setTableAccess({show: true, datasource: dataObject})}
+                    onClick: showTableAccess
                 },
                 {
                     id: "testds",

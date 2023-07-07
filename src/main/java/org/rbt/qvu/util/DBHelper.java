@@ -5,8 +5,10 @@
 package org.rbt.qvu.util;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 
 /**
  *
@@ -48,5 +50,8 @@ public class DBHelper {
             };
         }
     }
-
+    
+    public static Connection getConnection(DataSourceConfiguration datasource) throws Exception {
+        return DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(), datasource.getPassword());
+    }
 }

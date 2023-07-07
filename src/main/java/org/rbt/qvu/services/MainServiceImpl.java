@@ -49,6 +49,7 @@ import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
+import org.rbt.qvu.dto.TableAccess;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
@@ -214,7 +215,7 @@ public class MainServiceImpl implements MainService {
         Connection conn = null;
         ResultSet res = null;
         try {
-            conn = DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(), datasource.getPassword());
+            conn = DBHelper.getConnection(datasource);
             DatabaseMetaData dmd = conn.getMetaData();
             res = dmd.getSchemas();
         } catch (Exception ex) {
@@ -384,8 +385,9 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public List<Table> getDatasourceTables(String datasourceName) {
-        List<Table> retval = new ArrayList<>();
+    public OperationResult<List<Table>> getDatasourceTables(String datasourceName) {
+        OperationResult<List<Table>> retval = new OperationResult();
+        List<Table> data = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
         try {
@@ -406,13 +408,17 @@ public class MainServiceImpl implements MainService {
                     t.setColumns(getTableColumns(dmd, t));
                     setIndexColumns(dmd, t);
                     setPrimaryKeys(dmd, t);
-                    retval.add(t);
+                    data.add(t);
                 }
+                
+                retval.setResult(data);
             } else {
                 throw new Exception("Datasource " + datasourceName + " not found");
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setMessage(ex.toString());
         } finally {
             DBHelper.closeConnection(conn, null, res);
         }
@@ -518,4 +524,59 @@ public class MainServiceImpl implements MainService {
         return null;
     }
 
+    @Override
+    public OperationResult<List <TableAccess>> getTableAccess(DataSourceConfiguration ds) {
+        OperationResult<List <TableAccess>> retval = new OperationResult();
+        List <TableAccess> data = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+        
+        try {
+            conn = qvuds.getConnection(ds.getDatasourceName());
+            
+            if (conn == null) {
+                conn = DBHelper.getConnection(ds);
+            }
+            
+            Map<String, TableAccess> tamap = new HashMap();
+            
+            if (ds.getTableAccessList() != null) {
+                for (TableAccess ta : ds.getTableAccessList()) {
+                    tamap.put(ta.getTableName(), ta);
+                }
+            }
+            
+            DatabaseMetaData dmd = conn.getMetaData();
+            
+            res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+            
+            while (res.next()) {
+                String tname = res.getString(3);
+                
+                TableAccess curta = tamap.get(tname);
+                if (curta == null) {
+                    TableAccess tanew = new TableAccess();
+                    tanew.setDatasourceName(ds.getDatasourceName());
+                    tanew.setTableName(tname);
+                    data.add(tanew);
+                } else {
+                    data.add(curta);
+                }
+            }
+            
+            Collections.sort(data);
+            retval.setResult(data);
+        }
+        
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+        
+        finally {
+            DBHelper.closeConnection(conn, null, res);
+        }
+        
+        return retval;
+    }  
+        
 }

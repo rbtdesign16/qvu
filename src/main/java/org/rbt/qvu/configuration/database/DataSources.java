@@ -54,7 +54,13 @@ public class DataSources {
     public Connection getConnection(String dsname) {
         Connection retval = null;
         try {
-            retval = getDataSource(dsname).getConnection();
+            DataSource ds = getDataSource(dsname);
+            
+            if (ds != null) {
+                retval = ds.getConnection();
+            } else {
+                LOG.warn("datasource " + dsname + " does not exist");
+            }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }

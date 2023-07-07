@@ -42,7 +42,7 @@ const Home = (props) => {
         }
     };
 
-    const hasTabAcccess = () => {
+    const hasTabAccess = () => {
         return isAdministrator(authData) || isQueryDesigner(authData) || isReportDesigner(authData);
     };
 
@@ -50,7 +50,7 @@ const Home = (props) => {
         if (authData) {
             if (authData.initialSetupRequired) {
                 return <InitialSetup/>;
-            } else if (hasTabAcccess()) {
+            } else if (hasTabAccess()) {
                 return (
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">

@@ -227,4 +227,15 @@ export const getDatasourceTables = async (dsname) => {
     }
 };
 
+export const loadTableAccess = async (datasource) => {
+    try {
+        let res = await axios.post(getApiURL() + "/db/datasource/tableaccess", datasource, hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
 

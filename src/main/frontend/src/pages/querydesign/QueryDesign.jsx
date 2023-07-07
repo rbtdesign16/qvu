@@ -8,7 +8,12 @@ import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
-import {INFO, WARN, ERROR, hasRoleAccess} from "../../utils/helper";
+import {
+    INFO, 
+    WARN, 
+    ERROR, 
+    hasRoleAccess, 
+    DEFAULT_ERROR_TITLE} from "../../utils/helper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import { getDatasourceTables } from "../../utils/apiHelper"
@@ -22,7 +27,7 @@ const QueryDesign = () => {
     const loadDatasourceOptions = () => {
         if (datasources) {
             return datasources.map(d => {
-                // handle accces by role if required
+                // handle acces by role if required
                 if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
                     return <option value={d.datasourceName}>{d.datasourceName}</option>;
                 } else {
@@ -37,7 +42,12 @@ const QueryDesign = () => {
     const onDatasourceChange = async (e) => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
         let res = await getDatasourceTables(e.target.options[e.target.selectedIndex].value);
-        hideMessage();
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
+        } else {    
+            hideMessage();
+            
+        }
     };
     
     return (

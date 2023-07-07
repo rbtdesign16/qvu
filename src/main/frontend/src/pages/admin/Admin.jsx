@@ -7,8 +7,9 @@ import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
+import TableAccess from "./TableAccess";
 import {
-INFO,
+        INFO,
         WARN,
         ERROR,
         SUCCESS,
@@ -22,7 +23,7 @@ INFO,
         updateJsonArray} from "../../utils/helper";
 
 import {
-saveDatasource,
+        saveDatasource,
         saveUser,
         saveRole,
         deleteDatasource,
@@ -42,6 +43,7 @@ const Admin = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
+    const [tableAccess, setTableAccess] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -322,7 +324,7 @@ const Admin = () => {
                     text: getText("Table Access"),
                     className: "btn",
                     disabled: dataObject.newRecord,
-                    onClick: () => {}
+                    onClick: () => { setTableAccess({show: true, datasource: dataObject})}
                 },
                 {
                     id: "testds",
@@ -592,6 +594,7 @@ const Admin = () => {
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
+                <TableAccess config={tableAccess}/>
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>

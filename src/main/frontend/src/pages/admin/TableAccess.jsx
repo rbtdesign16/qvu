@@ -2,26 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React from "react";
-import PropTypes from "prop-types";
+import useAuth from "../../context/AuthContext";
+import useLang from "../../context/LangContext";
+import useDataHandler from "../../context/DataHandlerContext";
+import useMessage from "../../context/MessageContext";
+import useHelp from "../../context/HelpContext";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"
-import EntryPanel from "../widgets/EntryPanel"
-import useLang from "../context/LangContext";
 
-const EditObjectModal = (props) => {
+const TableAccess = (props) => {
     const {config} = props;
+    const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
-
-    const getOkLabel = () => {
-        if (config.dataObject) {
-            return config.dataObject.newRecord ? getText("Create") : getText("Update");
-        } else {
-            return "Create";
-        }
-    };
-
-
+    const {showHelp} = useHelp();
+    const {datasources, setDatasources, databaseTypes} = useDataHandler();
+    const {datasource} = props;
     return (
             <div className="static-modal">
                 <Modal animation={false} 
@@ -30,22 +25,23 @@ const EditObjectModal = (props) => {
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header>
-                        <Modal.Title>{config.title}</Modal.Title>
+                        <Modal.Title>{getText("Table Access")}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div><EntryPanel config={config}/><div className="modal-error-msg" id={config.idPrefix + "error-msg"}></div></div>
+                        <div>this is a test</div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="sm" onClick={() => config.cancel()}>Cancel</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config)}>{getOkLabel()}</Button>
+                        <Button size="sm" onClick={() => config.hideTableAccess() }>{getText("Cancel")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableAccess()}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
             );
 };
-
-EditObjectModal.propTypes = {
+ 
+ TableAccess.propTypes = {
     config: PropTypes.object.isRequired
 };
 
-export default EditObjectModal;
+ 
+ export default TableAccess;

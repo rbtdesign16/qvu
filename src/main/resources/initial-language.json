@@ -117,6 +117,8 @@
         "Schema:": "Schema",
         "Loading datasource information": "Loading datasource information",
         "datasourceRoles-help": "Select desired roles to limit datasource access by role. If no roles are selected the datasource is accessible to all users",
-        "Table Access": "Table Access"
+        "Table Access": "Table Access",
+        "Save": "Save",
+        "Cancel": "Cancel"
     }
 }

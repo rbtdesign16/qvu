@@ -120,6 +120,7 @@
         "Table Access": "Table Access",
         "Save": "Save",
         "Cancel": "Cancel",
-        "Loading table access": "Loading table access"
+        "Loading table access": "Loading table access",
+        "role alias": "role alias"
     }
 }

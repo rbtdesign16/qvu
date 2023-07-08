@@ -2,6 +2,11 @@
   "authenticatorServiceClassName": "",
   "securityType": "basic",
   "roleAttributeName": "role",
+  "roleAliases": {
+        "administrator": "administrator role",
+        "query designer": "query designer alias",
+        "report designer": "report designer alias"
+  },
   "allowServiceSave": false,
     "samlConfiguration": {
         "idpUrl": "",

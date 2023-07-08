@@ -12,8 +12,9 @@ import {
     INFO, 
     WARN, 
     ERROR, 
-    hasRoleAccess, 
     DEFAULT_ERROR_TITLE} from "../../utils/helper";
+import { hasRoleAccess } from "../../utils/authHelper";
+
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import { getDatasourceTables } from "../../utils/apiHelper"
@@ -43,7 +44,7 @@ const QueryDesign = () => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
         let res = await getDatasourceTables(e.target.options[e.target.selectedIndex].value);
         if (isApiError(res)) {
-            showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
+            showMessage(ERROR, res.message);
         } else {    
             hideMessage();
             

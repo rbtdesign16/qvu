@@ -31,9 +31,6 @@ export const TYPE_DATE = "date";
 export const TYPE_NUMBER = "number";
 export const TYPE_EMAIL = "email";
 
-export const SECURITY_TYPE_BASIC = "basic";
-export const SECURITY_TYPE_SAML = "saml";
-export const SECURITY_TYPE_OIDC = "oidc";
 
 export const SMALL_ICON_SIZE = 18;
 
@@ -59,24 +56,6 @@ export const loadDocumentFromBlob = async (fileName, blob) => {
         downloadLink.click();
         downloadLink.remove();
     }
-};
-
-export const userHasRole = (authData, role) => {
-    if (authData.currentUser && authData.currentUser.roles) {
-        return authData.currentUser.roles.includes(role);
-    }
-};
-
-export const isAdministrator = (authData) => {
-    return userHasRole(authData, ADMINISTRATOR_ROLE);
-};
-
-export const isQueryDesigner = (authData) => {
-    return userHasRole(authData, QUERY_DESIGNER_ROLE);
-};
-
-export const isReportDesigner = (authData) => {
-    return userHasRole(authData, REPORT_DESIGNER_ROLE);
 };
 
 export const setFieldError = (pre, fname) => {
@@ -212,18 +191,6 @@ export const replaceTokens = (msg, tokens) => {
 };
 
 
-export const hasRoleAccess = (requiredRoles, userRoles) => {
-    let retval = false;
-    if (!requiredRoles || (requiredRoles.length === 0)) {
-        retval = true;
-    } else if (userRoles && (userRoles.length > 0)) {
-        let int =  intersection(requiredRoles, userRoles);
-        retval = (int && (int.length > 0));
-    }    
-    
-    return retval;
-};
-    
 export const intersection = (a, b) => {
     if (a && a.length > 0 && b && b.length > 0) {
         const setA = new Set(a);

@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,9 +99,6 @@ public class MainServiceImpl implements MainService {
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
             
-            // always include the default role set
-            retval.getAllRoles().addAll(Constants.DEFAULT_ROLES);
-            
             // users and roles are defined via json
             if (scfg.isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(scfg.getBasicConfiguration().getRoles());
@@ -139,6 +135,27 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
+            
+            String alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_ADMINISTRATOR_ROLE);
+            if (StringUtils.isNotEmpty(alias)) {
+                retval.setAdministratorRole(alias);
+            } else {
+                retval.setAdministratorRole(Constants.DEFAULT_ADMINISTRATOR_ROLE);
+            }
+            
+            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
+            if (StringUtils.isNotEmpty(alias)) {
+                retval.setQueryDesignerRole(alias);
+            } else {
+                retval.setQueryDesignerRole(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
+            }
+
+            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
+            if (StringUtils.isNotEmpty(alias)) {
+                retval.setReportDesignerRole(alias);
+            } else {
+                retval.setReportDesignerRole(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
+            }
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));

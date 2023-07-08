@@ -35,6 +35,14 @@ import {
         testDatasource,
         isApiSuccess,
         isApiError} from "../../utils/apiHelper";
+import {
+    isAdministrator, 
+    isQueryDesigner, 
+    isReportDesigner,
+    DEFAULT_ADMINISTRATOR_ROLE,
+    DEFAULT_QUERY_DESIGNER_ROLE,
+    DEFAULT_REPORT_DESIGNER_ROLE} from "../../utils/authHelper";
+
 
 const Admin = () => {
     const {authData, setAuthData} = useAuth();
@@ -152,6 +160,21 @@ const Admin = () => {
             }];
     };
 
+    const getAliasMessageIfRequired = (rec) => {
+        let retval = "";
+        
+        if (isAdministrator(authData) && (rec.name === authData.administratorRole) && (rec.name !== DEFAULT_ADMINISTRATOR_ROLE)) {
+            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_ADMINISTRATOR_ROLE));
+        } else if (isQueryDesigner(authData) && (rec.name === authData.queryDesignerRole)  && (rec.name !== DEFAULT_QUERY_DESIGNER_ROLE)) {
+           retval += ("*" + getText("role alias", " ") + getText(DEFAULT_QUERY_DESIGNER_ROLE));
+        } else if (isQueryDesigner(authData) && (rec.name === authData.reportDesignerRole)  && (rec.name !== DEFAULT_REPORT_DESIGNER_ROLE)) {
+           retval += ("*" + getText("role alias", " ") + getText(DEFAULT_REPORT_DESIGNER_ROLE));
+        }
+        
+        return retval;
+            
+    };
+    
     const getUserEntryConfig = (isnew) => {
         let retval = [
             {
@@ -312,7 +335,7 @@ const Admin = () => {
     
     const hideTableAccess = () => {
         setTableAccess({show: false});
-    }
+    };
 
     const showTableAccess = (dataObject) => {
         setTableAccess({show: true, 
@@ -349,9 +372,9 @@ const Admin = () => {
                         showMessage(INFO, getText("Attempting to connect..."), null, true);
                         let res = await testDatasource(dataObject);
                         if (isApiSuccess(res)) {
-                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName, getText(DEFAULT_SUCCESS_TITLE));
+                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName);
                         } else {
-                            showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
+                            showMessage(ERROR, res.message);
                         }
                     }}]
         };
@@ -401,9 +424,9 @@ const Admin = () => {
             let res = await deleteDatasource(ds.datasourceName);
             if (isApiSuccess(res)) {
                 setDatasources(await loadDatasources());
-                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"), getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"));
             } else {
-                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + getText(res.message), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + getText(res.message));
             }
         };
 
@@ -427,9 +450,9 @@ const Admin = () => {
 
             if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted role", " ") + r.name, getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, getText("Deleted role", " ") + r.name);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name));
             }
         };
 
@@ -453,9 +476,9 @@ const Admin = () => {
 
             if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId, getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId);
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId));
             }
         };
 
@@ -506,6 +529,9 @@ const Admin = () => {
             {
                 label: getText("Description:"),
                 field: "description"
+            },
+            {
+                field: getAliasMessageIfRequired,
             }
         ],
         data: authData.allRoles
@@ -555,10 +581,10 @@ const Admin = () => {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(await loadDatasources());
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"), getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"));
 
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName));
             }
 
         } else {
@@ -576,9 +602,9 @@ const Admin = () => {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved", getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved");
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
@@ -596,9 +622,9 @@ const Admin = () => {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"), getText(DEFAULT_SUCCESS_TITLE));
+                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));

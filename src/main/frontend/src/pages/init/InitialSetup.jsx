@@ -12,14 +12,17 @@ import {
     ERROR,
     checkEntryFields,
     setErrorMessage,
-    SECURITY_TYPE_BASIC,
-    SECURITY_TYPE_SAML,
-    SECURITY_TYPE_OIDC,
     ERROR_TEXT_COLOR,
     SUCCESS_TEXT_COLOR,
     DEFAULT_ERROR_TITLE,
     replaceTokens
 } from "../../utils/helper";
+
+import {
+    SECURITY_TYPE_BASIC,
+    SECURITY_TYPE_SAML,
+    SECURITY_TYPE_OIDC,
+} from "../../utils/authHelper";
 
 import {
     verifyInitialRepositoryFolder,
@@ -365,12 +368,12 @@ const InitialSetup = () => {
                 let res = await doInitialSetup(data);
 
                 if (isApiError(res)) {
-                    showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
+                    showMessage(ERROR, getText(res.message));
                 } else {
                     setInitComplete(true);
                 }
             } else {
-                showMessage(ERROR, getText(res.message), getText(DEFAULT_ERROR_TITLE));
+                showMessage(ERROR, getText(res.message));
             }
         } else {
             setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));

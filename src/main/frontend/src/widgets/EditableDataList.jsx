@@ -16,14 +16,26 @@ const EditableDataList = (props) => {
     const getDelTitle = (indx) => {
         return listConfig.delTitle + " " + listConfig.data[indx][listConfig.displayConfig[0].field];
     };
+    
+    const getFieldValue = (rec, field) => {
+        if (field) {
+            if (typeof field === "function") {
+                return field(rec);
+            } else {
+                return rec[field];
+            }
+        } else {
+            return "";
+        }
+    };
 
     const getDisplay = (cfg, rec) => {
         if (cfg) {
             return cfg.map(c => {
                 if (rec) {
                     return <div className={listConfig.className}>
-                        <div className="label" >{c.label}</div>
-                        <div className="display-field" >{rec[c.field]}</div>
+                        <div className="label" >{c.label ? c.label : ""}</div>
+                        <div className="display-field" >{getFieldValue(rec, c.field)}</div>
                     </div>;
                 } else {
                     return "";

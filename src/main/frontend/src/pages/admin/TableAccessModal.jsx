@@ -42,7 +42,7 @@ const TableAccess = (props) => {
         let res = await loadTableAccess(config.datasource);
         
         if (isApiError(res)) {
-            showMessage(ERROR, res.message, getText(DEFAULT_ERROR_TITLE));
+            showMessage(ERROR, res.message);
         } else {
             hideMessage();
         }

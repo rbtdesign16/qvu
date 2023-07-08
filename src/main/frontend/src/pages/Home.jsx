@@ -14,7 +14,7 @@ import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
 import InitialSetup from "./init/InitialSetup";
 import PropTypes from "prop-types";
-import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/helper"
+import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/authHelper"
 
 
 const Home = (props) => {

@@ -37,6 +37,18 @@ const EntryPanel = (props) => {
         }
     };
 
+    const getLabelText = (text) => {
+        if (text) {
+            if (typeof text === "function") {
+                return text(dataObject);
+            } else {
+                return text;
+            }
+        } else {
+            return "";
+        }
+    };
+    
     const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
             return dataObject[c.name];
@@ -65,7 +77,7 @@ const EntryPanel = (props) => {
                 case "file":
                     return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "label":
-                    return <span className="read-only-data" style={c.style} >{c.text}</span>;
+                    return <span className="read-only-data" style={c.style} >{getLabelText(c.text)}</span>;
                 case "button":
                     return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
                 case "multiselect":

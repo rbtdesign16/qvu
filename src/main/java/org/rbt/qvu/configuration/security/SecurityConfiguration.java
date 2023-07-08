@@ -4,6 +4,8 @@
  */
 package org.rbt.qvu.configuration.security;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
@@ -23,6 +25,7 @@ public class SecurityConfiguration {
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
+    private Map<String, String> roleAliases = new HashMap<>();
     
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
@@ -113,5 +116,9 @@ public class SecurityConfiguration {
         }
         
         return retval;
+    }
+    
+    public String getRoleAlias(String role) {
+        return roleAliases.get(role);
     }
 }

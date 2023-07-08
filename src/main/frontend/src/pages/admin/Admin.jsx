@@ -15,6 +15,7 @@ import {
         SUCCESS,
         DEFAULT_SUCCESS_TITLE,
         DEFAULT_ERROR_TITLE,
+        ERROR_TEXT_COLOR,
         confirm,
         isEmpty,
         setFieldError,
@@ -313,11 +314,6 @@ const Admin = () => {
 
     };
 
-    const isBaseRole = (indx) => {
-        let r = authData.allRoles[indx];
-        return r.baseRole;
-    };
-
     const isDatasourceInaccessible = async (dataObject) => {
         let el = document.getElementById("taccess");
         if (el) {
@@ -517,7 +513,6 @@ const Admin = () => {
         addTitle: getText("Add role"),
         editTitle: getText("Edit role"),
         delTitle: getText("Delete role"),
-        isReadOnly: isBaseRole,
         onAdd: authData.allowUserRoleEdit ? addRole : null,
         onEdit: authData.allowUserRoleEdit ? editRole : null,
         onDelete: authData.allowUserRoleEdit ? deleteSelectedRole : null,
@@ -532,6 +527,7 @@ const Admin = () => {
             },
             {
                 field: getAliasMessageIfRequired,
+                fieldStyle: {color: ERROR_TEXT_COLOR}
             }
         ],
         data: authData.allRoles

@@ -261,13 +261,20 @@ img {
     width: 100%;
 }
 
-.bord-top {
+.bord-t {
     border-top: solid 1px var(--default-border-color);
+    padding-top: 5px;
+}
+
+.bord-b {
+    border-bottom: solid 1px var(--default-border-color);
+    padding-bottom: 5px;
 }
 
 .tb-border {
     border-top: solid 1px var(--default-border-color);
     border-bottom: solid 1px var(--default-border-color);
+    padding: 0;
 
 }
 

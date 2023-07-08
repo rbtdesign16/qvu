@@ -121,6 +121,7 @@
         "Save": "Save",
         "Cancel": "Cancel",
         "Loading table access": "Loading table access",
-        "role alias": "role alias"
+        "role alias": "role alias",
+        "tableRoles-help": "Select desired roles to limit table access by role. If no roles are selected the table is accessible to all users"
     }
 }

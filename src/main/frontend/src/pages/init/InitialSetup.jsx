@@ -497,7 +497,7 @@ const InitialSetup = () => {
                     <div className="title">{getText("Qvu Initial Setup")}</div>
                     <div><EntryPanel config={getConfig()}/></div>
                     <div id="init-error-msg"></div>
-                    <div className="btn-bar bord-top">
+                    <div className="btn-bar bord-t">
                         <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
                     </div>
                 </div>);

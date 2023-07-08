@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class Table {
     private String datasource;
+    private String displayName;
     private String name;
     private String type;
     private String schema;
@@ -66,4 +67,14 @@ public class Table {
     public void setPkName(String pkName) {
         this.pkName = pkName;
     }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+    
+    
 }

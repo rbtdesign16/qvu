@@ -26,6 +26,9 @@ export const isReportDesigner = (authData) => {
     return userHasRole(authData, authData.reportDesignerRole);
 };
 
+export const isUser = (authData) => {
+    return userHasRole(authData, authData.userRole);
+};
 
 export const hasRoleAccess = (requiredRoles, userRoles) => {
     let retval = false;

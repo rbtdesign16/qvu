@@ -17,6 +17,7 @@ public class AuthData {
     private String administratorRole;
     private String queryDesignerRole;
     private String reportDesignerRole;
+    private String userRole;
     private List<Role> allRoles = new ArrayList<>();
     private List<User> allUsers = new ArrayList<>();
     private User currentUser;
@@ -85,6 +86,14 @@ public class AuthData {
 
     public void setInitialSetupRequired(boolean initialSetupRequired) {
         this.initialSetupRequired = initialSetupRequired;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 
     

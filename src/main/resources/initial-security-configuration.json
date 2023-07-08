@@ -5,8 +5,10 @@
   "roleAliases": {
         "administrator": "administrator role",
         "query designer": "query designer alias",
-        "report designer": "report designer alias"
+        "report designer": "report designer alias",
+        "user": "user alias"
   },
+  
   "allowServiceSave": false,
     "samlConfiguration": {
         "idpUrl": "",

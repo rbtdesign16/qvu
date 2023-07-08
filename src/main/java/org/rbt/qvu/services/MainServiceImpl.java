@@ -157,6 +157,13 @@ public class MainServiceImpl implements MainService {
                 retval.setReportDesignerRole(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
             }
 
+            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_USER_ROLE);
+            if (StringUtils.isNotEmpty(alias)) {
+                retval.setUserRole(alias);
+            } else {
+                retval.setUserRole(Constants.DEFAULT_USER_ROLE);
+            }
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
             }

@@ -16,6 +16,7 @@ import {
         DEFAULT_SUCCESS_TITLE,
         DEFAULT_ERROR_TITLE,
         ERROR_TEXT_COLOR,
+        INFO_TEXT_COLOR,
         confirm,
         isEmpty,
         setFieldError,
@@ -35,7 +36,8 @@ import {
         formatErrorResponse,
         testDatasource,
         isApiSuccess,
-        isApiError} from "../../utils/apiHelper";
+        isApiError,
+        loadTableSettings} from "../../utils/apiHelper";
 import {
     isAdministrator, 
     isQueryDesigner, 
@@ -342,12 +344,40 @@ const Admin = () => {
         setTableSettings({show: false});
     };
 
-    const showTableSettings = (dataObject) => {
-        setTableSettings({show: true, 
-            datasource: dataObject,
-            saveTableSettings: saveTableSettings,
-            hideTableSettings: hideTableSettings});
+    const showTableSettings = async (dataObject) => {
+        showMessage(INFO, getText("Loading table settings", "..."), null, true);
+        
+        let res = await loadTableSettings(dataObject);
+       
+        if (isApiSuccess(res)) {
+             let tsMap = new Map();
+
+            dataObject.datasourceTableSettings.map(t => {
+                tsMap.set(t.tableName, t);
+            });
+
+            let t = [];
+
+            res.result.map(tres => {
+                let curt = tsMap.get(tres.tableName);
+                if (curt) {
+                    t.push(curt);
+                } else {
+                    t.push(tres);
+                }
+            });
+
+             hideMessage();
+
+            setTableSettings({show: true, 
+                datasource: dataObject,
+                saveTableSettings: saveTableSettings,
+                hideTableSettings: hideTableSettings, tables: t});
+        }  else {
+            showMessage(ERROR, res.message);
+        }
     };
+    
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -536,7 +566,7 @@ const Admin = () => {
             },
             {
                 field: getAliasMessageIfRequired,
-                fieldStyle: {color: ERROR_TEXT_COLOR}
+                fieldStyle: {color: INFO_TEXT_COLOR}
             }
         ],
         data: authData.allRoles

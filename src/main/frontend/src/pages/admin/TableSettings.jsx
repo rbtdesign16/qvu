@@ -47,7 +47,6 @@ const TableSettings = (props) => {
         }
     };
 
-    
     const getTableRoles = (indx) => {
         let retval = [];
 
@@ -80,38 +79,6 @@ const TableSettings = (props) => {
         return retval;
     };
     
-    const loadTableInfo = async () => {
-        showMessage(INFO, getText("Loading table settings", "..."), null, true);
-        
-        let res = await loadTableSettings(config.datasource);
-       
-        if (isApiSuccess(res)) {
-            setAvailableRoles(getAvailableRoles());
-
-            let tsMap = new Map();
-
-            config.datasource.datasourceTableSettings.map(t => {
-                tsMap.set(t.tableName, t);
-            });
-
-            let t = [];
-
-            res.result.map(tres => {
-                let curt = tsMap.get(tres.tableName);
-                if (curt) {
-                    t.push(curt);
-                } else {
-                    t.push(tres);
-                }
-            });
-
-            setTables(t);
-        }             
-        
-        hideMessage();
-
-    };
-
     const onHide = () => {
         if (config && config.hideTableSettings) {
             config.hideTableSettings();
@@ -157,12 +124,17 @@ const TableSettings = (props) => {
         }
     };
     
+    const onShow = () => {
+        setAvailableRoles(getAvailableRoles());
+        setTables(config.tables);
+    };
+    
     return (
         <div className="static-modal">
             <Modal animation={false} 
                    dialogClassName="table-settings"
                    show={config.show} 
-                   onShow={loadTableInfo}
+                   onShow={onShow}
                    backdrop={true} 
                    keyboard={true}>
                 <Modal.Header onHide={onHide}>

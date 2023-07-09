@@ -21,6 +21,7 @@ export const DEFAULT_WARN_TITLE = "Warning";
 export const ERROR_BACKGROUND_COLOR = "pink";
 export const ERROR_TEXT_COLOR = "crimson";
 export const SUCCESS_TEXT_COLOR = "#228b22";
+export const INFO_TEXT_COLOR = "#4682B4";
 
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";

@@ -227,9 +227,9 @@ export const getDatasourceTables = async (dsname) => {
     }
 };
 
-export const loadTableAccess = async (datasource) => {
+export const loadTableSettings = async (datasource) => {
     try {
-        let res = await axios.post(getApiURL() + "/db/datasource/tableaccess", datasource, hconfig);
+        let res = await axios.post(getApiURL() + "/db/datasource/tablesettings", datasource, hconfig);
 
         if (res) {
             return res.data;

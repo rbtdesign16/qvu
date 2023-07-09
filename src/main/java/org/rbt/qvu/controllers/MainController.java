@@ -17,7 +17,7 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
-import org.rbt.qvu.dto.TableAccess;
+import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
 import org.rbt.qvu.util.DBHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -137,9 +137,9 @@ public class MainController {
         return DBHelper.DATABASE_TYPES;
     }
 
-   @PostMapping("api/v1/db/datasource/tableaccess")
-    public OperationResult<List <TableAccess>> getTableAccess(@RequestBody DataSourceConfiguration datasource) {
-        LOG.debug("in getTableAccess()");
-        return service.getTableAccess(datasource);
+   @PostMapping("api/v1/db/datasource/tablesettings")
+    public OperationResult<List <TableSettings>> getTableSettings(@RequestBody DataSourceConfiguration datasource) {
+        LOG.debug("in getTableSettings()");
+        return service.getTableSettings(datasource);
     }
 }

@@ -11,13 +11,14 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class TableAccess implements Comparable<TableAccess> {
+public class TableSettings implements Comparable<TableSettings> {
     private String datasourceName;
+    private String displayName;
     private String tableName;
     private List<String> roles = new ArrayList<>();
 
     @Override
-    public int compareTo(TableAccess o) {
+    public int compareTo(TableSettings o) {
         return tableName.compareTo(o.getTableName());
     }
 
@@ -43,6 +44,14 @@ public class TableAccess implements Comparable<TableAccess> {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
     
     

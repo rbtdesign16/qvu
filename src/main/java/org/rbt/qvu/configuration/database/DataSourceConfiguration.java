@@ -6,8 +6,7 @@ package org.rbt.qvu.configuration.database;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.rbt.qvu.dto.TableAccess;
+import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.Constants;
 
 /**
@@ -30,7 +29,7 @@ public class DataSourceConfiguration {
     private boolean newDatasource;
     private String status = Constants.OFFLINE;
     private List<String> roles = new ArrayList<>();
-    private List<TableAccess> tableAccessList = new ArrayList<>();
+    private List<TableSettings> datasourceTableSettings = new ArrayList<>();
 
 
     public String getDatabaseType() {
@@ -153,12 +152,12 @@ public class DataSourceConfiguration {
         this.schema = schema;
     }
 
-    public List<TableAccess> getTableAccessList() {
-        return tableAccessList;
+    public List<TableSettings> getDatasourceTableSettings() {
+        return datasourceTableSettings;
     }
 
-    public void setTableAccessList(List<TableAccess> tableAccessList) {
-        this.tableAccessList = tableAccessList;
+    public void setDatasourceTableSettings(List<TableSettings> datasourceTableSettings) {
+        this.datasourceTableSettings = datasourceTableSettings;
     }
 
 

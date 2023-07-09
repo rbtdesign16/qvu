@@ -48,7 +48,7 @@ import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
-import org.rbt.qvu.dto.TableAccess;
+import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
@@ -549,9 +549,9 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List <TableAccess>> getTableAccess(DataSourceConfiguration ds) {
-        OperationResult<List <TableAccess>> retval = new OperationResult();
-        List <TableAccess> data = new ArrayList<>();
+    public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds) {
+        OperationResult<List <TableSettings>> retval = new OperationResult();
+        List <TableSettings> data = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
         
@@ -562,10 +562,10 @@ public class MainServiceImpl implements MainService {
                 conn = DBHelper.getConnection(ds);
             }
             
-            Map<String, TableAccess> tamap = new HashMap();
+            Map<String, TableSettings> tamap = new HashMap();
             
-            if (ds.getTableAccessList() != null) {
-                for (TableAccess ta : ds.getTableAccessList()) {
+            if (ds.getDatasourceTableSettings() != null) {
+                for (TableSettings ta : ds.getDatasourceTableSettings()) {
                     tamap.put(ta.getTableName(), ta);
                 }
             }
@@ -577,9 +577,9 @@ public class MainServiceImpl implements MainService {
             while (res.next()) {
                 String tname = res.getString(3);
                 
-                TableAccess curta = tamap.get(tname);
+                TableSettings curta = tamap.get(tname);
                 if (curta == null) {
-                    TableAccess tanew = new TableAccess();
+                    TableSettings tanew = new TableSettings();
                     tanew.setDatasourceName(ds.getDatasourceName());
                     tanew.setTableName(tname);
                     data.add(tanew);

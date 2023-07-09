@@ -19,11 +19,11 @@ import {
     DEFAULT_ERROR_TITLE,
     SMALL_ICON_SIZE} from "../../utils/helper";
 import {
-    loadTableAccess,
+    loadTableSettings,
     isApiSuccess,
     isApiError} from "../../utils/apiHelper";
 
-const TableAccess = (props) => {
+const TableSettings = (props) => {
     const {config} = props;
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
@@ -67,7 +67,7 @@ const TableAccess = (props) => {
     };
         
     const onHelp = () => {
-        showHelp(getText("tableRoles-help"));
+        showHelp(getText("tableSettings-help"));
     };
     
     const getAvailableRoles = () => {
@@ -81,26 +81,53 @@ const TableAccess = (props) => {
     };
     
     const loadTableInfo = async () => {
-        showMessage(INFO, getText("Loading table access", "..."), null, true);
+        showMessage(INFO, getText("Loading table settings", "..."), null, true);
         
-        let res = await loadTableAccess(config.datasource);
+        let res = await loadTableSettings(config.datasource);
+       
+        if (isApiSuccess(res)) {
+            setAvailableRoles(getAvailableRoles());
+
+            let tsMap = new Map();
+
+            config.datasource.datasourceTableSettings.map(t => {
+                tsMap.set(t.tableName, t);
+            });
+
+            let t = [];
+
+            res.result.map(tres => {
+                let curt = tsMap.get(tres.tableName);
+                if (curt) {
+                    t.push(curt);
+                } else {
+                    t.push(tres);
+                }
+            });
+
+            setTables(t);
+        }             
         
-        if (isApiError(res)) {
-            showMessage(ERROR, res.message);
-        } else {
-            hideMessage();
-        }
-          
-        setAvailableRoles(getAvailableRoles());
-        setTables(res.result);
+        hideMessage();
 
     };
 
     const onHide = () => {
-        if (config && config.hideTableAccess) {
-            config.hideTableAccess();
+        if (config && config.hideTableSettings) {
+            config.hideTableSettings();
         }
     };
+    
+    const getDisplayName = (indx) => {
+        return tables[indx].displayName;
+    };
+
+    const setDisplayName = (e, indx) => {
+        let t = [...tables];
+        t[indx].displayName = e.target.value;
+        setTables(t);
+    };
+
     
     const rolesValueRenderer = (selected) => {
         if (selected.length > 0) {
@@ -113,8 +140,9 @@ const TableAccess = (props) => {
     const loadTableEntries = () => {
         if (tables) {
             return tables.map((t, indx) => {
-                return <div className="entrygrid-100-175 bord-b">
+                return <div className="entrygrid-150-200 bord-b">
                     <div className="label">{getText("Table:")}</div><div className="display-field">{t.tableName}</div>
+                    <div className="label">{getText("Display Name:")}</div><div className="display-field"><input key={"dn" + indx} type="text" value={getDisplayName(indx)} onBlur={(e) => setDisplayName(e, indx)}/></div>
                     <div className="label">{getText("Roles:")}</div><div className="display-field">
                         <MultiSelect options={availableRoles}  
                             value={getTableRoles(indx)} 
@@ -132,30 +160,30 @@ const TableAccess = (props) => {
     return (
         <div className="static-modal">
             <Modal animation={false} 
-                   dialogClassName="table-access"
+                   dialogClassName="table-settings"
                    show={config.show} 
                    onShow={loadTableInfo}
                    backdrop={true} 
                    keyboard={true}>
                 <Modal.Header onHide={onHide}>
                     <Modal.Title><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
-                    &nbsp;&nbsp;{getText("Table Access", " - ") + getDatasourceName() }</Modal.Title>
+                    &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div style={{height: "400px", overflow: "auto"}}>{loadTableEntries()}</div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableAccess()}>{getText("Save")}</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableSettings(config.datasource, tables)}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>
         </div>
         );
 };
  
- TableAccess.propTypes = {
+ TableSettings.propTypes = {
     config: PropTypes.object.isRequired
 };
 
  
- export default TableAccess;
+ export default TableSettings;

@@ -7,7 +7,7 @@ import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
-import TableAccess from "./TableAccessModal";
+import TableSettings from "./TableSettings";
 import {
         INFO,
         WARN,
@@ -52,7 +52,7 @@ const Admin = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
-    const [tableAccess, setTableAccess] = useState({show: false});
+    const [tableSettings, setTableSettings] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -325,19 +325,28 @@ const Admin = () => {
                 
     };
     
-    const saveTableAccess = (dataObject) => {
-        hideTableAccess();
+    const saveTableSettings = (dataObject, tables) => {
+        let utables = [];
+        
+        tables.map(t => {
+            if (t.displayName || (t.toles && t.roles.length > 0)) {
+                utables.push(t);
+            }
+        });
+            
+         dataObject.datasourceTableSettings = utables;
+         hideTableSettings();
     };
     
-    const hideTableAccess = () => {
-        setTableAccess({show: false});
+    const hideTableSettings = () => {
+        setTableSettings({show: false});
     };
 
-    const showTableAccess = (dataObject) => {
-        setTableAccess({show: true, 
-            datasource: {...dataObject},
-            saveTableAccess: saveTableAccess,
-            hideTableAccess: hideTableAccess});
+    const showTableSettings = (dataObject) => {
+        setTableSettings({show: true, 
+            datasource: dataObject,
+            saveTableSettings: saveTableSettings,
+            hideTableSettings: hideTableSettings});
     };
     const getDatasourceConfig = (title, dataObject) => {
         return {
@@ -353,11 +362,11 @@ const Admin = () => {
             afterChange: afterDatasourceChange,
             buttons: [
                 {
-                    id: "taccess",
-                    text: getText("Table Access"),
+                    id: "tset",
+                    text: getText("Table Settings"),
                     className: "btn",
                     disabled: dataObject.newRecord,
-                    onClick: showTableAccess
+                    onClick: showTableSettings
                 },
                 {
                     id: "testds",
@@ -606,7 +615,7 @@ const Admin = () => {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
-
+    
     const saveModifiedUser = async (config) => {
         let ok = checkEntryFields(config);
 
@@ -630,7 +639,7 @@ const Admin = () => {
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
-                <TableAccess config={tableAccess}/>
+                <TableSettings config={tableSettings}/>
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>

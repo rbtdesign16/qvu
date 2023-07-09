@@ -117,11 +117,11 @@
         "Schema:": "Schema",
         "Loading datasource information": "Loading datasource information",
         "datasourceRoles-help": "Select desired roles to limit datasource access by role. If no roles are selected the datasource is accessible to all users",
-        "Table Access": "Table Access",
+        "Table Settings": "Table Settings",
         "Save": "Save",
         "Cancel": "Cancel",
-        "Loading table access": "Loading table access",
+        "Loading table settings": "Loading table settings",
         "role alias": "role alias",
-        "tableRoles-help": "Select desired roles to limit table access by role. If no roles are selected the table is accessible to all users"
+        "tableSettings-help": "Select desired roles to limit table access by role. If no roles are selected the table is accessible to all users. A display name can be associated with a table for a more user friendly UI presentation."
     }
 }

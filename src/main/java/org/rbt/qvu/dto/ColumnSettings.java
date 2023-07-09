@@ -20,7 +20,7 @@ public class ColumnSettings implements Comparable<ColumnSettings> {
 
     @Override
     public int compareTo(ColumnSettings o) {
-        return tableName.compareTo(o.getTableName());
+        return columnName.compareTo(o.getColumnName());
     }
 
     public String getTableName() {

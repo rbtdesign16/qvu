@@ -34,5 +34,5 @@ public interface MainService {
     
     public OperationResult<List<Table>> getDatasourceTables(String datasourceName);
     public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds);
-    public OperationResult<List <ColumnSettings>> getColumnSettings(TableSettings tableSettings);
+    public OperationResult<List <ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName);
 }

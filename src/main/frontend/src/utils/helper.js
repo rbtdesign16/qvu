@@ -32,6 +32,7 @@ export const TYPE_DATE = "date";
 export const TYPE_NUMBER = "number";
 export const TYPE_EMAIL = "email";
 
+export const MODAL_TITLE_SIZE = "h5";
 
 export const SMALL_ICON_SIZE = 18;
 
@@ -198,4 +199,14 @@ export const intersection = (a, b) => {
         return b.filter(value => setA.has(value));
     }
 };
+
+export const findInArray = (items, fieldName, value) => {
+    if (items) {
+        for (let i = 0; i < items.length; ++i) {
+            if (items[i][fieldName] === value) {
+                return items[i];
+            }
+        }
+    }
+    }
     

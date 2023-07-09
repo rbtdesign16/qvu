@@ -18,9 +18,11 @@ import {
     INFO,
     ERROR,
     DEFAULT_ERROR_TITLE,
-    SMALL_ICON_SIZE} from "../../utils/helper";
+    SMALL_ICON_SIZE,
+    MODAL_TITLE_SIZE,
+    findInArray} from "../../utils/helper";
 import {
-    loadTableSettings,
+    loadColumnSettings,
     isApiSuccess,
     isApiError} from "../../utils/apiHelper";
 
@@ -31,39 +33,37 @@ const TableSettings = (props) => {
     const {showHelp} = useHelp();
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const [tables, setTables] = useState([]);
+    const [datasource, setDatasource] = useState([]);
     const [availableRoles, setAvailableRoles] = useState([]);
     const [columnSettings, setColumnSettings] = useState({show: false});
 
     const setTableRoles = (indx, selections) => {
         if (selections) {
-            let t = [...tables]
-            if (!t[indx].roles) {
-                t[indx].roles = [];
+            let d = {...datasource};
+            if (!d.datasourceTables[indx].roles) {
+                d.datasourceTables[indx].roles = [];
             } else {
-                t[indx].roles.length = 0;
+                d.datasourceTables[indx].roles.length = 0;
             }
-            selections.map(s => t[indx].roles.push(s.value));
+            selections.map(s => d.datasourceTables[indx].roles.push(s.value));
             
-            setTables(t);
+            setDatasource(d);
         }
     };
 
     const getTableRoles = (indx) => {
         let retval = [];
 
-        if (tables[indx].roles) {
-            tables[indx].roles.map(r => retval.push({label: r, value: r}));
+        if (datasource.datasourceTables[indx].roles) {
+            datasource.datasourceTables[indx].roles.map(r => retval.push({label: r, value: r}));
         }
 
         return retval;    
     };
     
     const getDatasourceName = () => {
-        if (config && config.datasource) {
-            return config.datasource.datasourceName;
-        } else {
-            return "";
+        if (datasource) {
+            return datasource.datasourceName;
         }
     };
         
@@ -88,13 +88,13 @@ const TableSettings = (props) => {
     };
     
     const getDisplayName = (indx) => {
-        return tables[indx].displayName;
+        return datasource.datasourceTables[indx].displayName;
     };
 
     const setDisplayName = (e, indx) => {
-        let t = [...tables];
-        t[indx].displayName = e.target.value;
-        setTables(t);
+        let d = {...datasource};
+        d.datasourceTables[indx].displayName = e.target.value;
+        setDatasource(d);
     };
     
     const rolesValueRenderer = (selected) => {
@@ -106,13 +106,13 @@ const TableSettings = (props) => {
     };
     
     const isHidden = (indx) => {
-        return tables[indx].hide;
-    }
+        return datasource.datasourceTables[indx].hide;
+    };
     
     const setHidden = (e, indx) => {
-        let t = [...tables];
-        t[indx].hide = e.target.checked;
-        setTables(t);
+        let d = {...datasource};
+        d.datasourceTables[indx].hide = e.target.checked;
+        setDatasource(d);
     };
     
     const hideColumnSettings = () => {
@@ -120,20 +120,55 @@ const TableSettings = (props) => {
     };
 
     const saveColumnSettings = (table) => {
-        console.log("------>" + JSON.stringify(table));
+        let t = findInArray(datasource.datasourceTableSettings, "tableName", table.tableName);
+
+        if (t) {
+            t.tableColumnSettings = table.tableColumnSettings;
+        }
+        
         setColumnSettings({show: false});
     };
 
     const showColumnSettings = async (indx) => {
-        setColumnSettings({show: true, table: tables[indx], hideColumnSettings: hideColumnSettings, saveColumnSettings: saveColumnSettings});
+        showMessage(INFO, getText("Loading columns settings" , "..."), null, true);
+        let res = await loadColumnSettings(config.datasource, datasource.datasourceTables[indx].tableName);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            let t = {...datasource.datasourceTables[indx]};
+            let csMap = new Map();
+
+            t.tableColumnSettings.map(c => {
+                csMap.set(c.columnName, c);
+            });
+
+            let c = [];
+
+            res.result.map(tres => {
+                let curc = csMap.get(tres.columnName);
+                if (curc) {
+                    c.push(curc);
+                } else {
+                    c.push(tres);
+                }
+            });
+
+            hideMessage();
+            t.tableColumnSettings = c;
+            setColumnSettings({show: true, table: t, columns: res.result, hideColumnSettings: hideColumnSettings, saveColumnSettings: saveColumnSettings});
+            hideMessage();
+        }
     };
 
     const loadTableEntries = () => {
-        if (tables) {
-            return tables.map((t, indx) => {
-                return <div key={"tset" + indx} className="entrygrid-150-200 bord-b">
+        if (datasource && datasource.datasourceTables) {
+            return datasource.datasourceTables.map((t, indx) => {
+                return <div key={"tset" + indx} className="entrygrid-120-300 bord-b">
                     <div className="label">{getText("Table:")}</div><div className="display-field">{t.tableName}</div>
-                    <div className="label">{getText("Display Name:")}</div><div className="display-field"><input type="text" value={getDisplayName(indx)} onBlur={(e) => setDisplayName(e, indx)}/></div>
+                    <div className="label">{getText("Display Name:")}</div>
+                    <div className="display-field">
+                        <input type="text" size={35} defaultValue={getDisplayName(indx)} onBlur={(e) => setDisplayName(e, indx)}/>
+                    </div>
                     <div className="label">{getText("Roles:")}</div><div className="display-field">
                         <MultiSelect options={availableRoles}  
                             value={getTableRoles(indx)} 
@@ -141,7 +176,7 @@ const TableSettings = (props) => {
                             onChange={(selectedItems) => setTableRoles(indx, selectedItems)} 
                             valueRenderer={(selected, options) => rolesValueRenderer(selected)} />
                     </div>
-                    <div></div><div className="display-field"><input type="checkbox" checked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="label-l">{getText("Hide")}</span></div>
+                    <div></div><div className="display-field"><input type="checkbox" defaultChecked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="label-l">{getText("Hide")}</span></div>
                     <div></div><div className="display-field"><Button size="sm" onClick={(e) => showColumnSettings(indx)}>{getText("Column Settings")}</Button></div>;
                 </div>
             });       
@@ -152,7 +187,7 @@ const TableSettings = (props) => {
     
     const onShow = () => {
         setAvailableRoles(getAvailableRoles());
-        setTables(config.tables);
+        setDatasource(config.datasource);
     };
     
     return (
@@ -165,15 +200,15 @@ const TableSettings = (props) => {
                    backdrop={true} 
                    keyboard={true}>
                 <Modal.Header onHide={onHide}>
-                    <Modal.Title><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
+                    <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div style={{height: "425px", overflow: "auto"}}>{loadTableEntries()}</div>
+                    <div style={{height: "400px", overflow: "auto"}}>{loadTableEntries()}</div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableSettings(config.datasource, tables)}>{getText("Save")}</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableSettings(config.dataObject, datasource)}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>
         </div>

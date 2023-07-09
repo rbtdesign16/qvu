@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.t;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
@@ -605,8 +606,66 @@ public class MainServiceImpl implements MainService {
     }  
       
     @Override
-    public OperationResult<List <ColumnSettings>> getColumnSettings(TableSettings tableSettings) {
+    public OperationResult<List <ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName) {
         OperationResult<List <ColumnSettings>> retval = new OperationResult<>();
+        List <ColumnSettings> data = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+        
+        try {
+            conn = qvuds.getConnection(ds.getDatasourceName());
+            
+            if (conn == null) {
+                conn = DBHelper.getConnection(ds);
+            }
+            
+            TableSettings tset = null;
+            if (ds.getDatasourceTableSettings() != null) {
+                for (TableSettings t : ds.getDatasourceTableSettings()) {
+                    if (t.getTableName().equals(tableName)) {
+                        tset = t;
+                        break;
+                    }
+                }
+            }
+            
+            Map<String, ColumnSettings> cmap = new HashMap();
+            
+            if (tset != null) {
+                for (ColumnSettings cset : tset.getTableColumnSettings()) {
+                    cmap.put(cset.getColumnName(), cset);
+                }
+            }
+
+            DatabaseMetaData dmd = conn.getMetaData();
+            
+            res = dmd.getColumns(null, ds.getSchema(), tableName, "%");
+            
+            while (res.next()) {
+                String cname = res.getString(4);
+                
+                ColumnSettings curc = cmap.get(cname);
+                if (curc == null) {
+                    ColumnSettings cnew = new ColumnSettings();
+                    cnew.setTableName(tableName);
+                    cnew.setColumnName(cname);
+                    data.add(cnew);
+                } else {
+                    data.add(curc);
+                }
+            }
+            
+            Collections.sort(data);
+            retval.setResult(data);
+        }
+        
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+        
+        finally {
+            DBHelper.closeConnection(conn, null, res);
+        }
         
         return retval;
     }

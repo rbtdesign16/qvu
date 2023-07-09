@@ -17,6 +17,7 @@ public class TableSettings implements Comparable<TableSettings> {
     private String tableName;
     private boolean hide;
     private List<String> roles = new ArrayList<>();
+    private List <ColumnSettings> tableColumnSettings = new ArrayList<>();
 
     @Override
     public int compareTo(TableSettings o) {
@@ -61,6 +62,14 @@ public class TableSettings implements Comparable<TableSettings> {
 
     public void setHide(boolean hide) {
         this.hide = hide;
+    }
+
+    public List<ColumnSettings> getTableColumnSettings() {
+        return tableColumnSettings;
+    }
+
+    public void setTableColumnSettings(List<ColumnSettings> tableColumnSettings) {
+        this.tableColumnSettings = tableColumnSettings;
     }
     
     

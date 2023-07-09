@@ -144,9 +144,9 @@ public class MainController {
         return service.getTableSettings(datasource);
     }
 
-   @PostMapping("api/v1/db/datasource/columnsettings")
-    public OperationResult<List <ColumnSettings>> getColumnSettings(@RequestBody TableSettings tableSettings) {
+   @PostMapping("api/v1/db/datasource/{tableName}/columnsettings")
+    public OperationResult<List <ColumnSettings>> getColumnSettings(@RequestBody DataSourceConfiguration datasource, @PathVariable String tableName) {
         LOG.debug("in getColumnSettings()");
-        return service.getColumnSettings(tableSettings);
+        return service.getColumnSettings(datasource, tableName);
     }
 }

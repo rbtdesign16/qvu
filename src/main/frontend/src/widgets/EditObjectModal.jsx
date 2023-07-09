@@ -8,6 +8,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"
 import EntryPanel from "../widgets/EntryPanel"
 import useLang from "../context/LangContext";
+import {MODAL_TITLE_SIZE} from "../utils/helper";
 
 const EditObjectModal = (props) => {
     const {config} = props;
@@ -30,7 +31,7 @@ const EditObjectModal = (props) => {
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header>
-                        <Modal.Title>{config.title}</Modal.Title>
+                        <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div>{config.addComponents ? config.addComponents() : ""}<EntryPanel config={config}/><div className="modal-error-msg" id={config.idPrefix + "error-msg"}></div></div>

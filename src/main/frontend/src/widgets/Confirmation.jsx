@@ -2,11 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React from 'react';
-import PropTypes from 'prop-types';
-import Modal from 'react-bootstrap/Modal'
-import Button from 'react-bootstrap/Button'
-import { confirmable } from 'react-confirm';
+import React from "react";
+import PropTypes from "prop-types";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import { confirmable } from "react-confirm";
+import {MODAL_TITLE_SIZE} from "../utils/helper";
 
 const Confirmation = ({
   okLabel = 'OK',
@@ -25,7 +26,7 @@ const Confirmation = ({
         backdrop={enableEscape ? true : 'static'} 
         keyboard={enableEscape}>
         <Modal.Header>
-          <Modal.Title>{title}</Modal.Title>
+          <Modal.Title as={MODAL_TITLE_SIZE}>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {confirmation}

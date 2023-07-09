@@ -22,7 +22,8 @@ import {
         setFieldError,
         setErrorMessage,
         checkEntryFields,
-        updateJsonArray} from "../../utils/helper";
+        updateJsonArray,
+        findInArray} from "../../utils/helper";
 
 import {
         saveDatasource,
@@ -327,18 +328,21 @@ const Admin = () => {
                 
     };
     
-    const saveTableSettings = (dataObject, tables) => {
+    const saveTableSettings = (dataObject, datasource) => {
         let utables = [];
-        
-        tables.map(t => {
+
+        datasource.datasourceTables.map(t => {
             // only save rec with settings
-            if (t.displayName || t.hide || (t.toles && t.roles.length > 0)) {
+            if (t.displayName 
+                || t.hide 
+                || (t.toles && t.roles.length > 0) 
+                || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
                 utables.push(t);
             }
         });
-            
-         dataObject.datasourceTableSettings = utables;
-         hideTableSettings();
+
+        dataObject.datasourceTableSettings = utables;
+        hideTableSettings();
     };
     
     const hideTableSettings = () => {
@@ -370,8 +374,11 @@ const Admin = () => {
 
              hideMessage();
 
+            let ds = {...dataObject};
+            ds.datasourceTables = t;
             setTableSettings({show: true, 
-                datasource: dataObject,
+                dataObject: dataObject,
+                datasource: ds,
                 saveTableSettings: saveTableSettings,
                 hideTableSettings: hideTableSettings, tables: t});
         }  else {

@@ -11,24 +11,16 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class TableSettings implements Comparable<TableSettings> {
-    private String datasourceName;
-    private String displayName;
+public class ColumnSettings implements Comparable<ColumnSettings> {
     private String tableName;
+    private String displayName;
+    private String columnName;
     private boolean hide;
     private List<String> roles = new ArrayList<>();
 
     @Override
-    public int compareTo(TableSettings o) {
+    public int compareTo(ColumnSettings o) {
         return tableName.compareTo(o.getTableName());
-    }
-
-    public String getDatasourceName() {
-        return datasourceName;
-    }
-
-    public void setDatasourceName(String datasourceName) {
-        this.datasourceName = datasourceName;
     }
 
     public String getTableName() {
@@ -61,6 +53,14 @@ public class TableSettings implements Comparable<TableSettings> {
 
     public void setHide(boolean hide) {
         this.hide = hide;
+    }
+
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
     
     

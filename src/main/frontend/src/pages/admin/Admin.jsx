@@ -331,7 +331,8 @@ const Admin = () => {
         let utables = [];
         
         tables.map(t => {
-            if (t.displayName || (t.toles && t.roles.length > 0)) {
+            // only save rec with settings
+            if (t.displayName || t.hide || (t.toles && t.roles.length > 0)) {
                 utables.push(t);
             }
         });

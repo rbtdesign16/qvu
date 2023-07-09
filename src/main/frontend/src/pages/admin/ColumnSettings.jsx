@@ -10,7 +10,6 @@ import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import ColumnSettings from "./ColumnSettings";
 import { MultiSelect } from "react-multi-select-component";
 import { MdHelpOutline } from 'react-icons/md';
 import PropTypes from "prop-types";
@@ -24,20 +23,19 @@ import {
     isApiSuccess,
     isApiError} from "../../utils/apiHelper";
 
-const TableSettings = (props) => {
+const ColumnSettings = (props) => {
     const {config} = props;
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const [tables, setTables] = useState([]);
+    const [columns, setColumns] = useState([]);
     const [availableRoles, setAvailableRoles] = useState([]);
-    const [columnSettings, setColumnSettings] = useState({show: false});
-
-    const setTableRoles = (indx, selections) => {
+    
+   const setColumnRoles = (indx, selections) => {
         if (selections) {
-            let t = [...tables]
+            let t = [...columns]
             if (!t[indx].roles) {
                 t[indx].roles = [];
             } else {
@@ -49,26 +47,26 @@ const TableSettings = (props) => {
         }
     };
 
-    const getTableRoles = (indx) => {
+    const getColumnRoles = (indx) => {
         let retval = [];
 
-        if (tables[indx].roles) {
-            tables[indx].roles.map(r => retval.push({label: r, value: r}));
+        if (columns[indx].roles) {
+            columns[indx].roles.map(r => retval.push({label: r, value: r}));
         }
 
         return retval;    
     };
     
-    const getDatasourceName = () => {
-        if (config && config.datasource) {
-            return config.datasource.datasourceName;
+    const getTableName = () => {
+        if (config && config.table) {
+            return config.table.tableName;
         } else {
             return "";
         }
     };
         
     const onHelp = () => {
-        showHelp(getText("tableSettings-help"));
+        showHelp(getText("columnSettings-help"));
     };
     
     const getAvailableRoles = () => {
@@ -82,19 +80,19 @@ const TableSettings = (props) => {
     };
     
     const onHide = () => {
-        if (config && config.hideTableSettings) {
-            config.hideTableSettings();
+        if (config && config.hideColumnSettings) {
+            config.hideColumnSettings();
         }
     };
     
     const getDisplayName = (indx) => {
-        return tables[indx].displayName;
+        return columns[indx].displayName;
     };
 
     const setDisplayName = (e, indx) => {
-        let t = [...tables];
-        t[indx].displayName = e.target.value;
-        setTables(t);
+        let c = [...columns];
+        c[indx].displayName = e.target.value;
+        setColumns(c);
     };
     
     const rolesValueRenderer = (selected) => {
@@ -106,43 +104,29 @@ const TableSettings = (props) => {
     };
     
     const isHidden = (indx) => {
-        return tables[indx].hide;
+        return columns[indx].hide;
     }
     
     const setHidden = (e, indx) => {
-        let t = [...tables];
-        t[indx].hide = e.target.checked;
-        setTables(t);
-    };
-    
-    const hideColumnSettings = () => {
-        setColumnSettings({show: false});
+        let c = [...columns];
+        c[indx].hide = e.target.checked;
+        setColumns(c);
     };
 
-    const saveColumnSettings = (table) => {
-        console.log("------>" + JSON.stringify(table));
-        setColumnSettings({show: false});
-    };
-
-    const showColumnSettings = async (indx) => {
-        setColumnSettings({show: true, table: tables[indx], hideColumnSettings: hideColumnSettings, saveColumnSettings: saveColumnSettings});
-    };
-
-    const loadTableEntries = () => {
-        if (tables) {
-            return tables.map((t, indx) => {
-                return <div key={"tset" + indx} className="entrygrid-150-200 bord-b">
-                    <div className="label">{getText("Table:")}</div><div className="display-field">{t.tableName}</div>
+    const loadColumnEntries = () => {
+        if (columns) {
+            return columns.map((c, indx) => {
+                return <div key={"cset" + indx} className="entrygrid-150-200 bord-b">
+                    <div className="label">{getText("Column:")}</div><div className="display-field">{c.columnName}</div>
                     <div className="label">{getText("Display Name:")}</div><div className="display-field"><input type="text" value={getDisplayName(indx)} onBlur={(e) => setDisplayName(e, indx)}/></div>
                     <div className="label">{getText("Roles:")}</div><div className="display-field">
                         <MultiSelect options={availableRoles}  
                             value={getTableRoles(indx)} 
                             hasSelectAll={false} 
-                            onChange={(selectedItems) => setTableRoles(indx, selectedItems)} 
+                            onChange={(selectedItems) => setColumnRoles(indx, selectedItems)} 
                             valueRenderer={(selected, options) => rolesValueRenderer(selected)} />
                     </div>
                     <div></div><div className="display-field"><input type="checkbox" checked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="label-l">{getText("Hide")}</span></div>
-                    <div></div><div className="display-field"><Button size="sm" onClick={(e) => showColumnSettings(indx)}>{getText("Column Settings")}</Button></div>;
                 </div>
             });       
         } else {
@@ -152,37 +136,36 @@ const TableSettings = (props) => {
     
     const onShow = () => {
         setAvailableRoles(getAvailableRoles());
-        setTables(config.tables);
+        setColumns(config.columns);
     };
     
     return (
         <div className="static-modal">
-            <ColumnSettings config={columnSettings}/>
             <Modal animation={false} 
-                   dialogClassName="table-settings"
+                   dialogClassName="column-settings"
                    show={config.show} 
                    onShow={onShow}
                    backdrop={true} 
                    keyboard={true}>
                 <Modal.Header onHide={onHide}>
                     <Modal.Title><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
-                    &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>
+                    &nbsp;&nbsp;{getText("Column Settings", " - ") + getTableName() }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div style={{height: "425px", overflow: "auto"}}>{loadTableEntries()}</div>
+                    <div style={{height: "425px", overflow: "auto"}}>{loadColumnEntries()}</div>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableSettings(config.datasource, tables)}>{getText("Save")}</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={() => config.saveTableSettings(config.datasource, columns)}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>
         </div>
         );
 };
  
- TableSettings.propTypes = {
+ ColumnSettings.propTypes = {
     config: PropTypes.object.isRequired
 };
 
  
- export default TableSettings;
+ export default ColumnSettings;

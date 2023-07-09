@@ -15,6 +15,7 @@ import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
+import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
@@ -141,5 +142,11 @@ public class MainController {
     public OperationResult<List <TableSettings>> getTableSettings(@RequestBody DataSourceConfiguration datasource) {
         LOG.debug("in getTableSettings()");
         return service.getTableSettings(datasource);
+    }
+
+   @PostMapping("api/v1/db/datasource/columnsettings")
+    public OperationResult<List <ColumnSettings>> getColumnSettings(@RequestBody TableSettings tableSettings) {
+        LOG.debug("in getColumnSettings()");
+        return service.getColumnSettings(tableSettings);
     }
 }

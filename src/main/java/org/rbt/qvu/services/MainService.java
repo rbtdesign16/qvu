@@ -7,9 +7,11 @@ import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
+import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
+import org.springframework.web.bind.annotation.RequestBody;
 
 public interface MainService {
     public AuthData loadAuthData() throws Exception;
@@ -32,7 +34,5 @@ public interface MainService {
     
     public OperationResult<List<Table>> getDatasourceTables(String datasourceName);
     public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds);
-    
-    
-   
+    public OperationResult<List <ColumnSettings>> getColumnSettings(TableSettings tableSettings);
 }

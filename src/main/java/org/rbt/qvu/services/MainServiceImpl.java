@@ -46,6 +46,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
+import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
@@ -602,5 +603,12 @@ public class MainServiceImpl implements MainService {
         
         return retval;
     }  
+      
+    @Override
+    public OperationResult<List <ColumnSettings>> getColumnSettings(TableSettings tableSettings) {
+        OperationResult<List <ColumnSettings>> retval = new OperationResult<>();
         
+        return retval;
+    }
+
 }

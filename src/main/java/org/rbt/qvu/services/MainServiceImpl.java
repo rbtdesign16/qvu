@@ -421,6 +421,28 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    @Override
+    public OperationResult<List<Table>> getDatasourceTreeViewData(String datasourceName) {
+        User user = getCurrentUser();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("user: " + user.getName());
+            for (String s : user.getRoles()) {
+                LOG.debug("\trole: " + s);
+            }
+        }
+            
+
+        OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
+        
+        if (res.isSuccess()) {
+            List<Table> tables = res.getResult();
+        } else {
+        }
+        
+        
+        return null;
+    }
 
     @Override
     public OperationResult<List<Table>> getDatasourceTables(String datasourceName) {
@@ -429,14 +451,6 @@ public class MainServiceImpl implements MainService {
         Connection conn = null;
         ResultSet res = null;
         try {
-            Set<String> userRoles = getCurrentUserRoles();
-            
-            if (LOG.isDebugEnabled()) {
-                for (String s : userRoles) {
-                    LOG.debug("user role: " + s);
-                }
-            }
-            
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
@@ -644,17 +658,15 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private Set<String> getCurrentUserRoles() {
-        Set<String> retval = new HashSet<>();
+    private User getCurrentUser() {
+        User retval = null;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null) {
             Object o = auth.getPrincipal();
 
-            if (o != null) {
-                User u = (User)o;
-                retval.addAll(u.getRoles());
-                
+            if ((o != null) && (o instanceof User)) {
+                retval = (User)o;
             }
         }
 

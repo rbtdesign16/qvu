@@ -17,7 +17,7 @@ import { hasRoleAccess } from "../../utils/authHelper";
 
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
-import { getDatasourceTables, isApiError } from "../../utils/apiHelper"
+import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
 const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
@@ -42,7 +42,7 @@ const QueryDesign = () => {
 
     const onDatasourceChange = async (e) => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
-        let res = await getDatasourceTables(e.target.options[e.target.selectedIndex].value);
+        let res = await getDatasourceTreeViewData(e.target.options[e.target.selectedIndex].value);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {    

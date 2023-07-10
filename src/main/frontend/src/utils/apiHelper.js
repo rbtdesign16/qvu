@@ -227,6 +227,18 @@ export const getDatasourceTables = async (dsname) => {
     }
 };
 
+export const getDatasourceTreeViewData = async (dsname) => {
+    try {
+        let res = await axios.get(getApiURL() + "/db/datasource/" + dsname + "/treeview", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 export const loadTableSettings = async (datasource) => {
     try {
         let res = await axios.post(getApiURL() + "/db/datasource/tablesettings", datasource, hconfig);

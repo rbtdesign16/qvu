@@ -132,6 +132,12 @@ public class MainController {
         return service.getDatasourceTables(datasourceName);
     }
     
+    @GetMapping("api/v1/db/datasource/{datasourceName}/treeview")
+    public OperationResult<List<Table>> getDatasourceTreeViewData(@PathVariable String datasourceName) {
+        LOG.debug("in getDatasourceTables(" + datasourceName + ")");
+        return service.getDatasourceTreeViewData(datasourceName);
+    }
+
     @GetMapping("api/v1/db/types/load")
     public String[] getDatabaseTypes() {
         LOG.debug("in getDatabaseTypes()");

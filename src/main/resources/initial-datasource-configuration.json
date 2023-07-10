@@ -1,3 +1,5 @@
 {
-  "datasources": []
+    "maxImportedKeyDepth": 2,
+    "maxExportedKeyDepth": 4,
+    "datasources": []
 }

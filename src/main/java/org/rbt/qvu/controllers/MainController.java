@@ -17,6 +17,7 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
@@ -133,7 +134,7 @@ public class MainController {
     }
     
     @GetMapping("api/v1/db/datasource/{datasourceName}/treeview")
-    public OperationResult<List<Table>> getDatasourceTreeViewData(@PathVariable String datasourceName) {
+    public OperationResult<QuerySelectNode> getDatasourceTreeViewData(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTables(" + datasourceName + ")");
         return service.getDatasourceTreeViewData(datasourceName);
     }

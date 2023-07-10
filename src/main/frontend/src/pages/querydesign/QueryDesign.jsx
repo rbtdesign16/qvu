@@ -8,6 +8,8 @@ import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
+import { flattenTree } from "react-accessible-treeview";
+
 import {
     INFO, 
     WARN, 
@@ -24,6 +26,7 @@ const QueryDesign = () => {
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
+    const [treeData, setTreeData] = useState(null);
 
     const loadDatasourceOptions = () => {
         if (datasources) {
@@ -43,12 +46,12 @@ const QueryDesign = () => {
     const onDatasourceChange = async (e) => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
         let res = await getDatasourceTreeViewData(e.target.options[e.target.selectedIndex].value);
-        console.log(JSON.stringify(res.result));
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {    
+             let tdata = flattenTree(res.result);
+            setTreeData(tdata);
             hideMessage();
-            
         }
         return "";
     };
@@ -62,7 +65,7 @@ const QueryDesign = () => {
                             <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
                             {loadDatasourceOptions()}
                         </select>
-                        <DataSelectTree/>
+                        <DataSelectTree data={treeData}/>
                     </div>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="flex align-items-center justify-content-center">

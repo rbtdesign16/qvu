@@ -2,7 +2,7 @@
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
 Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
 */
-.directory {
+.query-select-tree {
   background: #242322;
   font-family: monospace;
   font-size: 16px;
@@ -12,41 +12,41 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
   border-radius: 0.4em;
 }
 
-.directory .tree,
-.directory .tree-node,
-.directory .tree-node-group {
+.query-select-tree .tree,
+.query-select-tree .tree-node,
+.query-select-tree .tree-node-group {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.directory .tree-branch-wrapper,
-.directory .tree-node__leaf {
+.query-select-tree .tree-branch-wrapper,
+.query-select-tree .tree-node__leaf {
   outline: none;
   outline: none;
 }
 
-.directory .tree-node {
+.query-select-tree .tree-node {
   cursor: pointer;
 }
 
-.directory .tree-node:hover {
+.query-select-tree .tree-node:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.directory .tree .tree-node--focused {
+.query-select-tree .tree .tree-node--focused {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.directory .tree .tree-node--selected {
+.query-select-tree .tree .tree-node--selected {
   background: rgba(48, 107, 176);
 }
 
-.directory .tree-node__branch {
+.query-select-tree .tree-node__branch {
   display: block;
 }
 
-.directory .icon {
+.query-select-tree .icon {
   vertical-align: middle;
   padding-right: 5px;
 }

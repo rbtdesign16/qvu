@@ -14,6 +14,9 @@ import java.util.Map;
  * @author rbtuc
  */
 public class DataSourcesConfiguration {
+    private int maxImportedKeyDepth = 2;
+    private int maxExportedKeyDepth = 4;
+    
     private static final Map<String, DataSourceConfiguration> DSMAP = new HashMap<>();
 
     private List<DataSourceConfiguration> datasources = new ArrayList<>();
@@ -42,4 +45,22 @@ public class DataSourcesConfiguration {
             DSMAP.put(ds.getDatasourceName(), ds);
         }
     }
+
+    public int getMaxImportedKeyDepth() {
+        return maxImportedKeyDepth;
+    }
+
+    public void setMaxImportedKeyDepth(int maxImportedKeyDepth) {
+        this.maxImportedKeyDepth = maxImportedKeyDepth;
+    }
+
+    public int getMaxExportedKeyDepth() {
+        return maxExportedKeyDepth;
+    }
+
+    public void setMaxExportedKeyDepth(int maxExportedKeyDepth) {
+        this.maxExportedKeyDepth = maxExportedKeyDepth;
+    }
+    
+    
 }

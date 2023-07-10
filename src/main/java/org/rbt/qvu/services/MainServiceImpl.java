@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
@@ -48,7 +50,7 @@ import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
-import org.rbt.qvu.dto.QuerySelectTreeData;
+import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.CacheHelper;
@@ -56,6 +58,7 @@ import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.DatasourceSettingsHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
+import org.rbt.qvu.util.QuerySelectTreeBuilder;
 import org.rbt.qvu.util.RoleComparator;
 
 @Service
@@ -422,7 +425,23 @@ public class MainServiceImpl implements MainService {
     }
     
     @Override
-    public OperationResult<List<Table>> getDatasourceTreeViewData(String datasourceName) {
+    public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName) {
+        OperationResult<QuerySelectNode> retval = new OperationResult<>();
+        OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
+        
+        if (res.isSuccess()) {
+            retval = buildQuerySelectTreeView(datasourceName, res.getResult());
+        } else {
+            retval.setErrorCode(res.getErrorCode());
+            retval.setMessage(res.getMessage());
+        }
+        
+        return retval;
+    }
+    
+    private OperationResult<QuerySelectNode> buildQuerySelectTreeView( String datasourceName, List<Table> tableInfo) {
+        OperationResult<QuerySelectNode> retval = new OperationResult();
+        
         User user = getCurrentUser();
         if (LOG.isDebugEnabled()) {
             LOG.debug("user: " + user.getName());
@@ -430,22 +449,18 @@ public class MainServiceImpl implements MainService {
                 LOG.debug("\trole: " + s);
             }
         }
-            
+       
+        Set<String> userRoles = new HashSet<>(user.getRoles());
 
-        OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
+
+        QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper, 
+                datasourceName, 
+                userRoles,
+                config.getDatasourcesConfig().getMaxImportedKeyDepth(), 
+                config.getDatasourcesConfig().getMaxExportedKeyDepth(),
+                tableInfo);
         
-        if (res.isSuccess()) {
-            return buildQuerySelectTreeView(datasourceSettingsHelper, datasourceName, res.getResult());
-        } else {
-            return res;
-        }
-    }
-    
-    private OperationResult buildQuerySelectTreeView(DatasourceSettingsHelper dsHelper, String datasourceName, List<Table> tableInfo) {
-        OperationResult<QuerySelectTreeData> retval = new OperationResult();
-        QuerySelectTreeData data = new QuerySelectTreeData(dsHelper, datasourceName, tableInfo);
-        
-        retval.setResult(data);
+        retval.setResult(node);
         return retval;
     }
 

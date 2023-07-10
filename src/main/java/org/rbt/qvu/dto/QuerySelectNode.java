@@ -17,12 +17,15 @@ public class QuerySelectNode {
     public static final String NODE_TYPE_ROOT = "t";
     public static final String NODE_TYPE_TABLE = "t";
     public static final String NODE_TYPE_COLUMN = "c";
-    public static final String NODE_TYPE_FOREIGNKEY= "f";
+    public static final String NODE_TYPE_IMPORTED_FOREIGNKEY= "ifk";
+    public static final String NODE_TYPE_EXPORTED_FOREIGNKEY= "efk";
     
-    private String name;
+    private String name = "";
     private String dbName;
-    private String type;
+    private String type = QuerySelectNode.NODE_TYPE_ROOT;
     private boolean selected;
+   // private Integer id;
+  //  private Integer parent;
     private Map<String, Object> additionalInfo;
     private List<QuerySelectNode> children;
 
@@ -80,7 +83,23 @@ public class QuerySelectNode {
     public void setAdditionalInfo(Map<String, Object> additionalInfo) {
         this.additionalInfo = additionalInfo;
     }
-    
- 
-    
+
+    /*
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getParent() {
+        return parent;
+    }
+
+    public void setParent(Integer parent) {
+        this.parent = parent;
+    }
+*/
+   
 }

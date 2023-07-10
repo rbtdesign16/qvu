@@ -1,92 +1,54 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
- */
-import React, { useState } from "react";
-import { DiCss3, DiJavascript, DiNpm } from "react-icons/di";
-import { FaList, FaRegFolder, FaRegFolderOpen } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
 import TreeView, { flattenTree } from "react-accessible-treeview";
+import PropTypes from "prop-types";
+import {
+NODE_TYPE_ROOT,
+        NODE_TYPE_TABLE,
+        NODE_TYPE_COLUMN,
+        NODE_TYPE_IMPORTED_FOREIGNKEY,
+        NODE_TYPE_EXPORTED_FOREIGNKEY } from "../../utils/helper";
 
-const folder = {
-    name: "",
-    children: [
-        {
-            name: "src",
-            children: [{name: "index.js"}, {name: "styles.css"}],
-        },
-        {
-            name: "node_modules",
-            children: [
-                {
-                    name: "react-accessible-treeview",
-                    children: [{name: "index.js"}],
-                },
-                {name: "react", children: [{name: "index.js"}]},
-            ],
-        },
-        {
-            name: ".npmignore",
-        },
-        {
-            name: "package.json",
-        },
-        {
-            name: "webpack.config.js",
-        },
-    ],
+const DataSelectTree = (props) => {
+    const {data} = props;
+    const getIcon = (nodeType) => {
+        switch (nodeType) {
+            case NODE_TYPE_ROOT:
+                return "";
+            case NODE_TYPE_TABLE:
+                return "";
+            case NODE_TYPE_COLUMN:
+                return "";
+            case NODE_TYPE_IMPORTED_FOREIGNKEY:
+                return "";
+            case NODE_TYPE_EXPORTED_FOREIGNKEY:
+                return "";
+        }
+    };
+
+    const nodeRenderer = (p) => {
+        const {element, isExpanded, level, getNodeProps} = p;
+        return (<div {...getNodeProps()} style={{paddingLeft: 20 * (level - 1)}}>
+            {getIcon(element.nodeType)}{element.name}
+        </div>);
+
+    };
+
+    if (data) {
+        return (<div className="datasel-tree-cont">
+
+            <TreeView
+                data={data}
+                aria-label="query-select-tree"
+                nodeRenderer={nodeRenderer}
+                /></div>
+                );
+    } else {
+        return <div className="datasel-tree-cont"></div>;
+    }
 };
 
-const data = flattenTree(folder);
-
-const FolderIcon = ({ isOpen }) =>
-    isOpen ? (
-            <FaRegFolderOpen color="e8a87c" className="icon" />
-            ) : (
-            <FaRegFolder color="e8a87c" className="icon" />
-            );
-
-const FileIcon = ({ filename }) => {
-    const extension = filename.slice(filename.lastIndexOf(".") + 1);
-    switch (extension) {
-        case "js":
-            return <DiJavascript color="yellow" className="icon" />;
-        case "css":
-            return <DiCss3 color="turquoise" className="icon" />;
-        case "json":
-            return <FaList color="yellow" className="icon" />;
-        case "npmignore":
-            return <DiNpm color="red" className="icon" />;
-        default:
-            return null;
-}
-};
-
-export const  DataSelectTree = () => {
-
-    return (
-            <div className="datasel-tree-cont">
-                <TreeView
-                    data={data}
-                    aria-label="directory tree"
-                    nodeRenderer={({
-                                element,
-                                        isBranch,
-                                        isExpanded,
-                                        getNodeProps,
-                                        level,
-                                }) => (
-                                <div {...getNodeProps()} style={{paddingLeft: 20 * (level - 1)}}>
-                                {isBranch ? (
-                                                        <FolderIcon isOpen={isExpanded} />
-                                                    ) : (
-                                                        <FileIcon filename={element.name} />
-                                                    )}
-                        
-                                {element.name}
-                        </div>
-                            )}
-            />            </div>
-            );
+DataSelectTree.propTypes = {
+    data: PropTypes.object
 };
 
 export default DataSelectTree;

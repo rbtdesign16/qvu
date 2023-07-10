@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
@@ -428,6 +429,14 @@ public class MainServiceImpl implements MainService {
         Connection conn = null;
         ResultSet res = null;
         try {
+            Set<String> userRoles = getCurrentUserRoles();
+            
+            if (LOG.isDebugEnabled()) {
+                for (String s : userRoles) {
+                    LOG.debug("user role: " + s);
+                }
+            }
+            
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
@@ -636,17 +645,20 @@ public class MainServiceImpl implements MainService {
     }
 
     private Set<String> getCurrentUserRoles() {
+        Set<String> retval = new HashSet<>();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null) {
             Object o = auth.getPrincipal();
 
             if (o != null) {
-                LOG.error("------>" + o.getClass().getName());
+                User u = (User)o;
+                retval.addAll(u.getRoles());
+                
             }
         }
 
-        return null;
+        return retval;
     }
 
     @Override

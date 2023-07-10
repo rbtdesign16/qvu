@@ -9,11 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
@@ -50,6 +48,7 @@ import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QuerySelectTreeData;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.CacheHelper;
@@ -436,12 +435,18 @@ public class MainServiceImpl implements MainService {
         OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
         
         if (res.isSuccess()) {
-            List<Table> tables = res.getResult();
+            return buildQuerySelectTreeView(datasourceSettingsHelper, datasourceName, res.getResult());
         } else {
+            return res;
         }
+    }
+    
+    private OperationResult buildQuerySelectTreeView(DatasourceSettingsHelper dsHelper, String datasourceName, List<Table> tableInfo) {
+        OperationResult<QuerySelectTreeData> retval = new OperationResult();
+        QuerySelectTreeData data = new QuerySelectTreeData(dsHelper, datasourceName, tableInfo);
         
-        
-        return null;
+        retval.setResult(data);
+        return retval;
     }
 
     @Override

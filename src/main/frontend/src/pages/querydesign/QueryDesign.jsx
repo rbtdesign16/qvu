@@ -43,18 +43,20 @@ const QueryDesign = () => {
     const onDatasourceChange = async (e) => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
         let res = await getDatasourceTreeViewData(e.target.options[e.target.selectedIndex].value);
+        console.log(JSON.stringify(res.result));
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {    
             hideMessage();
             
         }
+        return "";
     };
     
     return (
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel size={25} className="flex align-items-center justify-content-center">
-                    <div>
+                    <div style={{padding: "5px"}}>
                     <label>{getText("Datasource")}</label>
                         <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                             <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           

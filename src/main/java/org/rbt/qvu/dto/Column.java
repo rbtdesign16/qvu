@@ -13,7 +13,6 @@ public class Column {
     private String schema;
     private String table;
     private String name;
-    private String displayName;
     private int dataType;
     private String typeName;
     private int columnSize;
@@ -111,14 +110,6 @@ public class Column {
         this.indexed = indexed;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-    
      public String getDatasource() {
         return datasource;
     }

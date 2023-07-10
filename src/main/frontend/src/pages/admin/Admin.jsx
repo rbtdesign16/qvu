@@ -351,7 +351,6 @@ const Admin = () => {
 
     const showTableSettings = async (dataObject) => {
         showMessage(INFO, getText("Loading table settings", "..."), null, true);
-        let r = await getDatasourceTables(dataObject.datasourceName);
         let res = await loadTableSettings(dataObject);
        
         if (isApiSuccess(res)) {

@@ -17,7 +17,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.t;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
@@ -48,10 +47,13 @@ import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
+import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableSettings;
+import org.rbt.qvu.util.CacheHelper;
 import org.rbt.qvu.util.DBHelper;
+import org.rbt.qvu.util.DatasourceSettingsHelper;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.RoleComparator;
@@ -72,9 +74,14 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private ConfigFileHandler configFileHandler;
 
+    private DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
+
+    private CacheHelper cacheHelper = new CacheHelper();
+
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
+        datasourceSettingsHelper.load(config.getDatasourcesConfig());
     }
 
     @Override
@@ -100,7 +107,6 @@ public class MainServiceImpl implements MainService {
 
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
-            
             // users and roles are defined via json
             if (scfg.isFileBasedSecurity()) {
                 retval.getAllRoles().addAll(scfg.getBasicConfiguration().getRoles());
@@ -111,7 +117,7 @@ public class MainServiceImpl implements MainService {
             }
 
             Collections.sort(retval.getAllRoles(), new RoleComparator());
-            
+
             // if we have users loaded try to find user based
             // on incoming user id
             if (StringUtils.isNotEmpty(userId)) {
@@ -137,14 +143,14 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
-            
+
             String alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_ADMINISTRATOR_ROLE);
             if (StringUtils.isNotEmpty(alias)) {
                 retval.setAdministratorRole(alias);
             } else {
                 retval.setAdministratorRole(Constants.DEFAULT_ADMINISTRATOR_ROLE);
             }
-            
+
             alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
             if (StringUtils.isNotEmpty(alias)) {
                 retval.setQueryDesignerRole(alias);
@@ -231,7 +237,12 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
-        return configFileHandler.saveDatasource(datasource);
+        OperationResult retval = configFileHandler.saveDatasource(datasource);
+        if (retval.isSuccess()) {
+            datasourceSettingsHelper.load(config.getDatasourcesConfig());
+        }
+
+        return retval;
     }
 
     @Override
@@ -426,17 +437,30 @@ public class MainServiceImpl implements MainService {
                 res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
 
                 while (res.next()) {
-                    Table t = new Table();
-                    t.setDatasource(datasourceName);
-                    t.setSchema(res.getString(2));
-                    t.setName(res.getString(3));
-                    t.setType(res.getString(4));
-                    t.setColumns(getTableColumns(dmd, t));
-                    setIndexColumns(dmd, t);
-                    setPrimaryKeys(dmd, t);
+                    String schema = res.getString(2);
+                    String tname = res.getString(3);
+                    String key = ds.getDatasourceName() + "." + tname;
+
+                    Table t = cacheHelper.getTableCache().get(key);
+
+                    if (t == null) {
+                        t = new Table();
+                        t.setSchema(schema);
+                        t.setName(tname);
+                        t.setDatasource(datasourceName);
+                        t.setType(res.getString(4));
+                        t.setColumns(getTableColumns(datasourceName, dmd, t));
+                        t.setColumns(getTableColumns(datasourceName, dmd, t));
+                        t.setImportedKeys(getImportedKeys(datasourceName, dmd, t));
+                        t.setExportedKeys(getExportedKeys(datasourceName, dmd, t));
+                        setIndexColumns(dmd, t);
+                        setPrimaryKeys(dmd, t);
+                        cacheHelper.getTableCache().put(key, t);
+                    }
+
                     data.add(t);
                 }
-                
+
                 retval.setResult(data);
             } else {
                 throw new Exception("Datasource " + datasourceName + " not found");
@@ -507,7 +531,81 @@ public class MainServiceImpl implements MainService {
         }
     }
 
-    private List<Column> getTableColumns(DatabaseMetaData dmd, Table t) throws Exception {
+    private List<ForeignKey> getImportedKeys(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
+        List<ForeignKey> retval = new ArrayList<>();
+        ResultSet res = null;
+
+        try {
+            res = dmd.getImportedKeys(null, t.getSchema(), t.getName());
+
+            Map <String, ForeignKey> fkMap = new HashMap<>();
+            while (res.next()) {
+                String toTable = res.getString(3);
+                String toColumn = res.getString(4);
+                String fromColumn = res.getString(8);
+                String fkName = res.getString(12);
+                ForeignKey fk = fkMap.get(fkName);
+                
+                if (fk == null) {
+                    fk = new ForeignKey();
+                    fk.setDatasourceName(datasourceName);
+                    fk.setToTableName(toTable);
+                    fk.setName(fkName);
+                    fk.setTableName(t.getName());
+                    retval.add(fk);
+                    fkMap.put(fkName, fk);
+                }
+                
+                fk.getColumns().add(fromColumn);
+                fk.getToColumns().add(toColumn);
+             }
+        }
+        
+        finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+        
+        return retval;
+    }
+
+        private List<ForeignKey> getExportedKeys(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
+        List<ForeignKey> retval = new ArrayList<>();
+        ResultSet res = null;
+
+        try {
+            res = dmd.getExportedKeys(null, t.getSchema(), t.getName());
+
+            Map <String, ForeignKey> fkMap = new HashMap<>();
+            while (res.next()) {
+                String toColumn = res.getString(8);
+                String toTable = res.getString(7);
+                String fromColumn = res.getString(4);
+                String fkName = res.getString(12);
+                ForeignKey fk = fkMap.get(fkName);
+                
+                if (fk == null) {
+                    fk = new ForeignKey();
+                    fk.setDatasourceName(datasourceName);
+                    fk.setToTableName(toTable);
+                    fk.setName(fkName);
+                    fk.setTableName(t.getName());
+                    retval.add(fk);
+                    fkMap.put(fkName, fk);
+                }
+                
+                fk.getColumns().add(fromColumn);
+                fk.getToColumns().add(toColumn);
+             }
+        }
+        
+        finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+        
+        return retval;
+    }
+
+    private List<Column> getTableColumns(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
         List<Column> retval = new ArrayList<>();
         ResultSet res = null;
 
@@ -517,6 +615,7 @@ public class MainServiceImpl implements MainService {
             while (res.next()) {
                 Column c = new Column();
                 c.setSchema(res.getString(2));
+                c.setDatasource(datasourceName);
                 c.setTable(t.getName());
                 c.setName(res.getString(4));
                 c.setDataType(res.getInt(5));
@@ -535,51 +634,52 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private Set<String> getCurrentUserRoles() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (auth != null) {
             Object o = auth.getPrincipal();
-            
+
             if (o != null) {
                 LOG.error("------>" + o.getClass().getName());
             }
         }
-        
+
         return null;
     }
 
     @Override
-    public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds) {
-        OperationResult<List <TableSettings>> retval = new OperationResult();
-        List <TableSettings> data = new ArrayList<>();
+    public OperationResult<List<TableSettings>> getTableSettings(DataSourceConfiguration ds) {
+        OperationResult<List<TableSettings>> retval = new OperationResult();
+        List<TableSettings> data = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
-        
+
         try {
             conn = qvuds.getConnection(ds.getDatasourceName());
-            
+
             if (conn == null) {
                 conn = DBHelper.getConnection(ds);
             }
-            
+
             Map<String, TableSettings> tamap = new HashMap();
-            
+
             if (ds.getDatasourceTableSettings() != null) {
                 for (TableSettings ta : ds.getDatasourceTableSettings()) {
                     tamap.put(ta.getTableName(), ta);
                 }
             }
-            
+
             DatabaseMetaData dmd = conn.getMetaData();
-            
+
             res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-            
+
             while (res.next()) {
                 String tname = res.getString(3);
-                
+
                 TableSettings curta = tamap.get(tname);
+
                 if (curta == null) {
                     TableSettings tanew = new TableSettings();
                     tanew.setDatasourceName(ds.getDatasourceName());
@@ -589,36 +689,32 @@ public class MainServiceImpl implements MainService {
                     data.add(curta);
                 }
             }
-            
+
             Collections.sort(data);
             retval.setResult(data);
-        }
-        
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-        }
-        
-        finally {
+        } finally {
             DBHelper.closeConnection(conn, null, res);
         }
-        
+
         return retval;
-    }  
-      
+    }
+
     @Override
-    public OperationResult<List <ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName) {
-        OperationResult<List <ColumnSettings>> retval = new OperationResult<>();
-        List <ColumnSettings> data = new ArrayList<>();
+    public OperationResult<List<ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName) {
+        OperationResult<List<ColumnSettings>> retval = new OperationResult<>();
+        List<ColumnSettings> data = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
-        
+
         try {
             conn = qvuds.getConnection(ds.getDatasourceName());
-            
+
             if (conn == null) {
                 conn = DBHelper.getConnection(ds);
             }
-            
+
             TableSettings tset = null;
             if (ds.getDatasourceTableSettings() != null) {
                 for (TableSettings t : ds.getDatasourceTableSettings()) {
@@ -628,9 +724,9 @@ public class MainServiceImpl implements MainService {
                     }
                 }
             }
-            
+
             Map<String, ColumnSettings> cmap = new HashMap();
-            
+
             if (tset != null) {
                 for (ColumnSettings cset : tset.getTableColumnSettings()) {
                     cmap.put(cset.getColumnName(), cset);
@@ -638,15 +734,16 @@ public class MainServiceImpl implements MainService {
             }
 
             DatabaseMetaData dmd = conn.getMetaData();
-            
+
             res = dmd.getColumns(null, ds.getSchema(), tableName, "%");
-            
+
             while (res.next()) {
                 String cname = res.getString(4);
-                
+
                 ColumnSettings curc = cmap.get(cname);
                 if (curc == null) {
                     ColumnSettings cnew = new ColumnSettings();
+                    cnew.setDatasourceName(ds.getDatasourceName());
                     cnew.setTableName(tableName);
                     cnew.setColumnName(cname);
                     data.add(cnew);
@@ -654,19 +751,15 @@ public class MainServiceImpl implements MainService {
                     data.add(curc);
                 }
             }
-            
+
             Collections.sort(data);
             retval.setResult(data);
-        }
-        
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-        }
-        
-        finally {
+        } finally {
             DBHelper.closeConnection(conn, null, res);
         }
-        
+
         return retval;
     }
 

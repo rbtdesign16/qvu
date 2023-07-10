@@ -17,7 +17,7 @@ import { hasRoleAccess } from "../../utils/authHelper";
 
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
-import { getDatasourceTables } from "../../utils/apiHelper"
+import { getDatasourceTables, isApiError } from "../../utils/apiHelper"
 
 const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();

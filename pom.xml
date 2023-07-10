@@ -27,6 +27,7 @@
         <mssql.jdbc.version>7.4.1.jre8</mssql.jdbc.version>
         <oracle.jdbc.version>23.2.0.0</oracle.jdbc.version>
         <postgres.jdbc.version>42.6.0</postgres.jdbc.version>
+        <ehcache.version>3.10.8</ehcache.version>
         <javax.annotation.version>1.3.2</javax.annotation.version>
         <lombok.version>1.18.28</lombok.version>
         <beanutils.version>1.9.4</beanutils.version>
@@ -147,8 +148,11 @@
             <artifactId>commons-beanutils</artifactId>
             <version>${beanutils.version}</version>
         </dependency>
-        <!-- Thanks for using https://jar-download.com -->
-
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+        </dependency>      
     </dependencies>
 
     <build>
@@ -164,7 +168,7 @@
                         <log.level>DEBUG</log.level>
                     </systemPropertyVariables>
                 </configuration>
-             </plugin>
+            </plugin>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>

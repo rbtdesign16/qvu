@@ -9,6 +9,7 @@ package org.rbt.qvu.dto;
  * @author rbtuc
  */
 public class Column {
+    private String datasource;
     private String schema;
     private String table;
     private String name;
@@ -118,6 +119,15 @@ public class Column {
         this.displayName = displayName;
     }
     
-    
-    
+     public String getDatasource() {
+        return datasource;
+    }
+
+    public void setDatasource(String datasource) {
+        this.datasource = datasource;
+    }
+
+    public String getCacheKey() {
+        return datasource + "." + table + "." + name;
+    }
 }

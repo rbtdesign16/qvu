@@ -19,6 +19,8 @@ public class Table {
     private String schema;
     private String pkName;
     private List<Column> columns = new ArrayList<>();
+    private List<ForeignKey> importedKeys = new ArrayList<>();
+    private List<ForeignKey> exportedKeys = new ArrayList<>();
 
     public String getDatasource() {
         return datasource;
@@ -76,5 +78,25 @@ public class Table {
         this.displayName = displayName;
     }
     
+    public String getCacheKey() {
+        return datasource + "." + name;
+    }
+
+    public List<ForeignKey> getImportedKeys() {
+        return importedKeys;
+    }
+
+    public void setImportedKeys(List<ForeignKey> importedKeys) {
+        this.importedKeys = importedKeys;
+    }
+
+    public List<ForeignKey> getExportedKeys() {
+        return exportedKeys;
+    }
+
+    public void setExportedKeys(List<ForeignKey> exportedKeys) {
+        this.exportedKeys = exportedKeys;
+    }
+
     
 }

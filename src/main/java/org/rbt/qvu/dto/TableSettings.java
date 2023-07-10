@@ -72,5 +72,7 @@ public class TableSettings implements Comparable<TableSettings> {
         this.tableColumnSettings = tableColumnSettings;
     }
     
-    
+    public String getCacheKey() {
+        return datasourceName + "." + tableName;
+    }
 }

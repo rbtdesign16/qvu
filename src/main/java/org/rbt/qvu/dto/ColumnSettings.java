@@ -12,6 +12,7 @@ import java.util.List;
  * @author rbtuc
  */
 public class ColumnSettings implements Comparable<ColumnSettings> {
+    private String datasourceName;
     private String tableName;
     private String displayName;
     private String columnName;
@@ -62,6 +63,17 @@ public class ColumnSettings implements Comparable<ColumnSettings> {
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
+
+    public String getDatasourceName() {
+        return datasourceName;
+    }
+
+    public void setDatasourceName(String datasourceName) {
+        this.datasourceName = datasourceName;
+    }
     
-    
+    public String getCacheKey() {
+        return datasourceName + "." + tableName + "." + columnName;
+    }
+
 }

@@ -53,9 +53,7 @@ public class Config {
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
                 langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
-             LOG.error("------->1");
                 securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
-             LOG.error("------->2");
                 datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
 
             }

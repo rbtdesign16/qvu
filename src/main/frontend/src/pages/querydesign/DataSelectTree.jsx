@@ -100,6 +100,16 @@ const DataSelectTree = (props) => {
         e.stopPropagation();
     };
 
+    const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
+        if (isBranch) {
+            return <span><ArrowIcon isOpen={isExpanded}/><span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span></span>;
+         } else {
+             return <span><CheckBoxIcon
+                className="checkbox-icon"
+                onClick={(e) => onClick(e, element, handleSelect, isSelected)}
+                checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name}</span></span>;
+         }       
+    };
     
     const nodeRenderer = (p) => {
         const {element,
@@ -114,12 +124,8 @@ const DataSelectTree = (props) => {
             {...getNodeProps({onClick: handleExpand})}
             style={{marginLeft: 40 * (level - 1)}}
             >
-            {isBranch && <ArrowIcon isOpen={isExpanded} />}
-            {!isBranch && <CheckBoxIcon
-                className="checkbox-icon"
-                onClick={(e) => onClick(e, element, handleSelect, isSelected)}
-                checked={isSelected} />}
-            <span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span>
+            {getNode(element, handleSelect, isSelected, isBranch, isExpanded )}
+
         </div>
     };
 

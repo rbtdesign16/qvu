@@ -31,37 +31,67 @@ public class QuerySelectTreeBuilder {
             tMap.put(t.getCacheKey(), t);
         }
         for (Table t : tableInfo) {
-            QuerySelectNode n = new QuerySelectNode();
-            n.getMetadata().put("type", QuerySelectNode.NODE_TYPE_TABLE);
-            n.getMetadata().put("dbname", t.getName());
-
             String key = datasourceName + "." + t.getName();
             TableSettings ta = dsHelper.getTableSettings(key);
 
-            String tName = t.getName();
-            boolean hide = false;
-            if (ta != null) {
-                if (StringUtils.isNotEmpty(ta.getDisplayName())) {
-                    tName = ta.getDisplayName();
+            if (userHasAccess(ta, userRoles)) {
+                QuerySelectNode n = new QuerySelectNode();
+                n.getMetadata().put("type", QuerySelectNode.NODE_TYPE_TABLE);
+                n.getMetadata().put("dbname", t.getName());
+
+                String tName = t.getName();
+                boolean hide = false;
+                if (ta != null) {
+                    if (StringUtils.isNotEmpty(ta.getDisplayName())) {
+                        tName = ta.getDisplayName();
+                    }
+                    hide = ta.isHide();
                 }
-                hide = ta.isHide();
-            }
 
-            n.setName(tName);
+                n.setName(tName);
 
-            if (!hide) {
-                retval.getChildren().add(n);
-                loadColumns(n, ta, t, t.getName());
-                Set<String> fkSet = new HashSet();
-                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, t.getName(), fkSet);
-                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0,t.getName(), fkSet);
+                if (!hide) {
+                    retval.getChildren().add(n);
+                    loadColumns(n, ta, t, t.getName(), userRoles);
+                    Set<String> fkSet = new HashSet();
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, t.getName(), fkSet);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0, t.getName(), fkSet);
+                }
             }
         }
-        
+
         return retval;
     }
 
-    private static void loadColumns(QuerySelectNode n, TableSettings ta, Table t, String rootTable) {
+    private static boolean userHasAccess(TableSettings ts, Set<String> userRoles) {
+        boolean retval = true;
+
+        if ((ts != null) && (ts.getRoles() != null) && !ts.getRoles().isEmpty()) {
+            Set<String> tset = new HashSet<>(ts.getRoles());
+
+            tset.retainAll(userRoles);
+
+            retval = !tset.isEmpty();
+        }
+
+        return retval;
+    }
+
+    private static boolean userHasAccess(ColumnSettings cs, Set<String> userRoles) {
+        boolean retval = true;
+
+        if ((cs != null) && (cs.getRoles() != null) && !cs.getRoles().isEmpty()) {
+            Set<String> cset = new HashSet<>(cs.getRoles());
+
+            cset.retainAll(userRoles);
+
+            retval = !cset.isEmpty();
+        }
+
+        return retval;
+    }
+
+    private static void loadColumns(QuerySelectNode n, TableSettings ta, Table t, String rootTable, Set<String> userRoles) {
         Map<String, ColumnSettings> csMap = new HashMap<>();
 
         if ((ta != null) && (ta.getTableColumnSettings() != null)) {
@@ -75,116 +105,118 @@ public class QuerySelectTreeBuilder {
             String cname = c.getName();
             boolean hide = false;
             ColumnSettings cs = csMap.get(c.getCacheKey());
+            if (userHasAccess(cs, userRoles)) {
+                if (cs != null) {
+                    if (StringUtils.isNotEmpty(cs.getDisplayName())) {
+                        cname = cs.getDisplayName();
+                    }
 
-            if (cs != null) {
-                if (StringUtils.isNotEmpty(cs.getDisplayName())) {
-                    cname = cs.getDisplayName();
+                    hide = cs.isHide();
                 }
 
-                hide = cs.isHide();
-            }
+                if (!hide) {
+                    QuerySelectNode cn = new QuerySelectNode();
+                    cn.getMetadata().put("roottable", rootTable);
+                    cn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_COLUMN);
+                    cn.getMetadata().put("dbname", c.getName());
+                    if (c.getPkIndex() > 0) {
+                        cn.getMetadata().put("pk", true);
+                    }
 
-            if (!hide) {
-                QuerySelectNode cn = new QuerySelectNode();
-                cn.getMetadata().put("roottable", rootTable);
-                cn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_COLUMN);
-                cn.getMetadata().put("dbname", c.getName());
-                if (c.getPkIndex() > 0) {
-                    cn.getMetadata().put("pk", true);
-                }    
-                    
-                cn.setName(cname);
+                    cn.setName(cname);
 
-                cn.getMetadata().put("datatype", c.getDataType());
-                cn.getMetadata().put("datatypename", c.getTypeName());
+                    cn.getMetadata().put("datatype", c.getDataType());
+                    cn.getMetadata().put("datatypename", c.getTypeName());
 
-                n.getChildren().add(cn);
+                    n.getChildren().add(cn);
+                }
             }
         }
 
     }
 
-    private static void loadForeignKeys(QuerySelectNode n, 
-        DatasourceSettingsHelper dsHelper, 
-        String datasourceName, 
-        Map<String, Table> tMap, 
-        Table t, 
-        List<ForeignKey> fkList, 
-        boolean imported, 
-        int maxDepth, 
-        int curDepth, 
-        String rootTable,
-        Set<String> fkSet) {
+    private static void loadForeignKeys(QuerySelectNode n,
+            DatasourceSettingsHelper dsHelper,
+            String datasourceName,
+            Map<String, Table> tMap,
+            Set<String> userRoles,
+            Table t,
+            List<ForeignKey> fkList,
+            boolean imported,
+            int maxDepth,
+            int curDepth,
+            String rootTable,
+            Set<String> fkSet) {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
                 for (ForeignKey fk : fkList) {
-                     // do this to prevent circular relationships
-                    if (!fkSet.contains(fk.getName()))  {
+                    // do this to prevent circular relationships
+                    if (!fkSet.contains(fk.getName())) {
                         fkSet.add(fk.getName());
                         String toTable = fk.getToTableName();
                         boolean hide = false;
                         String key = datasourceName + "." + toTable;
                         TableSettings ts = dsHelper.getTableSettings(key);
+                        if (userHasAccess(ts, userRoles)) {
 
-                        if (ts != null) {
-                            if (StringUtils.isNotEmpty(ts.getDisplayName())) {
-                                toTable = ts.getDisplayName();
-                            }
-
-                            hide = ts.isHide();
-                        }
-
-                        if (!hide) {
-                            QuerySelectNode fkn = new QuerySelectNode();
-                            if (imported) {
-                                fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
-                            } else {
-                                fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
-                            }
-                            fkn.getMetadata().put("dbname",  fk.getToTableName());
-                            fkn.setName(toTable);
-                            fkn.getMetadata().put("fkname",  fk.getName());
-                            fkn.getMetadata().put("fromcols", fk.getColumns());
-                            fkn.getMetadata().put("tocols", fk.getToColumns());
-
-                            n.getChildren().add(fkn);
-
-                            
-                            Table fkt = tMap.get(key);
-                            
-                            List<String> fromdiscols = new ArrayList<>();
-                            List<String> todiscols = new ArrayList<>();
-                            
-                            for (int i = 0; i < fk.getColumns().size(); ++i) {
-                                String cname = fk.getColumns().get(i);
-                                String tocname = fk.getToColumns().get(i);
-                                ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
-                                
-                                if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                    fromdiscols.add(cs.getDisplayName());
-                                } else {
-                                    fromdiscols.add(cname);
+                            if (ts != null) {
+                                if (StringUtils.isNotEmpty(ts.getDisplayName())) {
+                                    toTable = ts.getDisplayName();
                                 }
-                            
-                                cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
-                       
-                                if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                    todiscols.add(cs.getDisplayName());
-                                } else {
-                                    todiscols.add(tocname);
-                                }
+
+                                hide = ts.isHide();
                             }
-                            
-                            fkn.getMetadata().put("fromdiscols", fromdiscols);
-                            fkn.getMetadata().put("todiscols", todiscols);
-                            
-                       
-                            loadColumns(fkn, ts, fkt, rootTable);
-                            if (curDepth < maxDepth) {
+
+                            if (!hide) {
+                                QuerySelectNode fkn = new QuerySelectNode();
                                 if (imported) {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                    fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
                                 } else {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                    fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
+                                }
+                                fkn.getMetadata().put("dbname", fk.getToTableName());
+                                fkn.setName(toTable);
+                                fkn.getMetadata().put("fkname", fk.getName());
+                                fkn.getMetadata().put("fromcols", fk.getColumns());
+                                fkn.getMetadata().put("tocols", fk.getToColumns());
+
+                                n.getChildren().add(fkn);
+
+                                Table fkt = tMap.get(key);
+
+                                List<String> fromdiscols = new ArrayList<>();
+                                List<String> todiscols = new ArrayList<>();
+
+                                for (int i = 0; i < fk.getColumns().size(); ++i) {
+                                    String cname = fk.getColumns().get(i);
+                                    String tocname = fk.getToColumns().get(i);
+                                    ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
+
+                                    if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                        fromdiscols.add(cs.getDisplayName());
+                                    } else {
+                                        fromdiscols.add(cname);
+                                    }
+
+                                    cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
+
+                                    if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                        todiscols.add(cs.getDisplayName());
+                                    } else {
+                                        todiscols.add(tocname);
+                                    }
+                                }
+
+                                fkn.getMetadata().put("fromdiscols", fromdiscols);
+                                fkn.getMetadata().put("todiscols", todiscols);
+
+                                loadColumns(fkn, ts, fkt, rootTable, userRoles);
+                                if (curDepth < maxDepth) {
+                                    if (imported) {
+                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                    } else {
+                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                    }
                                 }
                             }
                         }
@@ -193,4 +225,5 @@ public class QuerySelectTreeBuilder {
             }
         }
     }
+
 }

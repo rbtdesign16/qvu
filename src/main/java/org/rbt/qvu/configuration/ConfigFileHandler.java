@@ -343,7 +343,6 @@ public class ConfigFileHandler {
         
         // make sure all records are marked as not new
         if (securityConfig.isBasicConfig()) {
-            LOG.error("--------------->xxx");
             for (User u : securityConfig.getBasicConfiguration().getUsers()) {
                 u.setNewRecord(false);
             }

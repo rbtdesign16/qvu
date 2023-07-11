@@ -1,52 +1,64 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-.query-select-tree {
-  background: #242322;
-  font-family: monospace;
-  font-size: 16px;
-  color: white;
-  user-select: none;
-  padding: 20px;
-  border-radius: 0.4em;
+
+.tree-view {
+    border-top: 1px solid var(--default-border-color);
+    height: calc(100% - 60px);
+    margin-top: 3px;
+    overflow: auto;
 }
 
-.query-select-tree .tree,
-.query-select-tree .tree-node,
-.query-select-tree .tree-node-group {
+.tree-view {
+  font-size: 16px;
+  user-select: none;
+  min-height: 320px;
+  padding: 20px;
+  box-sizing: content-box;
+}
+
+.tree-view .tree,
+.tree-view .tree-node,
+.tree-view .tree-node-group {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.query-select-tree .tree-branch-wrapper,
-.query-select-tree .tree-node__leaf {
-  outline: none;
+.tree-view .tree-branch-wrapper,
+.tree-view .tree-node__leaf {
   outline: none;
 }
 
-.query-select-tree .tree-node {
+.tree-view .tree-node {
   cursor: pointer;
 }
 
-.query-select-tree .tree-node:hover {
-  background: rgba(255, 255, 255, 0.1);
+.tree-view .tree-node .name:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
-.query-select-tree .tree .tree-node--focused {
-  background: rgba(255, 255, 255, 0.2);
+.tree-view .tree-node--focused .name {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.query-select-tree .tree .tree-node--selected {
-  background: rgba(48, 107, 176);
+.tree-view .tree-node {
+  display: inline-block;
 }
 
-.query-select-tree .tree-node__branch {
-  display: block;
-}
-
-.query-select-tree .icon {
+.tree-view .tree-view-icon {
+  margin: 0 5px;
   vertical-align: middle;
-  padding-right: 5px;
+}
+
+.tree-view button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tree-view .arrow {
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.tree-view .arrow--open {
+  transform: rotate(90deg);
 }

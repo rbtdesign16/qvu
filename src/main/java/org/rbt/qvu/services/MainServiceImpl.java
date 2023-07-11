@@ -442,6 +442,7 @@ public class MainServiceImpl implements MainService {
     private OperationResult<QuerySelectNode> buildQuerySelectTreeView( String datasourceName, List<Table> tableInfo) {
         OperationResult<QuerySelectNode> retval = new OperationResult();
         
+        try {
         User user = getCurrentUser();
         if (LOG.isDebugEnabled()) {
             LOG.debug("user: " + user.getName());
@@ -461,6 +462,12 @@ public class MainServiceImpl implements MainService {
                 tableInfo);
         
         retval.setResult(node);
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            retval.setMessage(ex.toString());
+        }
+        
         return retval;
     }
 

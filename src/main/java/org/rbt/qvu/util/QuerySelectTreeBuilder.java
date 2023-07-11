@@ -5,7 +5,6 @@
 package org.rbt.qvu.util;
 
 import io.micrometer.common.util.StringUtils;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,15 +24,15 @@ import org.rbt.qvu.dto.TableSettings;
 public class QuerySelectTreeBuilder {
     public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, String datasourceName, Set<String> userRoles, int maxImportedKeyDepth, int maxExportedKeyDepth, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
-        retval.setType(QuerySelectNode.NODE_TYPE_ROOT);
+        retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
         Map<String, Table> tMap = new HashMap<>();
         for (Table t : tableInfo) {
             tMap.put(t.getCacheKey(), t);
         }
         for (Table t : tableInfo) {
             QuerySelectNode n = new QuerySelectNode();
-            n.setType(QuerySelectNode.NODE_TYPE_TABLE);
-            n.setDbName(t.getName());
+            n.getMetadata().put("type", QuerySelectNode.NODE_TYPE_TABLE);
+            n.getMetadata().put("dbname", t.getName());
 
             String key = datasourceName + "." + t.getName();
             TableSettings ta = dsHelper.getTableSettings(key);
@@ -53,8 +52,8 @@ public class QuerySelectTreeBuilder {
                 retval.getChildren().add(n);
                 loadColumns(n, ta, t);
                 Set<String> fkSet = new HashSet();
-                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY, maxImportedKeyDepth, 1, fkSet);
-                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY, maxExportedKeyDepth, 1, fkSet);
+                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY, maxImportedKeyDepth, 0, fkSet);
+                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY, maxExportedKeyDepth, 0, fkSet);
             }
         }
         
@@ -86,15 +85,16 @@ public class QuerySelectTreeBuilder {
 
             if (!hide) {
                 QuerySelectNode cn = new QuerySelectNode();
-           //     cn.setParent(n.getId());
-            //    cn.setId(currentId++);
-                cn.setType(QuerySelectNode.NODE_TYPE_COLUMN);
-                cn.setDbName(c.getName());
+                cn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_COLUMN);
+                cn.getMetadata().put("dbname", c.getName());
+                if (c.getPkIndex() > 0) {
+                    cn.getMetadata().put("pk", true);
+                }    
+                    
                 cn.setName(cname);
 
-                Map<String, Object> info = cn.getAdditionalInfo();
-                info.put("type", c.getDataType());
-                info.put("typename", c.getTypeName());
+                cn.getMetadata().put("datatype", c.getDataType());
+                cn.getMetadata().put("datatypename", c.getTypeName());
 
                 n.getChildren().add(cn);
             }
@@ -103,7 +103,7 @@ public class QuerySelectTreeBuilder {
     }
 
     private static void loadForeignKeys(QuerySelectNode n, DatasourceSettingsHelper dsHelper, String datasourceName, Map<String, Table> tMap, Table t, List<ForeignKey> fkList, String nodeType, int maxDepth, int curDepth, Set<String> fkSet) {
-        if (curDepth < maxDepth) {
+        if (curDepth <= maxDepth) {
             if (fkList != null) {
                 
                 for (ForeignKey fk : fkList) {
@@ -125,33 +125,25 @@ public class QuerySelectTreeBuilder {
 
                         if (!hide) {
                             QuerySelectNode fkn = new QuerySelectNode();
-                  //          fkn.setId(currentId++);
-                  //          fkn.setParent(n.getId());
-                            fkn.setType(nodeType);
-                            fkn.setDbName(fk.getToTableName());
+                            fkn.getMetadata().put("type", nodeType);
+                            fkn.getMetadata().put("dbname",  fk.getToTableName());
                             fkn.setName(toTable);
+                            fkn.getMetadata().put("fkname",  fk.getName());
 
-                            Map<String, Object> info = fkn.getAdditionalInfo();
-                            info.put("fkname", fk.getName());
-
-                            List<String[]> columns = new ArrayList<>();
-                            for (int i = 0; i < fk.getColumns().size(); ++i) {
-                                String fromColumn = fk.getColumns().get(i);
-                                String toColumn = fk.getToColumns().get(i);
-                                columns.add(new String[]{fromColumn, toColumn});
-                            }
-
-                            info.put("columns", columns);
+                            fkn.getMetadata().put("fromcolumn", Helper.listToString(fk.getColumns()));
+                            fkn.getMetadata().put("tocolumns", Helper.listToString(fk.getToColumns()));
 
                             n.getChildren().add(fkn);
 
                             Table fkt = tMap.get(key);
 
                             loadColumns(fkn, ts, fkt);
-                            if (QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY.equals(nodeType)) {
-                                loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
-                            } else {
-                                loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
+                            if (curDepth < maxDepth) {
+                                if (QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY.equals(nodeType)) {
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
+                                } else {
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
+                                }
                             }
                         }
                     }

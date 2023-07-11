@@ -50,6 +50,20 @@ public class Helper {
         return retval;
     }
     
+    public static String listToString(List input) {
+        StringBuilder retval = new StringBuilder();
+        String comma = "";
+        
+        for (Object o : input) {
+            retval.append(comma);
+            retval.append(o);
+            comma = ",";
+        }
+        
+        return retval.toString();
+    }
+        
+        
     public static String toMd5Hash(String input) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(input.getBytes("UTF-8"));

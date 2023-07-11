@@ -36,7 +36,7 @@ export const MODAL_TITLE_SIZE = "h5";
 
 export const SMALL_ICON_SIZE = 18;
 
-export const NODE_TYPE_ROOT = "t";
+export const NODE_TYPE_ROOT = "r";
 export const NODE_TYPE_TABLE = "t";
 export const NODE_TYPE_COLUMN = "c";
 export const NODE_TYPE_IMPORTED_FOREIGNKEY= "ifk";

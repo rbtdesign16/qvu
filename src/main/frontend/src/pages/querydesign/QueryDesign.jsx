@@ -49,7 +49,8 @@ const QueryDesign = () => {
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {    
-             let tdata = flattenTree(res.result);
+            let tdata = flattenTree(res.result);
+            console.log(JSON.stringify(tdata));
             setTreeData(tdata);
             hideMessage();
         }
@@ -59,14 +60,12 @@ const QueryDesign = () => {
     return (
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel size={25} className="flex align-items-center justify-content-center">
-                    <div style={{padding: "5px"}}>
                     <label>{getText("Datasource")}</label>
-                        <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
-                            <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
-                            {loadDatasourceOptions()}
-                        </select>
-                        <DataSelectTree data={treeData}/>
-                    </div>
+                    <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
+                        <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
+                        {loadDatasourceOptions()}
+                    </select>
+                    <DataSelectTree data={treeData}/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="flex align-items-center justify-content-center">
                     Panel 2

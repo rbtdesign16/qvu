@@ -14,19 +14,14 @@ import java.util.Map;
  * @author rbtuc
  */
 public class QuerySelectNode {
-    public static final String NODE_TYPE_ROOT = "t";
+    public static final String NODE_TYPE_ROOT = "r";
     public static final String NODE_TYPE_TABLE = "t";
     public static final String NODE_TYPE_COLUMN = "c";
     public static final String NODE_TYPE_IMPORTED_FOREIGNKEY= "ifk";
     public static final String NODE_TYPE_EXPORTED_FOREIGNKEY= "efk";
     
     private String name = "";
-    private String dbName;
-    private String type = QuerySelectNode.NODE_TYPE_ROOT;
-    private boolean selected;
-   // private Integer id;
-  //  private Integer parent;
-    private Map<String, Object> additionalInfo;
+    private Map<String, Object> metadata;
     private List<QuerySelectNode> children;
 
     public String getName() {
@@ -37,30 +32,16 @@ public class QuerySelectNode {
         this.name = name;
     }
 
-    public String getDbName() {
-        return dbName;
+    public Map<String, Object> getMetadata() {
+        if (metadata == null) {
+            metadata = new HashMap<>();
+        }
+        return metadata;
     }
 
-    public void setDbName(String dbName) {
-        this.dbName = dbName;
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
     }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
 
     public List<QuerySelectNode> getChildren() {
         if (children == null) {
@@ -73,33 +54,5 @@ public class QuerySelectNode {
         this.children = children;
     }
 
-    public Map<String, Object> getAdditionalInfo() {
-        if (additionalInfo == null) {
-            additionalInfo = new HashMap<>();
-        }
-        return additionalInfo;
-    }
-
-    public void setAdditionalInfo(Map<String, Object> additionalInfo) {
-        this.additionalInfo = additionalInfo;
-    }
-
-    /*
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getParent() {
-        return parent;
-    }
-
-    public void setParent(Integer parent) {
-        this.parent = parent;
-    }
-*/
-   
+    
 }

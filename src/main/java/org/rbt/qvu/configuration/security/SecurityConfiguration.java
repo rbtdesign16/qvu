@@ -26,6 +26,8 @@ public class SecurityConfiguration {
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
     private Map<String, String> roleAliases = new HashMap<>();
+    private long lastUpdated;
+
     
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
@@ -121,4 +123,22 @@ public class SecurityConfiguration {
     public String getRoleAlias(String role) {
         return roleAliases.get(role);
     }
+
+    public Map<String, String> getRoleAliases() {
+        return roleAliases;
+    }
+
+    public void setRoleAliases(Map<String, String> roleAliases) {
+        this.roleAliases = roleAliases;
+    }
+
+    public long getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(long lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+    
+    
 }

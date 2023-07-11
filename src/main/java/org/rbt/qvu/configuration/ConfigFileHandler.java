@@ -23,6 +23,7 @@ import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
+import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.UserComparator;
 import org.slf4j.Logger;
@@ -75,34 +76,40 @@ public class ConfigFileHandler {
                 datasources = gson.fromJson(new String(bytes), DataSourcesConfiguration.class);
 
                 if (datasources != null) {
-                    int indx = -1;
-                    for (int i = 0; i < datasources.getDatasources().size(); ++i) {
-                        DataSourceConfiguration ds = datasources.getDatasources().get(i);
-                        if (ds.getDatasourceName().equalsIgnoreCase(datasource.getDatasourceName())) {
-                            indx = i;
-                            break;
-                        }
-                    }
-
-                    if (indx > -1) {
-                        if (datasource.isNewDatasource()) {
-                            retval.setErrorCode(OperationResult.RECORD_EXISTS);
-                            retval.setMessage("datasource " + datasource.getDatasourceName() + " already exists");
-                            throw new SaveException(retval);
-                        } else {
-                            datasources.getDatasources().set(indx, datasource);
-                        }
+                    if (datasources.getLastUpdated() > config.getDatasourcesConfig().getLastUpdated()) {
+                        retval.setErrorCode(Errors.RECORD_UPDATED);
+                        retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"datrasources"}));
+                        throw new SaveException(retval);
                     } else {
-                        datasources.getDatasources().add(datasource);
+                        int indx = -1;
+                        for (int i = 0; i < datasources.getDatasources().size(); ++i) {
+                            DataSourceConfiguration ds = datasources.getDatasources().get(i);
+                            if (ds.getDatasourceName().equalsIgnoreCase(datasource.getDatasourceName())) {
+                                indx = i;
+                                break;
+                            }
+                        }
+
+                        if (indx > -1) {
+                            if (datasource.isNewDatasource()) {
+                                retval.setErrorCode(OperationResult.RECORD_EXISTS);
+                                retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] { datasource.getDatasourceName()}));
+                                throw new SaveException(retval);
+                            } else {
+                                datasources.getDatasources().set(indx, datasource);
+                            }
+                        } else {
+                            datasources.getDatasources().add(datasource);
+                        }
                     }
                 }
             }
 
             if (datasources != null) {
+                datasources.setLastUpdated(System.currentTimeMillis());
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                 }
-
                 config.setDatasourcesConfig(datasources);
             }
         } catch (SaveException ex) {
@@ -196,10 +203,7 @@ public class ConfigFileHandler {
             }
 
             if (securityConfig != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    fos.write(getGson(true).toJson(securityConfig).getBytes());
-                    config.setSecurityConfig(securityConfig);
-                }
+                saveSecurityConfig(securityConfig);
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();
@@ -233,10 +237,7 @@ public class ConfigFileHandler {
             }
 
             if (securityConfig != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    fos.write(getGson(true).toJson(securityConfig).getBytes());
-                    config.setSecurityConfig(securityConfig);
-                }
+                saveSecurityConfig(securityConfig);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -278,12 +279,7 @@ public class ConfigFileHandler {
             }
 
             if (securityConfig != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-
-                    Gson myGson = new GsonBuilder().setPrettyPrinting().create();
-                    fos.write(myGson.toJson(securityConfig).getBytes());
-                    config.setSecurityConfig(securityConfig);
-                }
+                this.saveSecurityConfig(securityConfig);
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();
@@ -317,10 +313,7 @@ public class ConfigFileHandler {
             }
 
             if (securityConfig != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    fos.write(getGson(true).toJson(securityConfig).getBytes());
-                    config.setSecurityConfig(securityConfig);
-                }
+                saveSecurityConfig(securityConfig);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -330,20 +323,29 @@ public class ConfigFileHandler {
         return retval;
     }
 
-    public OperationResult saveSecurityConfig(SecurityConfiguration securityConfig) {
+    public OperationResult saveSecurityConfig(SecurityConfiguration securityConfig) throws Exception {
         OperationResult retval = new OperationResult();
 
-        try {
-            File f = new File(config.getSecurityConfigurationFileName());
-            try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                fos.write(getGson(true).toJson(securityConfig).getBytes());
-            }
+        SecurityConfiguration cursec = null;
+        File f = new File(config.getSecurityConfigurationFileName());
+        try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+            byte[] bytes = fis.readAllBytes();
+            cursec = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
-            config.setSecurityConfig(securityConfig);
-        } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
+            if (cursec.getLastUpdated() > securityConfig.getLastUpdated()) {
+                retval.setErrorCode(Errors.RECORD_UPDATED);
+                retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"security configuration"}));
+                throw new SaveException(retval);
+            }
         }
 
+        securityConfig.setLastUpdated(System.currentTimeMillis());
+        try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+            fos.write(getGson(true).toJson(securityConfig).getBytes());
+        }
+
+        config.setSecurityConfig(securityConfig);
+        
         return retval;
     }
 

@@ -125,6 +125,7 @@
         "tableSettings-help": "Select desired roles to limit table access by role. If no roles are selected the table is accessible to all users. A display name can be associated with a table for a more user friendly UI presentation. Check \"Hide\" to prevent table display in the UI.",
         "Column Settings": "Column Settings",
         "Column:": "Column:",
-        "Loading column settings": "Loading column settings"
+        "Loading column settings": "Loading column settings",
+        "errorCode-4": "$1 record has been updated since last load"
     }
 }

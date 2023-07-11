@@ -16,6 +16,7 @@ import java.util.Map;
 public class DataSourcesConfiguration {
     private int maxImportedKeyDepth = 2;
     private int maxExportedKeyDepth = 4;
+    private long lastUpdated;
     
     private static final Map<String, DataSourceConfiguration> DSMAP = new HashMap<>();
 
@@ -60,6 +61,14 @@ public class DataSourcesConfiguration {
 
     public void setMaxExportedKeyDepth(int maxExportedKeyDepth) {
         this.maxExportedKeyDepth = maxExportedKeyDepth;
+    }
+
+    public long getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(long lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
     
     

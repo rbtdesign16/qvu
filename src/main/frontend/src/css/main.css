@@ -211,12 +211,13 @@ img {
 
 .icon-s {
     cursor: pointer;
+    margin-top: -5px;
 }
 
 .icon-s-dis {
     cursor: default;
     filter: grayscale();
-    
+    margin-top: -5px;
 }
 
 .icon-m {

@@ -17,6 +17,7 @@ public class Errors {
     public static final int FOLDER_IS_NOT_EMPTY = -1;
     public static final int FOLDER_NOT_FOUND = -2;
     public static final int DB_CONNECTION_FAILED = -3;
+    public static final int RECORD_UPDATED = -4;
 
     static {
         ERROR_MESSAGE_MAP.put(OperationResult.RECORD_EXISTS, "errorCode1");
@@ -27,6 +28,7 @@ public class Errors {
         ERROR_MESSAGE_MAP.put(FOLDER_IS_NOT_EMPTY, "errorCode-1");
         ERROR_MESSAGE_MAP.put(FOLDER_NOT_FOUND, "errorCode-2");
         ERROR_MESSAGE_MAP.put(DB_CONNECTION_FAILED, "errorCode-3");
+        ERROR_MESSAGE_MAP.put(RECORD_UPDATED, "errorCode-4");
     }
 
     public static String getMessage(Integer errorCode) {

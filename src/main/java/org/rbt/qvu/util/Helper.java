@@ -71,8 +71,10 @@ public class Helper {
     }
     
     public static void populateResultError(OperationResult res, Throwable t) {
-        res.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-        res.setMessage(t.toString());
+        if (res.isSuccess()) {
+            res.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+            res.setMessage(t.toString());
+        }
     }
     
 }

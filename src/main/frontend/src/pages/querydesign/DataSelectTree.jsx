@@ -14,7 +14,10 @@ import {
         SMALL_ICON_SIZE} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
-    const {data, selectedIds} = props;
+    const {data} = props;
+    const [currentTable, setCurrentTable] = useState(null);
+    const [selectedIds, setSelectedIds] = useState(props.selectedIds ? props.selectedIds : []);
+
     const ArrowIcon = ({ isOpen, className }) => {
         const baseClass = "arrow";
         const classes = cx(
@@ -26,14 +29,6 @@ const DataSelectTree = (props) => {
         return <IoMdArrowDropright className={classes} />;
     };
 
-    const getSelectedIds = () => {
-        if (!selectedIds) {
-            return [];
-        } else {
-            return selectedIds;
-        }
-    };
-    
     const CheckBoxIcon = ({ checked, ...rest }) => {
         if (checked) {
             return <FaCheckSquare {...rest} />;
@@ -64,7 +59,7 @@ const DataSelectTree = (props) => {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
                     }    
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
-                    return <FcTreeStructure  style={{transform: "rotate(180deg)" }} className="icon-s"  size={SMALL_ICON_SIZE}/>;
+                    return <FcTreeStructure   size={SMALL_ICON_SIZE} className="icon-s" style={{transform: "rotate(180deg)" }}/>;
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
                     return <FcTreeStructure className="icon-s" size={SMALL_ICON_SIZE}/>;
 
@@ -74,12 +69,43 @@ const DataSelectTree = (props) => {
         }
     };
 
+    const onClick = (e, element, handleSelect, isSelected) => {
+        // if currently unselected to we are selecting
+        if (!isSelected) {
+            if (element.metadata && element.metadata.roottable) {
+                if (!currentTable) {
+                    setCurrentTable( element.metadata.roottable);
+                }
+                
+                if (currentTable !== element.metadata.roottable) {
+                    setSelectedIds([element.id]);
+                    setCurrentTable(element.metadata.roottable);
+                } else {
+                    let sids = [...selectedIds];
+                    sids.push(element.id);
+                    setSelectedIds(sids);
+                }
+                    
+            }
+        } else { // unselect - remove id
+            let sids = [...selectedIds];
+            let indx = sids.indexOf(element.id);
+            if (indx > -1) {
+                sids.splice(indx, 1);
+                setSelectedIds(sids);
+            }
+        }   
+ 
+        handleSelect(e);
+        e.stopPropagation();
+    };
+
+    
     const nodeRenderer = (p) => {
         const {element,
             isBranch,
             isExpanded,
             isSelected,
-            isHalfSelected,
             getNodeProps,
             level,
             handleSelect,
@@ -91,10 +117,7 @@ const DataSelectTree = (props) => {
             {isBranch && <ArrowIcon isOpen={isExpanded} />}
             {!isBranch && <CheckBoxIcon
                 className="checkbox-icon"
-                onClick={(e) => {
-                    handleSelect(e);
-                    e.stopPropagation();
-                            }}
+                onClick={(e) => onClick(e, element, handleSelect, isSelected)}
                 checked={isSelected} />}
             <span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span>
         </div>
@@ -106,7 +129,7 @@ const DataSelectTree = (props) => {
                 data={data}
                 propagateCollapse={true}
                 multiSelect={true}
-                selectedIds={getSelectedIds()}
+                selectedIds={selectedIds}
                 nodeRenderer={nodeRenderer}
                 />
         </div>);

@@ -51,17 +51,17 @@ public class QuerySelectTreeBuilder {
 
             if (!hide) {
                 retval.getChildren().add(n);
-                loadColumns(n, ta, t);
+                loadColumns(n, ta, t, t.getName());
                 Set<String> fkSet = new HashSet();
-                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, fkSet);
-                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0, fkSet);
+                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, t.getName(), fkSet);
+                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0,t.getName(), fkSet);
             }
         }
         
         return retval;
     }
 
-    private static void loadColumns(QuerySelectNode n, TableSettings ta, Table t) {
+    private static void loadColumns(QuerySelectNode n, TableSettings ta, Table t, String rootTable) {
         Map<String, ColumnSettings> csMap = new HashMap<>();
 
         if ((ta != null) && (ta.getTableColumnSettings() != null)) {
@@ -86,6 +86,7 @@ public class QuerySelectTreeBuilder {
 
             if (!hide) {
                 QuerySelectNode cn = new QuerySelectNode();
+                cn.getMetadata().put("roottable", rootTable);
                 cn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_COLUMN);
                 cn.getMetadata().put("dbname", c.getName());
                 if (c.getPkIndex() > 0) {
@@ -103,7 +104,17 @@ public class QuerySelectTreeBuilder {
 
     }
 
-    private static void loadForeignKeys(QuerySelectNode n, DatasourceSettingsHelper dsHelper, String datasourceName, Map<String, Table> tMap, Table t, List<ForeignKey> fkList, boolean imported, int maxDepth, int curDepth, Set<String> fkSet) {
+    private static void loadForeignKeys(QuerySelectNode n, 
+        DatasourceSettingsHelper dsHelper, 
+        String datasourceName, 
+        Map<String, Table> tMap, 
+        Table t, 
+        List<ForeignKey> fkList, 
+        boolean imported, 
+        int maxDepth, 
+        int curDepth, 
+        String rootTable,
+        Set<String> fkSet) {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
                 for (ForeignKey fk : fkList) {
@@ -168,12 +179,12 @@ public class QuerySelectTreeBuilder {
                             fkn.getMetadata().put("todiscols", todiscols);
                             
                        
-                            loadColumns(fkn, ts, fkt);
+                            loadColumns(fkn, ts, fkt, rootTable);
                             if (curDepth < maxDepth) {
                                 if (imported) {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, fkSet);
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
                                 } else {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, fkSet);
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
                                 }
                             }
                         }

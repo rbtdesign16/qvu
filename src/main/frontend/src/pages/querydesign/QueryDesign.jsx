@@ -50,6 +50,7 @@ const QueryDesign = () => {
             showMessage(ERROR, res.message);
         } else {    
             let tdata = flattenTree(res.result);
+       //     console.log("------>" + JSON.stringify(tdata));
             setTreeData(tdata);
             hideMessage();
         }

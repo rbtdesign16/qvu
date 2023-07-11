@@ -602,6 +602,7 @@ public class MainServiceImpl implements MainService {
                     fk.setToTableName(toTable);
                     fk.setName(fkName);
                     fk.setTableName(t.getName());
+                    fk.setImported(true);
                     retval.add(fk);
                     fkMap.put(fkName, fk);
                 }
@@ -618,7 +619,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-        private List<ForeignKey> getExportedKeys(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
+    private List<ForeignKey> getExportedKeys(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
         List<ForeignKey> retval = new ArrayList<>();
         ResultSet res = null;
 

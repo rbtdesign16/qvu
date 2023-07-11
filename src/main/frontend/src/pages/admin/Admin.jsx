@@ -619,6 +619,8 @@ const Admin = () => {
         if (ok) {
             showMessage(INFO, getText("Saving datasource", " ") + config.dataObject.datasourceName + "...", getText("Saving"), true);
             let res = await saveDatasource(config.dataObject);
+            
+            console.log("----------->" + JSON.stringify(config.dataObject));
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(await loadDatasources());

@@ -120,11 +120,21 @@ const TableSettings = (props) => {
     };
 
     const saveColumnSettings = (table) => {
-        let t = findInArray(datasource.datasourceTableSettings, "tableName", table.tableName);
+        let d = {...datasource};
+        
+        if (!datasource.datasourceTableSettings) {
+            datasource.datasourceTableSettings = [];
+        }
+        
+        let t = findInArray(d.datasourceTableSettings, "tableName", table.tableName);
 
-        if (t) {
+        if (!t) {
+            d.datasourceTableSettings.push(table);
+        } else {
             t.tableColumnSettings = table.tableColumnSettings;
         }
+        
+        setDatasource(d);
         
         setColumnSettings({show: false});
     };

@@ -42,6 +42,14 @@ const DataSelectTree = (props) => {
         }
     };
     
+    const getColumnLinks = (md) => {
+        if (md.fromdiscols && md.todiscols) {
+            return ": [" + md.fromdiscols + " -> " + md.todiscols + "]";
+        } else {
+            return "";
+        }
+    };
+    
     const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
             switch (String(element.metadata.type)) {
@@ -56,7 +64,7 @@ const DataSelectTree = (props) => {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
                     }    
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
-                    return <FcTreeStructure className="icon-s" style = {{transform: "rotate(180deg)" }}size={SMALL_ICON_SIZE}/>;
+                    return <FcTreeStructure  style={{transform: "rotate(180deg)" }} className="icon-s"  size={SMALL_ICON_SIZE}/>;
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
                     return <FcTreeStructure className="icon-s" size={SMALL_ICON_SIZE}/>;
 
@@ -88,7 +96,7 @@ const DataSelectTree = (props) => {
                     e.stopPropagation();
                             }}
                 checked={isSelected} />}
-            <span className="name">{getIcon(element)}{element.name}</span>
+            <span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span>
         </div>
     };
 

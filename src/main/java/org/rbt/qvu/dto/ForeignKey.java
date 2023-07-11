@@ -16,6 +16,7 @@ public class ForeignKey {
     private String datasourceName;
     private String tableName;
     private String toTableName;
+    private boolean imported;
     private List<String> columns = new ArrayList();
     private List<String> toColumns = new ArrayList<>();
     
@@ -66,4 +67,14 @@ public class ForeignKey {
     public void setToColumns(List<String> toColumns) {
         this.toColumns = toColumns;
     }
+
+    public boolean isImported() {
+        return imported;
+    }
+
+    public void setImported(boolean imported) {
+        this.imported = imported;
+    }
+    
+    
 }

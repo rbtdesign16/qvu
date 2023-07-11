@@ -5,6 +5,7 @@
 package org.rbt.qvu.util;
 
 import io.micrometer.common.util.StringUtils;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,8 +53,8 @@ public class QuerySelectTreeBuilder {
                 retval.getChildren().add(n);
                 loadColumns(n, ta, t);
                 Set<String> fkSet = new HashSet();
-                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY, maxImportedKeyDepth, 0, fkSet);
-                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY, maxExportedKeyDepth, 0, fkSet);
+                loadForeignKeys(n, dsHelper, datasourceName, tMap, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, fkSet);
+                loadForeignKeys(n, dsHelper,  datasourceName, tMap, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0, fkSet);
             }
         }
         
@@ -102,12 +103,11 @@ public class QuerySelectTreeBuilder {
 
     }
 
-    private static void loadForeignKeys(QuerySelectNode n, DatasourceSettingsHelper dsHelper, String datasourceName, Map<String, Table> tMap, Table t, List<ForeignKey> fkList, String nodeType, int maxDepth, int curDepth, Set<String> fkSet) {
+    private static void loadForeignKeys(QuerySelectNode n, DatasourceSettingsHelper dsHelper, String datasourceName, Map<String, Table> tMap, Table t, List<ForeignKey> fkList, boolean imported, int maxDepth, int curDepth, Set<String> fkSet) {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
-                
                 for (ForeignKey fk : fkList) {
-                    // do this to prevent circular relationships
+                     // do this to prevent circular relationships
                     if (!fkSet.contains(fk.getName()))  {
                         fkSet.add(fk.getName());
                         String toTable = fk.getToTableName();
@@ -125,24 +125,55 @@ public class QuerySelectTreeBuilder {
 
                         if (!hide) {
                             QuerySelectNode fkn = new QuerySelectNode();
-                            fkn.getMetadata().put("type", nodeType);
+                            if (imported) {
+                                fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
+                            } else {
+                                fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
+                            }
                             fkn.getMetadata().put("dbname",  fk.getToTableName());
                             fkn.setName(toTable);
                             fkn.getMetadata().put("fkname",  fk.getName());
-
-                            fkn.getMetadata().put("fromcolumn", Helper.listToString(fk.getColumns()));
-                            fkn.getMetadata().put("tocolumns", Helper.listToString(fk.getToColumns()));
+                            fkn.getMetadata().put("fromcols", fk.getColumns());
+                            fkn.getMetadata().put("tocols", fk.getToColumns());
 
                             n.getChildren().add(fkn);
 
+                            
                             Table fkt = tMap.get(key);
-
+                            
+                            List<String> fromdiscols = new ArrayList<>();
+                            List<String> todiscols = new ArrayList<>();
+                            
+                            for (int i = 0; i < fk.getColumns().size(); ++i) {
+                                String cname = fk.getColumns().get(i);
+                                String tocname = fk.getToColumns().get(i);
+                                ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
+                                
+                                if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                    fromdiscols.add(cs.getDisplayName());
+                                } else {
+                                    fromdiscols.add(cname);
+                                }
+                            
+                                cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
+                       
+                                if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                    todiscols.add(cs.getDisplayName());
+                                } else {
+                                    todiscols.add(tocname);
+                                }
+                            }
+                            
+                            fkn.getMetadata().put("fromdiscols", fromdiscols);
+                            fkn.getMetadata().put("todiscols", todiscols);
+                            
+                       
                             loadColumns(fkn, ts, fkt);
                             if (curDepth < maxDepth) {
-                                if (QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY.equals(nodeType)) {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
+                                if (imported) {
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, fkSet);
                                 } else {
-                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), nodeType, maxDepth, curDepth + 1, fkSet);
+                                    loadForeignKeys(fkn, dsHelper, datasourceName, tMap, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, fkSet);
                                 }
                             }
                         }

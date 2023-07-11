@@ -7,6 +7,7 @@ import { Tabs, Tab } from "react-bootstrap";
 import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
+import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import QueryData from "./QueryData";
 import QueryFilter from "./QueryFilter";
@@ -24,6 +25,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
         const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
+    const {setTreeViewData} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -50,14 +52,14 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
-            let tdata = flattenTree(res.result);
-            setTreeData(tdata);
+            setTreeViewData(flattenTree(res.result));
             hideMessage();
         }
         return "";
     };
 
     return (
+            
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
                     <label>{getText("Datasource")}</label>
@@ -65,7 +67,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
                         <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
                         {loadDatasourceOptions()}
                     </select>
-                    <DataSelectTree data={treeData}/>
+                    <DataSelectTree/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="flex align-items-center justify-content-center">
                     <div className="gdesign-tab-cont">

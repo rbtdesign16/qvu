@@ -13,11 +13,13 @@ import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
 import InitialSetup from "./init/InitialSetup";
+import {QueryDesignProvider} from "../context/QueryDesignContext";
+
 import PropTypes from "prop-types";
 import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/authHelper"
 
 
-const Home = (props) => {
+        const Home = (props) => {
     const {copyright, version} = props;
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
@@ -57,7 +59,9 @@ const Home = (props) => {
                                 <Admin/>
                             </Tab> }
                             { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title={getText("Query Design")}>
-                                <QueryDesign/>
+                                <QueryDesignProvider>
+                                    <QueryDesign/>
+                                </QueryDesignProvider>
                             </Tab>}
                             { isReportDesigner(authData) && <Tab eventKey="rdsgn" title={getText("Report Design")}>
                                 <ReportDesign/>
@@ -70,7 +74,7 @@ const Home = (props) => {
             return <Splash message={getText("Initializing", "...")}/>;
         }
     };
-    
+
     return (
             <div className="home">
                 <Message/>

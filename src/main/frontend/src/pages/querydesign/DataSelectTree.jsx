@@ -3,6 +3,7 @@ import TreeView from "react-accessible-treeview";
 import {FcDataSheet, FcTimeline, FcDatabase, FcTreeStructure, FcKey} from "react-icons/fc";
 import { FaSquare, FaCheckSquare, FaMinusSquare } from "react-icons/fa";
 import { IoMdArrowDropright } from "react-icons/io";
+import useQueryDesign from "../../context/QueryDesignContext";
 import cx from "classnames";
 import PropTypes from "prop-types";
 import {
@@ -14,9 +15,7 @@ import {
         SMALL_ICON_SIZE} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
-    const {data} = props;
-    const [currentTable, setCurrentTable] = useState(null);
-    const [selectedIds, setSelectedIds] = useState(props.selectedIds ? props.selectedIds : []);
+    const {treeViewData, selectedNodeIds, baseTable, setTreeViewData, setSelectedNodeIds, setBaseTable} = useQueryDesign();
 
     const ArrowIcon = ({ isOpen, className }) => {
         const baseClass = "arrow";
@@ -44,6 +43,7 @@ const DataSelectTree = (props) => {
             return "";
         }
     };
+    
     
     const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
@@ -73,26 +73,26 @@ const DataSelectTree = (props) => {
         // if currently unselected to we are selecting
         if (!isSelected) {
             if (element.metadata && element.metadata.roottable) {
-                if (!currentTable) {
-                    setCurrentTable( element.metadata.roottable);
+                if (!baseTable) {
+                    setBaseTable( element.metadata.roottable);
                 }
                 
-                if (currentTable !== element.metadata.roottable) {
-                    setSelectedIds([element.id]);
-                    setCurrentTable(element.metadata.roottable);
+                if (baseTable !== element.metadata.roottable) {
+                    setSelectedNodeIds([element.id]);
+                    setBaseTable(element.metadata.roottable);
                 } else {
-                    let sids = [...selectedIds];
+                    let sids = [...selectedNodeIds];
                     sids.push(element.id);
-                    setSelectedIds(sids);
+                    setSelectedNodeIds(sids);
                 }
                     
             }
         } else { // unselect - remove id
-            let sids = [...selectedIds];
+            let sids = [...selectedNodeIds];
             let indx = sids.indexOf(element.id);
             if (indx > -1) {
                 sids.splice(indx, 1);
-                setSelectedIds(sids);
+                setSelectedNodeIds(sids);
             }
         }   
  
@@ -129,23 +129,19 @@ const DataSelectTree = (props) => {
         </div>
     };
 
-    if (data) {
+    if (treeViewData) {
         return (<div className="tree-view">
             <TreeView
-                data={data}
+                data={treeViewData}
                 propagateCollapse={true}
                 multiSelect={true}
-                selectedIds={selectedIds}
+                selectedIds={selectedNodeIds}
                 nodeRenderer={nodeRenderer}
                 />
         </div>);
     } else {
         return <div></div>;
     }
-};
-
-DataSelectTree.propTypes = {
-    data: PropTypes.object
 };
 
 export default DataSelectTree;

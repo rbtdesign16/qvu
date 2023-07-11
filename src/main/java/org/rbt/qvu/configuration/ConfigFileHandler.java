@@ -340,6 +340,19 @@ public class ConfigFileHandler {
         }
 
         securityConfig.setLastUpdated(System.currentTimeMillis());
+        
+        // make sure all records are marked as not new
+        if (securityConfig.isBasicConfig()) {
+            LOG.error("--------------->xxx");
+            for (User u : securityConfig.getBasicConfiguration().getUsers()) {
+                u.setNewRecord(false);
+            }
+            
+            for (Role r : securityConfig.getBasicConfiguration().getRoles()) {
+                r.setNewRecord(false);
+            }
+        }
+        
         try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
             fos.write(getGson(true).toJson(securityConfig).getBytes());
         }

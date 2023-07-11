@@ -173,7 +173,11 @@ export const isValidNumber = (number, validator) => {
 };
 
 export const isValidEmail = (email, validator) => {
-    return (email && email.includes("@") && email.includes("."));
+    if (!email) {
+        return true;
+    } else {
+        return (email.includes("@") && email.includes("."));
+    }
 };
 
 export const updateJsonArray = (fieldName, newRec, data) => {

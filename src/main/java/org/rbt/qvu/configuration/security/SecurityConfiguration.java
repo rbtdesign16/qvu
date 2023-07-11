@@ -140,5 +140,7 @@ public class SecurityConfiguration {
         this.lastUpdated = lastUpdated;
     }
     
-    
+    public boolean isBasicConfig() {
+        return Constants.BASIC_SECURITY_TYPE.equals(securityType);
+    }
 }

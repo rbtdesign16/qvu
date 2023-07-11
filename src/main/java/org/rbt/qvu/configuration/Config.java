@@ -55,11 +55,12 @@ public class Config {
                 langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
                 securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
-
             }
             
             if (securityConfig == null) {
                 throw new Exception("failed to load security configuration");
+            } else {
+                securityConfig.setSecurityType(securityType);
             }
 
             LOG.info("force.init=" + forceInit);

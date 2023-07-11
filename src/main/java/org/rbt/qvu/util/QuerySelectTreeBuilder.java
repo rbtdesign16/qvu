@@ -30,6 +30,9 @@ public class QuerySelectTreeBuilder {
         for (Table t : tableInfo) {
             tMap.put(t.getCacheKey(), t);
         }
+        
+        int curDepth = 0;
+        int indx = 0;
         for (Table t : tableInfo) {
             String key = datasourceName + "." + t.getName();
             TableSettings ta = dsHelper.getTableSettings(key);
@@ -38,7 +41,6 @@ public class QuerySelectTreeBuilder {
                 QuerySelectNode n = new QuerySelectNode();
                 n.getMetadata().put("type", QuerySelectNode.NODE_TYPE_TABLE);
                 n.getMetadata().put("dbname", t.getName());
-
                 String tName = t.getName();
                 boolean hide = false;
                 if (ta != null) {
@@ -54,23 +56,35 @@ public class QuerySelectTreeBuilder {
                     retval.getChildren().add(n);
                     loadColumns(n, ta, t, t.getName(), userRoles);
                     Set<String> fkSet = new HashSet();
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, 0, t.getName(), fkSet);
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, 0, t.getName(), fkSet);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, curDepth, t.getName(), fkSet);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, curDepth, t.getName(), fkSet);
                 }
             }
         }
 
+        Integer[] idHolder = {1};
+        setIds(retval, idHolder);
+        
         return retval;
     }
 
+    private static void setIds(QuerySelectNode n, Integer[] idHolder) {
+        n.setId(idHolder[0]++);
+        
+        if (n.getChildren() != null) {
+            for (QuerySelectNode c : n.getChildren()) {
+                setIds(c, idHolder);
+            }
+        } 
+            
+    }
+    
     private static boolean userHasAccess(TableSettings ts, Set<String> userRoles) {
         boolean retval = true;
 
         if ((ts != null) && (ts.getRoles() != null) && !ts.getRoles().isEmpty()) {
             Set<String> tset = new HashSet<>(ts.getRoles());
-
             tset.retainAll(userRoles);
-
             retval = !tset.isEmpty();
         }
 

@@ -21,6 +21,7 @@ public class QuerySelectNode {
     public static final String NODE_TYPE_EXPORTED_FOREIGNKEY= "efk";
     
     private String name = "";
+    private int id;
     private Map<String, Object> metadata;
     private List<QuerySelectNode> children;
 
@@ -54,5 +55,13 @@ public class QuerySelectNode {
         this.children = children;
     }
 
-    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
 }

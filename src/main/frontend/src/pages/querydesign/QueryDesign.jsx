@@ -49,8 +49,8 @@ const QueryDesign = () => {
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {    
+     //       console.log("------>" + JSON.stringify(res.result));
             let tdata = flattenTree(res.result);
-       //     console.log("------>" + JSON.stringify(tdata));
             setTreeData(tdata);
             hideMessage();
         }

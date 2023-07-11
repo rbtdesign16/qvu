@@ -81,7 +81,7 @@
         "?": "?",
         "Help": "Help",
         "password-validation-msg": "8 characters minimum, mixed case, at least 1 special character",
-        "Initializing...": "Initializing...",
+        "Initializing": "Initializing",
         "configuration complete": "configuration complete",
         "configuration incomplete": "configuration incomplete",
         "Invalid repository folder entered" : "Invalid repository folder entered",
@@ -110,10 +110,10 @@
         "Test Connection": "Test Connection",
         "Select a datasource":"Select a datasource",
         "Role Access:": "Role Access:",
-        "Select roles...": "Select roles...",
+        "Select roles": "Select roles",
         "Role(s) selected": "Role(s) selected",
         "Item(s) selected": "Item(s) selected",
-        "Select...": "Select...",
+        "Select": "Select",
         "Schema:": "Schema",
         "Loading datasource information": "Loading datasource information",
         "datasourceRoles-help": "Select desired roles to limit datasource access by role. If no roles are selected the datasource is accessible to all users",
@@ -126,6 +126,13 @@
         "Column Settings": "Column Settings",
         "Column:": "Column:",
         "Loading column settings": "Loading column settings",
-        "errorCode-4": "$1 record has been updated since last load"
+        "errorCode-4": "$1 record has been updated since last load",
+        "Admin": "Admin",
+        "Query Design": "Query Design",
+        "Report Design": "Report Design",
+        "Attempting to connect": "Attempting to connect",
+        "Data": "Data",
+        "Filter": "Filter",
+        "SQL": "SQL"
     }
 }

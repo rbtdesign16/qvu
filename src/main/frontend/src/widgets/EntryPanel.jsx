@@ -93,7 +93,7 @@ const EntryPanel = (props) => {
             if (selected.length > 0) {
                 return getText("Item(s) selected");
             } else {
-                getText("Select...");
+                getText("Select", "...");
             }    
         } 
     };

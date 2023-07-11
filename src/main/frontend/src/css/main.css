@@ -15,7 +15,7 @@ html {
 
 body {
     font-family: "Roboto", sans-serif;
-    font-size: var(--default-font-sz);
+    font-size: var(--default-font-size);
     color: var(--default-font-color);
     background-color: var(--default-background-color);
     height: 100%;
@@ -118,12 +118,6 @@ body {
     margin-top: 5px;
     height: calc(100% - 60px);
     position: absolute;
-    overflow: hidden;
-}
-
-.tab-content {
-    height: calc(100% - 60px);
-    position: relative;
     overflow: auto;
 }
 
@@ -340,4 +334,23 @@ select {
 .column-settings {
     left: 5%;
     top: 5%;
+}
+
+.gdesign-tab-cont {
+    padding-top: 5px;
+    height: 100%;
+}
+
+.p-splitter-panel {
+    flex-grow: 1;
+    min-width: 5px;
+    height: 100%
+}
+
+.p-splitter {
+    background: var(--default-background-color);
+    border: 1px solid var(--default-border-color);
+    color: var(--default-font-color);
+    height: calc(100% - 60px);
+    position: absolute;
 }

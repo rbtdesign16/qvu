@@ -1,5 +1,4 @@
 import React, {useContext, useState, useEffect} from "react";
-import { Tabs, Tab }from "react-bootstrap";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
@@ -228,7 +227,7 @@ const Admin = () => {
         if (selected.length > 0) {
             return getText("Role(s) selected");
         } else {
-            return getText("Select roles...");
+            return getText("Select roles", "...");
         }
     };
 
@@ -411,7 +410,7 @@ const Admin = () => {
                     className: "btn btn-primary",
                     disabled: dataObject.newRecord,
                     onClick: async () => {
-                        showMessage(INFO, getText("Attempting to connect..."), null, true);
+                        showMessage(INFO, getText("Attempting to connect", "..."), null, true);
                         let res = await testDatasource(dataObject);
                         if (isApiSuccess(res)) {
                             showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName);

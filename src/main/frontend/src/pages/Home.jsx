@@ -53,13 +53,13 @@ const Home = (props) => {
             } else if (hasTabAccess()) {
                 return (
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                            { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title="Admin">
+                            { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title={getText("Admin")}>
                                 <Admin/>
                             </Tab> }
-                            { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title="Query Design">
+                            { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title={getText("Query Design")}>
                                 <QueryDesign/>
                             </Tab>}
-                            { isReportDesigner(authData) && <Tab eventKey="rdsgn" title="Report Design">
+                            { isReportDesigner(authData) && <Tab eventKey="rdsgn" title={getText("Report Design")}>
                                 <ReportDesign/>
                             </Tab>}
                         </Tabs>);
@@ -67,7 +67,7 @@ const Home = (props) => {
                 return <Splash />;
             }
         } else {
-            return <Splash message={getText("Initializing...")}/>;
+            return <Splash message={getText("Initializing", "...")}/>;
         }
     };
     

@@ -8,20 +8,21 @@ import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
+import QueryData from "./QueryData";
+import QueryFilter from "./QueryFilter";
+import QuerySql from "./QuerySql";
 import { flattenTree } from "react-accessible-treeview";
-
-import {
-    INFO, 
-    WARN, 
-    ERROR, 
-    DEFAULT_ERROR_TITLE} from "../../utils/helper";
 import { hasRoleAccess } from "../../utils/authHelper";
-
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
+import {INFO,
+        WARN,
+        ERROR,
+        DEFAULT_ERROR_TITLE} from "../../utils/helper";
+
 import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
-const QueryDesign = () => {
+        const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
@@ -48,18 +49,17 @@ const QueryDesign = () => {
         let res = await getDatasourceTreeViewData(e.target.options[e.target.selectedIndex].value);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
-        } else {    
-     //       console.log("------>" + JSON.stringify(res.result));
+        } else {
             let tdata = flattenTree(res.result);
             setTreeData(tdata);
             hideMessage();
         }
         return "";
     };
-    
+
     return (
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
-                <SplitterPanel size={25} className="flex align-items-center justify-content-center">
+                <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
                     <label>{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                         <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
@@ -68,7 +68,19 @@ const QueryDesign = () => {
                     <DataSelectTree data={treeData}/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="flex align-items-center justify-content-center">
-                    Panel 2
+                    <div className="gdesign-tab-cont">
+                        <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
+                            <Tab eventKey="dsel" title={getText("Data")}>
+                                <QueryData/>
+                            </Tab> 
+                            <Tab eventKey="fil" title={getText("Filter")}>
+                                <QueryFilter/>
+                            </Tab>
+                            <Tab eventKey="sql" title={getText("SQL")}>
+                                <QuerySql/>
+                            </Tab>
+                        </Tabs>
+                    </div>  
                 </SplitterPanel>
             </Splitter>);
 

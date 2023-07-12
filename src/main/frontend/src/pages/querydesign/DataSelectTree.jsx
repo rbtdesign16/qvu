@@ -4,6 +4,7 @@ import {FcTimeline, FcKey} from "react-icons/fc";
 import { FaSquare, FaCheckSquare, FaMinusSquare } from "react-icons/fa";
 import { IoMdArrowDropright } from "react-icons/io";
 import useQueryDesign from "../../context/QueryDesignContext";
+import useLang from "../../context/LangContext";
 import cx from "classnames";
 import PropTypes from "prop-types";
 import {
@@ -15,6 +16,7 @@ import {
         SMALL_ICON_SIZE} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
+    const {getText} = useLang();
     const {
         treeViewData, 
         selectedColumnIds, 
@@ -52,10 +54,6 @@ const DataSelectTree = (props) => {
         }
     };
     
-    const getTableInfo = (element) => {
-        return element.metadata.dbname;
-    }
-    
     const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
             switch (String(element.metadata.type)) {
@@ -63,9 +61,9 @@ const DataSelectTree = (props) => {
                     return <FcDatabase className="icon-s" size={SMALL_ICON_SIZE}/>;
                 case NODE_TYPE_TABLE:
                     if (selectedTableIds.includes(element.id)) {
-                        return <img title={getTableInfo(element)} src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     } else {
-                        return <img title={getTableInfo(element)} src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img  src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     }
                 case NODE_TYPE_COLUMN:
                     if (element.metadata.pk) {
@@ -75,15 +73,15 @@ const DataSelectTree = (props) => {
                     }    
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
                     if (selectedTableIds.includes(element.id)) {
-                        return <img title={getTableInfo(element)} src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     } else {
-                        return <img title={getTableInfo(element)} src="table_imp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_imp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     }
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
                     if (selectedTableIds.includes(element.id)) {
-                        return <img title={getTableInfo(element)} src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     } else {
-                        return <img title={getTableInfo(element)} src="table_exp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_exp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     }
 
             }
@@ -146,12 +144,12 @@ const DataSelectTree = (props) => {
     
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><ArrowIcon isOpen={isExpanded}/><span className="name">{getIcon(element)}{element.name+ "[" + element.id + "]"}{getColumnLinks(element.metadata)}</span></span>;
+            return <span><ArrowIcon isOpen={isExpanded}/><span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span></span>;
          } else {
              return <span><CheckBoxIcon
                 className="checkbox-icon"
                 onClick={(e) => onClick(e, element, handleSelect, isSelected)}
-                checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name + "[" + element.id + "]"}</span></span>;
+                checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name}</span></span>;
          }       
     };
     

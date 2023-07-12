@@ -133,6 +133,9 @@
         "Attempting to connect": "Attempting to connect",
         "Data": "Data",
         "Filter": "Filter",
-        "SQL": "SQL"
+        "SQL": "SQL",
+        "Table Name:": "Table Name:",
+        "Column Name:": "Column Name:",
+        "Data Type:": "Data Type:"
     }
 }

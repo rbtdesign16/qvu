@@ -25,7 +25,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
         const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData} = useQueryDesign();
+    const {setTreeViewData, setDatasource} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -48,11 +48,13 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
     const onDatasourceChange = async (e) => {
         showMessage(INFO, getText("Loading datasource information", "..."), null, true);
-        let res = await getDatasourceTreeViewData(e.target.options[e.target.selectedIndex].value);
+        let datasource = e.target.options[e.target.selectedIndex].value;
+        let res = await getDatasourceTreeViewData(datasource);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             setTreeViewData(flattenTree(res.result));
+            setDatasource(datasource);
             hideMessage();
         }
         return "";

@@ -18,14 +18,23 @@ const JoinType = (props) => {
         return (joinType === "inner");
     };
     
+    const onHide = () => {
+        if (config && config.hide) {
+            config.hide();
+        }
+    }
+    
     return (
             <div className="static-modal">
                 <Modal animation={false} 
                        size="sm"
                        show={config.show} 
+                       aria-labelledby="contained-modal-title-vcenter"
+                       centered
+                       onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
-                    <Modal.Header>
+                    <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getText("Join Type")}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>

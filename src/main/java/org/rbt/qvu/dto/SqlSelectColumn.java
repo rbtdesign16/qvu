@@ -15,6 +15,7 @@ public class SqlSelectColumn {
     private String displayName;
     private int sortPosition = -1;
     private String aggregateFunction;
+    private String customSql;
     private String path;
 
     public String getDatasource() {
@@ -72,4 +73,14 @@ public class SqlSelectColumn {
     public void setPath(String path) {
         this.path = path;
     }
+
+    public String getCustomSql() {
+        return customSql;
+    }
+
+    public void setCustomSql(String customSql) {
+        this.customSql = customSql;
+    }
+    
+    
 }

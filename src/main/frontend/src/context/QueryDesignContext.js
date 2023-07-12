@@ -1,8 +1,9 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 export const QueryDesignContext = createContext();
 
 export const QueryDesignProvider = ({ children }) => {
+    const [datasource, setDatasource] = useState(null);
     const [treeViewData, setTreeViewData] = useState(null);
     const [baseTable, setBaseTable] = useState(null);
     const [selectedColumnIds, setSelectedColumnIds] = useState([]);
@@ -10,14 +11,68 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
 
+    const createSqlSelectColumns  = async () => {
+        let cols = [];
+        let cMap = new Map();
+        
+        for (let i = 0; i < selectColumns.length; ++i) {
+            cMap.set(selectColumns[i].path, selectColumns[i]);
+        }
+        
+        for (let i = 0; i < selectedColumnIds.length; ++i) {
+            let element = treeViewData[selectedColumnIds[i]];
+            let table = treeViewData[element.parent].metadata.dbname;
+            
+            let path = getPath(element);
+            
+            let c = cMap.get(path);
+            if (c) {
+                cols.push(c);
+            } else {
+                cols.push({
+                    datasource: datasource,
+                    tableName: table,
+                    columnName: element.metadata.dbname,
+                    displayName: element.name,
+                    sortPosition: -1,
+                    aggregateFunction: "",
+                    path: path,
+                    customSql: ""
+                });
+            }
+        }
+        
+        setSelectColumns(cols);
+    };
+    
+    const getPath = (element) => {
+        let elements = [];
+        
+        let p = treeViewData[element.parent];
+        
+        while (p) {
+            elements.unshift(p.metadata.dbname);
+            p = treeViewData[p.parent];
+        }
+        
+        return elements.join("|");
+        
+    };
+    
+    useEffect(() => {
+       createSqlSelectColumns();
+    }, [selectedColumnIds]);
     return (
             <QueryDesignContext.Provider
-                value={{treeViewData, 
+                value={{
+                    datasource,
+                    treeViewData, 
                     selectedColumnIds, 
                     selectedTableIds, 
                     baseTable, 
                     selectColumns, 
                     filterColumns, 
+                    setDatasource,
                     setTreeViewData, 
                     setSelectedColumnIds, 
                     setSelectedTableIds, 

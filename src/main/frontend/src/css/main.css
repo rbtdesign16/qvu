@@ -206,6 +206,8 @@ img {
 .icon-s {
     cursor: pointer;
     margin-top: -5px;
+    margin-right: 3px;
+    
 }
 
 .icon-s-dis {

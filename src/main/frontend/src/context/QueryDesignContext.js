@@ -5,19 +5,22 @@ export const QueryDesignContext = createContext();
 export const QueryDesignProvider = ({ children }) => {
     const [treeViewData, setTreeViewData] = useState(null);
     const [baseTable, setBaseTable] = useState(null);
-    const [selectedNodeIds, setSelectedNodeIds] = useState([]);
+    const [selectedColumnIds, setSelectedColumnIds] = useState([]);
+    const [selectedTableIds, setSelectedTableIds] = useState([]);
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
 
     return (
             <QueryDesignContext.Provider
                 value={{treeViewData, 
-                    selectedNodeIds, 
+                    selectedColumnIds, 
+                    selectedTableIds, 
                     baseTable, 
                     selectColumns, 
                     filterColumns, 
                     setTreeViewData, 
-                    setSelectedNodeIds, 
+                    setSelectedColumnIds, 
+                    setSelectedTableIds, 
                     setBaseTable,
                     setSelectColumns,
                     setFilterColumns}}>

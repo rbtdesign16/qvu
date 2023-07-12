@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TreeView from "react-accessible-treeview";
-import {FcDataSheet, FcTimeline, FcDatabase, FcTreeStructure, FcKey} from "react-icons/fc";
+import {FcTimeline, FcKey} from "react-icons/fc";
 import { FaSquare, FaCheckSquare, FaMinusSquare } from "react-icons/fa";
 import { IoMdArrowDropright } from "react-icons/io";
 import useQueryDesign from "../../context/QueryDesignContext";
@@ -15,7 +15,15 @@ import {
         SMALL_ICON_SIZE} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
-    const {treeViewData, selectedNodeIds, baseTable, setTreeViewData, setSelectedNodeIds, setBaseTable} = useQueryDesign();
+    const {
+        treeViewData, 
+        selectedColumnIds, 
+        selectedTableIds, 
+        baseTable, 
+        setTreeViewData, 
+        setSelectedColumnIds, 
+        setSelectedTableIds, 
+        setBaseTable} = useQueryDesign();
 
     const ArrowIcon = ({ isOpen, className }) => {
         const baseClass = "arrow";
@@ -44,6 +52,9 @@ const DataSelectTree = (props) => {
         }
     };
     
+    const getTableInfo = (element) => {
+        return element.metadata.dbname;
+    }
     
     const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
@@ -51,7 +62,11 @@ const DataSelectTree = (props) => {
                 case NODE_TYPE_ROOT:
                     return <FcDatabase className="icon-s" size={SMALL_ICON_SIZE}/>;
                 case NODE_TYPE_TABLE:
-                    return <FcDataSheet className="icon-s" size={SMALL_ICON_SIZE}/>;
+                    if (selectedTableIds.includes(element.id)) {
+                        return <img title={getTableInfo(element)} src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    } else {
+                        return <img title={getTableInfo(element)} src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    }
                 case NODE_TYPE_COLUMN:
                     if (element.metadata.pk) {
                         return <FcKey className="icon-s" size={SMALL_ICON_SIZE}/>;
@@ -59,9 +74,17 @@ const DataSelectTree = (props) => {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
                     }    
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
-                    return <FcTreeStructure   size={SMALL_ICON_SIZE} className="icon-s" style={{transform: "rotate(180deg)" }}/>;
+                    if (selectedTableIds.includes(element.id)) {
+                        return <img title={getTableInfo(element)} src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    } else {
+                        return <img title={getTableInfo(element)} src="table_imp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    }
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
-                    return <FcTreeStructure className="icon-s" size={SMALL_ICON_SIZE}/>;
+                    if (selectedTableIds.includes(element.id)) {
+                        return <img title={getTableInfo(element)} src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    } else {
+                        return <img title={getTableInfo(element)} src="table_exp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    }
 
             }
         } else {
@@ -81,14 +104,14 @@ const DataSelectTree = (props) => {
                     setSelectedNodeIds([element.id]);
                     setBaseTable(element.metadata.roottable);
                 } else {
-                    let sids = [...selectedNodeIds];
+                    let sids = [...selectedColumnIds];
                     sids.push(element.id);
                     setSelectedNodeIds(sids);
                 }
                     
             }
         } else { // unselect - remove id
-            let sids = [...selectedNodeIds];
+            let sids = [...selectedColumnIds];
             let indx = sids.indexOf(element.id);
             if (indx > -1) {
                 sids.splice(indx, 1);
@@ -99,15 +122,36 @@ const DataSelectTree = (props) => {
         handleSelect(e);
         e.stopPropagation();
     };
+    
+    const setSelectedNodeIds = (ids) => {
+        setSelectedColumnIds(ids);
+        setSelectedTableIds(getSelectedTableIds(ids));
+    };
 
+    const getSelectedTableIds = (ids) => {
+        let tset = new Set();
+        
+        for (let i = 0; i < ids.length; ++i) {
+            let pid = treeViewData[ids[i]].parent;
+           
+            while (pid) {
+                tset.add(pid);
+                pid = treeViewData[pid].parent;
+             }
+        }
+         
+        let retval = [...tset]; 
+        return retval;
+    };
+    
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><ArrowIcon isOpen={isExpanded}/><span className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span></span>;
+            return <span><ArrowIcon isOpen={isExpanded}/><span className="name">{getIcon(element)}{element.name+ "[" + element.id + "]"}{getColumnLinks(element.metadata)}</span></span>;
          } else {
              return <span><CheckBoxIcon
                 className="checkbox-icon"
                 onClick={(e) => onClick(e, element, handleSelect, isSelected)}
-                checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name}</span></span>;
+                checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name + "[" + element.id + "]"}</span></span>;
          }       
     };
     
@@ -135,7 +179,7 @@ const DataSelectTree = (props) => {
                 data={treeViewData}
                 propagateCollapse={true}
                 multiSelect={true}
-                selectedIds={selectedNodeIds}
+                selectedIds={selectedColumnIds}
                 nodeRenderer={nodeRenderer}
                 />
         </div>);

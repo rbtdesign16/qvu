@@ -55,14 +55,14 @@ public class QuerySelectTreeBuilder {
                 if (!hide) {
                     retval.getChildren().add(n);
                     loadColumns(n, ta, t, t.getName(), userRoles);
-                    Set<String> fkSet = new HashSet();
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, curDepth, t.getName(), fkSet);
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, curDepth, t.getName(), fkSet);
+                    Map<String, Integer> fkMap = new HashMap<>();
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, curDepth, t.getName(), fkMap);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, curDepth, t.getName(), fkMap);
                 }
             }
         }
 
-        Integer[] idHolder = {1};
+        Integer[] idHolder = {0};
         setIds(retval, idHolder);
         
         return retval;
@@ -160,13 +160,23 @@ public class QuerySelectTreeBuilder {
             int maxDepth,
             int curDepth,
             String rootTable,
-            Set<String> fkSet) {
+            Map<String, Integer> fkMap) {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
                 for (ForeignKey fk : fkList) {
+                    
+                    // using this to prevent circular references 
+                    
+                    Integer cnt = fkMap.get(fk.getName());
                     // do this to prevent circular relationships
-                    if (!fkSet.contains(fk.getName())) {
-                        fkSet.add(fk.getName());
+                    if ((cnt == null) || (cnt == 1)) {
+                        if (cnt == null) {
+                            cnt = 0;
+                        }
+                        
+                        cnt++;
+                        
+                        fkMap.put(fk.getName(), cnt);
                         String toTable = fk.getToTableName();
                         boolean hide = false;
                         String key = datasourceName + "." + toTable;
@@ -227,9 +237,9 @@ public class QuerySelectTreeBuilder {
                                 loadColumns(fkn, ts, fkt, rootTable, userRoles);
                                 if (curDepth < maxDepth) {
                                     if (imported) {
-                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
                                     } else {
-                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkSet);
+                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
                                     }
                                 }
                             }

@@ -136,6 +136,9 @@
         "SQL": "SQL",
         "Table Name:": "Table Name:",
         "Column Name:": "Column Name:",
-        "Data Type:": "Data Type:"
+        "Data Type:": "Data Type:",
+        "Join Type": "Join Type",
+        "Inner": "Inner",
+        "Outer": "Outer"
     }
 }

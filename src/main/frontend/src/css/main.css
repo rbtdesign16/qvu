@@ -319,6 +319,7 @@ select {
 
 .ds-sel {
     width: 100%;
+    min-width: 0;
 }
 
 .dropdown-heading {

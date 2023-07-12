@@ -6,10 +6,21 @@ export const QueryDesignProvider = ({ children }) => {
     const [treeViewData, setTreeViewData] = useState(null);
     const [baseTable, setBaseTable] = useState(null);
     const [selectedNodeIds, setSelectedNodeIds] = useState([]);
+    const [selectColumns, setSelectColumns] = useState([]);
+    const [filterColumns, setFilterColumns] = useState([]);
 
     return (
             <QueryDesignContext.Provider
-                value={{treeViewData, selectedNodeIds, baseTable, setTreeViewData, setSelectedNodeIds, setBaseTable}}>
+                value={{treeViewData, 
+                    selectedNodeIds, 
+                    baseTable, 
+                    selectColumns, 
+                    filterColumns, 
+                    setTreeViewData, 
+                    setSelectedNodeIds, 
+                    setBaseTable,
+                    setSelectColumns,
+                    setFilterColumns}}>
                 {children}
             </QueryDesignContext.Provider>
             );

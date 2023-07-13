@@ -41,7 +41,7 @@ export const QueryDesignProvider = ({ children }) => {
                 });
             }
         }
-        
+
         setSelectColumns(cols);
     };
     
@@ -50,8 +50,20 @@ export const QueryDesignProvider = ({ children }) => {
         
         let p = treeViewData[element.parent];
         
-        while (p) {
-            elements.unshift(p.metadata.dbname);
+        while (p && (p.id > 0)) {
+            let nm = p.metadata.dbname;
+            if (p.metadata.type.endsWith("fk")) {
+                let comma = "";
+                nm += "[";
+                for (let i = 0; i < p.metadata.fromcols.length; ++i) {
+                    nm += (comma + p.metadata.fromcols[i] + "=" +  p.metadata.tocols[i]);
+                }
+                
+                nm += "]";
+                comma = ",";
+            }
+                
+            elements.unshift(nm);
             p = treeViewData[p.parent];
         }
         

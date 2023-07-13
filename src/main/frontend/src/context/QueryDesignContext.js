@@ -10,6 +10,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectedTableIds, setSelectedTableIds] = useState([]);
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
+    const [joins, setJoins] = useState([]);
 
     const createSqlSelectColumns  = async () => {
         let cols = [];
@@ -19,11 +20,17 @@ export const QueryDesignProvider = ({ children }) => {
             cMap.set(selectColumns[i].path, selectColumns[i]);
         }
         
+        let tablePathSet = new Set();
+        
         for (let i = 0; i < selectedColumnIds.length; ++i) {
             let element = treeViewData[selectedColumnIds[i]];
             let table = treeViewData[element.parent].metadata.dbname;
             
             let path = getPath(element);
+            
+            let pos = path.lastIndexOf("|");
+            
+            tablePathSet.add(path.substring(0, pos));
             
             let c = cMap.get(path);
             if (c) {
@@ -41,13 +48,19 @@ export const QueryDesignProvider = ({ children }) => {
                 });
             }
         }
+        
+        createJoins(tablePathSet);
 
         setSelectColumns(cols);
+    };
+    
+    const createJoins = (pathSet) => {
     };
     
     const getPath = (element) => {
         let elements = [];
         
+        elements.unshift(element.metadata.dbname);
         let p = treeViewData[element.parent];
         
         while (p && (p.id > 0)) {

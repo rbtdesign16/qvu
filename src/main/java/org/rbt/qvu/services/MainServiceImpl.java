@@ -427,6 +427,8 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName) {
         OperationResult<QuerySelectNode> retval = new OperationResult<>();
+        
+        long start = System.currentTimeMillis();
         OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
         
         if (res.isSuccess()) {
@@ -436,6 +438,7 @@ public class MainServiceImpl implements MainService {
             retval.setMessage(res.getMessage());
         }
         
+        LOG.debug("getDatasourceTreeViewData() - elapsed time: " +  ((System.currentTimeMillis() - start)/1000) + "sec");
         return retval;
     }
     

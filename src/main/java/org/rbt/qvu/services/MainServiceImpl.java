@@ -481,6 +481,8 @@ public class MainServiceImpl implements MainService {
         Connection conn = null;
         ResultSet res = null;
         try {
+            long start = System.currentTimeMillis();
+            
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
@@ -515,6 +517,8 @@ public class MainServiceImpl implements MainService {
                 }
 
                 retval.setResult(data);
+                
+                LOG.debug("getDatasourceTables(" + datasourceName  + ") - elapsed time: " + ((System.currentTimeMillis() - start)/1000) + "sec");
             } else {
                 throw new Exception("Datasource " + datasourceName + " not found");
             }

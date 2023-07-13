@@ -11,9 +11,9 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class SqlJoin {
+public class SqlFrom {
     private String table;
-    private String type;
+    private String joinType;
     private String alias;
     private List <String> fromColumns = new ArrayList<>();
     private List <String> toColumns = new ArrayList<>();
@@ -24,14 +24,6 @@ public class SqlJoin {
 
     public void setTable(String table) {
         this.table = table;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getAlias() {
@@ -56,6 +48,14 @@ public class SqlJoin {
 
     public void setToColumns(List<String> toColumns) {
         this.toColumns = toColumns;
+    }
+
+    public String getJoinType() {
+        return joinType;
+    }
+
+    public void setJoinType(String joinType) {
+        this.joinType = joinType;
     }
     
     

@@ -10,9 +10,9 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectedTableIds, setSelectedTableIds] = useState([]);
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
-    const [joins, setJoins] = useState([]);
+    const [from, setFrom] = useState([]);
 
-    const createSqlSelectColumns  = async () => {
+    const updateSelectColumns  = async () => {
         let cols = [];
         let cMap = new Map();
         
@@ -34,6 +34,7 @@ export const QueryDesignProvider = ({ children }) => {
             
             let c = cMap.get(path);
             if (c) {
+                c.path = path;
                 cols.push(c);
             } else {
                 cols.push({
@@ -49,12 +50,17 @@ export const QueryDesignProvider = ({ children }) => {
             }
         }
         
-        createJoins(tablePathSet);
+        createFrom([...tablePathSet]);
 
         setSelectColumns(cols);
     };
     
-    const createJoins = (pathSet) => {
+    const createFrom = async (paths) => {
+         paths.sort((a, b) => {
+            return (b.length - a.length);
+        });
+        
+        console.log("---->" + paths);
     };
     
     const getPath = (element) => {
@@ -66,8 +72,13 @@ export const QueryDesignProvider = ({ children }) => {
         while (p && (p.id > 0)) {
             let nm = p.metadata.dbname;
             if (p.metadata.type.endsWith("fk")) {
+                nm += "{";
+                nm += (p.metadata.jointype ? p.metadata.jointype : "outer");
+                nm += "}";
+                
                 let comma = "";
                 nm += "[";
+                
                 for (let i = 0; i < p.metadata.fromcols.length; ++i) {
                     nm += (comma + p.metadata.fromcols[i] + "=" +  p.metadata.tocols[i]);
                 }
@@ -85,7 +96,7 @@ export const QueryDesignProvider = ({ children }) => {
     };
     
     useEffect(() => {
-       createSqlSelectColumns();
+       updateSelectColumns();
     }, [selectedColumnIds]);
     return (
             <QueryDesignContext.Provider
@@ -96,14 +107,17 @@ export const QueryDesignProvider = ({ children }) => {
                     selectedTableIds, 
                     baseTable, 
                     selectColumns, 
+                    from,
                     filterColumns, 
                     setDatasource,
                     setTreeViewData, 
                     setSelectedColumnIds, 
+                    setFrom,
                     setSelectedTableIds, 
                     setBaseTable,
                     setSelectColumns,
-                    setFilterColumns}}>
+                    setFilterColumns,
+                    updateSelectColumns}}>
                 {children}
             </QueryDesignContext.Provider>
             );

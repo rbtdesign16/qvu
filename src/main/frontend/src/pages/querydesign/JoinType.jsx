@@ -6,14 +6,16 @@ import React, {useState} from "react";
 import PropTypes from "prop-types";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"
+import useHelp from "../../context/HelpContext";
+import { MdHelpOutline } from 'react-icons/md';
 import useLang from "../../context/LangContext";
-import {MODAL_TITLE_SIZE} from "../../utils/helper";
+import {MODAL_TITLE_SIZE, SMALL_ICON_SIZE} from "../../utils/helper";
 
 const JoinType = (props) => {
     const {getText} = useLang();
     const {config} = props;
     const [joinType, setJoinType] = useState(config.joinType ? config.joinType : "outer");
-
+    const {showHelp} = useHelp();
     const isInner = () => {
         return (joinType === "inner");
     };
@@ -22,7 +24,7 @@ const JoinType = (props) => {
         if (config && config.hide) {
             config.hide();
         }
-    }
+    };
     
     return (
             <div className="static-modal">
@@ -35,7 +37,9 @@ const JoinType = (props) => {
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header closeButton>
-                        <Modal.Title as={MODAL_TITLE_SIZE}>{getText("Join Type")}</Modal.Title>
+                        <Modal.Title as={MODAL_TITLE_SIZE}>
+                            <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>
+                            {getText("Join Type")}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div onChange={(e) => setJoinType(e.target.value)}>

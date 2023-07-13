@@ -139,6 +139,7 @@
         "Data Type:": "Data Type:",
         "Join Type": "Join Type",
         "Inner": "Inner",
-        "Outer": "Outer"
+        "Outer": "Outer",
+        "joinType-help": "A join is used to combine multiple tables and retrieve data based on a common fields in relational databases. An inner join includes rows from the tables where the join conditions are satisfied. An outer join not only lists the matching rows, but it also returns the unmatched rows will no value (null) from the other tables."
     }
 }

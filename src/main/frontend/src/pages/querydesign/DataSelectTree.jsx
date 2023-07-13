@@ -26,8 +26,10 @@ const DataSelectTree = (props) => {
         setTreeViewData,
         setSelectedColumnIds,
         setSelectedTableIds,
-        setBaseTable} = useQueryDesign();
+        setBaseTable,
+        updateSelectColumns} = useQueryDesign();
     const [showJoinType, setShowJoinType] = useState({show: false});
+    
     const ArrowIcon = ({ isOpen, className }) => {
         const baseClass = "arrow";
         const classes = cx(
@@ -165,6 +167,7 @@ const DataSelectTree = (props) => {
     const setJoinType = (joinType, nodeId) => {
         treeViewData[nodeId].metadata.jointype = joinType;
         hideJoinType();
+        updateSelectColumns();
     }
 
     const handleContextMenu = (e, element) => {

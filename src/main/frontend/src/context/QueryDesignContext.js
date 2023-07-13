@@ -174,7 +174,6 @@ export const QueryDesignProvider = ({ children }) => {
             }
         }
         
-       console.log("------>" + JSON.stringify(retval));
         return retval;
      };
     

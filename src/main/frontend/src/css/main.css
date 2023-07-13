@@ -223,14 +223,14 @@ img {
 .icon-m-dis {
     cursor: default;
     filter: grayscale();
-    
 }
 
 .label-l {
     text-align: left;
     padding-left: 5px;
+    cursor: pointer;
     font-size: var(--default-label-font-size);
-    font-weight: var(--default-label-font-weight);
+    font-weight: var(--default-font-weight);
     color: var(--default-label-font-color);
 }
 

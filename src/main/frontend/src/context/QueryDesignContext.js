@@ -12,26 +12,30 @@ export const QueryDesignProvider = ({ children }) => {
     const [filterColumns, setFilterColumns] = useState([]);
     const [from, setFrom] = useState([]);
 
-    const updateSelectColumns  = async () => {
+    const updateSelectColumns = async () => {
         let cols = [];
         let cMap = new Map();
-        
+
         for (let i = 0; i < selectColumns.length; ++i) {
             cMap.set(selectColumns[i].path, selectColumns[i]);
         }
-        
+
         let tablePathSet = new Set();
-        
+
         for (let i = 0; i < selectedColumnIds.length; ++i) {
             let element = treeViewData[selectedColumnIds[i]];
             let table = treeViewData[element.parent].metadata.dbname;
-            
+
             let path = getPath(element);
-            
+
             let pos = path.lastIndexOf("|");
-            
-            tablePathSet.add(path.substring(0, pos));
-            
+
+            if (pos > -1) {
+                tablePathSet.add(path.substring(0, pos));
+            } else {
+                tablePathSet.add(path);
+            }
+
             let c = cMap.get(path);
             if (c) {
                 c.path = path;
@@ -49,75 +53,226 @@ export const QueryDesignProvider = ({ children }) => {
                 });
             }
         }
-        
-        createFrom([...tablePathSet]);
 
+        setFrom(buildFromRecords([...tablePathSet], cols));
         setSelectColumns(cols);
     };
     
-    const createFrom = async (paths) => {
-         paths.sort((a, b) => {
+    const getJoinFromColumns = (part) => {
+        let pos1 = part.indexOf("[");
+        let pos2 = part.indexOf("]");
+        
+        let cols = part.substring(pos1 + 1, pos2).split(",");
+        
+        let retval = [];
+        
+        for (let i = 0; i < cols.length; ++i) {
+             retval.push(cols[i].substring(0, cols[i].indexOf("=")));
+        }
+        
+        return retval;
+    };
+    
+    const getJoinToColumns = (part) => {
+       let pos1 = part.indexOf("[");
+        let pos2 = part.indexOf("]");
+        
+        let cols = part.substring(pos1 + 1, pos2).split(",");
+        
+        let retval = [];
+        
+        for (let i = 0; i < cols.length; ++i) {
+             retval.push(cols[i].substring(cols[i].indexOf("=") + 1));
+        }
+        
+        return retval;
+    };
+
+    const getFromEntry = (parent, part, alias) => {
+        let pos = part.lastIndexOf("|");
+        if (pos > -1) {
+            let lastEntry = part.substring(pos + 1);
+
+            let pos1 = lastEntry.indexOf("{");
+            let pos2 = lastEntry.indexOf("}");
+            let pos3 = lastEntry.indexOf("@");
+            
+            let fromColumns = getJoinFromColumns(lastEntry);
+            let toColumns = getJoinToColumns(lastEntry);
+            
+            return {
+               alias: alias,
+               fromAlias: parent.alias,
+               joinType: lastEntry.substring(pos3 + 1, pos2),
+               table: lastEntry.substring(0, pos1),
+               fromColumns: fromColumns,
+               toColumns: toColumns
+           };
+        }
+    };
+
+    const buildFromRecords = async (paths, cols) => {
+        paths.sort((a, b) => {
             return (b.length - a.length);
         });
         
-        console.log("---->" + paths);
-    };
+        
+        let tindx = 0;
+        // root table
+        let retval = [];
+        retval.push({
+            table: baseTable,
+            alias: ("t" + (tindx++))
+        });
+
+        let jMap = new Map();
+       
+        jMap.set(baseTable, retval[0]);
+            
+        // break paths into unique join paths
+        if (paths && (paths.length > 0) && (paths[0].indexOf("|") > -1)) {
+            let requiredPaths = getRequiredJoinPaths(paths);
+            
+            let tindx = 1;
+            let pos = -1;
+            
+            // create the from records based on the unique join paths
+            for (let i = 0; i < requiredPaths.length; ++i) {
+                let parent = baseTable;
+                do {
+                    let part;
+                    pos = requiredPaths[i].indexOf("|", pos + 1);
+                    if (pos > -1) {
+                       part = requiredPaths[i].substring(0, pos);
+                    } else {
+                       part = requiredPaths[i].substring(0, paths[i].length);
+                    }
+                    
+                    if (!jMap.has(part)) {
+                        let alias = ("t" + (tindx++));
+                        let entry = getFromEntry(jMap.get(parent), part, alias);
+ 
+                        if (entry) {
+                             jMap.set(part, entry);
+                            retval.push(entry);
+                        }
+                    }
+                            
+                    parent = part;
+                } while (pos > -1);
+            }
+        }
+        
+        for (let i = 0; i < cols.length; ++i) {
+            let cpath = cols[i].path;
+            let tpath = cpath.substring(0, cpath.lastIndexOf("|"));
+            
+            let jrec = jMap.get(tpath);
+            
+            if (jrec) {
+                cols[i].tableAlias = jrec.alias;
+            }
+        }
+        
+       console.log("------>" + JSON.stringify(retval));
+        return retval;
+     };
     
+    const getRequiredJoinPaths = (paths) => {
+        let pSet = new Set();
+        let pos = -1;
+        for (let i = 0; i < paths.length; ++i) {
+            do {
+                pos = paths[i].indexOf("|", pos + 1);
+                if (pos > -1) {
+                    pSet.add(paths[i].substring(0, pos));
+                } else {
+                    pSet.add(paths[i], paths[i].substring(0, paths[i].length));
+                }
+             } while (pos > -1)
+        }
+
+        paths = [...pSet];
+        
+        paths.sort();
+
+        let remitems = [];
+
+        for (let i = 0; i < paths.length; ++i) {
+            for (let j = i+1; j < paths.length; ++j) {
+                 if (paths[j].includes(paths[i])) {
+                    remitems.push(i);
+                    break;
+                }
+            }
+        }
+
+        let retval = [];
+        for (let i = 0; i < paths.length; ++i) {
+            if (!remitems.includes(i)) {
+                retval.push(paths[i]);
+            }
+        }
+
+        retval.sort((a, b) => (b.length - a.length));
+        
+        return retval;
+    };
+
     const getPath = (element) => {
         let elements = [];
-        
+
         elements.unshift(element.metadata.dbname);
         let p = treeViewData[element.parent];
-        
+
         while (p && (p.id > 0)) {
             let nm = p.metadata.dbname;
             if (p.metadata.type.endsWith("fk")) {
-                nm += "{";
+                nm += "{" + p.metadata.fkname + "@";
                 nm += (p.metadata.jointype ? p.metadata.jointype : "outer");
                 nm += "}";
-                
+
                 let comma = "";
                 nm += "[";
-                
                 for (let i = 0; i < p.metadata.fromcols.length; ++i) {
-                    nm += (comma + p.metadata.fromcols[i] + "=" +  p.metadata.tocols[i]);
+                    nm += (comma + p.metadata.fromcols[i] + "=" + p.metadata.tocols[i]);
+                    comma = ",";
                 }
-                
+
                 nm += "]";
-                comma = ",";
             }
-                
+
             elements.unshift(nm);
             p = treeViewData[p.parent];
         }
-        
+
         return elements.join("|");
-        
+
     };
-    
+
     useEffect(() => {
-       updateSelectColumns();
+        updateSelectColumns();
     }, [selectedColumnIds]);
     return (
             <QueryDesignContext.Provider
                 value={{
-                    datasource,
-                    treeViewData, 
-                    selectedColumnIds, 
-                    selectedTableIds, 
-                    baseTable, 
-                    selectColumns, 
-                    from,
-                    filterColumns, 
-                    setDatasource,
-                    setTreeViewData, 
-                    setSelectedColumnIds, 
-                    setFrom,
-                    setSelectedTableIds, 
-                    setBaseTable,
-                    setSelectColumns,
-                    setFilterColumns,
-                    updateSelectColumns}}>
+                                datasource,
+                                treeViewData,
+                                selectedColumnIds,
+                                selectedTableIds,
+                                baseTable,
+                                selectColumns,
+                                from,
+                                filterColumns,
+                                setDatasource,
+                                setTreeViewData,
+                                setSelectedColumnIds,
+                                setFrom,
+                                setSelectedTableIds,
+                                setBaseTable,
+                                setSelectColumns,
+                                setFilterColumns,
+                                updateSelectColumns}}>
                 {children}
             </QueryDesignContext.Provider>
             );

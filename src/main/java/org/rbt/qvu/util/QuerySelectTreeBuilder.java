@@ -182,7 +182,6 @@ public class QuerySelectTreeBuilder {
                         String key = datasourceName + "." + toTable;
                         TableSettings ts = dsHelper.getTableSettings(key);
                         if (userHasAccess(ts, userRoles)) {
-
                             if (ts != null) {
                                 if (StringUtils.isNotEmpty(ts.getDisplayName())) {
                                     toTable = ts.getDisplayName();
@@ -203,7 +202,6 @@ public class QuerySelectTreeBuilder {
                                 fkn.getMetadata().put("fkname", fk.getName());
                                 fkn.getMetadata().put("fromcols", fk.getColumns());
                                 fkn.getMetadata().put("tocols", fk.getToColumns());
-
                                 n.getChildren().add(fkn);
 
                                 Table fkt = tMap.get(key);

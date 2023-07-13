@@ -53,7 +53,8 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
-            setTreeViewData(flattenTree(res.result));
+            let treeData = flattenTree(res.result);
+            setTreeViewData(treeData);
             setDatasource(datasource);
             hideMessage();
         }

@@ -11,6 +11,7 @@ package org.rbt.qvu.dto;
 public class SqlSelectColumn {
     private String datasource;
     private String tableName;
+    private String tableAlias;
     private String columnName;
     private String displayName;
     private int sortPosition = -1;
@@ -80,6 +81,14 @@ public class SqlSelectColumn {
 
     public void setCustomSql(String customSql) {
         this.customSql = customSql;
+    }
+
+    public String getTableAlias() {
+        return tableAlias;
+    }
+
+    public void setTableAlias(String tableAlias) {
+        this.tableAlias = tableAlias;
     }
     
     

@@ -15,6 +15,7 @@ public class SqlFrom {
     private String table;
     private String joinType;
     private String alias;
+    private String fromAlias;
     private List <String> fromColumns = new ArrayList<>();
     private List <String> toColumns = new ArrayList<>();
 
@@ -56,6 +57,14 @@ public class SqlFrom {
 
     public void setJoinType(String joinType) {
         this.joinType = joinType;
+    }
+
+    public String getFromAlias() {
+        return fromAlias;
+    }
+
+    public void setFromAlias(String fromAlias) {
+        this.fromAlias = fromAlias;
     }
     
     

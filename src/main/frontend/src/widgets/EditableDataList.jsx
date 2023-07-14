@@ -45,7 +45,7 @@ const EditableDataList = (props) => {
                     }
 
                     return <div className={listConfig.className}>
-                        <div style={labelStyle} className="label" >{c.label ? c.label : ""}</div>
+                        <div  className="label" style={labelStyle} >{c.label ? c.label : ""}</div>
                         <div className="display-field"  style={fieldStyle} >{getFieldValue(rec, c.field)}</div>
                     </div>;
                 } else {
@@ -71,8 +71,8 @@ const EditableDataList = (props) => {
     
     const getButtons = (indx) => {
         return <div className="btn-bar tb-border">
-            {isEditDisabled(indx) ? <CiEdit className="icon-s-dis" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} /> : <CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} title={getEditTitle(indx)} onClick={(e) => listConfig.onEdit(indx)} />}
-            {isDeleteDisabled(indx) ? <MdOutlineDeleteForever className="icon-s-dis" size={SMALL_ICON_SIZE}  title={getDelTitle(indx)} /> : <MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE} title={getDelTitle(indx)} onClick={(e) => listConfig.onDelete(indx)} />}
+            {isEditDisabled(indx) ? <span title={getEditTitle(indx)}><CiEdit className="icon-s-dis" size={SMALL_ICON_SIZE} /></span> : <span title={getEditTitle(indx)}><CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => listConfig.onEdit(indx)} /></span>}
+            {isDeleteDisabled(indx) ? <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon-s-dis" size={SMALL_ICON_SIZE}  /> </span>: <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => listConfig.onDelete(indx)} /></span>}
         </div>;
      };
 
@@ -94,7 +94,7 @@ const EditableDataList = (props) => {
                 <div className="title">
                     <span>{listConfig.title}</span>
                     {listConfig.onAdd &&
-                            <span style={{float: "right"}}><MdOutlineAddBox size={SMALL_ICON_SIZE} title={listConfig.addTitle} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
+                            <span  title={listConfig.addTitle} style={{float: "right"}}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
                     }
                 </div>
                 <div className="data-container">

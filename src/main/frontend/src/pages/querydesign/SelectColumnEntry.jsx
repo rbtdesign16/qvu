@@ -8,20 +8,31 @@ import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
 import useHelp from "../../context/HelpContext";
 import { MdHelpOutline } from "react-icons/md";
-import {AiFillFileAdd, AiFillCaretDown, AiFillCaretUp, AiFillCopy} from "react-icons/ai";
-import {SMALL_ICON_SIZE} from "../../utils/helper";
+import {AiFillFileAdd, AiFillDelete, AiFillCaretDown, AiFillCaretUp, AiFillCopy} from "react-icons/ai";
+import {SMALL_ICON_SIZE, confirm} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
     const {columnData, index} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
-    const {selectColumns, setSelectColumns, formatPathForDisplay} = useQueryDesign();
+    const {selectColumns, 
+        setSelectColumns, 
+        formatPathForDisplay, 
+        updateSelectColumns,
+        selectedColumnIds,
+        setSelectedColumnIds} = useQueryDesign();
 
     const getHelpText = () => {
-        if (columnData.pkindex && (Number(columnData.pkindex) > -1)) {
+        let pkindex = -1;
+        
+        if (columnData.pkindex) {
+            pkindex = Number(columnData.pkindex);
+        }
+        
+        if (pkindex > -1) {
             return <div className="entrygrid-125-550">
                     <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                    <div className="label">{getText("PK Index:")}</div><div>{columnData.pkindex}</div>
+                    <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
                     <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
                     <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
                     <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
@@ -36,20 +47,20 @@ const SelectColumnEntry = (props) => {
         }
     };
     
-    const duplicateEntry = () => {
+    const duplicateEntry = async () => {
         let s = [...selectColumns];
-        let item = {...s[index]};
+        let item = {...columnData};
+        item.isdup = true;
         if (index  < (s.length - 1)) {
             s.splice(index, 0, item);
         } else {
             s.push(item);
         }
         
-        setSelectColumns(s);
-        updateSelectColumns();
+        updateSelectColumns(s);
     };
     
-    const copyEntry = () => {
+    const copyPath = () => {
         navigator.clipboard.writeText(columnData.path);
     };
     
@@ -69,6 +80,34 @@ const SelectColumnEntry = (props) => {
         setSelectColumns(s);
     };
     
+    const remove = async () => {
+        if (await confirm(getText("Remove:", " " + columnData.displayName + "?"))) {
+            let s = [...selectColumns];
+            s.splice(index, 1);
+            
+            let cnt = 0;
+            for (let i = 0; i < s.length; ++i) {
+                if (s[i].path === columnData.path) {
+                    cnt++;
+                    break;
+                }
+            }
+            
+            if (cnt === 0) {
+                let indx = selectedColumnIds.findIndex((element) => element === columnData.nodeId);
+                
+                if (indx > -1) {
+                    let sids = [...selectedColumnIds];
+                    sids.splice(indx, 1);
+                    setSelectedColumnIds(sids);
+                }
+            }
+            
+            setSelectColumns(s);
+                
+        }
+    };
+    
     return <div key={"cse-" + index} className="select-column-entry">
         <div className="detail-hdr">
             <span>
@@ -79,11 +118,12 @@ const SelectColumnEntry = (props) => {
         
         <div className="tab platinum-b">
             <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
-            <span title={getText("Copy path")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyEntry()} /></span>
+            <span title={getText("Copy path")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyPath()} /></span>
             <div style={{paddingTop: "10%"}}>
                 {(index > 0) && <span title={getText("Move up")}><AiFillCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
                 {(index < (selectColumns.length - 1)) && <span title={getText("Move down")}><AiFillCaretDown className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveDown()} /></span>}
-            </div>
+                </div>
+            <div title={getText("Remove entry")}><AiFillDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></div>
         </div>
         <div className="detail">
         detail

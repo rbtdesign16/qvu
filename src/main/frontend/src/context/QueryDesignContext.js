@@ -12,12 +12,25 @@ export const QueryDesignProvider = ({ children }) => {
     const [filterColumns, setFilterColumns] = useState([]);
     const [from, setFrom] = useState([]);
 
-    const updateSelectColumns = async () => {
+    const updateSelectColumns = async (scols) => {
         let cols = [];
         let cMap = new Map();
+        
+        if (!scols) {
+            scols = [...selectColumns];
+        }
 
-        for (let i = 0; i < selectColumns.length; ++i) {
-            cMap.set(selectColumns[i].path, selectColumns[i]);
+        for (let i = 0; i < scols.length; ++i) {
+            // may have multiple columsn for same path
+            // in the SelectColumnList
+            let c = cMap.get(scols[i].path);
+            
+            if (!c) {
+                c = [];
+            }
+            
+            c.push(scols[i]);
+            cMap.set(scols[i].path, c);
         }
 
         let tablePathSet = new Set();
@@ -37,9 +50,11 @@ export const QueryDesignProvider = ({ children }) => {
             }
 
             let c = cMap.get(path);
-            if (c) {
-                c.path = path;
-                cols.push(c);
+            if (c && (c.length > 0)) {
+                for (let j = 0; j < c.length; ++j) {
+                    c[j].path = path;
+                    cols.push(c[j]);
+                }
             } else {
                 cols.push({
                     datasource: datasource,
@@ -52,7 +67,8 @@ export const QueryDesignProvider = ({ children }) => {
                     pkindex: element.metadata.pkindex ? element.metadata.pkindex : -1,
                     aggregateFunction: "",
                     path: path,
-                    customSql: ""
+                    customSql: "",
+                    nodeId: selectedColumnIds[i]
                 });
             }
         }

@@ -27,37 +27,36 @@ const JoinType = (props) => {
     };
     
     return ( 
-            <div className="static-modal">
-                <Modal animation={false} 
-                       size="sm"
-                       show={config.show} 
-                       aria-labelledby="contained-modal-title-vcenter"
-                       centered
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
-                    <Modal.Header closeButton>
-                        <Modal.Title as={MODAL_TITLE_SIZE}>
-                            <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>
-                            {getText("Join Type")}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div onChange={(e) => setJoinType(e.target.value)}>
-                            <input id="outer" type="radio" name="jointype" checked={!isInner()} value="outer"/><label className="label-l" htmlFor="outer"> {getText("Outer Join")}</label><br />
-                            <input id="inner" type="radio" name="jointype" checked={isInner()} value="inner"/><label className="label-l"  htmlFor="inner">{getText("Inner Join")}</label>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button size="sm" onClick={() => config.hide()}>Cancel</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={(e) => config.setJoinType(joinType, config.nodeId)}>{getText("Ok")}</Button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
-                    );
-        };
+        <div className="static-modal">
+            <Modal animation={false} 
+                   size="sm"
+                   show={config.show} 
+                   aria-labelledby="contained-modal-title-vcenter"
+                   centered
+                   onHide={onHide}
+                   backdrop={true} 
+                   keyboard={true}>
+                <Modal.Header closeButton>
+                    <Modal.Title as={MODAL_TITLE_SIZE}>
+                        <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>
+                        {getText("Join Type")}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div onChange={(e) => setJoinType(e.target.value)}>
+                        <input id="outer" type="radio" name="jointype" checked={!isInner()} value="outer"/><label className="label-l" htmlFor="outer"> {getText("Outer Join")}</label><br />
+                        <input id="inner" type="radio" name="jointype" checked={isInner()} value="inner"/><label className="label-l"  htmlFor="inner">{getText("Inner Join")}</label>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button size="sm" onClick={() => config.hide()}>Cancel</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={(e) => config.setJoinType(joinType, config.nodeId)}>{getText("Ok")}</Button>
+                </Modal.Footer>
+            </Modal>
+        </div>);
+};
 
-        JoinType.propTypes = {
-            config: PropTypes.object.isRequired
-        };
+JoinType.propTypes = {
+    config: PropTypes.object.isRequired
+};
 
-        export default JoinType;
+export default JoinType;

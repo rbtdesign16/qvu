@@ -42,6 +42,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     margin: 5px;
 }
 
+.entrygrid-125-425 {
+    display: grid;
+    grid-template-columns: 125px 425px;
+    grid-row-gap: 3px;
+    margin: 5px;
+}
+
+
 .entrygrid-175-425 {
     display: grid;
     grid-template-columns: 175px 425px;

@@ -9,7 +9,7 @@ import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
-import QueryData from "./QueryData";
+import SelectColumnList from "./SelectColumnList";
 import QueryFilter from "./QueryFilter";
 import QuerySql from "./QuerySql";
 import { flattenTree } from "react-accessible-treeview";
@@ -62,30 +62,27 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
     };
 
     return (
-            
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
-                    <label>{getText("Datasource")}</label>
+                    <label className="label-l">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                         <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
                         {loadDatasourceOptions()}
                     </select>
                     <DataSelectTree/>
                 </SplitterPanel>
-                <SplitterPanel size={75} className="flex align-items-center justify-content-center">
-                    <div className="gdesign-tab-cont">
-                        <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
-                            <Tab eventKey="dsel" title={getText("Data")}>
-                                <QueryData/>
-                            </Tab> 
-                            <Tab eventKey="fil" title={getText("Filter")}>
-                                <QueryFilter/>
-                            </Tab>
-                            <Tab eventKey="sql" title={getText("SQL")}>
-                                <QuerySql/>
-                            </Tab>
-                        </Tabs>
-                    </div>  
+                <SplitterPanel size={75} className="query-design-cont">
+                    <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
+                        <Tab eventKey="dsel" title={getText("Data")}>
+                            <SelectColumnList className="select-column-list"/>
+                        </Tab> 
+                        <Tab eventKey="fil" title={getText("Filter")}>
+                            <QueryFilter/>
+                        </Tab>
+                        <Tab eventKey="sql" title={getText("SQL")}>
+                            <QuerySql/>
+                        </Tab>
+                    </Tabs>
                 </SplitterPanel>
             </Splitter>);
 

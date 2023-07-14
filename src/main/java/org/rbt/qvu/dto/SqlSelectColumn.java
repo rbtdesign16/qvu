@@ -11,6 +11,8 @@ package org.rbt.qvu.dto;
 public class SqlSelectColumn {
     private String datasource;
     private String tableName;
+    private int dataType;
+    private String dataTypeName;
     private String tableAlias;
     private String columnName;
     private String displayName;
@@ -89,6 +91,22 @@ public class SqlSelectColumn {
 
     public void setTableAlias(String tableAlias) {
         this.tableAlias = tableAlias;
+    }
+
+    public int getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(int dataType) {
+        this.dataType = dataType;
+    }
+
+    public String getDataTypeName() {
+        return dataTypeName;
+    }
+
+    public void setDataTypeName(String dataTypeName) {
+        this.dataTypeName = dataTypeName;
     }
     
     

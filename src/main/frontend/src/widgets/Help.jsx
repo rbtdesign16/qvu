@@ -34,7 +34,7 @@ const Help = (props) => {
                 >
                 <Modal.Header bsPrefix="message-header" closeButton>
                     <Modal.Title bsPrefix="message-title" id="contained-modal-title-vcenter">
-                        {getText("Help")}
+                    {getText("Help")}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body bsPrefix="message-body">{getHelp()}</Modal.Body>

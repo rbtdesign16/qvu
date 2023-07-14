@@ -44,6 +44,8 @@ export const QueryDesignProvider = ({ children }) => {
                 cols.push({
                     datasource: datasource,
                     tableName: table,
+                    dataType: element.metadata.datatype,
+                    dataTypeName: element.metadata.datatypename,
                     columnName: element.metadata.dbname,
                     displayName: element.name,
                     sortPosition: -1,
@@ -56,6 +58,22 @@ export const QueryDesignProvider = ({ children }) => {
 
         setFrom(buildFromRecords([...tablePathSet], cols));
         setSelectColumns(cols);
+    };
+    
+    const formatPathForDisplay = (path) => {
+        let l = path.split("|");
+        
+        for (let i = 0; i < l.length; ++i) {
+            if (l[i].includes("{")) {
+                let pos1 = l[i].indexOf("{");
+                let pos2 = l[i].indexOf("}");
+                l[i] = l[i].substring(0, pos1) + l[i].substring(pos2+1);
+            }
+        }
+        
+        
+            
+        return l.join(" -> ");
     };
     
     const getJoinFromColumns = (part) => {
@@ -255,23 +273,24 @@ export const QueryDesignProvider = ({ children }) => {
     return (
             <QueryDesignContext.Provider
                 value={{
-                                datasource,
-                                treeViewData,
-                                selectedColumnIds,
-                                selectedTableIds,
-                                baseTable,
-                                selectColumns,
-                                from,
-                                filterColumns,
-                                setDatasource,
-                                setTreeViewData,
-                                setSelectedColumnIds,
-                                setFrom,
-                                setSelectedTableIds,
-                                setBaseTable,
-                                setSelectColumns,
-                                setFilterColumns,
-                                updateSelectColumns}}>
+                    datasource,
+                    treeViewData,
+                    selectedColumnIds,
+                    selectedTableIds,
+                    baseTable,
+                    selectColumns,
+                    from,
+                    filterColumns,
+                    setDatasource,
+                    setTreeViewData,
+                    setSelectedColumnIds,
+                    setFrom,
+                    setSelectedTableIds,
+                    setBaseTable,
+                    setSelectColumns,
+                    setFilterColumns,
+                    updateSelectColumns,
+                    formatPathForDisplay}}>
                 {children}
             </QueryDesignContext.Provider>
             );

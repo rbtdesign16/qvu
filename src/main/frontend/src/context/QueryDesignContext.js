@@ -49,6 +49,7 @@ export const QueryDesignProvider = ({ children }) => {
                     columnName: element.metadata.dbname,
                     displayName: element.name,
                     sortPosition: -1,
+                    pkindex: element.metadata.pkindex ? element.metadata.pkindex : -1,
                     aggregateFunction: "",
                     path: path,
                     customSql: ""

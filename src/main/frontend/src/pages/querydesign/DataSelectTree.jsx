@@ -69,7 +69,7 @@ const DataSelectTree = (props) => {
                         return <img  src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     }
                 case NODE_TYPE_COLUMN:
-                    if (element.metadata.pk) {
+                    if (element.metadata.pkindex > -1) {
                         return <FcKey className="icon-s" size={SMALL_ICON_SIZE}/>;
                     } else {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
@@ -162,13 +162,13 @@ const DataSelectTree = (props) => {
     
     const hideJoinType = () => {
         setShowJoinType({show: false});
-    }
+    };
     
     const setJoinType = (joinType, nodeId) => {
         treeViewData[nodeId].metadata.jointype = joinType;
         hideJoinType();
         updateSelectColumns();
-    }
+    };
 
     const handleContextMenu = (e, element) => {
         if (element && element.metadata) {
@@ -188,7 +188,7 @@ const DataSelectTree = (props) => {
                     break;
             }
         }
-    }
+    };
 
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {

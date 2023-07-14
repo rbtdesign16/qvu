@@ -134,7 +134,7 @@ public class QuerySelectTreeBuilder {
                     cn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_COLUMN);
                     cn.getMetadata().put("dbname", c.getName());
                     if (c.getPkIndex() > 0) {
-                        cn.getMetadata().put("pk", true);
+                        cn.getMetadata().put("pkindex", c.getPkIndex());
                     }
 
                     cn.setName(cname);

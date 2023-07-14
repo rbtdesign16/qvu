@@ -17,6 +17,7 @@ public class SqlSelectColumn {
     private String columnName;
     private String displayName;
     private int sortPosition = -1;
+    private int pkIndex;
     private String aggregateFunction;
     private String customSql;
     private String path;
@@ -107,6 +108,14 @@ public class SqlSelectColumn {
 
     public void setDataTypeName(String dataTypeName) {
         this.dataTypeName = dataTypeName;
+    }
+
+    public int getPkIndex() {
+        return pkIndex;
+    }
+
+    public void setPkIndex(int pkIndex) {
+        this.pkIndex = pkIndex;
     }
     
     

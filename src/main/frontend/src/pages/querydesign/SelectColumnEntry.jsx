@@ -18,12 +18,22 @@ const SelectColumnEntry = (props) => {
     const {selectColumns, setSelectColumns, formatPathForDisplay} = useQueryDesign();
 
     const getHelpText = () => {
-        return <div className="entrygrid-125-550">
-            <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-            <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-            <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-            <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-            </div>;
+        if (columnData.pkindex && (Number(columnData.pkindex) > -1)) {
+            return <div className="entrygrid-125-550">
+                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+                    <div className="label">{getText("PK Index:")}</div><div>{columnData.pkindex}</div>
+                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+                </div>;
+        } else {
+            return <div className="entrygrid-125-550">
+                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+                </div>;
+        }
     };
     
     const duplicateEntry = () => {

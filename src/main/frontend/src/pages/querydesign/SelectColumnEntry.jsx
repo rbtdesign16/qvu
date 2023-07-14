@@ -8,14 +8,14 @@ import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
 import useHelp from "../../context/HelpContext";
 import { MdHelpOutline } from "react-icons/md";
-import {AiFillCaretDown, AiFillCaretUp, AiFillCopy} from "react-icons/ai";
+import {AiFillFileAdd, AiFillCaretDown, AiFillCaretUp, AiFillCopy} from "react-icons/ai";
 import {SMALL_ICON_SIZE} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
     const {columnData, index} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
-    const {selectColumns, setSelectedColumns, formatPathForDisplay} = useQueryDesign();
+    const {selectColumns, setSelectColumns, formatPathForDisplay} = useQueryDesign();
 
     const getHelpText = () => {
         return <div className="entrygrid-125-550">
@@ -26,13 +26,37 @@ const SelectColumnEntry = (props) => {
             </div>;
     };
     
+    const duplicateEntry = () => {
+        let s = [...selectColumns];
+        let item = {...s[index]};
+        if (index  < (s.length - 1)) {
+            s.splice(index, 0, item);
+        } else {
+            s.push(item);
+        }
+        
+        setSelectColumns(s);
+        updateSelectColumns();
+    };
+    
     const copyEntry = () => {
+        navigator.clipboard.writeText(columnData.path);
     };
     
     const moveUp = () => {
+        let s = [...selectColumns];
+        let item = s[index];
+        s.splice(index, 1);
+        s.splice(index-1, 0, item);
+        setSelectColumns(s);
     };
 
     const moveDown = () => {
+        let s = [...selectColumns];
+        let item = s[index+1];
+        s.splice(index+1, 1);
+        s.splice(index, 0, item);
+        setSelectColumns(s);
     };
     
     return <div key={"cse-" + index} className="select-column-entry">
@@ -44,11 +68,12 @@ const SelectColumnEntry = (props) => {
          </div>
         
         <div className="tab platinum-b">
-        <span title={getText("Copy path")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyEntry()} /></span>
-                <div style={{paddingTop: "40%"}}>
+            <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
+            <span title={getText("Copy path")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyEntry()} /></span>
+            <div style={{paddingTop: "10%"}}>
                 {(index > 0) && <span title={getText("Move up")}><AiFillCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
                 {(index < (selectColumns.length - 1)) && <span title={getText("Move down")}><AiFillCaretDown className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveDown()} /></span>}
-                </div>
+            </div>
         </div>
         <div className="detail">
         detail

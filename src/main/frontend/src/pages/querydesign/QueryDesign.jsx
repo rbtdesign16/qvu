@@ -47,18 +47,22 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
     };
 
     const onDatasourceChange = async (e) => {
-        showMessage(INFO, getText("Loading datasource information", "..."), null, true);
         let datasource = e.target.options[e.target.selectedIndex].value;
-        let res = await getDatasourceTreeViewData(datasource);
-        if (isApiError(res)) {
-            showMessage(ERROR, res.message);
+        if (datasource) {
+            showMessage(INFO, getText("Loading datasource information", "..."), null, true);
+            let res = await getDatasourceTreeViewData(datasource);
+            if (isApiError(res)) {
+                showMessage(ERROR, res.message);
+            } else {
+                let treeData = flattenTree(res.result);
+                setTreeViewData(treeData);
+                setDatasource(datasource);
+                hideMessage();
+            }
         } else {
-            let treeData = flattenTree(res.result);
-            setTreeViewData(treeData);
-            setDatasource(datasource);
-            hideMessage();
+            setTreeViewData(null);
+            setDatasource(null);
         }
-        return "";
     };
 
     return (
@@ -66,7 +70,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
                 <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
                     <label className="label-l">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
-                        <option value="" disabled selected hidden>{getText("Select a datasource", "...")}</option>                           
+                        <option value=""></option>                           
                         {loadDatasourceOptions()}
                     </select>
                     <DataSelectTree/>

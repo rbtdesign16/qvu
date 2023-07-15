@@ -43,4 +43,10 @@ public class Errors {
         
         return retval;
     }
+    
+    public static void populateError(OperationResult result, Exception ex) {
+        result.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
+        result.setMessage(ex.toString());
+    }
+ 
 }

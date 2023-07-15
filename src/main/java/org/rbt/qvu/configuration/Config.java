@@ -52,9 +52,7 @@ public class Config {
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
-                langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
-                securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
-                datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
+                loadConfiguration();
             }
             
             if (securityConfig == null) {
@@ -75,6 +73,12 @@ public class Config {
             LOG.error(ex.toString(), ex);
         }
 
+    }
+
+    public void loadConfiguration() throws Exception {
+        langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
+        securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
+        datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
     }
 
     public String getSecurityConfigurationFileName() {

@@ -27,7 +27,7 @@ public class QuerySelectTreeBuilder {
     public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, int maxImportedKeyDepth, int maxExportedKeyDepth, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
-        
+
         Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
         for (ForeignKey fk : datasource.getCustomForeignKeys()) {
             List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
@@ -37,12 +37,11 @@ public class QuerySelectTreeBuilder {
             }
             fklist.add(fk);
         }
-        
-        
+
         Map<String, Table> tMap = new HashMap<>();
         for (Table t : tableInfo) {
             List<ForeignKey> fklist = customForeignKeys.get(t.getName());
-            
+
             if (fklist != null) {
                 for (ForeignKey fk : fklist) {
                     if (fk.isImported()) {
@@ -52,10 +51,10 @@ public class QuerySelectTreeBuilder {
                     }
                 }
             }
-            
+
             tMap.put(t.getCacheKey(), t);
         }
-        
+
         int curDepth = 0;
         int indx = 0;
         for (Table t : tableInfo) {
@@ -90,21 +89,21 @@ public class QuerySelectTreeBuilder {
 
         Integer[] idHolder = {0};
         setIds(retval, idHolder);
-        
+
         return retval;
     }
 
     private static void setIds(QuerySelectNode n, Integer[] idHolder) {
         n.setId(idHolder[0]++);
-        
+
         if (n.getChildren() != null) {
             for (QuerySelectNode c : n.getChildren()) {
                 setIds(c, idHolder);
             }
-        } 
-            
+        }
+
     }
-    
+
     private static boolean userHasAccess(TableSettings ts, Set<String> userRoles) {
         boolean retval = true;
 
@@ -190,78 +189,81 @@ public class QuerySelectTreeBuilder {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
                 for (ForeignKey fk : fkList) {
-                    // using this to prevent circular references 
-                    Integer cnt = fkMap.get(fk.getName());
-                    // do this to prevent circular relationships
-                    if ((cnt == null) || (cnt == 1)) {
-                        if (cnt == null) {
-                            cnt = 0;
-                        }
-                        
-                        cnt++;
-                        
-                        fkMap.put(fk.getName(), cnt);
-                        String toTable = fk.getToTableName();
-                        boolean hide = false;
-                        String key = datasourceName + "." + toTable;
-                        TableSettings ts = dsHelper.getTableSettings(key);
-                        if (userHasAccess(ts, userRoles)) {
-                            if (ts != null) {
-                                if (StringUtils.isNotEmpty(ts.getDisplayName())) {
-                                    toTable = ts.getDisplayName();
-                                }
-
-                                hide = ts.isHide();
+                    if (tMap.containsKey(fk.getTableCacheKey()) 
+                            && tMap.containsKey(fk.getToTableCacheKey())) {
+                        // using this to prevent circular references 
+                        Integer cnt = fkMap.get(fk.getName());
+                        // do this to prevent circular relationships
+                        if ((cnt == null) || (cnt == 1)) {
+                            if (cnt == null) {
+                                cnt = 0;
                             }
 
-                            if (!hide) {
-                                QuerySelectNode fkn = new QuerySelectNode();
-                                if (imported) {
-                                    fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
-                                } else {
-                                    fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
-                                }
-                                fkn.getMetadata().put("dbname", fk.getToTableName());
-                                fkn.setName(toTable);
-                                fkn.getMetadata().put("fkname", fk.getName());
-                                fkn.getMetadata().put("fromcols", fk.getColumns());
-                                fkn.getMetadata().put("tocols", fk.getToColumns());
-                                n.getChildren().add(fkn);
+                            cnt++;
 
-                                Table fkt = tMap.get(key);
-
-                                List<String> fromdiscols = new ArrayList<>();
-                                List<String> todiscols = new ArrayList<>();
-
-                                for (int i = 0; i < fk.getColumns().size(); ++i) {
-                                    String cname = fk.getColumns().get(i);
-                                    String tocname = fk.getToColumns().get(i);
-                                    ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
-
-                                    if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                        fromdiscols.add(cs.getDisplayName());
-                                    } else {
-                                        fromdiscols.add(cname);
+                            fkMap.put(fk.getName(), cnt);
+                            String toTable = fk.getToTableName();
+                            boolean hide = false;
+                            String key = fk.getToTableCacheKey();
+                            TableSettings ts = dsHelper.getTableSettings(key);
+                            if (userHasAccess(ts, userRoles)) {
+                                if (ts != null) {
+                                    if (StringUtils.isNotEmpty(ts.getDisplayName())) {
+                                        toTable = ts.getDisplayName();
                                     }
 
-                                    cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
-
-                                    if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                        todiscols.add(cs.getDisplayName());
-                                    } else {
-                                        todiscols.add(tocname);
-                                    }
+                                    hide = ts.isHide();
                                 }
 
-                                fkn.getMetadata().put("fromdiscols", fromdiscols);
-                                fkn.getMetadata().put("todiscols", todiscols);
-
-                                loadColumns(fkn, ts, fkt, rootTable, userRoles);
-                                if (curDepth < maxDepth) {
+                                if (!hide) {
+                                    QuerySelectNode fkn = new QuerySelectNode();
                                     if (imported) {
-                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
+                                        fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
                                     } else {
-                                        loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
+                                        fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
+                                    }
+                                    fkn.getMetadata().put("dbname", fk.getToTableName());
+                                    fkn.setName(toTable);
+                                    fkn.getMetadata().put("fkname", fk.getName());
+                                    fkn.getMetadata().put("fromcols", fk.getColumns());
+                                    fkn.getMetadata().put("tocols", fk.getToColumns());
+                                    n.getChildren().add(fkn);
+
+                                    Table fkt = tMap.get(key);
+
+                                    List<String> fromdiscols = new ArrayList<>();
+                                    List<String> todiscols = new ArrayList<>();
+
+                                    for (int i = 0; i < fk.getColumns().size(); ++i) {
+                                        String cname = fk.getColumns().get(i);
+                                        String tocname = fk.getToColumns().get(i);
+                                        ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
+
+                                        if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                            fromdiscols.add(cs.getDisplayName());
+                                        } else {
+                                            fromdiscols.add(cname);
+                                        }
+
+                                        cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
+
+                                        if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
+                                            todiscols.add(cs.getDisplayName());
+                                        } else {
+                                            todiscols.add(tocname);
+                                        }
+                                    }
+
+                                    fkn.getMetadata().put("fromdiscols", fromdiscols);
+                                    fkn.getMetadata().put("todiscols", todiscols);
+
+                                    loadColumns(fkn, ts, fkt, rootTable, userRoles);
+                                    if (curDepth < maxDepth) {
+                                        if (imported) {
+                                            loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
+                                        } else {
+                                            loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getExportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);
+                                        }
                                     }
                                 }
                             }

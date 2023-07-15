@@ -76,5 +76,12 @@ public class ForeignKey {
         this.imported = imported;
     }
     
+    public String getTableCacheKey() {
+        return datasourceName + "." + tableName;
+    }
+    
+    public String getToTableCacheKey() {
+        return datasourceName + "." + toTableName;
+    }
     
 }

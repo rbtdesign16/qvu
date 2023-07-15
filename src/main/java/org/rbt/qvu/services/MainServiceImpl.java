@@ -240,12 +240,19 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
-        OperationResult retval = configFileHandler.saveDatasource(datasource);
-        if (retval.isSuccess()) {
-            cacheHelper.getTableCache().clear();
-            datasourceSettingsHelper.load(config.getDatasourcesConfig());
-        }
+        OperationResult<List<DataSourceConfiguration>> retval = new OperationResult();
 
+        try {
+            retval = configFileHandler.saveDatasource(datasource);
+
+            if (retval.isSuccess()) {
+                cacheHelper.getTableCache().clear();
+                config.getDatasourcesConfig().setDatasources(retval.getResult());
+                datasourceSettingsHelper.load(config.getDatasourcesConfig());
+            }
+        } catch (Exception ex) {
+            Errors.populateError(retval, ex);
+        }
         return retval;
     }
 
@@ -424,54 +431,53 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     @Override
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName) {
         OperationResult<QuerySelectNode> retval = new OperationResult<>();
-        
+
         long start = System.currentTimeMillis();
         OperationResult<List<Table>> res = getDatasourceTables(datasourceName);
-        
+
         if (res.isSuccess()) {
             retval = buildQuerySelectTreeView(datasourceName, res.getResult());
         } else {
             retval.setErrorCode(res.getErrorCode());
             retval.setMessage(res.getMessage());
         }
-        
-        LOG.debug("getDatasourceTreeViewData() - elapsed time: " +  ((System.currentTimeMillis() - start)/1000) + "sec");
+
+        LOG.debug("getDatasourceTreeViewData() - elapsed time: " + ((System.currentTimeMillis() - start) / 1000) + "sec");
         return retval;
     }
-    
-    private OperationResult<QuerySelectNode> buildQuerySelectTreeView( String datasourceName, List<Table> tableInfo) {
+
+    private OperationResult<QuerySelectNode> buildQuerySelectTreeView(String datasourceName, List<Table> tableInfo) {
         OperationResult<QuerySelectNode> retval = new OperationResult();
-        
+
         try {
-        User user = getCurrentUser();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("user: " + user.getName());
-            for (String s : user.getRoles()) {
-                LOG.debug("\trole: " + s);
+            User user = getCurrentUser();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("user: " + user.getName());
+                for (String s : user.getRoles()) {
+                    LOG.debug("\trole: " + s);
+                }
             }
-        }
-       
-        Set<String> userRoles = new HashSet<>(user.getRoles());
 
+            Set<String> userRoles = new HashSet<>(user.getRoles());
 
-        QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper, 
-                config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName), 
-                userRoles,
-                config.getDatasourcesConfig().getMaxImportedKeyDepth(), 
-                config.getDatasourcesConfig().getMaxExportedKeyDepth(),
-                tableInfo);
-        
-        retval.setResult(node);
+            QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper,
+                    config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName),
+                    userRoles,
+                    config.getDatasourcesConfig().getMaxImportedKeyDepth(),
+                    config.getDatasourcesConfig().getMaxExportedKeyDepth(),
+                    tableInfo);
+
+            retval.setResult(node);
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
             retval.setMessage(ex.toString());
         }
-        
+
         return retval;
     }
 
@@ -483,7 +489,7 @@ public class MainServiceImpl implements MainService {
         ResultSet res = null;
         try {
             long start = System.currentTimeMillis();
-            
+
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
@@ -512,14 +518,14 @@ public class MainServiceImpl implements MainService {
                         setIndexColumns(dmd, t);
                         setPrimaryKeys(dmd, t);
                         cacheHelper.getTableCache().put(key, t);
-                    }
-
+                    } 
+                    
                     data.add(t);
                 }
 
                 retval.setResult(data);
-                
-                LOG.debug("getDatasourceTables(" + datasourceName  + ") - elapsed time: " + ((System.currentTimeMillis() - start)/1000) + "sec");
+
+                LOG.debug("getDatasourceTables(" + datasourceName + ") - elapsed time: " + ((System.currentTimeMillis() - start) / 1000) + "sec");
             } else {
                 throw new Exception("Datasource " + datasourceName + " not found");
             }
@@ -596,14 +602,14 @@ public class MainServiceImpl implements MainService {
         try {
             res = dmd.getImportedKeys(null, t.getSchema(), t.getName());
 
-            Map <String, ForeignKey> fkMap = new HashMap<>();
+            Map<String, ForeignKey> fkMap = new HashMap<>();
             while (res.next()) {
                 String toTable = res.getString(3);
                 String toColumn = res.getString(4);
                 String fromColumn = res.getString(8);
                 String fkName = res.getString(12);
                 ForeignKey fk = fkMap.get(fkName);
-                
+
                 if (fk == null) {
                     fk = new ForeignKey();
                     fk.setDatasourceName(datasourceName);
@@ -614,16 +620,14 @@ public class MainServiceImpl implements MainService {
                     retval.add(fk);
                     fkMap.put(fkName, fk);
                 }
-                
+
                 fk.getColumns().add(fromColumn);
                 fk.getToColumns().add(toColumn);
-             }
-        }
-        
-        finally {
+            }
+        } finally {
             DBHelper.closeConnection(null, null, res);
         }
-        
+
         return retval;
     }
 
@@ -634,14 +638,14 @@ public class MainServiceImpl implements MainService {
         try {
             res = dmd.getExportedKeys(null, t.getSchema(), t.getName());
 
-            Map <String, ForeignKey> fkMap = new HashMap<>();
+            Map<String, ForeignKey> fkMap = new HashMap<>();
             while (res.next()) {
                 String toColumn = res.getString(8);
                 String toTable = res.getString(7);
                 String fromColumn = res.getString(4);
                 String fkName = res.getString(12);
                 ForeignKey fk = fkMap.get(fkName);
-                
+
                 if (fk == null) {
                     fk = new ForeignKey();
                     fk.setDatasourceName(datasourceName);
@@ -651,16 +655,14 @@ public class MainServiceImpl implements MainService {
                     retval.add(fk);
                     fkMap.put(fkName, fk);
                 }
-                
+
                 fk.getColumns().add(fromColumn);
                 fk.getToColumns().add(toColumn);
-             }
-        }
-        
-        finally {
+            }
+        } finally {
             DBHelper.closeConnection(null, null, res);
         }
-        
+
         return retval;
     }
 
@@ -702,7 +704,7 @@ public class MainServiceImpl implements MainService {
             Object o = auth.getPrincipal();
 
             if ((o != null) && (o instanceof User)) {
-                retval = (User)o;
+                retval = (User) o;
             }
         }
 

@@ -231,7 +231,7 @@ const DataSelectTree = (props) => {
                 />
         </div>);
     } else {
-        return <div></div>;
+        return <div style={{padding: "5px", overflow: "hidden"}}>{getText("Select a datasource", "...")}</div>;
     }
 };
 

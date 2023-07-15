@@ -111,6 +111,7 @@ public class ConfigFileHandler {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                 }
                 config.setDatasourcesConfig(datasources);
+                retval.setResult(config.getDatasourcesConfig().getDatasources());
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();

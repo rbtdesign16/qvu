@@ -649,7 +649,7 @@ const Admin = () => {
             
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
-                setDatasources(await loadDatasources());
+                setDatasources(res.result);
                 setEditModal({show: false});
                 showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"));
 

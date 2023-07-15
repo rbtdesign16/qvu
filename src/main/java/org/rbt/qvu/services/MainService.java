@@ -36,5 +36,5 @@ public interface MainService {
     public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds);
     public OperationResult<List <ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName);
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName);
-
+    public OperationResult<List<String>> getDatasourceTableNames(String datasourceName);
 }

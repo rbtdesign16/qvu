@@ -38,7 +38,8 @@ import {
         testDatasource,
         isApiSuccess,
         isApiError,
-        loadTableSettings} from "../../utils/apiHelper";
+        loadTableSettings,
+        loadDatasourceTableNames} from "../../utils/apiHelper";
 import {
     isAdministrator, 
     isQueryDesigner, 
@@ -53,7 +54,7 @@ const Admin = () => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {datasources, setDatasources, databaseTypes} = useDataHandler();
+    const {datasources, setDatasources, databaseTypes, datasourceTableNames, setDatasourceTableNames} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
@@ -398,11 +399,28 @@ const Admin = () => {
 
     const showCustomForeignKeys = async (dataObject) => {
         let ds = {...dataObject};
-        setCustomForeignKeys({show: true, 
-            dataObject: dataObject,
-            datasource: ds,
-            saveCustomForeignKeys: saveCustomForeignKeys,
-            hideCustomForeignKeys: hideCustomForeignKeys});
+        let tnames;
+        if (!datasourceTableNames[dataObject.datasourceName]) {
+            showMessage(INFO, getText("Loading custom foreign keys", "..."), true);
+            let res = await loadDatasourceTableNames(ds.datasourceName);
+            if (isApiError(res)) {
+                showMessage(ERROR, res.message);
+            } else {
+                hideMessage();
+                tnames = res.result;
+                let dsnames = {...datasourceTableNames};
+                dsnames[dataObject.datasourceName] = tnames;
+                setDatasourceTableNames(dsnames);
+            }
+        }
+        
+        if (tnames && (tnames.length > 0)) {
+             setCustomForeignKeys({show: true, 
+                dataObject: dataObject,
+                datasource: ds,
+                saveCustomForeignKeys: saveCustomForeignKeys,
+                hideCustomForeignKeys: hideCustomForeignKeys});
+        }
     };
 
     const getDatasourceConfig = (title, dataObject) => {

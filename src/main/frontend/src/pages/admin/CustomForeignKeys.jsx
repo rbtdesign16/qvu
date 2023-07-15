@@ -28,11 +28,15 @@ const CustomForeignKeys = (props) => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {showMessage} = useMessage();
+    const {datasourceTableNames} = useDataHandler();
     const [customForeignKeys, setCustomForeignKeys] = useState([]);
+    const [datasourceName, setDatasourceName] = useState(null);
     
     const getDatasourceName = () => {
         if (config.datasource) {
             return config.datasource.datasourceName;
+        } else {
+            return "";
         }
     };
         
@@ -64,6 +68,8 @@ const CustomForeignKeys = (props) => {
         let fk = customForeignKeys[indx];
         if (e.target.name === "imported") {
             fk.imported = e.target.checked;
+        } else if ((e.target.name === "tableName") || (e.target.name === "toTableName")) {
+            fk[e.target.name] = e.target.options[e.target.selectedIndex].value;
         } else if ((e.target.name === "columns") || (e.target.name === "toColumns")) {
             let cols =  e.target.value.split(",");
             for (let i = 0; i < cols.length; ++i) {
@@ -82,14 +88,28 @@ const CustomForeignKeys = (props) => {
           setCustomForeignKeys(cfk);
       }
     };
+    
+    const getTableNameOptions = (val) => {
+        return datasourceTableNames[datasourceName].map(t => {
+            if (val === t) {
+                return <option value={t} selected>{t}</option>;
+            } else {
+                return <option value={t}>{t}</option>;
+            }
+        });
+    };
+    
+    const getTableSelect = (indx, field) => {
+        return <select name={field} onChange={(e) => onChange(e, indx)}><option value=""></option>{getTableNameOptions(customForeignKeys[indx][field])}</select>;
+    }; 
         
     const loadForeignKeyEntries = () => {
         if (customForeignKeys && (customForeignKeys.length > 0)) {
             return customForeignKeys.map((fk, indx) => {
                  return <div key={getUUID()} className="entrygrid-150-200 bord-b">
                     <div className="label">{getText("Name:")}</div><div><input size={30} name="name" type="text" defaultValue={fk.name} onBlur={(e) => onChange(e, indx)}/></div>
-                    <div className="label">{getText("Source Table:")}</div><div><input size={30} name="tableName" type="text" defaultValue={fk.tableName} onBlur={(e) => onChange(e, indx)}/></div>
-                    <div className="label">{getText("Target Table:")}</div><div><input size={30} name="toTableName" type="text" defaultValue={fk.toTableName} onBlur={(e) => onChange(e, indx)}/></div>
+                    <div className="label">{getText("Source Table:")}</div><div>{getTableSelect(indx, "tableName")}</div>
+                    <div className="label">{getText("Target Table:")}</div><div>{getTableSelect(indx, "toTableName")}</div>
                     <div className="label">{getText("Source Columns:")}</div><div><input size={30} name="columns" type="text" defaultValue={fk.columns ? fk.columns.join(",") : ""} onBlur={(e) => onChange(e, indx)}/></div>
                     <div className="label">{getText("Target Columns:")}</div><div><input size={30} name="toColumns" type="text" defaultValue={fk.toColumns ? fk.toColumns.join(",") : ""} onBlur={(e) => onChange(e, indx)}/></div>
                     <div className="label"></div><div><input name="imported" type="checkbox" defaultChecked={fk.imported} onChange={(e) => onChange(e, indx)} id={"imp-" + indx}/>
@@ -108,6 +128,7 @@ const CustomForeignKeys = (props) => {
     const onShow = () => {
         if (config.datasource.customForeignKeys) {
             setCustomForeignKeys(config.datasource.customForeignKeys);
+            setDatasourceName(getDatasourceName());
         }
     };
     
@@ -167,7 +188,7 @@ const CustomForeignKeys = (props) => {
                    keyboard={true}>
                 <Modal.Header onHide={onHide}>
                     <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
-                    &nbsp;&nbsp;{getText("Custom Foreign Keys", " - ") + getDatasourceName() }</Modal.Title>
+                    &nbsp;&nbsp;{getText("Custom Foreign Keys", " - ") + datasourceName }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div style={{height: "400px", overflow: "auto"}}>{loadForeignKeyEntries()}</div>

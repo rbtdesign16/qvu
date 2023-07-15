@@ -7,6 +7,7 @@ export const DataHandlerProvider = ({ children }) => {
     // set up initial state and reducer
     const [datasources, setDatasources] = useState(null);
     const [databaseTypes, setDatabaseTypes] = useState(null);
+    const [datasourceTableNames, setDatasourceTableNames] = useState({});
 
     const initializeDataHandler = async () => {
         if (!datasources) {
@@ -18,7 +19,7 @@ export const DataHandlerProvider = ({ children }) => {
 
     return (
             <DataHandlerContext.Provider
-                value={{datasources, databaseTypes, initializeDataHandler, setDatasources}}>
+                value={{datasources, databaseTypes, initializeDataHandler, setDatasources, datasourceTableNames, setDatasourceTableNames}}>
                 {children}
             </DataHandlerContext.Provider>
             );

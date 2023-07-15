@@ -263,3 +263,16 @@ export const loadColumnSettings = async (datasource, tableName) => {
     }
 };
 
+export const loadDatasourceTableNames = async (datasource) => {
+    try {
+        let res = await axios.get(getApiURL() + "/db/datasource/" + datasource + "/tablenames", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
+

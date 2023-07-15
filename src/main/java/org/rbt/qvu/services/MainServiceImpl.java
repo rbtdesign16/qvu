@@ -713,6 +713,46 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
+    public OperationResult<List<String>> getDatasourceTableNames(String datasourceName) {
+        OperationResult<List<String>> retval = new OperationResult();
+        List<String> data = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+
+        try {
+            DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
+            if (ds != null) {
+                conn = qvuds.getConnection(datasourceName);
+
+                if (conn == null) {
+                    conn = DBHelper.getConnection(ds);
+                }
+
+
+                DatabaseMetaData dmd = conn.getMetaData();
+
+                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                
+                while (res.next()) {
+                    data.add(res.getString(3));
+                }
+                
+                retval.setResult(data);
+            }
+        }
+        
+        catch (Exception ex) {
+            Errors.populateError(retval, ex);
+        }
+        
+        finally {
+            DBHelper.closeConnection(conn, null, res);
+        }
+        
+        return retval;
+    }
+        
+    @Override
     public OperationResult<List<TableSettings>> getTableSettings(DataSourceConfiguration ds) {
         OperationResult<List<TableSettings>> retval = new OperationResult();
         List<TableSettings> data = new ArrayList<>();

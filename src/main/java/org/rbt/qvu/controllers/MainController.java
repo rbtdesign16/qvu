@@ -101,7 +101,6 @@ public class MainController {
         return service.testDatasource(datasource);
     }
 
-
     @DeleteMapping("api/v1/db/datasource/{datasourceName}")
     public OperationResult deleteDatasource(@PathVariable String datasourceName) {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");
@@ -126,13 +125,12 @@ public class MainController {
         return service.doInitialSetup(initialSetup);
     }
 
-    
     @GetMapping("api/v1/db/datasource/{datasourceName}/tables")
     public OperationResult<List<Table>> getDatasourceTables(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTables(" + datasourceName + ")");
         return service.getDatasourceTables(datasourceName);
     }
-    
+
     @GetMapping("api/v1/db/datasource/{datasourceName}/treeview")
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTables(" + datasourceName + ")");
@@ -145,15 +143,22 @@ public class MainController {
         return DBHelper.DATABASE_TYPES;
     }
 
-   @PostMapping("api/v1/db/datasource/tablesettings")
-    public OperationResult<List <TableSettings>> getTableSettings(@RequestBody DataSourceConfiguration datasource) {
+    @PostMapping("api/v1/db/datasource/tablesettings")
+    public OperationResult<List<TableSettings>> getTableSettings(@RequestBody DataSourceConfiguration datasource) {
         LOG.debug("in getTableSettings()");
         return service.getTableSettings(datasource);
     }
 
-   @PostMapping("api/v1/db/datasource/{tableName}/columnsettings")
-    public OperationResult<List <ColumnSettings>> getColumnSettings(@RequestBody DataSourceConfiguration datasource, @PathVariable String tableName) {
+    @PostMapping("api/v1/db/datasource/{tableName}/columnsettings")
+    public OperationResult<List<ColumnSettings>> getColumnSettings(@RequestBody DataSourceConfiguration datasource, @PathVariable String tableName) {
         LOG.debug("in getColumnSettings()");
         return service.getColumnSettings(datasource, tableName);
     }
+
+    @GetMapping("api/v1/db/datasource/{datasourceName}/tablenames")
+    public OperationResult<List<String>> getDatasourceTableNames(@PathVariable String datasourceName) {
+        LOG.debug("in getDatasourceTableNames(" + datasourceName + ")");
+        return service.getDatasourceTableNames(datasourceName);
+    }
+
 }

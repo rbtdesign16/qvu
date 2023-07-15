@@ -1,5 +1,5 @@
 import Confirmation from "../widgets/Confirmation";
-;
+import { v4 as uuid } from 'uuid';
 import { createConfirmation } from 'react-confirm';
 
 const defaultConfirmation = createConfirmation(Confirmation);
@@ -219,5 +219,10 @@ export const findInArray = (items, fieldName, value) => {
             }
         }
     }
-    }
+};
+
+
+export const getUUID = () => {
+    return uuid();
+};
     

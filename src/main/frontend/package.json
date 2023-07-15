@@ -18,7 +18,8 @@
         "primereact": "^9.6.0",
         "react-accessible-treeview": "^2.6.1",
         "classnames": "^2.2.6",
-        "prop-types": "^15.7.2"
+        "prop-types": "^15.7.2",
+        "uuid": "^9.0.0"
     },
     "scripts": {
         "start": "react-scripts start",

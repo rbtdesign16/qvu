@@ -7,6 +7,7 @@ import useHelp from "../../context/HelpContext";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
+import CustomForeignKeys from "./CustomForeignKeys";
 import {
         INFO,
         WARN,
@@ -55,6 +56,7 @@ const Admin = () => {
     const {datasources, setDatasources, databaseTypes} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
+    const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -384,6 +386,25 @@ const Admin = () => {
         }
     };
     
+   
+    const saveCustomForeignKeys = (dataObject, fks) => {
+        dataObject.customForeignKeys = fks;
+        hideCustomForeignKeys();
+    };
+    
+    const hideCustomForeignKeys = () => {
+        setCustomForeignKeys({show: false});
+    };
+
+    const showCustomForeignKeys = async (dataObject) => {
+        let ds = {...dataObject};
+        setCustomForeignKeys({show: true, 
+            dataObject: dataObject,
+            datasource: ds,
+            saveCustomForeignKeys: saveCustomForeignKeys,
+            hideCustomForeignKeys: hideCustomForeignKeys});
+    };
+
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -403,6 +424,13 @@ const Admin = () => {
                     className: "btn",
                     disabled: dataObject.newRecord,
                     onClick: showTableSettings
+                },
+                {
+                    id: "cfket",
+                    text: getText("Custom Foreign Keys"),
+                    className: "btn",
+                    disabled: dataObject.newRecord,
+                    onClick: showCustomForeignKeys
                 },
                 {
                     id: "testds",
@@ -677,6 +705,7 @@ const Admin = () => {
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
+                <CustomForeignKeys config={customForeignKeys}/>
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>

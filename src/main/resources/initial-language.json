@@ -146,6 +146,17 @@
         "Move down": "Move down",
         "Copy path": "Copy path",
         "Duplicate entry": "Duplicate entry",
-        "Remove": "Remove"
+        "Remove": "Remove",
+        "Loading custom foreign keys": "Loading custom foreign keys",
+        "Custom Foreign Keys": "Custom Foreign Keys",
+        "customForeignKeys-help": "The user can create psudo foreign key relationships here that are not built into the database. Enter the source and target table name and a comma delimited list of source and target columns to create the foreign key. The name must match exactly what is in the database and the name must be unique. If the source columsn point reference the primary key columns of the target table then  \"Imported Keys\" should be checked, otherwise is should be unchecked.",
+        "Imported Keys": "Imported Keys",
+        "Source Table:": "Source Table:",
+        "Target Table:": "Target Table:",
+        "Source Columns:": "Source Columns:",
+        "Target Columns:": "Target Columns",
+        "Please ensure source columns and target columns contain same number of entries": "Please ensure source columns and target columns contain same number of entries",
+        "Click Add to add psuedo foreign keys": "Click Add to add psuedo foreign keys",
+        "Duplicate name exists:": "Duplicate name exists:"
     }
 }

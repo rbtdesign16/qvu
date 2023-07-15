@@ -337,6 +337,11 @@ select {
     top: 5%;
 }
 
+.custom-foreign-keys {
+    left: 10%;
+    top: 10%;
+}
+
 .p-splitter-panel {
     flex-grow: 1;
     min-width: 5px;

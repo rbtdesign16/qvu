@@ -6,6 +6,7 @@ package org.rbt.qvu.configuration.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.Constants;
 
@@ -30,6 +31,7 @@ public class DataSourceConfiguration {
     private String status = Constants.OFFLINE;
     private List<String> roles = new ArrayList<>();
     private List<TableSettings> datasourceTableSettings = new ArrayList<>();
+    private List<ForeignKey> customForeignKeys = new ArrayList<>();
 
 
     public String getDatabaseType() {
@@ -160,5 +162,12 @@ public class DataSourceConfiguration {
         this.datasourceTableSettings = datasourceTableSettings;
     }
 
+    public List<ForeignKey> getCustomForeignKeys() {
+        return customForeignKeys;
+    }
+
+    public void setCustomForeignKeys(List<ForeignKey> customForeignKeys) {
+        this.customForeignKeys = customForeignKeys;
+    }
 
 }

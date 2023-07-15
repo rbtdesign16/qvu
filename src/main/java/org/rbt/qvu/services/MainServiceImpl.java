@@ -242,6 +242,7 @@ public class MainServiceImpl implements MainService {
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
         OperationResult retval = configFileHandler.saveDatasource(datasource);
         if (retval.isSuccess()) {
+            cacheHelper.getTableCache().clear();
             datasourceSettingsHelper.load(config.getDatasourcesConfig());
         }
 
@@ -458,7 +459,7 @@ public class MainServiceImpl implements MainService {
 
 
         QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper, 
-                datasourceName, 
+                config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName), 
                 userRoles,
                 config.getDatasourcesConfig().getMaxImportedKeyDepth(), 
                 config.getDatasourcesConfig().getMaxExportedKeyDepth(),

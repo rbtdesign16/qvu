@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.ForeignKey;
@@ -23,17 +24,42 @@ import org.rbt.qvu.dto.TableSettings;
  * @author rbtuc
  */
 public class QuerySelectTreeBuilder {
-    public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, String datasourceName, Set<String> userRoles, int maxImportedKeyDepth, int maxExportedKeyDepth, List<Table> tableInfo) {
+    public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, int maxImportedKeyDepth, int maxExportedKeyDepth, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
+        
+        Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
+        for (ForeignKey fk : datasource.getCustomForeignKeys()) {
+            List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
+            if (fklist == null) {
+                fklist = new ArrayList<>();
+                customForeignKeys.put(fk.getTableName(), fklist);
+            }
+            fklist.add(fk);
+        }
+        
+        
         Map<String, Table> tMap = new HashMap<>();
         for (Table t : tableInfo) {
+            List<ForeignKey> fklist = customForeignKeys.get(t.getName());
+            
+            if (fklist != null) {
+                for (ForeignKey fk : fklist) {
+                    if (fk.isImported()) {
+                        t.getImportedKeys().add(fk);
+                    } else {
+                        t.getExportedKeys().add(fk);
+                    }
+                }
+            }
+            
             tMap.put(t.getCacheKey(), t);
         }
         
         int curDepth = 0;
         int indx = 0;
         for (Table t : tableInfo) {
+            String datasourceName = datasource.getDatasourceName();
             String key = datasourceName + "." + t.getName();
             TableSettings ta = dsHelper.getTableSettings(key);
 
@@ -164,9 +190,7 @@ public class QuerySelectTreeBuilder {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
                 for (ForeignKey fk : fkList) {
-                    
                     // using this to prevent circular references 
-                    
                     Integer cnt = fkMap.get(fk.getName());
                     // do this to prevent circular relationships
                     if ((cnt == null) || (cnt == 1)) {

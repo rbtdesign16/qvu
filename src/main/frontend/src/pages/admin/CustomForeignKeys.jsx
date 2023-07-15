@@ -175,7 +175,7 @@ const CustomForeignKeys = (props) => {
                 <Modal.Footer>
                     <Button size="sm" onClick={() => addForeignKey() }>{getText("Add")}</Button>
                     <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                    <Button size="sm" variant="primary" disabled={(customForeignKeys.length === 0)}type="submit" onClick={() => onSave()}>{getText("Save")}</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={() => onSave()}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>
         </div>

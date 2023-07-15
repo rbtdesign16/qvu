@@ -21,6 +21,7 @@ import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
+import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.util.Errors;
@@ -42,6 +43,9 @@ public class ConfigFileHandler {
 
     @Autowired
     private Config config;
+    
+    @Autowired
+    private DataSources dbDatasources;
 
     private final Gson gson = new Gson();
     private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -111,6 +115,7 @@ public class ConfigFileHandler {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                 }
                 config.setDatasourcesConfig(datasources);
+                dbDatasources.reloadDatasource(datasource);
                 retval.setResult(config.getDatasourcesConfig().getDatasources());
             }
         } catch (SaveException ex) {

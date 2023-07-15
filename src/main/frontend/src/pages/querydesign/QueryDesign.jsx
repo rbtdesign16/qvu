@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from "react-bootstrap";
 import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
@@ -25,18 +25,21 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
         const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData, setDatasource} = useQueryDesign();
+    const {setTreeViewData, treeViewData, setDatasource, datasource} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
-    const [treeData, setTreeData] = useState(null);
 
     const loadDatasourceOptions = () => {
         if (datasources) {
             return datasources.map(d => {
                 // handle acces by role if required
                 if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
-                    return <option value={d.datasourceName}>{d.datasourceName}</option>;
+                    if (treeViewData && datasource && (d.datasourceName === datasource.datasourceName)) {
+                        return <option value={d.datasourceName} selected>{d.datasourceName}</option>;
+                    } else {
+                        return <option value={d.datasourceName}>{d.datasourceName}</option>;
+                    }
                 } else {
                     return "";
                 }
@@ -65,12 +68,17 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
         }
     };
 
+    useEffect(() => {
+        setTreeViewData(null);
+        setDatasource(null);
+    }, [datasources]);
+
     return (
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
                     <label className="label-l">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
-                        <option value=""></option>                           
+                        <option value="" selected={!datasource}></option>                           
                         {loadDatasourceOptions()}
                     </select>
                     <DataSelectTree/>

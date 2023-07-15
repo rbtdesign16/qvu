@@ -4,13 +4,14 @@
  */
 package org.rbt.qvu.util;
 
+import java.util.Iterator;
 import org.ehcache.Cache;
+import org.ehcache.Cache.Entry;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.rbt.qvu.dto.Table;
-import org.rbt.qvu.dto.TableSettings;
 
 /**
  *
@@ -35,4 +36,17 @@ public class CacheHelper {
         return cacheManager.getCache(Constants.TABLE_CACHE_NAME, String.class, Table.class);
     }
     
+    public void clearDatasource(String datasourceName) {
+        Cache<String, Table> tcache = getTableCache();
+        
+        Iterator<Entry<String, Table>> it = tcache.iterator();
+        
+        String key = datasourceName + ".";
+        while (it.hasNext()) {
+            if (it.next().getKey().startsWith(key)) {
+                it.remove();
+            }
+        }
+    }
+        
 }

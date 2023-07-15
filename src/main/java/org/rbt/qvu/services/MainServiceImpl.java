@@ -247,6 +247,7 @@ public class MainServiceImpl implements MainService {
 
             if (retval.isSuccess()) {
                 cacheHelper.getTableCache().clear();
+                cacheHelper.clearDatasource(datasource.getDatasourceName());
                 config.getDatasourcesConfig().setDatasources(retval.getResult());
                 datasourceSettingsHelper.load(config.getDatasourcesConfig());
             }

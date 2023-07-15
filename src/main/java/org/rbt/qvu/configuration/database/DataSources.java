@@ -55,7 +55,7 @@ public class DataSources {
         Connection retval = null;
         try {
             DataSource ds = getDataSource(dsname);
-            
+
             if (ds != null) {
                 retval = ds.getConnection();
             } else {
@@ -99,6 +99,39 @@ public class DataSources {
         return retval;
     }
 
+    public void reloadDatasource(DataSourceConfiguration c) {
+        HikariDataSource ds = dbDataSources.get(c.getDatasourceName());
+
+        if (ds != null) {
+            ds.close();
+        }
+        
+        HikariConfig pconfig = new HikariConfig();
+        pconfig.setJdbcUrl(c.getUrl());
+        pconfig.setUsername(c.getUsername());
+        pconfig.setPassword(c.getPassword());
+        pconfig.setDriverClassName(c.getDriver());
+
+        if (c.getConnectionTimeout() != null) {
+            pconfig.setConnectionTimeout(c.getConnectionTimeout());
+        }
+
+        if (c.getIdleTimeout() != null) {
+            pconfig.setIdleTimeout(c.getIdleTimeout());
+        }
+
+        if (c.getMaxLifeTime() != null) {
+            pconfig.setMaxLifetime(c.getMaxLifeTime());
+        }
+
+        if (c.getMaxPoolSize() != null) {
+            pconfig.setMaximumPoolSize(c.getMaxPoolSize());
+        }
+
+        dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
+        c.setStatus(Constants.ONLINE);
+    }
+
     public void loadDataSources() {
         DataSourcesConfiguration dsc = config.getDatasourcesConfig();
         LOG.debug("datasources: " + new Gson().toJson(dsc, DataSourcesConfiguration.class));
@@ -127,7 +160,6 @@ public class DataSources {
                     pconfig.setMaximumPoolSize(c.getMaxPoolSize());
                 }
 
-                
                 dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
                 c.setStatus(Constants.ONLINE);
             } catch (Exception ex) {
@@ -137,4 +169,5 @@ public class DataSources {
             }
         }
     }
+
 }

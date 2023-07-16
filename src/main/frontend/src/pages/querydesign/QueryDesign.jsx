@@ -76,7 +76,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
     return (
             <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
                 <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
-                    <label className="label-l">{getText("Datasource")}</label>
+                    <label className="ck-label">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                         <option value="" selected={!datasource}></option>                           
                         {loadDatasourceOptions()}

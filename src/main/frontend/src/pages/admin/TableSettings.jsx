@@ -186,7 +186,7 @@ const TableSettings = (props) => {
                             onChange={(selectedItems) => setTableRoles(indx, selectedItems)} 
                             valueRenderer={(selected, options) => rolesValueRenderer(selected)} />
                     </div>
-                    <div></div><div className="display-field"><input type="checkbox" defaultChecked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="label-l">{getText("Hide")}</span></div>
+                    <div></div><div className="display-field"><input type="checkbox" defaultChecked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="ck-label">{getText("Hide")}</span></div>
                     <div></div><div className="display-field"><Button size="sm" onClick={(e) => showColumnSettings(indx)}>{getText("Column Settings")}</Button></div>;
                 </div>
             });       
@@ -207,9 +207,10 @@ const TableSettings = (props) => {
                    dialogClassName="table-settings"
                    show={config.show} 
                    onShow={onShow}
+                   onHide={onHide}
                    backdrop={true} 
                    keyboard={true}>
-                <Modal.Header onHide={onHide}>
+                   <Modal.Header >closeButton
                     <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>
                 </Modal.Header>

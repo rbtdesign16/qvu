@@ -154,9 +154,11 @@
         "Source Table:": "Source Table:",
         "Target Table:": "Target Table:",
         "Source Columns:": "Source Columns:",
-        "Target Columns:": "Target Columns",
+        "Target Columns:": "Target Columns:",
         "Please ensure source columns and target columns contain same number of entries": "Please ensure source columns and target columns contain same number of entries",
         "Click Add to add psuedo foreign keys": "Click Add to add psuedo foreign keys",
-        "Duplicate name exists:": "Duplicate name exists:"
+        "Duplicate name exists:": "Duplicate name exists:",
+        "select source columns": "select source columns",
+        "select target columns": "select target columns"
     }
 }

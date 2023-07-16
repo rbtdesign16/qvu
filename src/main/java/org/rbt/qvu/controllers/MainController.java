@@ -19,6 +19,7 @@ import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
+import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
 import org.rbt.qvu.util.DBHelper;
@@ -156,7 +157,7 @@ public class MainController {
     }
 
     @GetMapping("api/v1/db/datasource/{datasourceName}/tablenames")
-    public OperationResult<List<String>> getDatasourceTableNames(@PathVariable String datasourceName) {
+    public OperationResult<List<TableColumnNames>> getDatasourceTableNames(@PathVariable String datasourceName) {
         LOG.debug("in getDatasourceTableNames(" + datasourceName + ")");
         return service.getDatasourceTableNames(datasourceName);
     }

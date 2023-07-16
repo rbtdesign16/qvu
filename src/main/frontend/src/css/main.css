@@ -210,28 +210,24 @@ img {
     
 }
 
+.icon {
+    cursor: pointer;
+}
+
 .icon-s-dis {
     cursor: default;
     filter: grayscale();
     margin-top: -5px;
 }
 
-.icon-m {
-    cursor: pointer;
-}
-
-.icon-m-dis {
-    cursor: default;
-    filter: grayscale();
-}
-
-.label-l {
+.ck-label {
     text-align: left;
     padding-left: 5px;
     font-size: var(--default-label-font-size);
     font-weight: var(--default-font-weight);
     color: var(--default-label-font-color);
 }
+
 
 .label {
     text-align: right;
@@ -340,6 +336,7 @@ select {
 .custom-foreign-keys {
     left: 10%;
     top: 10%;
+    min-width: 550px;
 }
 
 .p-splitter-panel {
@@ -381,7 +378,7 @@ select {
 
 .select-column-entry .detail-hdr span {
     color: var(--default-label-font-color);
-    font-size: car(----default-font-size);
+    font-size: car(--default-font-size);
 }
 
 .select-column-entry .tab {
@@ -410,4 +407,23 @@ select {
     overflow: auto;
     height: calc(100% - 60px);
     width: 100%;
+}
+
+.multi-select {
+    min-width: 275px;
+    height: 28px;
+}
+
+.multi-select .dropdown-heading {
+    display: flex;
+    min-width: 100%;
+    align-items: center;
+    border: solid 1px darkslategray;
+    padding-left: 3px;
+}
+
+.column-select {
+    width: 200px;
+    height: 28px;
+    overflow: auto;
 }

@@ -11,6 +11,7 @@ import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
+import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 
 public interface MainService {
@@ -36,5 +37,5 @@ public interface MainService {
     public OperationResult<List <TableSettings>> getTableSettings(DataSourceConfiguration ds);
     public OperationResult<List <ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName);
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName);
-    public OperationResult<List<String>> getDatasourceTableNames(String datasourceName);
+    public OperationResult<List<TableColumnNames>> getDatasourceTableNames(String datasourceName);
 }

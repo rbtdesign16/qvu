@@ -35,6 +35,7 @@ export const TYPE_EMAIL = "email";
 export const MODAL_TITLE_SIZE = "h5";
 
 export const SMALL_ICON_SIZE = 18;
+export const MEDIUM_ICON_SIZE = 20;
 
 export const NODE_TYPE_ROOT = "r";
 export const NODE_TYPE_TABLE = "t";

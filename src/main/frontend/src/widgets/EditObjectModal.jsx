@@ -22,22 +22,26 @@ const EditObjectModal = (props) => {
         }
     };
 
+    const onHide = () => {
+        config.cancel();
+    }
 
     return (
             <div className="static-modal">
                 <Modal animation={false} 
                        size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
+                       onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
-                    <Modal.Header>
+                    <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div>{config.addComponents ? config.addComponents() : ""}<EntryPanel config={config}/><div className="modal-error-msg" id={config.idPrefix + "error-msg"}></div></div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="sm" onClick={() => config.cancel()}>Cancel</Button>
+                        <Button size="sm" onClick={() => onHide() }>Cancel</Button>
                         <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config)}>{getOkLabel()}</Button>
                     </Modal.Footer>
                 </Modal>

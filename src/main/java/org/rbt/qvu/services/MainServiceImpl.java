@@ -52,6 +52,7 @@ import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
+import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.CacheHelper;
 import org.rbt.qvu.util.DBHelper;
@@ -713,9 +714,9 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<String>> getDatasourceTableNames(String datasourceName) {
-        OperationResult<List<String>> retval = new OperationResult();
-        List<String> data = new ArrayList<>();
+    public OperationResult<List<TableColumnNames>> getDatasourceTableNames(String datasourceName) {
+        OperationResult<List<TableColumnNames>> retval = new OperationResult();
+        List<TableColumnNames> data = new ArrayList<>();
         Connection conn = null;
         ResultSet res = null;
 
@@ -734,7 +735,10 @@ public class MainServiceImpl implements MainService {
                 res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
                 
                 while (res.next()) {
-                    data.add(res.getString(3));
+                    TableColumnNames t = new TableColumnNames();
+                    t.setTableName(res.getString(3));
+                    t.setColumnNames(getColumnNames(dmd, ds.getSchema(), t.getTableName()));
+                    data.add(t);
                 }
                 
                 retval.setResult(data);
@@ -803,6 +807,27 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    private List<String> getColumnNames(DatabaseMetaData dmd, String schema, String table) throws Exception {
+        List<String> retval = new ArrayList<>();
+        ResultSet res = null;
+                
+        try {
+            res = dmd.getColumns(null, schema, table, "%");
+
+            while (res.next()) {
+                retval.add(res.getString(4));
+            }
+        }
+                
+        finally {
+            DBHelper.closeConnection(null, null, res);
+        }
+        
+        return retval;
+    }
+                    
+
 
     @Override
     public OperationResult<List<ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName) {

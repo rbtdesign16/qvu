@@ -43,8 +43,8 @@ const JoinType = (props) => {
                 </Modal.Header>
                 <Modal.Body>
                     <div onChange={(e) => setJoinType(e.target.value)}>
-                        <input id="outer" type="radio" name="jointype" checked={!isInner()} value="outer"/><label className="label-l" htmlFor="outer"> {getText("Outer Join")}</label><br />
-                        <input id="inner" type="radio" name="jointype" checked={isInner()} value="inner"/><label className="label-l"  htmlFor="inner">{getText("Inner Join")}</label>
+                        <input id="outer" type="radio" name="jointype" checked={!isInner()} value="outer"/><label className="ck-label" htmlFor="outer"> {getText("Outer Join")}</label><br />
+                        <input id="inner" type="radio" name="jointype" checked={isInner()} value="inner"/><label className="ck-label"  htmlFor="inner">{getText("Inner Join")}</label>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>

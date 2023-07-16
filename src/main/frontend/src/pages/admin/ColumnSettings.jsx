@@ -129,7 +129,7 @@ const ColumnSettings = (props) => {
                             onChange={(selectedItems) => setColumnRoles(indx, selectedItems)} 
                             valueRenderer={(selected, options) => rolesValueRenderer(selected)} />
                     </div>
-                    <div></div><div className="display-field"><input type="checkbox" defaultChecked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="label-l">{getText("Hide")}</span></div>
+                    <div></div><div className="display-field"><input type="checkbox" defaultChecked={isHidden(indx)} onChange={(e) => setHidden(e, indx)}/><span className="ck-label">{getText("Hide")}</span></div>
                 </div>
             });       
         } else {
@@ -148,9 +148,10 @@ const ColumnSettings = (props) => {
                    dialogClassName="column-settings"
                    show={config.show} 
                    onShow={onShow}
+                   onHide={onHide}
                    backdrop={true} 
                    keyboard={true}>
-                <Modal.Header onHide={onHide}>
+                <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Column Settings", " - ") + getTableName() }</Modal.Title>
                 </Modal.Header>

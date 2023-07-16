@@ -43,6 +43,36 @@ export const NODE_TYPE_COLUMN = "c";
 export const NODE_TYPE_IMPORTED_FOREIGNKEY= "ifk";
 export const NODE_TYPE_EXPORTED_FOREIGNKEY= "efk";
     
+export const JDBC_TYPE_TINYINT =  -6;
+export const JDBC_TYPE_SMALLINT=   5;
+export const JDBC_TYPE_INTEGER =   4;
+export const JDBC_TYPE_BIGINT  =  -5;
+export const JDBC_TYPE_REAL=   7;
+export const JDBC_TYPE_DOUBLE  =   8;
+export const JDBC_TYPE_NUMERIC =   2;
+export const JDBC_TYPE_DECIMAL =   3;
+export const JDBC_TYPE_CHAR=   1;
+export const JDBC_TYPE_VARCHAR =  12;
+export const JDBC_TYPE_LONGVARCHAR =  -1;
+export const JDBC_TYPE_DATE=  91;
+export const JDBC_TYPE_TIME=  92;
+export const JDBC_TYPE_TIMESTAMP   =  93;
+export const JDBC_TYPE_BINARY  =  -2;
+export const JDBC_TYPE_VARBINARY   =  -3;
+export const JDBC_TYPE_LONGVARBINARY   =  -4;
+export const JDBC_TYPE_BLOB= 2004;
+export const JDBC_TYPE_CLOB= 2005;
+export const JDBC_TYPE_BOOLEAN = 16;
+export const JDBC_TYPE_NCHAR = -15;
+export const JDBC_TYPE_NVARCHAR = -9;
+export const JDBC_TYPE_LONGNVARCHAR = -16;
+export const JDBC_TYPE_NCLOB = 2011;
+export const JDBC_TYPE_TIME_WITH_TIMEZONE = 2013;
+export const JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE = 2014;
+
+export const NUMBER_AGGREATE_FUNCTIONS = ["min", "max", "sum", "avg", "count"];
+export const DATE_TIME_AGGREGATE_FUNCTIONS = ["min", "max", "count"];
+export const STRING_AGGREATE_FUNCTIONS = ["count"];
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
@@ -143,7 +173,7 @@ export const isValidDate = (date, validator) => {
             if (validator.min && validator.max) {
                 return ((validator.min.getTime() <= date.getTime() && validator.max.getTime() >= date.getTime()));
             } else if (validator.min) {
-                return date.getTime() >= validator.min.getTime()
+                return date.getTime() >= validator.min.getTime();
             } else if (validator.max) {
                 return date.getTime() <= validator.max.getTime();
             } else {
@@ -227,3 +257,51 @@ export const getUUID = () => {
     return uuid();
 };
     
+export const getAggregateFunctionsByDataType = (dataType) => {
+    if (isDataTypeNumeric(dataType)) {
+        return NUMBER_AGGREATE_FUNCTIONS;
+    } else if (isDataTypeDateTime(dataType)) {
+        return DATE_TIME_AGGREGATE_FUNCTIONS;
+    } else {
+        return STRING_AGGREATE_FUNCTIONS;
+    }
+};
+
+
+export const isDataTypeNumeric = (type) => {
+    return ((type === JDBC_TYPE_TINYINT)
+        || (type === JDBC_TYPE_SMALLINT)
+        || (type === JDBC_TYPE_INTEGER)
+        || (type === JDBC_TYPE_BIGINT)
+        || (type === JDBC_TYPE_REAL)
+        || (type === JDBC_TYPE_DOUBLE)
+        || (type === JDBC_TYPE_NUMERIC)
+        || (type === JDBC_TYPE_DECIMAL));
+};
+
+export const isDataTypeDateTime = (type) => {
+    return ((type === JDBC_TYPE_DATE)
+        || (type === JDBC_TYPE_TIME)
+        || (type === JDBC_TYPE_TIMESTAMP)
+        || (type === JDBC_TYPE_TIME_WITH_TIMEZONE)
+        || (type === JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE));
+};
+
+export const isDataTypeString = (type) => {
+    return (( type === JDBC_TYPE_CHAR)
+        || (type === JDBC_TYPE_VARCHAR)
+        || (type === JDBC_TYPE_LONGVARCHAR)
+        || (type === JDBC_TYPE_CLOB)
+        || (type === JDBC_TYPE_NCHAR)
+        || (type === JDBC_TYPE_NVARCHAR)
+        || (type === JDBC_TYPE_LONGNVARCHAR)
+        || (type === JDBC_TYPE_NCLOB));
+};
+    
+export const isDataTypeFloat = (type, decimalDigits) => {
+    if ((type === JDBC_TYPE_REAL) || (type === JDBC_TYPE_DOUBLE)) {
+        return true;
+    } else if ((type === JDBC_TYPE_NUMERIC) || (type === JDBC_TYPE_DECIMAL)) {
+        return decimalDigits > 0;
+    }
+};

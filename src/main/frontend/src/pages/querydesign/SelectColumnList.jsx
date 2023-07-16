@@ -11,6 +11,7 @@ const SelectColumnList = () => {
     
     const getColumnData = () => {
         if (selectColumns) {
+            console.log("------>" + JSON.stringify(selectColumns));
             return selectColumns.map((data, index) => <SelectColumnEntry index={index} columnData={data}/>);
         } else {
             return "";

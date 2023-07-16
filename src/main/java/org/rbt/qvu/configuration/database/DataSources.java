@@ -32,7 +32,7 @@ public class DataSources {
 
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
-
+    
     @Autowired
     private Config config;
 

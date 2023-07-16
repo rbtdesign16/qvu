@@ -160,6 +160,7 @@
         "Duplicate name exists:": "Duplicate name exists:",
         "select source columns": "select source columns",
         "select target columns": "select target columns",
-        "customForeignKeyColumnSelect-help": "Select the foreign key columns for the desired table. Column order will be in the order selected. The number and data type for the selected columns should be the same for the source and target tables."
+        "customForeignKeyColumnSelect-help": "Select the foreign key columns for the desired table. Column order will be in the order selected. The number and data type for the selected columns should be the same for the source and target tables.",
+        "Custom SQL": "Custom SQL"
     }
 }

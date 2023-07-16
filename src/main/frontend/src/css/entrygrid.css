@@ -13,20 +13,12 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     width: 100px;
 }
 
-.entrygrid-25-225 {
+.entrygrid-25-275 {
     display: grid;
-    grid-template-columns: 25px 225px;
+    grid-template-columns: 25px 275px;
     margin: 5px;
     grid-row-gap: 3px;
 }
-
-.entrygrid-25-250 {
-    display: grid;
-    grid-template-columns: 25px 250px;
-    margin: 5px;
-    grid-row-gap: 3px;
-}
-
 .entrygrid-120-300 {
     display: grid;
     grid-template-columns: 120px 300px;
@@ -88,8 +80,4 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     grid-template-columns: 100px 175px;
     grid-row-gap: 3px;
     margin: 5px;
-}
-
-.modal-title {
-    
 }

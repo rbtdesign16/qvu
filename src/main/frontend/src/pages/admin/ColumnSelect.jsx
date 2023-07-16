@@ -24,11 +24,12 @@ import {
 const ColumnSelect = (props) => {
     const {config} = props;
     const {getText} = useLang();
+    const {showHelp} = useHelp();
     const [columns, setColumns] = useState([]);
     const [columnSelections, setColumnSelections] = useState([]);
     
     const onHelp = () => {
-        showHelp(getText("customForeignKeys-help"));
+        showHelp(getText("customForeignKeyColumnSelect-help"));
     };
     
     const onHide = () => {
@@ -39,9 +40,7 @@ const ColumnSelect = (props) => {
     
             
     const onSave = () => {
-        let retval = [];
-        
-        config.saveColumnSelections(config.index, columnSelections.join(","), config.field);
+        config.saveColumnSelections(config.index, columnSelections, config.field);
     };
     
     const onChange = (e, indx) => {
@@ -58,13 +57,16 @@ const ColumnSelect = (props) => {
         
         setColumnSelections(cols);
     };
-            
+           
+    const isSelected = (c) => {
+        return columnSelections && columnSelections.includes(c);
+    };
     
     const loadColumns = () => {
         if (columns) {
              return columns.map((c, indx) => {
                 let id = "c-" + indx;
-               return <div className="column-select"><input id={id} type="checkbox" defaultChecked={columnSelections.includes(c)} onChange={e => onChange(e, indx)}  /><label className="ck-label" htmlFor={id}>{c}</label></div>;
+               return <div className="column-select"><input id={id} type="checkbox" checked={isSelected(c)} onChange={e => onChange(e, indx)}  /><label className="ck-label" htmlFor={id}>{c}</label></div>;
             });
         } else {
             return "";
@@ -72,10 +74,13 @@ const ColumnSelect = (props) => {
     };
     
     const onShow = () => {
+        let scols = [];
         if (config && config.selectedColumns) {
-            setColumnSelections(String(config.selectedColumns).split(","));
-            setColumns(config.columnNames);
-        }
+            scols = config.selectedColumns;
+        } 
+
+        setColumnSelections(scols);
+        setColumns(config.columnNames);
     };
     
     return (

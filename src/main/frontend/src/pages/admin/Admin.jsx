@@ -398,29 +398,24 @@ const Admin = () => {
     };
 
     const showCustomForeignKeys = async (dataObject) => {
-        let ds = {...dataObject};
-        let tnames;
         if (!datasourceTableNames[dataObject.datasourceName]) {
             showMessage(INFO, getText("Loading custom foreign keys", "..."), true);
-            let res = await loadDatasourceTableNames(ds.datasourceName);
+            let res = await loadDatasourceTableNames(dataObject.datasourceName);
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
                 hideMessage();
-                tnames = res.result;
                 let dsnames = {...datasourceTableNames};
-                dsnames[dataObject.datasourceName] = tnames;
+                dsnames[dataObject.datasourceName] = res.result;
                 setDatasourceTableNames(dsnames);
             }
         }
         
-        if (tnames && (tnames.length > 0)) {
-             setCustomForeignKeys({show: true, 
-                dataObject: dataObject,
-                datasource: ds,
-                saveCustomForeignKeys: saveCustomForeignKeys,
-                hideCustomForeignKeys: hideCustomForeignKeys});
-        }
+        setCustomForeignKeys({show: true, 
+           dataObject: dataObject,
+           datasource: {...dataObject},
+           saveCustomForeignKeys: saveCustomForeignKeys,
+           hideCustomForeignKeys: hideCustomForeignKeys});
     };
 
     const getDatasourceConfig = (title, dataObject) => {

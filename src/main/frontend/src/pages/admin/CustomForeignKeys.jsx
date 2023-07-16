@@ -34,7 +34,7 @@ const CustomForeignKeys = (props) => {
     const [customForeignKeys, setCustomForeignKeys] = useState([]);
     const [showColumnSelect, setShowColumnSelect] = useState({show: false});
     const [datasourceName, setDatasourceName] = useState(null);
-
+    
     const getDatasourceName = () => {
         if (config.datasource) {
             return config.datasource.datasourceName;
@@ -68,14 +68,17 @@ const CustomForeignKeys = (props) => {
     };
 
     const onChange = (e, indx) => {
-        let fk = customForeignKeys[indx];
+        let cfks = [...customForeignKeys];
+        let fk = cfks[indx];
         if (e.target.name === "imported") {
             fk.imported = e.target.checked;
         } else if ((e.target.name === "tableName") || (e.target.name === "toTableName")) {
             fk[e.target.name] = e.target.options[e.target.selectedIndex].value;
-        } else {
+         } else {
             fk[e.target.name] = e.target.value;
         }
+        
+        setCustomForeignKeys(cfks);
     };
 
     const remove = async (indx) => {
@@ -110,7 +113,6 @@ const CustomForeignKeys = (props) => {
         }
     };
 
-
     const hideColumnSelect = () => {
         setShowColumnSelect({show: false});
     };
@@ -125,15 +127,17 @@ const CustomForeignKeys = (props) => {
 
     const onColumnSelect = (indx, field, tableField) => {
         let tableName = customForeignKeys[indx][tableField];
+        
         let columnNames = getColumnNames(tableName);
-
-        if (columnNames && (columnNames.length > 0)) {
+        let selectedColumns = customForeignKeys[indx][field] ? customForeignKeys[indx][field] : "";
+        
+         if (columnNames && (columnNames.length > 0)) {
             setShowColumnSelect({
                 show: true,
                 tableName: tableName,
                 columnNames: columnNames,
                 field: field,
-                selectedColumns: customForeignKeys[indx][field],
+                selectedColumns: selectedColumns,
                 index: indx,
                 saveColumnSelections: saveColumnSelections,
                 hideColumnSelect: hideColumnSelect
@@ -142,7 +146,7 @@ const CustomForeignKeys = (props) => {
     };
 
     const getColumnSelect = (indx, field, tableField) => {
-        return <input size={25} name={field} defaultValue={customForeignKeys[indx][field]} readOnly onBlur={(e) => onChange(e, indx)}/>;
+        return <input size={25} name={field} defaultValue={customForeignKeys[indx][field] ? customForeignKeys[indx][field].join(",") : ""} readOnly onBlur={(e) => onChange(e, indx)}/>;
     };
 
     const loadForeignKeyEntries = () => {
@@ -153,14 +157,14 @@ const CustomForeignKeys = (props) => {
                         <div className="label"><span className="red-f">*</span>{getText("Source Table:")}</div><div>{getTableSelect(indx, "tableName")}</div>
                         <div className="label"><span className="red-f">*</span>{getText("Target Table:")}</div><div>{getTableSelect(indx, "toTableName")}</div>
                         <div className="label"><span className="red-f">*</span>{getText("Source Columns:")}</div>
-                        <div className="entrygrid-25-250">
+                        <div className="entrygrid-25-275">
                             <div title={getText("select source columns")}>
                                 <AiOutlineProfile  className="icon cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => onColumnSelect(indx, "columns", "tableName")} />
                             </div>
                             {getColumnSelect(indx, "columns", "tableName")}
                         </div>
                         <div className="label"><span className="red-f">*</span>{getText("Target Columns:")}</div>
-                        <div className="entrygrid-25-250">
+                        <div className="entrygrid-25-275">
                             <div title={getText("select target columns")}>
                                 <AiOutlineProfile  className="icon cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => onColumnSelect(indx, "toColumns", "toTableName")} />
                             </div>
@@ -187,6 +191,10 @@ const CustomForeignKeys = (props) => {
             setDatasourceName(getDatasourceName());
         }
     };
+    
+    const checkColumnLinks = (cfk) => {
+        return (cfk.columns.length === cfk.toColumns.length);
+    };
 
     const checkValues = () => {
         let retval = "";
@@ -197,7 +205,7 @@ const CustomForeignKeys = (props) => {
                     || !customForeignKeys[i].columns
                     || !customForeignKeys[i].toColumns) {
                 retval = getText("please complete all required entries for entry[" + i + "]");
-            } else if (customForeignKeys[i].columns.length !== customForeignKeys[i].toColumns.length) {
+            } else if (!checkColumnLinks(customForeignKeys[i])) {
                 retval = getText("Please ensure source columns and target columns contain same number of entries");
             }
 

@@ -495,6 +495,18 @@ public class MainServiceImpl implements MainService {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
+                
+                // load up custom foreign keys to apply tp table definitions
+                Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
+                for (ForeignKey fk : ds.getCustomForeignKeys()) {
+                    List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
+                    if (fklist == null) {
+                        fklist = new ArrayList<>();
+                        customForeignKeys.put(fk.getTableName(), fklist);
+                    }
+                    fklist.add(fk);
+                }
+
                 conn = qvuds.getConnection(datasourceName);
                 DatabaseMetaData dmd = conn.getMetaData();
 
@@ -517,6 +529,19 @@ public class MainServiceImpl implements MainService {
                         t.setColumns(getTableColumns(datasourceName, dmd, t));
                         t.setImportedKeys(getImportedKeys(datasourceName, dmd, t));
                         t.setExportedKeys(getExportedKeys(datasourceName, dmd, t));
+                        
+                        // add any applicable custom foreign keys to current table
+                        List<ForeignKey> fklist = customForeignKeys.get(t.getName());
+                        if (fklist != null) {
+                            for (ForeignKey fk : fklist) {
+                                if (fk.isImported()) {
+                                    t.getImportedKeys().add(fk);
+                                } else {
+                                    t.getExportedKeys().add(fk);
+                                }
+                            }
+                        }
+                         
                         setIndexColumns(dmd, t);
                         setPrimaryKeys(dmd, t);
                         cacheHelper.getTableCache().put(key, t);

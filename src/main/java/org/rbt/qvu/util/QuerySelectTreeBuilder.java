@@ -28,43 +28,9 @@ public class QuerySelectTreeBuilder {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
 
-        Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
-        for (ForeignKey fk : datasource.getCustomForeignKeys()) {
-            List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
-            if (fklist == null) {
-                fklist = new ArrayList<>();
-                customForeignKeys.put(fk.getTableName(), fklist);
-            }
-            fklist.add(fk);
-        }
 
         Map<String, Table> tMap = new HashMap<>();
         for (Table t : tableInfo) {
-            List<ForeignKey> fklist = customForeignKeys.get(t.getName());
-
-            // do this to prevent adding duplicates
-            Set<String> hs = new HashSet();
-            for (ForeignKey fk : t.getExportedKeys()) {
-                hs.add(fk.getName());
-            }
-
-            for (ForeignKey fk : t.getImportedKeys()) {
-                hs.add(fk.getName());
-            }
-            
-            if (fklist != null) {
-                for (ForeignKey fk : fklist) {
-                    if (!hs.contains(fk.getName())) {
-                        if (fk.isImported()) {
-                            t.getImportedKeys().add(fk);
-                        } else {
-                            t.getExportedKeys().add(fk);
-                        }
-                        hs.add(fk.getName());
-                    }
-                }
-            }
-
             tMap.put(t.getCacheKey(), t);
         }
 

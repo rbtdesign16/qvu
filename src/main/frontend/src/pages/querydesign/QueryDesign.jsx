@@ -50,16 +50,16 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
     };
 
     const onDatasourceChange = async (e) => {
-        let datasource = e.target.options[e.target.selectedIndex].value;
-        if (datasource) {
+        let ds = e.target.options[e.target.selectedIndex].value;
+        if (ds) {
             showMessage(INFO, getText("Loading datasource information", "..."), null, true);
-            let res = await getDatasourceTreeViewData(datasource);
+            let res = await getDatasourceTreeViewData(ds);
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
                 let treeData = flattenTree(res.result);
                 setTreeViewData(treeData);
-                setDatasource(datasource);
+                setDatasource(ds);
                 hideMessage();
             }
         } else {

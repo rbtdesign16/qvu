@@ -188,7 +188,7 @@ export const QueryDesignProvider = ({ children }) => {
                         let entry = getFromEntry(jMap.get(parent), part, alias);
  
                         if (entry) {
-                             jMap.set(part, entry);
+                            jMap.set(part, entry);
                             retval.push(entry);
                         }
                     }

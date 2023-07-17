@@ -42,12 +42,25 @@ public class QuerySelectTreeBuilder {
         for (Table t : tableInfo) {
             List<ForeignKey> fklist = customForeignKeys.get(t.getName());
 
+            // do this to prevent adding duplicates
+            Set<String> hs = new HashSet();
+            for (ForeignKey fk : t.getExportedKeys()) {
+                hs.add(fk.getName());
+            }
+
+            for (ForeignKey fk : t.getImportedKeys()) {
+                hs.add(fk.getName());
+            }
+            
             if (fklist != null) {
                 for (ForeignKey fk : fklist) {
-                    if (fk.isImported()) {
-                        t.getImportedKeys().add(fk);
-                    } else {
-                        t.getExportedKeys().add(fk);
+                    if (!hs.contains(fk.getName())) {
+                        if (fk.isImported()) {
+                            t.getImportedKeys().add(fk);
+                        } else {
+                            t.getExportedKeys().add(fk);
+                        }
+                        hs.add(fk.getName());
                     }
                 }
             }
@@ -56,7 +69,6 @@ public class QuerySelectTreeBuilder {
         }
 
         int curDepth = 0;
-        int indx = 0;
         for (Table t : tableInfo) {
             String datasourceName = datasource.getDatasourceName();
             String key = datasourceName + "." + t.getName();

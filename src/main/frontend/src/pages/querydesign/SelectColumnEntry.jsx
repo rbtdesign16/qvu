@@ -127,11 +127,15 @@ const SelectColumnEntry = (props) => {
         }
     };
     
+    const getHeaderTitle = () => {
+        return getText("Table Alias:", " ") + columnData.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(columnData.path);
+    };
+    
     return <div key={"cse-" + index} className="select-column-entry">
         <div className="detail-hdr">
             <span>
                 <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
-                {columnData.displayName}
+                <span title={getHeaderTitle()} >{columnData.displayName}</span>
             </span>
         </div>
     

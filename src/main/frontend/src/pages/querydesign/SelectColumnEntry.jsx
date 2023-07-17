@@ -131,8 +131,38 @@ const SelectColumnEntry = (props) => {
         return getText("Table Alias:", " ") + columnData.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(columnData.path);
     };
     
+    const handleDragStart = (e) => {
+        e.dataTransfer.setData("text/plain", "" + index);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDrop= (e) => {
+        let el = document.elementFromPoint(e.clientX, e.clientY);
+        if (el && el.id && el.id.startsWith("hdr-")) {
+            let dindx = Number(el.id.replace("hdr-", ""));
+            let sindx = Number(e.dataTransfer.getData("text/plain"));
+            if (sindx !== dindx) {
+                let scols = [...selectColumns];
+                let col = scols[sindx];
+                scols.splice(sindx, 1);
+                scols.splice(dindx, 0, col);
+                setSelectColumns(scols);
+           }
+       }
+    };
+    
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+     };
+
+    
     return <div key={"cse-" + index} className="select-column-entry">
-        <div className="detail-hdr">
+        <div draggable={true} 
+            id={"hdr-" + index}  
+            onDragStart={e => handleDragStart(e)} 
+            onDrop={e => handleDrop(e)} 
+            onDragOver={e => handleDragOver(e)} className="detail-hdr">
             <span>
                 <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
                 <span title={getHeaderTitle()} >{columnData.displayName}</span>
@@ -140,7 +170,7 @@ const SelectColumnEntry = (props) => {
         </div>
     
         <div className="tab platinum-b">
-            <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
+           <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
             <span title={getText("Copy column name")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyColumnName()} /></span>
             <div style={{paddingTop: "10%"}}>
                 {(index > 0) && <span title={getText("Move up")}><AiFillCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
@@ -149,6 +179,7 @@ const SelectColumnEntry = (props) => {
             <div title={getText("Remove entry")}><AiFillDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></div>
         </div>
         <div className="detail">
+            <div style={{paddingLeft: "10px"}} ><input type="checkbox" name="showInResults" defaultChecked={columnData.showInResults} onChange={e => onChange(e)}/><label className="ck-label">{getText("Show in Results")}</label></div>
             <div className="entrygrid-selcolentry">
                 <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={columnData.displayName} onChange={e => onChange(e)}/></div>
                 <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(columnData.sortPosition) > 0 ? columnData.sortPosition : ""} onChange={e => onChange(e)}/></div>

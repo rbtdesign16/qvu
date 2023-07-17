@@ -163,6 +163,7 @@
         "customForeignKeyColumnSelect-help": "Select the foreign key columns for the desired table. Column order will be in the order selected. The number and data type for the selected columns should be the same for the source and target tables.",
         "Custom SQL": "Custom SQL",
         "Copy column name": "Copy column name",
-        "Table Alias:": "Table Alias:"
+        "Table Alias:": "Table Alias:",
+        "Show in Results":"Show in Results"
     }
 }

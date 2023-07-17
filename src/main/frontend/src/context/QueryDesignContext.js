@@ -69,6 +69,7 @@ export const QueryDesignProvider = ({ children }) => {
                     aggregateFunction: "",
                     path: path,
                     customSql: "",
+                    showInResults: true,
                     nodeId: selectedColumnIds[i]
                 });
             }

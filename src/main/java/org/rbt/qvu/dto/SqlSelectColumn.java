@@ -18,6 +18,7 @@ public class SqlSelectColumn {
     private String displayName;
     private int sortPosition = -1;
     private int pkIndex;
+    private boolean showInResults = true;
     private String aggregateFunction;
     private String customSql;
     private String path;
@@ -116,6 +117,14 @@ public class SqlSelectColumn {
 
     public void setPkIndex(int pkIndex) {
         this.pkIndex = pkIndex;
+    }
+
+    public boolean isShowInResults() {
+        return showInResults;
+    }
+
+    public void setShowInResults(boolean showInResults) {
+        this.showInResults = showInResults;
     }
     
     

@@ -192,7 +192,7 @@ const DataSelectTree = (props) => {
 
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><ArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}{element.name}{getColumnLinks(element.metadata)}</span></span>;
+            return <span><ArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}&nbsp;{element.name}{getColumnLinks(element.metadata)}</span></span>;
         } else {
             return <span><CheckBoxIcon
                     className="checkbox-icon"

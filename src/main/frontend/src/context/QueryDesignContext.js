@@ -11,6 +11,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
     const [from, setFrom] = useState([]);
+    
 
     const updateSelectColumns = async (scols) => {
         let cols = [];

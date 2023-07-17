@@ -85,7 +85,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 .entrygrid-selcolentry {
     display: grid;
-    grid-template-columns: 120px 190px 120px 100px 75px 75px;
+    grid-template-columns: 120px 190px 120px 75px 75px 75px;
     margin: 5px;
     grid-row-gap: 3px;
+}
+
+.entrygrid-selcolentry input[type=number] {
+    width: 50px;
 }

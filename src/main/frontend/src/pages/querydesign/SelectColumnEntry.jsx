@@ -31,6 +31,7 @@ const SelectColumnEntry = (props) => {
 
         if (pkindex > -1) {
             return <div className="entrygrid-125-550">
+                <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
                 <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
                 <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
                 <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
@@ -39,6 +40,7 @@ const SelectColumnEntry = (props) => {
             </div>;
         } else {
             return <div className="entrygrid-125-550">
+                <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
                 <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
                 <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
                 <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
@@ -60,8 +62,8 @@ const SelectColumnEntry = (props) => {
         updateSelectColumns(s);
     };
 
-    const copyPath = () => {
-        navigator.clipboard.writeText(columnData.path);
+    const copyColumnName = () => {
+        navigator.clipboard.writeText(columnData.tableAlias + "." + columnData.columnName);
     };
 
     const moveUp = () => {
@@ -128,14 +130,14 @@ const SelectColumnEntry = (props) => {
     return <div key={"cse-" + index} className="select-column-entry">
         <div className="detail-hdr">
             <span>
-                <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText(columnData))} />
+                <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
                 {columnData.displayName}
             </span>
         </div>
     
         <div className="tab platinum-b">
             <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
-            <span title={getText("Copy path")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyPath()} /></span>
+            <span title={getText("Copy column name")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyColumnName()} /></span>
             <div style={{paddingTop: "10%"}}>
                 {(index > 0) && <span title={getText("Move up")}><AiFillCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
                 {(index < (selectColumns.length - 1)) && <span title={getText("Move down")}><AiFillCaretDown className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveDown()} /></span>}
@@ -145,7 +147,7 @@ const SelectColumnEntry = (props) => {
         <div className="detail">
             <div className="entrygrid-selcolentry">
                 <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={columnData.displayName} onChange={e => onChange(e)}/></div>
-                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="text" name="sortPosition" size={5} defaultValue={columnData.sortPosition} onChange={e => onChange(e)}/></div>
+                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(columnData.sortPosition) > 0 ? columnData.sortPosition : ""} onChange={e => onChange(e)}/></div>
                 <div className="label">{getText("Function:")}</div><div className="data-field"><select name="aggregateFunction"  onChange={e => onChange(e, indx)}><option selected={!columnData.aggregateFunction} value=""></option>{getAggregateFunctions()}</select></div>
             </div>
             <div style={{marginLeft: "25px"}}>

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.rbt.qvu.configuration;
+package org.rbt.qvu.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,13 +20,13 @@ import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.User;
+import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
-import org.rbt.qvu.util.Errors;
-import org.rbt.qvu.util.Helper;
-import org.rbt.qvu.util.UserComparator;
+import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.QueryDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -38,8 +38,8 @@ import org.springframework.stereotype.Component;
  * @author rbtuc
  */
 @Component
-public class ConfigFileHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigFileHandler.class);
+public class FileHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(FileHandler.class);
 
     @Autowired
     private Config config;
@@ -69,6 +69,14 @@ public class ConfigFileHandler {
         }
         return retval;
     }
+        public List<DocumentGroup> loadDocumentGroups() {
+        List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
+        }
+        return retval;
+    }
+
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
         OperationResult retval = new OperationResult();
@@ -367,4 +375,40 @@ public class ConfigFileHandler {
         return retval;
     }
 
+    public OperationResult saveQueryDocument(QueryDocument doc) throws Exception {
+        OperationResult retval = new OperationResult();
+/*
+        File f = new File(config.getSecurityConfigurationFileName());
+        try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+            byte[] bytes = fis.readAllBytes();
+            cursec = gson.fromJson(new String(bytes), SecurityConfiguration.class);
+
+            if (cursec.getLastUpdated() > securityConfig.getLastUpdated()) {
+                retval.setErrorCode(Errors.RECORD_UPDATED);
+                retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"security configuration"}));
+                throw new SaveException(retval);
+            }
+        }
+
+        securityConfig.setLastUpdated(System.currentTimeMillis());
+        
+        // make sure all records are marked as not new
+        if (securityConfig.isBasicConfig()) {
+            for (User u : securityConfig.getBasicConfiguration().getUsers()) {
+                u.setNewRecord(false);
+            }
+            
+            for (Role r : securityConfig.getBasicConfiguration().getRoles()) {
+                r.setNewRecord(false);
+            }
+        }
+        
+        try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+            fos.write(getGson(true).toJson(securityConfig).getBytes());
+        }
+
+        config.setSecurityConfig(securityConfig);
+        */
+        return retval;
+    }
 }

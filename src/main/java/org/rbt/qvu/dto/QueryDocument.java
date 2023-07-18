@@ -13,8 +13,12 @@ import java.util.List;
  * @author rbtuc
  */
 public class QueryDocument {
+    private String name;
+    private String path;
     private String createdBy;
+    private String updatedBy;
     private Timestamp createDate;
+    private Timestamp lastUpdatedDate;
     private String datasource;
     private String baseTable;
     private List<SqlSelectColumn> selectColumns = new ArrayList<>();
@@ -22,6 +26,15 @@ public class QueryDocument {
     private List<SqlFrom> fromRecords = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
     public String getCreatedBy() {
         return createdBy;
     }
@@ -85,9 +98,28 @@ public class QueryDocument {
     public void setRoles(List<String> roles) {
         this.roles = roles;
     }
-    
-    
-    
-    
-    
-}
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Timestamp getLastUpdatedDate() {
+        return lastUpdatedDate;
+    }
+
+    public void setLastUpdatedDate(Timestamp lastUpdatedDate) {
+        this.lastUpdatedDate = lastUpdatedDate;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+ }

@@ -73,6 +73,18 @@ export const loadDatasources = async () => {
     }
 };
 
+export const loadDocumentGroups = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/document/groups/load");
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 export const loadDatabaseTypes = async () => {
     try {
         let res = await axios.get(getApiURL() + "/db/types/load");
@@ -125,6 +137,31 @@ export const saveRole = async (r) => {
 
     try {
         let res = await axios.post(getApiURL() + "/auth/role/save", r, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
+
+export const saveDocumentGroup = async (g) => {
+
+    try {
+        let res = await axios.post(getApiURL() + "/document/group/save", g, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
+export const deleteDocumentGroup = async (gname) => {
+
+    try {
+        let res = await axios.delete(getApiURL() + "/document/group/" + gname);
         if (res) {
             return res.data;
         }

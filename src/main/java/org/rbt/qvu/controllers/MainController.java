@@ -16,7 +16,9 @@ import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
+import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
@@ -67,6 +69,13 @@ public class MainController {
         return service.loadDatasources();
     }
 
+    @GetMapping("api/v1/document/groups/load")
+    public List<DocumentGroup> loadDocumentGroups() {
+        LOG.debug("in loadDocumentGroups()");
+
+        return service.loadDocumentGroups();
+    }
+
     @PostMapping("api/v1/auth/role/save")
     public OperationResult saveRole(@RequestBody Role role) {
         LOG.debug("in saveRole()");
@@ -106,6 +115,19 @@ public class MainController {
     public OperationResult deleteDatasource(@PathVariable String datasourceName) {
         LOG.debug("in deleteDatasource(" + datasourceName + ")");
         return service.deleteDatasource(datasourceName);
+    }
+
+    
+    @PostMapping("api/v1/document/group/save")
+    public OperationResult saveDocumentGroup(@RequestBody DocumentGroup group) {
+        LOG.debug("in saveDocumentGroup()");
+        return service.saveDocumentGroup(group);
+    }
+
+    @DeleteMapping("api/v1/document/group/{groupName}")
+    public OperationResult deleteDocumentGroup(@PathVariable String groupName) {
+        LOG.debug("in deleteDocumentGroup(" + groupName + ")");
+        return service.deleteDocumentGroup(groupName);
     }
 
     @GetMapping("api/v1/lang/{langkey}/load")
@@ -162,4 +184,9 @@ public class MainController {
         return service.getDatasourceTableNames(datasourceName);
     }
 
+    @PostMapping("api/v1/document/query/save")
+    public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc) {
+        LOG.debug("in saveQueryDocument()");
+        return service.saveQueryDocument(doc);
+    }
 }

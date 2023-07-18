@@ -8,7 +8,7 @@ import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
 import useHelp from "../../context/HelpContext";
 import { MdHelpOutline } from "react-icons/md";
-import {AiFillFileAdd, AiFillDelete, AiFillCaretDown, AiFillCaretUp, AiFillCopy} from "react-icons/ai";
+import {AiOutlineFileAdd, AiOutlineDelete, AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineCopy} from "react-icons/ai";
 import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
@@ -170,13 +170,13 @@ const SelectColumnEntry = (props) => {
         </div>
     
         <div className="tab platinum-b">
-           <span title={getText("Duplicate entry")}><AiFillFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
-            <span title={getText("Copy column name")}><AiFillCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyColumnName()} /></span>
+           <span title={getText("Duplicate entry")}><AiOutlineFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
+            <span title={getText("Copy column name")}><AiOutlineCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyColumnName()} /></span>
             <div style={{paddingTop: "10%"}}>
-                {(index > 0) && <span title={getText("Move up")}><AiFillCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
-                {(index < (selectColumns.length - 1)) && <span title={getText("Move down")}><AiFillCaretDown className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveDown()} /></span>}
+                {(index > 0) && <span title={getText("Move up")}><AiOutlineCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
+                {(index < (selectColumns.length - 1)) && <span title={getText("Move down")}><AiOutlineCaretDown className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveDown()} /></span>}
             </div>
-            <div title={getText("Remove entry")}><AiFillDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></div>
+            <div title={getText("Remove entry")}><AiOutlineDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></div>
         </div>
         <div className="detail">
             <div style={{paddingLeft: "10px"}} ><input type="checkbox" name="showInResults" defaultChecked={columnData.showInResults} onChange={e => onChange(e)}/><label className="ck-label">{getText("Show in Results")}</label></div>

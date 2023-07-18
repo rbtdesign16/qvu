@@ -53,8 +53,8 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
             if (authData.initialSetupRequired) {
                 return <InitialSetup/>;
             } else if (hasTabAccess()) {
-                return (
-                        <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+                return (<div>
+                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title={getText("Admin")}>
                                 <Admin/>
                             </Tab> }
@@ -66,8 +66,7 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
                             { isReportDesigner(authData) && <Tab eventKey="rdsgn" title={getText("Report Design")}>
                                 <ReportDesign/>
                             </Tab>}
-                        </Tabs>);
-            } else {
+                        </Tabs></div>);
                 return <Splash />;
             }
         } else {

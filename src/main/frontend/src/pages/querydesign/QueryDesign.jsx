@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from "react-bootstrap";
+import Button from "react-bootstrap/Button"
 import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
@@ -25,7 +26,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
         const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData, treeViewData, setDatasource, datasource} = useQueryDesign();
+    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -49,6 +50,18 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
         }
     };
 
+    const isValidSelectColumns = () => {
+        return (selectColumns && (selectColumns.length > 0));
+    };
+    
+    const isValidFilterColumns = () => {
+        return (filterColumns && (filterColumns.length > 0));
+    };
+
+    const isSaveEnabled = () => {
+        return  isValidSelectColumns() && isValidFilterColumns();
+    };
+    
     const onDatasourceChange = async (e) => {
         let ds = e.target.options[e.target.selectedIndex].value;
         if (ds) {
@@ -84,6 +97,7 @@ import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
                     <DataSelectTree/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="query-design-cont">
+                    <Button size="sm" style={{marginRight: "150px", float: "right"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
                     <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
                         <Tab eventKey="dsel" title={getText("Data")}>
                             <SelectColumnList className="select-column-list"/>

@@ -8,9 +8,11 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
+import org.rbt.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("config")
 public class Config {
-    private static Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("#{systemProperties['force.init'] ?: false}")
     private boolean forceInit;
@@ -37,6 +39,7 @@ public class Config {
 
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
+    private DocumentGroupsConfiguration documentGroupsConfig;
     private Map<String, Map<String, String>> langResources = new HashMap<>();
     private boolean initialSetupRequired;
 
@@ -79,6 +82,17 @@ public class Config {
         langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
         securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
         datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
+        
+        String dgfile = getDocumentGroupsConfigurationFileName();
+        File f = new File(dgfile);
+        
+        // if document groups file does not exist initialze it
+        if (!f.exists()) {
+            f.getParentFile().mkdirs();
+            FileUtils.write(f, "{\"lastUpdated\": null, \"documentGroups\": []}", "UTF-8");
+        }
+        
+        documentGroupsConfig = ConfigBuilder.build(dgfile, DocumentGroupsConfiguration.class);
     }
 
     public String getSecurityConfigurationFileName() {
@@ -89,12 +103,21 @@ public class Config {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.DATASOURCES_CONFIG_FILE_NAME;
     }
 
+    public String getDocumentGroupsConfigurationFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.DOCUMENT_GROUPS_CONFIG_FILE_NAME;
+        
+    }
+
     public SecurityConfiguration getSecurityConfig() {
         return securityConfig;
     }
 
     public DataSourcesConfiguration getDatasourcesConfig() {
         return datasourcesConfig;
+    }
+
+    public DocumentGroupsConfiguration getDocumentGroupsConfig() {
+        return documentGroupsConfig;
     }
 
     public String getSecurityType() {

@@ -164,6 +164,25 @@
         "Custom SQL": "Custom SQL",
         "Copy column name": "Copy column name",
         "Table Alias:": "Table Alias:",
-        "Show in Results":"Show in Results"
+        "Show in Results":"Show in Results",
+        "Save Query Document": "Save Query Document",
+        
+        "Add group": "Add group",
+        "Create new group": "Create new group",
+        "Update group": "Update group",
+        "Delete group": "Delete group",
+        "Deleting group": "Deleting group",
+        "Deleted group": "Deleted group",
+        "Failed to delete group": "Failed to delete group $1",
+        "Saving document group": "Saving document group $1",
+        "Document group saved": "Doucument group $1 saved",
+        "Failed to save document group:": "Failed to save document group:",
+        "Saving role": "Saving role $1",
+        "Role saved": "Role $1 saved",
+        "Saving user": "Saving user $1",
+        "User saved": "User $1 saved",
+        "Datasource saved": "Datasource $1 saved"
+        
+        
     }
 }

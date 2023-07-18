@@ -5,6 +5,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +25,7 @@ import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.Config;
-import org.rbt.qvu.configuration.ConfigFileHandler;
+import org.rbt.qvu.util.FileHandler;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
@@ -48,8 +49,10 @@ import org.rbt.qvu.configuration.ConfigBuilder;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
+import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
@@ -61,6 +64,7 @@ import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.QuerySelectTreeBuilder;
 import org.rbt.qvu.util.RoleComparator;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class MainServiceImpl implements MainService {
@@ -76,7 +80,7 @@ public class MainServiceImpl implements MainService {
     private HttpServletRequest request;
 
     @Autowired
-    private ConfigFileHandler configFileHandler;
+    private FileHandler fileHandler;
 
     private DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -177,7 +181,7 @@ public class MainServiceImpl implements MainService {
             }
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("AuthData: " + configFileHandler.getGson().toJson(retval, AuthData.class));
+                LOG.debug("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
             }
         }
 
@@ -236,7 +240,12 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public List<DataSourceConfiguration> loadDatasources() {
-        return configFileHandler.loadDatasources();
+        return fileHandler.loadDatasources();
+    }
+
+    @Override
+    public List<DocumentGroup> loadDocumentGroups() {
+        return fileHandler.loadDocumentGroups();
     }
 
     @Override
@@ -244,7 +253,7 @@ public class MainServiceImpl implements MainService {
         OperationResult<List<DataSourceConfiguration>> retval = new OperationResult();
 
         try {
-            retval = configFileHandler.saveDatasource(datasource);
+            retval = fileHandler.saveDatasource(datasource);
 
             if (retval.isSuccess()) {
                 cacheHelper.getTableCache().clear();
@@ -282,7 +291,7 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult deleteDatasource(String datasourceName) {
-        return configFileHandler.deleteDatasource(datasourceName);
+        return fileHandler.deleteDatasource(datasourceName);
     }
 
     @Override
@@ -296,7 +305,7 @@ public class MainServiceImpl implements MainService {
                 Helper.populateResultError(retval, ex);
             }
         } else {
-            retval = configFileHandler.saveRole(role);
+            retval = fileHandler.saveRole(role);
         }
 
         return retval;
@@ -312,11 +321,37 @@ public class MainServiceImpl implements MainService {
                 Helper.populateResultError(retval, ex);
             }
         } else {
-            retval = configFileHandler.deleteRole(roleName);
+            retval = fileHandler.deleteRole(roleName);
         }
 
         return retval;
     }
+
+    @Override
+    public OperationResult saveDocumentGroup(DocumentGroup group) {
+        OperationResult retval = new OperationResult();
+        try {
+            group.setNewRecord(false);
+            retval = config.getDocumentGroupsConfig().saveDocumentGroup(group);
+        } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+        return retval;
+    }
+
+    @Override
+    public OperationResult deleteDocumentGroup(String groupName) {
+        OperationResult retval = new OperationResult();
+        try {
+            retval = config.getDocumentGroupsConfig().deleteDocumentGroup(groupName);
+        } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+    }
+
+
 
     @Override
     public OperationResult saveUser(User user) {
@@ -329,7 +364,7 @@ public class MainServiceImpl implements MainService {
                 Helper.populateResultError(retval, ex);
             }
         } else {
-            retval = configFileHandler.saveUser(user);
+            retval = fileHandler.saveUser(user);
         }
 
         return retval;
@@ -345,7 +380,7 @@ public class MainServiceImpl implements MainService {
                 Helper.populateResultError(retval, ex);
             }
         } else {
-            retval = configFileHandler.deleteUser(userId);
+            retval = fileHandler.deleteUser(userId);
         }
 
         return retval;
@@ -356,9 +391,9 @@ public class MainServiceImpl implements MainService {
         String retval = "";
         Map<String, String> langMap = config.getLangResources().get(langkey);
         if (langMap == null) {
-            retval = configFileHandler.getGson(true).toJson(config.getLangResources().get(Constants.DEFAULT_LANGUAGE_KEY));
+            retval = fileHandler.getGson(true).toJson(config.getLangResources().get(Constants.DEFAULT_LANGUAGE_KEY));
         } else {
-            retval = configFileHandler.getGson(true).toJson(langMap);
+            retval = fileHandler.getGson(true).toJson(langMap);
         }
 
         LOG.debug("Language File: " + retval);
@@ -390,7 +425,7 @@ public class MainServiceImpl implements MainService {
             }
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
-            configFileHandler.saveSecurityConfig(securityConfig);
+            fileHandler.saveSecurityConfig(securityConfig);
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
         } catch (Exception ex) {
@@ -914,6 +949,30 @@ public class MainServiceImpl implements MainService {
         }
 
         return retval;
+    }
+
+    @Override
+    public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc) {
+        OperationResult retval = new OperationResult();
+        try {
+            User curuser = getCurrentUser();
+            
+            if (doc.getCreateDate() == null) {
+                doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
+                doc.setCreatedBy(curuser.getName());
+            } else {
+                doc.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
+                doc.setUpdatedBy(curuser.getName());
+            }
+            
+            
+            retval = fileHandler.saveQueryDocument(doc);
+         } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+ 
+        return retval;
+
     }
 
 }

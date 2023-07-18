@@ -23,16 +23,20 @@ import {
         setErrorMessage,
         checkEntryFields,
         updateJsonArray,
-        findInArray} from "../../utils/helper";
+        findInArray,
+        replaceTokens} from "../../utils/helper";
 
 import {
         saveDatasource,
+        saveDocumentGroup,
+        deleteDocumentGroup,
         saveUser,
         saveRole,
         deleteDatasource,
         deleteRole,
         deleteUser,
         loadDatasources,
+        loadDocumentGroups,
         loadAuth,
         formatErrorResponse,
         testDatasource,
@@ -54,7 +58,7 @@ const Admin = () => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {datasources, setDatasources, databaseTypes, datasourceTableNames, setDatasourceTableNames} = useDataHandler();
+    const {datasources, setDatasources, databaseTypes, datasourceTableNames, setDatasourceTableNames, documentGroups, setDocumentGroups} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
@@ -63,8 +67,8 @@ const Admin = () => {
         if (await confirm(message)) {
             okFunc();
         }
-    };
-
+    };    
+    
     const getDatasourceEntryConfig = () => {
         return [
             {
@@ -150,6 +154,31 @@ const Admin = () => {
             }];
     };
 
+    const getDocumentGroupEntryConfig = () => {
+        return [
+            {
+                label: getText("Name:"),
+                name: "name",
+                type: "input",
+                key: true,
+                required: true
+            },
+            {
+                label: getText("Description:"),
+                name: "description",
+                type: "input"
+            },{
+                label: getText("Roles:"),
+                name: "roles",
+                type: "multiselect",
+                options: getAvailableRoles,
+                setSelected: setDocumentGroupRoles,
+                getSelected: getDocumentGroupRoles,
+                valueRenderer: rolesValueRenderer
+            }];
+    };
+
+    
     const getRoleEntryConfig = () => {
         return [
             {
@@ -281,6 +310,27 @@ const Admin = () => {
     };
 
     const getUserRoles = (dataObject) => {
+        let retval = [];
+
+        if (dataObject.roles) {
+            dataObject.roles.map(r => retval.push({label: r, value: r}));
+        }
+
+        return retval;
+    };
+    
+    const setDocumentGroupRoles = (dataObject, selections) => {
+        if (selections) {
+            if (!dataObject.roles) {
+                dataObject.roles = [];
+            } else {
+                dataObject.roles.length = 0;
+            }
+            selections.map(s => dataObject.roles.push(s.value));
+        }
+    };
+
+    const getDocumentGroupRoles = (dataObject) => {
         let retval = [];
 
         if (dataObject.roles) {
@@ -475,6 +525,18 @@ const Admin = () => {
         };
     };
 
+    const getDocumentGroupConfig = (title, dataObject) => {
+        return {
+            idPrefix: "emo-",
+            show: true,
+            title: title,
+            cancel: hideEdit,
+            save: saveModifiedDocumentGroup,
+            delete: deleteSelectedDocumentGroup,
+            dataObject: dataObject,
+            entryConfig: getDocumentGroupEntryConfig()
+        };
+    };
 
     const getUserConfig = (title, dataObject) => {
         return {
@@ -541,6 +603,34 @@ const Admin = () => {
         handleOnClick(getText("delete role", " ") + r.name + getText("?"), okFunc);
     };
 
+   const addDocumentGroup = () => {
+        setEditModal(getDocumentGroupConfig(getText("Create new group"), {newRecord: true}));
+    };
+
+    const editDocumentGroup = (indx) => {
+        let g = documentGroups[indx];
+        setEditModal(getDocumentGroupConfig(getText("Update group", " ") + g.name, {...g}));
+    };
+
+    const deleteSelectedDocumentGroup = async (indx) => {
+        const g = documentGroups[indx];
+        const okFunc = async () => {
+            showMessage(INFO, getText("Deleting group", " ") + g.name + "...", null, true);
+            let res = await deleteDocumentGroup(g.name);
+
+            if (isApiSuccess(res)) {
+                setDocumentGroups(await loadDocumentGroups());
+                showMessage(SUCCESS, getText("Deleted group", " ") + g.name);
+            } else {
+                showMessage(ERROR, formatErrorResponse(res, replaceTokens(getText("Failed to delete group"), [g.name])));
+            }
+        };
+
+        handleOnClick(getText("Delete group", " ") + g.name + getText("?"), okFunc);
+    };
+
+    
+    
     const addUser = () => {
         setEditModal(getUserConfig(getText("Create new user"), {newRecord: true}));
     };
@@ -619,6 +709,30 @@ const Admin = () => {
         data: authData.allRoles
     };
 
+    const documentGroupsConfig = {
+        title: "Document Groups",
+        width: "325px",
+        height: "500px",
+        className: "entrygrid-100-175",
+        addTitle: getText("Add group"),
+        editTitle: getText("Edit group"),
+        delTitle: getText("Delete group"),
+        onAdd: addDocumentGroup,
+        onEdit: editDocumentGroup,
+        onDelete: deleteSelectedDocumentGroup,
+        displayConfig: [
+            {
+                label: getText("Name:"),
+                field: "name"
+            },
+            {
+                label: getText("Description:"),
+                field: "description"
+            }
+        ],
+        data: documentGroups
+    };
+
 
     const usersConfig = {
         title: "Users",
@@ -664,7 +778,7 @@ const Admin = () => {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(res.result);
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("Datasource", " ") + config.dataObject.datasourceName + " " + getText("saved"));
+                showMessage(SUCCESS, replaceTokens(getText("Datasource saved"), [config.dataObject.datasourceName]));
 
             } else {
                 showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName));
@@ -679,15 +793,35 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, "Saving role " + config.dataObject.name + "...", null, true);
+            showMessage(INFO, replaceTokens(getText("Saving role", "..."),  [config.dataObject.name]), null, true);
             let res = await saveRole(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, "Role " + config.dataObject.name + " saved");
+                showMessage(SUCCESS, replaceTokens(getText("Role saved"), [config.dataObject.name ]));
             } else {
                 showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name));
+            }
+        } else {
+            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
+        }
+    };
+    
+     const saveModifiedDocumentGroup = async (config) => {
+        let ok = checkEntryFields(config);
+
+        if (ok) {
+            console.log("----------->1");
+            showMessage(INFO, replaceTokens(getText("Saving document group", "..."), [config.dataObject.name]), null, true);
+            let res = await saveDocumentGroup(config.dataObject);
+            if (isApiSuccess(res)) {
+                setErrorMessage(config.idPrefix, "");
+                setDocumentGroups(await loadDocumentGroups());
+                setEditModal({show: false});
+                showMessage(SUCCESS, replaceTokens(getText("Document group saved"), [config.dataObject.name]));
+            } else {
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save document group:", " ") + config.dataObject.name));
             }
         } else {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
@@ -699,13 +833,13 @@ const Admin = () => {
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");
-            showMessage(INFO, "Saving user " + config.dataObject.userId + "...", null, true);
+            showMessage(INFO, replaceTokens(getText("Saving user", "..."), [config.dataObject.userId]), null, true);
             let res = await saveUser(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, getText("User", " ") + config.dataObject.userId + " " + getText("saved"));
+                showMessage(SUCCESS, replaceTokens(getText("User saved"), [config.dataObject.userId]));
             } else {
                 showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
             }
@@ -722,6 +856,7 @@ const Admin = () => {
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>
+                <EditableDataList listConfig={documentGroupsConfig}/>
             </div>
             );
 };

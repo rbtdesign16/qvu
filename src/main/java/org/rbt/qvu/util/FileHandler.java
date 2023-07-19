@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
@@ -326,6 +327,31 @@ public class FileHandler {
         return retval;
     }
 
+    private void removeRoleFromUsers(SecurityConfiguration securityConfig, String roleName) {
+        Iterator <User> it = securityConfig.getBasicConfiguration().getUsers().iterator();
+        
+        while (it.hasNext()) {
+            User u = it.next();
+            Iterator <String> it2 = u.getRoles().iterator();
+            while (it2.hasNext()) {
+                if (it2.next().equalsIgnoreCase(roleName)) {
+                    it2.remove();
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void removeRoleFromAliases(SecurityConfiguration securityConfig, String roleName) {
+        Iterator <Entry<String, String>> it = securityConfig.getRoleAliases().entrySet().iterator();
+        while (it.hasNext()) {
+            Entry <String, String> e  = it.next();
+            if (e.getValue().equalsIgnoreCase(roleName)) {
+                it.remove();
+            }
+        }
+    }
+    
     public OperationResult deleteRole(String roleName) {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
@@ -340,6 +366,9 @@ public class FileHandler {
                     while (it.hasNext()) {
                         Role r = it.next();
                         if (r.getName().equalsIgnoreCase(roleName)) {
+                            removeRoleFromUsers(securityConfig, roleName);
+                            removeRoleFromAliases(securityConfig, roleName);
+                         //   removeRoleFromDocuments(roleName);
                             it.remove();
                             break;
                         }

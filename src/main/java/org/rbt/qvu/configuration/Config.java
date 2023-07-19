@@ -106,8 +106,28 @@ public class Config {
 
     public String getDocumentGroupsConfigurationFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.DOCUMENT_GROUPS_CONFIG_FILE_NAME;
-        
     }
+
+    public File getDocumentsFolder() {
+        File retval = new File(repositoryFolder + File.separator + "documents");
+        if (!retval.exists()) {
+            retval.mkdirs();
+        }
+        
+        return retval;
+    }
+    
+    public File getDocumentGroupsFolder(String groupName) {
+        File documents = getDocumentsFolder();
+        
+        File retval = new File(documents.getPath() + File.separator + groupName);
+        if (!retval.exists()) {
+            retval.mkdirs();
+        }
+        
+        return retval;
+    }
+
 
     public SecurityConfiguration getSecurityConfig() {
         return securityConfig;

@@ -332,7 +332,7 @@ public class MainServiceImpl implements MainService {
         OperationResult retval = new OperationResult();
         try {
             group.setNewRecord(false);
-            retval = config.getDocumentGroupsConfig().saveDocumentGroup(group);
+            retval = fileHandler.saveDocumentGroup(group);
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }
@@ -343,7 +343,7 @@ public class MainServiceImpl implements MainService {
     public OperationResult deleteDocumentGroup(String groupName) {
         OperationResult retval = new OperationResult();
         try {
-            retval = config.getDocumentGroupsConfig().deleteDocumentGroup(groupName);
+            retval = fileHandler.deleteDocumentGroup(groupName);
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }

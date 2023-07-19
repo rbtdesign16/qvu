@@ -24,6 +24,7 @@ import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
+import org.rbt.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.QueryDocument;
@@ -76,7 +77,6 @@ public class FileHandler {
         }
         return retval;
     }
-
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
         OperationResult retval = new OperationResult();
@@ -161,6 +161,103 @@ public class FileHandler {
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                     config.setDatasourcesConfig(datasources);
+                    retval.setErrorCode(OperationResult.SUCCESS);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+
+    }
+
+    public OperationResult saveDocumentGroup(DocumentGroup group) {
+        OperationResult retval = new OperationResult();
+        DocumentGroupsConfiguration docgroups = null;
+        try {
+            File f = new File(config.getDocumentGroupsConfigurationFileName());
+            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                docgroups = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+
+                if (docgroups != null) {
+                    if (docgroups.getLastUpdated() > config.getDocumentGroupsConfig().getLastUpdated()) {
+                        retval.setErrorCode(Errors.RECORD_UPDATED);
+                        retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"document groups"}));
+                        throw new SaveException(retval);
+                    } else {
+                        int indx = -1;
+                        for (int i = 0; i < docgroups.getDocumentGroups().size(); ++i) {
+                            DocumentGroup dg = docgroups.getDocumentGroups().get(i);
+                            if (dg.getName().equalsIgnoreCase(group.getName())) {
+                                indx = i;
+                                break;
+                            }
+                        }
+
+                        if (indx > -1) {
+                            if (group.isNewRecord()) {
+                                retval.setErrorCode(OperationResult.RECORD_EXISTS);
+                                retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] { group.getName()}));
+                                throw new SaveException(retval);
+                            } else {
+                                docgroups.getDocumentGroups().set(indx, group);
+                            }
+                        } else {
+                            docgroups.getDocumentGroups().add(group);
+                        }
+                        
+                        group.setNewRecord(false);
+                    }
+                }
+            }
+
+            if (docgroups != null) {
+                Collections.sort(docgroups.getDocumentGroups(), new DocumentGroupComparator());
+                docgroups.setLastUpdated(System.currentTimeMillis());
+                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(docgroups).getBytes());
+                }
+                config.setDocumentGroupsConfig(docgroups);
+                retval.setResult(config.getDocumentGroupsConfig().getDocumentGroups());
+            }
+        } catch (SaveException ex) {
+            retval = ex.getOpResult();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+    }
+
+    public OperationResult deleteDocumentGroup(String groupName) {
+        OperationResult retval = new OperationResult();
+        DocumentGroupsConfiguration docgroups = null;
+        try {
+            File f = new File(config.getDocumentGroupsConfigurationFileName());
+            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                docgroups = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+
+                if (docgroups != null) {
+                    Iterator<DocumentGroup> it = docgroups.getDocumentGroups().iterator();
+                    while (it.hasNext()) {
+                        DocumentGroup dg = it.next();
+                        if (dg.getName().equalsIgnoreCase(groupName)) {
+                            it.remove();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (docgroups != null) {
+                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(docgroups).getBytes());
+                    config.setDocumentGroupsConfig(docgroups);
                     retval.setErrorCode(OperationResult.SUCCESS);
                 }
             }

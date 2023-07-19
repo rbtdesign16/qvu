@@ -27,7 +27,8 @@ import org.springframework.stereotype.Component;
 @Component("config")
 public class Config {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
-
+    private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default decument group\", \"roles\":[], \"queryDocuments\":[],\"reportDocument\":[]}]}";
+    
     @Value("#{systemProperties['force.init'] ?: false}")
     private boolean forceInit;
 
@@ -89,7 +90,7 @@ public class Config {
         // if document groups file does not exist initialze it
         if (!f.exists()) {
             f.getParentFile().mkdirs();
-            FileUtils.write(f, "{\"lastUpdated\": null, \"documentGroups\": []}", "UTF-8");
+            FileUtils.write(f, DEFAULT_DOCUMENT_GROUPS, "UTF-8");
         }
         
         documentGroupsConfig = ConfigBuilder.build(dgfile, DocumentGroupsConfiguration.class);
@@ -139,6 +140,12 @@ public class Config {
     public void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {
         this.datasourcesConfig = datasourcesConfig;
     }
+
+    public void setDocumentGroupsConfig(DocumentGroupsConfiguration documentGroupsConfig) {
+        this.documentGroupsConfig = documentGroupsConfig;
+    }
+    
+    
 
     public void setSecurityConfig(SecurityConfiguration securityConfig) {
         this.securityConfig = securityConfig;

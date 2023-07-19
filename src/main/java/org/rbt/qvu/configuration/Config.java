@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component("config")
 public class Config {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
-    private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default decument group\", \"roles\":[], \"queryDocuments\":[],\"reportDocument\":[]}]}";
+    private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default document group\", \"roles\":[], \"queryDocuments\":[],\"reportDocument\":[]}]}";
     
     @Value("#{systemProperties['force.init'] ?: false}")
     private boolean forceInit;

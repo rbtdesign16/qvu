@@ -11,12 +11,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import org.apache.commons.io.FileUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
@@ -91,7 +93,7 @@ public class FileHandler {
                 if (datasources != null) {
                     if (datasources.getLastUpdated() > config.getDatasourcesConfig().getLastUpdated()) {
                         retval.setErrorCode(Errors.RECORD_UPDATED);
-                        retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"datrasources"}));
+                        retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"datasources"}));
                         throw new SaveException(retval);
                     } else {
                         int indx = -1;
@@ -271,6 +273,38 @@ public class FileHandler {
 
     }
 
+    public OperationResult saveDocumentGroups(DocumentGroupsConfiguration docgroups) {
+        OperationResult retval = new OperationResult();
+        try {
+            File f = new File(config.getDocumentGroupsConfigurationFileName());
+            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                DocumentGroupsConfiguration dg = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+
+                if (dg != null) {
+                    if (docgroups.getLastUpdated() > config.getDocumentGroupsConfig().getLastUpdated()) {
+                        retval.setErrorCode(Errors.RECORD_UPDATED);
+                        retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"document groups"}));
+                    }
+                }
+            }
+
+            if (retval.isSuccess()) {
+                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(docgroups).getBytes());
+                    config.setDocumentGroupsConfig(docgroups);
+                    retval.setErrorCode(OperationResult.SUCCESS);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }
+
+        return retval;
+
+    }
+
     public OperationResult saveRole(Role role) {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
@@ -352,6 +386,21 @@ public class FileHandler {
         }
     }
     
+    private void removeRoleFromDocumentGroups(DocumentGroupsConfiguration docgroups, String roleName) {
+        Iterator <DocumentGroup> it = docgroups.getDocumentGroups().iterator();
+        
+        while (it.hasNext()) {
+            DocumentGroup dg = it.next();
+            Iterator <String> it2 = dg.getRoles().iterator();
+             while (it2.hasNext()) {
+                if (it2.next().equalsIgnoreCase(roleName)) {
+                    it2.remove();
+                    break;
+                }
+            }
+        }
+    }
+    
     public OperationResult deleteRole(String roleName) {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
@@ -368,15 +417,19 @@ public class FileHandler {
                         if (r.getName().equalsIgnoreCase(roleName)) {
                             removeRoleFromUsers(securityConfig, roleName);
                             removeRoleFromAliases(securityConfig, roleName);
-                         //   removeRoleFromDocuments(roleName);
-                            it.remove();
+                            DocumentGroupsConfiguration docgroups = config.getDocumentGroupsConfig();
+                            removeRoleFromDocumentGroups(docgroups, roleName);
+                            retval = saveDocumentGroups(docgroups);
+                            if (retval.isSuccess()) {
+                                it.remove();
+                            }                            
                             break;
                         }
                     }
                 }
             }
 
-            if (securityConfig != null) {
+            if ((securityConfig != null) && retval.isSuccess()){
                 saveSecurityConfig(securityConfig);
             }
         } catch (Exception ex) {
@@ -501,40 +554,71 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult saveQueryDocument(QueryDocument doc) throws Exception {
+    public OperationResult saveQueryDocument(QueryDocument doc) {
         OperationResult retval = new OperationResult();
-/*
-        File f = new File(config.getSecurityConfigurationFileName());
-        try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-            byte[] bytes = fis.readAllBytes();
-            cursec = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
-            if (cursec.getLastUpdated() > securityConfig.getLastUpdated()) {
-                retval.setErrorCode(Errors.RECORD_UPDATED);
-                retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"security configuration"}));
-                throw new SaveException(retval);
-            }
-        }
-
-        securityConfig.setLastUpdated(System.currentTimeMillis());
+        try {
+        File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName());
         
-        // make sure all records are marked as not new
-        if (securityConfig.isBasicConfig()) {
-            for (User u : securityConfig.getBasicConfiguration().getUsers()) {
-                u.setNewRecord(false);
-            }
-            
-            for (Role r : securityConfig.getBasicConfiguration().getRoles()) {
-                r.setNewRecord(false);
-            }
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
         
-        try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-            fos.write(getGson(true).toJson(securityConfig).getBytes());
+        File docFile = new File(folder.getPath() + File.separator + "query" + File.separator + doc.getName());
+        
+        if (doc.isNewRecord() && docFile.exists()) {
+            retval.setErrorCode(OperationResult.RECORD_EXISTS);
+            retval.setMessage("query document " + doc.getName() + " already exists");
+            throw new SaveException(retval);
+        } 
+        
+        
+        if (docFile.exists()) {
+            try (FileInputStream fis = new FileInputStream(docFile); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                QueryDocument curdoc = gson.fromJson(new String(bytes), QueryDocument.class);
+
+                if (curdoc.getLastUpdated().getTime() > doc.getLastUpdated().getTime()) {
+                    retval.setErrorCode(Errors.RECORD_UPDATED);
+                    retval.setMessage( Errors.getMessage(retval.getErrorCode(), new String[] {"query document"}));
+                    throw new SaveException(retval);
+                }
+            }
+        }
+        
+        doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+        
+          
+        try (FileOutputStream fos = new FileOutputStream(docFile); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+            fos.write(getGson(true).toJson(doc).getBytes());
+        }
+        } catch (SaveException ex) {
+            retval = ex.getOpResult();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
         }
 
-        config.setSecurityConfig(securityConfig);
-        */
         return retval;
     }
+    
+    public OperationResult deleteDocument(String type, String group, String name) {
+        OperationResult retval = new OperationResult();
+
+        try {
+            File f = config.getDocumentGroupsFolder(group);
+            File doc = new File(f.getPath() + File.separator + type + File.separator + name);
+            
+            if (doc.exists()) {
+                FileUtils.delete(doc);
+            }
+        }
+        
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }   
+        
+        return retval;
+    }     
 }

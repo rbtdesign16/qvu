@@ -961,7 +961,7 @@ public class MainServiceImpl implements MainService {
                 doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                 doc.setCreatedBy(curuser.getName());
             } else {
-                doc.setLastUpdatedDate(new Timestamp(System.currentTimeMillis()));
+                doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                 doc.setUpdatedBy(curuser.getName());
             }
             
@@ -975,4 +975,8 @@ public class MainServiceImpl implements MainService {
 
     }
 
+    @Override
+    public OperationResult deleteDocument(String type, String group, String name) {
+        return fileHandler.deleteDocument(type, group, name);
+    }
 }

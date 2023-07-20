@@ -18,13 +18,14 @@ public class QueryDocument {
     private String createdBy;
     private String updatedBy;
     private Timestamp createDate;
-    private Timestamp lastUpdatedDate;
+    private Timestamp lastUpdated;
     private String datasource;
     private String baseTable;
+    private String documentGroupName;
+    private boolean newRecord;
     private List<SqlSelectColumn> selectColumns = new ArrayList<>();
     private List<SqlFilterColumn> filterColumns = new ArrayList<>();
     private List<SqlFrom> fromRecords = new ArrayList<>();
-    private List<String> roles = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -33,7 +34,6 @@ public class QueryDocument {
     public void setName(String name) {
         this.name = name;
     }
-
     
     public String getCreatedBy() {
         return createdBy;
@@ -91,14 +91,6 @@ public class QueryDocument {
         this.fromRecords = fromRecords;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
     public String getUpdatedBy() {
         return updatedBy;
     }
@@ -107,13 +99,15 @@ public class QueryDocument {
         this.updatedBy = updatedBy;
     }
 
-    public Timestamp getLastUpdatedDate() {
-        return lastUpdatedDate;
+    public Timestamp getLastUpdated() {
+        return lastUpdated;
     }
 
-    public void setLastUpdatedDate(Timestamp lastUpdatedDate) {
-        this.lastUpdatedDate = lastUpdatedDate;
+    public void setLastUpdated(Timestamp lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
+    
+    
 
     public String getPath() {
         return path;
@@ -122,4 +116,22 @@ public class QueryDocument {
     public void setPath(String path) {
         this.path = path;
     }
+
+    public String getDocumentGroupName() {
+        return documentGroupName;
+    }
+
+    public void setDocumentGroupName(String documentGroupName) {
+        this.documentGroupName = documentGroupName;
+    }
+
+    public boolean isNewRecord() {
+        return newRecord;
+    }
+
+    public void setNewRecord(boolean newRecord) {
+        this.newRecord = newRecord;
+    }
+    
+    
  }

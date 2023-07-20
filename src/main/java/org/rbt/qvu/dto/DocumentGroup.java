@@ -15,9 +15,8 @@ public class DocumentGroup {
     private String name;
     private String description;
     private boolean newRecord;
+    private boolean defaultGroup;
     private List<String> roles = new ArrayList<>();
-    private List<String> queryDocuments = new ArrayList<>();
-    private List<String> reportDocuments = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -35,22 +34,6 @@ public class DocumentGroup {
         this.roles = roles;
     }
 
-    public List<String> getQueryDocuments() {
-        return queryDocuments;
-    }
-
-    public void setQueryDocuments(List<String> queryDocuments) {
-        this.queryDocuments = queryDocuments;
-    }
-
-    public List<String> getReportDocuments() {
-        return reportDocuments;
-    }
-
-    public void setReportDocuments(List<String> reportDocuments) {
-        this.reportDocuments = reportDocuments;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -65,6 +48,14 @@ public class DocumentGroup {
 
     public void setNewRecord(boolean newRecord) {
         this.newRecord = newRecord;
+    }
+
+    public boolean isDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(boolean defaultGroup) {
+        this.defaultGroup = defaultGroup;
     }
     
     

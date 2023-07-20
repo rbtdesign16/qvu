@@ -656,9 +656,14 @@ const Admin = () => {
 
         handleOnClick(getText("delete user", " ") + u.name + getText("?"), okFunc);
     };
+    
+    const isDocumentGroupDeleteable = (indx) => {
+         return !documentGroups[indx].defaultGroup;
+    };
+
 
     const datasourcesConfig = {
-        title: "Datasources",
+        title: getText("Datasources"),
         width: "325px",
         height: "500px",
         addTitle: getText("Add datasource"),
@@ -682,7 +687,7 @@ const Admin = () => {
     };
 
     const rolesConfig = {
-        title: "Roles",
+        title: getText("Roles"),
         width: "325px",
         height: "500px",
         className: "entrygrid-100-175",
@@ -710,13 +715,14 @@ const Admin = () => {
     };
 
     const documentGroupsConfig = {
-        title: "Document Groups",
+        title: getText("Document Groups"),
         width: "325px",
         height: "500px",
         className: "entrygrid-100-175",
         addTitle: getText("Add group"),
         editTitle: getText("Edit group"),
         delTitle: getText("Delete group"),
+        isDeleteable: isDocumentGroupDeleteable,
         onAdd: addDocumentGroup,
         onEdit: editDocumentGroup,
         onDelete: deleteSelectedDocumentGroup,
@@ -735,7 +741,7 @@ const Admin = () => {
 
 
     const usersConfig = {
-        title: "Users",
+        title: getText("Users"),
         width: "325px",
         height: "500px",
         addTitle: getText("Add user"),
@@ -765,7 +771,6 @@ const Admin = () => {
     const hideEdit = () => {
         setEditModal({show: false});
     };
-
 
     const saveModifiedDatasource = async (config) => {
         let ok = checkEntryFields(config);
@@ -812,7 +817,6 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            console.log("----------->1");
             showMessage(INFO, replaceTokens(getText("Saving document group", "..."), [config.dataObject.name]), null, true);
             let res = await saveDocumentGroup(config.dataObject);
             if (isApiSuccess(res)) {

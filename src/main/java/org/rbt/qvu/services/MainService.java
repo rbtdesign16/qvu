@@ -47,4 +47,6 @@ public interface MainService {
     public OperationResult<List<TableColumnNames>> getDatasourceTableNames(String datasourceName);
 
     public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc);
+    public OperationResult deleteDocument(String type, String group, String name);
+
 }

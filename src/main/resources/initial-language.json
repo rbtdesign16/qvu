@@ -181,7 +181,11 @@
         "Role saved": "Role $1 saved",
         "Saving user": "Saving user $1",
         "User saved": "User $1 saved",
-        "Datasource saved": "Datasource $1 saved"
+        "Datasource saved": "Datasource $1 saved",
+        "Document Groups": "Document Groups",
+        "Roles": "Roles",
+        "Datasources": "Datasources",
+        "Users": "Users"
         
         
     }

@@ -61,12 +61,16 @@ const EditableDataList = (props) => {
         return (listConfig.isReadOnly && listConfig.isReadOnly(indx));
     };
     
-    const isEditDisabled = (indx) => {
+   const isEditDisabled = (indx) => {
         return !listConfig.onEdit || isReadOnly(indx);
     };
 
     const isDeleteDisabled = (indx) => {
-        return !listConfig.onDelete || isReadOnly(indx);
+        if (listConfig.isDeleteable && !listConfig.isDeleteable(indx)) {
+            return true;
+        } else {
+            return !listConfig.onDelete || isReadOnly(indx);
+        }
     };
     
     const getButtons = (indx) => {

@@ -189,4 +189,10 @@ public class MainController {
         LOG.debug("in saveQueryDocument()");
         return service.saveQueryDocument(doc);
     }
+    
+    @GetMapping("api/v1/document/{type}/{group}/{name}")
+    public OperationResult deleteDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
+        return service.deleteDocument(type, group, name);
+    }
+
 }

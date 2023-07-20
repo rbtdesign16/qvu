@@ -192,12 +192,12 @@ public class MainController {
     }
     
     @PostMapping("api/v1/document/report/save")
-    public OperationResult<ReportDocument> saveQueryDocument(@RequestBody ReportDocument doc) {
+    public OperationResult<ReportDocument> saveReportDocument(@RequestBody ReportDocument doc) {
         LOG.debug("in saveReportDocument()");
         return service.saveReportDocument(doc);
     }
 
-    @GetMapping("api/v1/document/{type}/{group}/{name}")
+    @DeleteMapping("api/v1/document/delete/{type}/{group}/{name}")
     public OperationResult deleteDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
         return service.deleteDocument(type, group, name);
     }

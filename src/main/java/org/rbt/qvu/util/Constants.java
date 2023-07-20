@@ -82,7 +82,6 @@ public class Constants {
             Role ri = new Role();
             ri.setName(roleName);
             ri.setDescription("base application role");
-            ri.setBaseRole(true);
             DEFAULT_ROLES.add(ri);
         }
     }

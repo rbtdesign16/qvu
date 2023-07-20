@@ -54,6 +54,7 @@ import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
+import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
@@ -351,8 +352,6 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-
-
     @Override
     public OperationResult saveUser(User user) {
         OperationResult retval = new OperationResult();
@@ -530,7 +529,7 @@ public class MainServiceImpl implements MainService {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
-                
+
                 // load up custom foreign keys to apply tp table definitions
                 Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
                 for (ForeignKey fk : ds.getCustomForeignKeys()) {
@@ -564,7 +563,7 @@ public class MainServiceImpl implements MainService {
                         t.setColumns(getTableColumns(datasourceName, dmd, t));
                         t.setImportedKeys(getImportedKeys(datasourceName, dmd, t));
                         t.setExportedKeys(getExportedKeys(datasourceName, dmd, t));
-                        
+
                         // add any applicable custom foreign keys to current table
                         List<ForeignKey> fklist = customForeignKeys.get(t.getName());
                         if (fklist != null) {
@@ -576,12 +575,12 @@ public class MainServiceImpl implements MainService {
                                 }
                             }
                         }
-                         
+
                         setIndexColumns(dmd, t);
                         setPrimaryKeys(dmd, t);
                         cacheHelper.getTableCache().put(key, t);
-                    } 
-                    
+                    }
+
                     data.add(t);
                 }
 
@@ -789,33 +788,28 @@ public class MainServiceImpl implements MainService {
                     conn = DBHelper.getConnection(ds);
                 }
 
-
                 DatabaseMetaData dmd = conn.getMetaData();
 
                 res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-                
+
                 while (res.next()) {
                     TableColumnNames t = new TableColumnNames();
                     t.setTableName(res.getString(3));
                     t.setColumnNames(getColumnNames(dmd, ds.getSchema(), t.getTableName()));
                     data.add(t);
                 }
-                
+
                 retval.setResult(data);
             }
-        }
-        
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Errors.populateError(retval, ex);
-        }
-        
-        finally {
+        } finally {
             DBHelper.closeConnection(conn, null, res);
         }
-        
+
         return retval;
     }
-        
+
     @Override
     public OperationResult<List<TableSettings>> getTableSettings(DataSourceConfiguration ds) {
         OperationResult<List<TableSettings>> retval = new OperationResult();
@@ -867,27 +861,23 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private List<String> getColumnNames(DatabaseMetaData dmd, String schema, String table) throws Exception {
         List<String> retval = new ArrayList<>();
         ResultSet res = null;
-                
+
         try {
             res = dmd.getColumns(null, schema, table, "%");
 
             while (res.next()) {
                 retval.add(res.getString(4));
             }
-        }
-                
-        finally {
+        } finally {
             DBHelper.closeConnection(null, null, res);
         }
-        
+
         return retval;
     }
-                    
-
 
     @Override
     public OperationResult<List<ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName) {
@@ -951,12 +941,16 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    public OperationResult getDocument(String type, String group, String name) {
+        return fileHandler.getDocument(type, group, name);
+    }
+
     @Override
     public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc) {
         OperationResult retval = new OperationResult();
         try {
             User curuser = getCurrentUser();
-            
+
             if (doc.getCreateDate() == null) {
                 doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                 doc.setCreatedBy(curuser.getName());
@@ -964,13 +958,35 @@ public class MainServiceImpl implements MainService {
                 doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                 doc.setUpdatedBy(curuser.getName());
             }
-            
-            
+
             retval = fileHandler.saveQueryDocument(doc);
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }
- 
+
+        return retval;
+
+    }
+
+    @Override
+    public OperationResult<ReportDocument> saveReportDocument(@RequestBody ReportDocument doc) {
+        OperationResult retval = new OperationResult();
+        try {
+            User curuser = getCurrentUser();
+
+            if (doc.getCreateDate() == null) {
+                doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
+                doc.setCreatedBy(curuser.getName());
+            } else {
+                doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
+                doc.setUpdatedBy(curuser.getName());
+            }
+
+            retval = fileHandler.saveReportDocument(doc);
+        } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+
         return retval;
 
     }
@@ -979,4 +995,5 @@ public class MainServiceImpl implements MainService {
     public OperationResult deleteDocument(String type, String group, String name) {
         return fileHandler.deleteDocument(type, group, name);
     }
+
 }

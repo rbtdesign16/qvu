@@ -18,6 +18,7 @@ public class Errors {
     public static final int FOLDER_NOT_FOUND = -2;
     public static final int DB_CONNECTION_FAILED = -3;
     public static final int RECORD_UPDATED = -4;
+    public static final int DOCUMENT_NOT_FOUND = -5;
 
     static {
         ERROR_MESSAGE_MAP.put(OperationResult.RECORD_EXISTS, "errorCode1");
@@ -29,6 +30,7 @@ public class Errors {
         ERROR_MESSAGE_MAP.put(FOLDER_NOT_FOUND, "errorCode-2");
         ERROR_MESSAGE_MAP.put(DB_CONNECTION_FAILED, "errorCode-3");
         ERROR_MESSAGE_MAP.put(RECORD_UPDATED, "errorCode-4");
+        ERROR_MESSAGE_MAP.put(DOCUMENT_NOT_FOUND, "errorCode-5");
     }
 
     public static String getMessage(Integer errorCode) {

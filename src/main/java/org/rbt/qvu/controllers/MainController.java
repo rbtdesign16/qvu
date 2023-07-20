@@ -20,6 +20,7 @@ import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
+import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
@@ -190,9 +191,20 @@ public class MainController {
         return service.saveQueryDocument(doc);
     }
     
+    @PostMapping("api/v1/document/report/save")
+    public OperationResult<ReportDocument> saveQueryDocument(@RequestBody ReportDocument doc) {
+        LOG.debug("in saveReportDocument()");
+        return service.saveReportDocument(doc);
+    }
+
     @GetMapping("api/v1/document/{type}/{group}/{name}")
     public OperationResult deleteDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
         return service.deleteDocument(type, group, name);
+    }
+
+    @GetMapping("api/v1/document/{type}/{group}/{name}")
+    public OperationResult getDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
+        return service.getDocument(type, group, name);
     }
 
 }

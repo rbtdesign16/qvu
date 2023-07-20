@@ -21,6 +21,7 @@ public class QueryDocument {
     private Timestamp lastUpdated;
     private String datasource;
     private String baseTable;
+    private String savedDocumentGroupName;
     private String documentGroupName;
     private boolean newRecord;
     private List<SqlSelectColumn> selectColumns = new ArrayList<>();
@@ -131,6 +132,14 @@ public class QueryDocument {
 
     public void setNewRecord(boolean newRecord) {
         this.newRecord = newRecord;
+    }
+
+    public String getSavedDocumentGroupName() {
+        return savedDocumentGroupName;
+    }
+
+    public void setSavedDocumentGroupName(String savedDocumentGroupName) {
+        this.savedDocumentGroupName = savedDocumentGroupName;
     }
     
     

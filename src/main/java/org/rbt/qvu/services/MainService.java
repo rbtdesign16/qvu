@@ -12,9 +12,11 @@ import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
+import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface MainService {
@@ -46,6 +48,8 @@ public interface MainService {
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName);
     public OperationResult<List<TableColumnNames>> getDatasourceTableNames(String datasourceName);
 
+    public OperationResult getDocument(String type, String group, String name);
+    public OperationResult<ReportDocument> saveReportDocument(@RequestBody ReportDocument doc);
     public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc);
     public OperationResult deleteDocument(String type, String group, String name);
 

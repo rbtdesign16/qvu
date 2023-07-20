@@ -185,8 +185,7 @@
         "Document Groups": "Document Groups",
         "Roles": "Roles",
         "Datasources": "Datasources",
-        "Users": "Users"
-        
-        
+        "Users": "Users",
+        "errorCode-5": "$1 document $2 not found"
     }
 }

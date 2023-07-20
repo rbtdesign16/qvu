@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.SecurityConfig;
+import org.rbt.qvu.security.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;

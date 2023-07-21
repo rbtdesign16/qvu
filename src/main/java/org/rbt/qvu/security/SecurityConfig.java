@@ -22,7 +22,9 @@ import org.rbt.qvu.configuration.security.SamlConfiguration;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -36,6 +38,7 @@ import org.springframework.security.saml2.provider.service.registration.RelyingP
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -57,11 +60,13 @@ public class SecurityConfig {
     }
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
 
-    @Bean("basicmgr")
-    @DependsOn("config")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE, matchIfMissing = true)
+    @Bean
+    @ConditionalOnExpression("'${security.type}'.contains('basic')")
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
         LOG.debug("in basicAuthManager()");
         AuthenticationManagerBuilder authenticationManagerBuilder
@@ -70,37 +75,41 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 
-    @Bean("samlrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
+    @Bean
+    @ConditionalOnExpression("'${security.type}'.contains('saml')")
     RelyingPartyRegistrationRepository samlRepository() throws Exception {
         LOG.debug("in samlRepository()");
         RelyingPartyRegistration relyingPartyRegistration = null;
         SamlConfiguration samlConfig = config.getSecurityConfig().getSamlConfiguration();
-        if (samlConfig.isSignAssertions()) {
-            String keyFileName = samlConfig.getSigningKeyFileName();
-            final Saml2X509Credential credentials
-                    = Saml2X509Credential.signing(getPrivateKey(keyFileName),
-                            getCertificate(samlConfig.getSigningCertFileName()));
-            relyingPartyRegistration = RelyingPartyRegistrations
-                    .fromMetadataLocation(samlConfig.getIdpUrl())
-                    .registrationId("qvusaml")
-                    .signingX509Credentials((c) -> c.add(credentials))
-                    .build();
+        if (samlConfig != null) {
+            if (samlConfig.isSignAssertions()) {
+                String keyFileName = samlConfig.getSigningKeyFileName();
+                final Saml2X509Credential credentials
+                        = Saml2X509Credential.signing(getPrivateKey(keyFileName),
+                                getCertificate(samlConfig.getSigningCertFileName()));
+                relyingPartyRegistration = RelyingPartyRegistrations
+                        .fromMetadataLocation(samlConfig.getIdpUrl())
+                        .registrationId("qvusaml")
+                        .signingX509Credentials((c) -> c.add(credentials))
+                        .build();
+            } else {
+                relyingPartyRegistration
+                        = RelyingPartyRegistrations
+                                .fromMetadataLocation(samlConfig.getIdpUrl())
+                                .registrationId("qvusaml")
+                                .build();
+
+            }
+
+            return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
         } else {
-            relyingPartyRegistration
-                    = RelyingPartyRegistrations
-                            .fromMetadataLocation(samlConfig.getIdpUrl())
-                            .registrationId("qvusaml")
-                            .build();
-
+            return null;
         }
-
-        return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
 
     }
 
-    @Bean("oidcrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
+    @Bean
+    @ConditionalOnExpression("'${security.type}'.contains('oidc')")
     ClientRegistrationRepository oidcRepository() throws Exception {
         LOG.debug("in oidcRepository()");
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
@@ -110,45 +119,31 @@ public class SecurityConfig {
                 .clientSecret(oidcConfig.getClientSecret()).build();
 
         return new InMemoryClientRegistrationRepository(clientRegistration);
-
     }
 
     @Bean
-    @DependsOn("basicmgr")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.BASIC_SECURITY_TYPE, matchIfMissing = true)
-    public SecurityFilterChain basicFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in basicFilterChain()");
-        http
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
-                .authenticationManager(basicAuthManager(http))
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(withDefaults());
-        return http.build();
-    }
-
-    @Bean
-    @DependsOn("samlrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.SAML_SECURITY_TYPE)
-    public SecurityFilterChain samlFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in samlFilterChain()");
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
         http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
-                .csrf(csrf -> csrf.disable())
-                .saml2Login(withDefaults());
-        return http.build();
-    }
+                .csrf(csrf -> csrf.disable());
 
-    @Bean
-    @DependsOn("oidcrepo")
-    @ConditionalOnProperty(name = Constants.SECURITY_TYPE_PROPERTY, havingValue = Constants.OIDC_SECURITY_TYPE)
-    public SecurityFilterChain oidcFilterChain(HttpSecurity http) throws Exception {
-        LOG.debug("in oidcFilterChain()");
-        http
-                .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().authenticated())
-                .csrf(csrf -> csrf.disable())
-                .oauth2Login(withDefaults());
+        if (config.getSecurityType().contains(Constants.OIDC_SECURITY_TYPE)) {
+            LOG.debug("adding oauth2 login support");
+            http.oauth2Login(withDefaults());
+        }
+
+        if (config.getSecurityType().contains(Constants.SAML_SECURITY_TYPE)) {
+            LOG.debug("adding saml login support");
+            http.saml2Login(withDefaults());
+        }
+
+        if (config.getSecurityType().contains(Constants.BASIC_SECURITY_TYPE)) {
+            LOG.debug("adding basic auth login suppor");
+            http.httpBasic(withDefaults());
+        }
+
         return http.build();
     }
 

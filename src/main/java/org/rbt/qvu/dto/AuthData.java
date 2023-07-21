@@ -21,7 +21,8 @@ public class AuthData {
     private List<Role> allRoles = new ArrayList<>();
     private List<User> allUsers = new ArrayList<>();
     private User currentUser;
-    private boolean allowUserEdit;
+    private boolean allowUserAdd;
+    private boolean allowUserDelete;
     private boolean initialSetupRequired;
 
     public List<Role> getAllRoles() {
@@ -46,14 +47,6 @@ public class AuthData {
 
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
-    }
-
-    public boolean isAllowUserEdit() {
-        return allowUserEdit;
-    }
-
-    public void setAllowUserEdit(boolean allowUserEdit) {
-        this.allowUserEdit = allowUserEdit;
     }
 
     public String getAdministratorRole() {
@@ -94,6 +87,22 @@ public class AuthData {
 
     public void setUserRole(String userRole) {
         this.userRole = userRole;
+    }
+
+    public boolean isAllowUserAdd() {
+        return allowUserAdd;
+    }
+
+    public void setAllowUserAdd(boolean allowUserAdd) {
+        this.allowUserAdd = allowUserAdd;
+    }
+
+    public boolean isAllowUserDelete() {
+        return allowUserDelete;
+    }
+
+    public void setAllowUserDelete(boolean allowUserDelete) {
+        this.allowUserDelete = allowUserDelete;
     }
 
     

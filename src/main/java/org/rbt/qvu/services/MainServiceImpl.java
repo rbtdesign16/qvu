@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.util.FileHandler;
@@ -38,8 +37,6 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
-import org.rbt.qvu.configuration.ConfigBuilder;
-import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
@@ -99,6 +96,10 @@ public class MainServiceImpl implements MainService {
         }
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             retval.setCurrentUser(getCurrentUser());
+            boolean localUser = isLocalUser();
+            retval.setAllowUserAdd(localUser);
+            retval.setAllowUserDelete(localUser);
+            
             SecurityConfiguration scfg = config.getSecurityConfig();
             retval.setInitialSetupRequired(config.isInitialSetupRequired());
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
@@ -109,14 +110,10 @@ public class MainServiceImpl implements MainService {
                 retval.getAllUsers().addAll(authService.getAllUsers());
             } else {
                 retval.getAllRoles().addAll(scfg.getRoles());
-                if (scfg.isFileBasedSecurity()) {
-                    retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
-                }
+                retval.setAllUsers(scfg.getUsers());
             }
 
             Collections.sort(retval.getAllRoles(), new RoleComparator());
-
-            retval.setAllowUserEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
             String alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_ADMINISTRATOR_ROLE);
             if (StringUtils.isNotEmpty(alias)) {
@@ -334,8 +331,6 @@ public class MainServiceImpl implements MainService {
                     securityConfig.setSamlConfiguration(initialSetup.getSamlConfiguration());
                 case Constants.OIDC_SECURITY_TYPE ->
                     securityConfig.setOidcConfiguration(initialSetup.getOidcConfiguration());
-                case Constants.BASIC_SECURITY_TYPE ->
-                    securityConfig.setBasicConfiguration(getInitializedBasicConfig(initialSetup));
             }
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
@@ -344,19 +339,6 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
-        }
-
-        return retval;
-    }
-
-    private BasicConfiguration getInitializedBasicConfig(InitialSetup initialSetup) throws Exception {
-        BasicConfiguration retval = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class).getBasicConfiguration();
-        User u = retval.findUser(Constants.DEFAULT_ADMIN_USER);
-
-        if (u != null) {
-            u.setPassword(Helper.toMd5Hash(initialSetup.getAdminPassword()));
-        } else {
-            throw new SaveException(config.getLanguageText(initialSetup.getLangKey(), "Default admin user not found"));
         }
 
         return retval;
@@ -671,6 +653,11 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    private boolean isLocalUser() {
+       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+       return (auth.getPrincipal() instanceof User);
+    }
 
     private User getCurrentUser() {
         User retval = null;
@@ -692,24 +679,31 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    private SecurityConfiguration getSecurityConfig() {
+        return config.getSecurityConfig();
+    }
+    
     private User toUser(DefaultSaml2AuthenticatedPrincipal u) {
-        User retval = new User();
-        retval.setUserId(u.getName());
-
-        String roleAttribute = config.getSecurityConfig().getSamlConfiguration().getUserRolesAttributeName();
-
-        if (StringUtils.isEmpty(roleAttribute)) {
-            roleAttribute = Constants.DEFAULT_SAML_ROLE_ATTRIBUTE_NAME;
+        User retval = getSecurityConfig().findUser(u.getName());
+        
+        if (retval == null) {
+            retval = new User();
+            retval.setUserId(u.getName());
+            fileHandler.saveUser(retval);
         }
 
-        List<String> roles = u.getAttribute(roleAttribute);
-        retval.setRoles(roles);
         return retval;
     }
 
     private User toUser(DefaultOAuth2User u) {
-        User retval = new User();
-        retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
+        User retval = getSecurityConfig().findUser(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
+        
+        if (retval == null) {
+            retval = new User();
+            retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
+            fileHandler.saveUser(retval);
+        }
+
         return retval;
     }
 

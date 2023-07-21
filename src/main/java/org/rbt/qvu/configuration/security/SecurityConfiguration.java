@@ -13,7 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.RoleComparator;
+import org.rbt.qvu.util.UserComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +30,10 @@ public class SecurityConfiguration {
     private boolean allowServiceSave = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
-    private BasicConfiguration basicConfiguration;
     private Map<String, String> roleAliases = new HashMap<>();
     private List<Role> roles = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
+
     private long lastUpdated;
 
     
@@ -48,14 +51,6 @@ public class SecurityConfiguration {
 
     public void setOidcConfiguration(OidcConfiguration oidcConfiguration) {
         this.oidcConfiguration = oidcConfiguration;
-    }
-
-    public BasicConfiguration getBasicConfiguration() {
-        return basicConfiguration;
-    }
-
-    public void setBasicConfiguration(BasicConfiguration basicConfiguration) {
-        this.basicConfiguration = basicConfiguration;
     }
 
     public String getAuthenticatorServiceClassName() {
@@ -103,23 +98,10 @@ public class SecurityConfiguration {
 
     public void postConstruct() {
         LOG.debug("in SecurityConfiguration.postConstruct()");
-        if (basicConfiguration != null) {
-            basicConfiguration.postConstruct();
-        }
-        
         Collections.sort(this.roles, new RoleComparator());
-
+        Collections.sort(this.users, new UserComparator());
     }
    
-    public boolean isFileBasedSecurity() {
-        boolean retval = false;
-        if (this.isBasic()) {
-            retval = basicConfiguration.isFileBasedSecurity();
-        }
-        
-        return retval;
-    }
-    
     public String getRoleAlias(String role) {
         return roleAliases.get(role);
     }
@@ -166,5 +148,24 @@ public class SecurityConfiguration {
         return retval;
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
 
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public User findUser(String userId) {
+        User retval = null;
+        User u = new User();
+        u.setUserId(userId);
+        int indx = Collections.binarySearch(users, u, new UserComparator());
+
+        if (indx > -1) {
+            retval = users.get(indx);
+        }
+
+        return retval;
+    }
 }

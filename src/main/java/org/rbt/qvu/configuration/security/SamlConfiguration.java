@@ -14,7 +14,6 @@ public class SamlConfiguration {
     private String spEntityId;
     private String signingCertFileName;
     private String signingKeyFileName;
-    private String userRolesAttributeName = "Role";
 
     public String getIdpUrl() {
         return idpUrl;
@@ -56,13 +55,4 @@ public class SamlConfiguration {
         this.signingKeyFileName = signingKeyFileName;
     }
 
-    public String getUserRolesAttributeName() {
-        return userRolesAttributeName;
-    }
-
-    public void setUserRolesAttributeName(String userRolesAttributeName) {
-        this.userRolesAttributeName = userRolesAttributeName;
-    }
-
-    
 }

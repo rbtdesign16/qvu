@@ -367,7 +367,7 @@ public class FileHandler {
     }
 
     private void removeRoleFromUsers(SecurityConfiguration securityConfig, String roleName) {
-        Iterator<User> it = securityConfig.getBasicConfiguration().getUsers().iterator();
+        Iterator<User> it = securityConfig.getUsers().iterator();
 
         while (it.hasNext()) {
             User u = it.next();
@@ -456,7 +456,7 @@ public class FileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    User curuser = securityConfig.getBasicConfiguration().findUser(user.getUserId());
+                    User curuser = securityConfig.findUser(user.getUserId());
                     if (curuser != null) {
                         if (user.isNewRecord()) {
                             retval.setErrorCode(OperationResult.RECORD_EXISTS);
@@ -469,10 +469,10 @@ public class FileHandler {
                         }
                     } else {
                         user.setPassword(Helper.toMd5Hash(user.getPassword()));
-                        securityConfig.getBasicConfiguration().getUsers().add(user);
+                        securityConfig.getUsers().add(user);
                     }
 
-                    Collections.sort(securityConfig.getBasicConfiguration().getUsers(), new UserComparator());
+                    Collections.sort(securityConfig.getUsers(), new UserComparator());
                 }
             }
 
@@ -499,7 +499,7 @@ public class FileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    Iterator<User> it = securityConfig.getBasicConfiguration().getUsers().iterator();
+                    Iterator<User> it = securityConfig.getUsers().iterator();
                     while (it.hasNext()) {
                         User u = it.next();
                         if (u.getUserId().equalsIgnoreCase(userId)) {
@@ -539,15 +539,13 @@ public class FileHandler {
 
         securityConfig.setLastUpdated(System.currentTimeMillis());
 
-        // make sure all records are marked as not new
-        if (securityConfig.isBasicConfig()) {
-            for (User u : securityConfig.getBasicConfiguration().getUsers()) {
-                u.setNewRecord(false);
-            }
+    // make sure all records are marked as not new
+        for (User u : securityConfig.getUsers()) {
+            u.setNewRecord(false);
+        }
 
-            for (Role r : securityConfig.getRoles()) {
-                r.setNewRecord(false);
-            }
+        for (Role r : securityConfig.getRoles()) {
+            r.setNewRecord(false);
         }
 
         try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {

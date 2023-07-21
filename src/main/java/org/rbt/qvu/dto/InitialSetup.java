@@ -4,7 +4,6 @@
  */
 package org.rbt.qvu.dto;
 
-import org.rbt.qvu.configuration.security.BasicConfiguration;
 import org.rbt.qvu.configuration.security.OidcConfiguration;
 import org.rbt.qvu.configuration.security.SamlConfiguration;
 
@@ -22,7 +21,6 @@ public class InitialSetup {
     private boolean allowServiceSave;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
-    private BasicConfiguration basicConfiguration;
 
     public String getRepository() {
         return repository;
@@ -96,15 +94,4 @@ public class InitialSetup {
         this.adminPassword = adminPassword;
     }
 
-    public BasicConfiguration getBasicConfiguration() {
-        return basicConfiguration;
-    }
-
-    public void setBasicConfiguration(BasicConfiguration basicConfiguration) {
-        this.basicConfiguration = basicConfiguration;
-    }
-    
-    
-    
-    
 }

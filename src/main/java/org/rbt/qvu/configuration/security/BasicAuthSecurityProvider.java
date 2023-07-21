@@ -59,9 +59,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 roles = securityConfig.getAuthenticatorService().getAllRoles();
             } else {
                 roles = securityConfig.getRoles();
-                if (securityConfig.isFileBasedSecurity()) {
-                    users = securityConfig.getBasicConfiguration().getUsers();
-                }
+                users = securityConfig.getUsers();
             }
 
             Collections.sort(users, new UserComparator());
@@ -85,11 +83,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             }
 
             SecurityService service = config.getSecurityConfig().getAuthenticatorService();
-            if (config.getSecurityConfig().getBasicConfiguration().isFileBasedSecurity()) {
-                retval = authenticateFromProperties(name, password);
-            } else if (service != null) {
+            if (service != null) {
                 retval = authenticateWithClass(service, name, password);
+            } else {
+                retval = authenticateFromProperties(name, password);
             }
+            
             LOG.debug("user " + name + " authenticated=" + ((retval != null) && retval.isAuthenticated()));
         } catch (Exception ex) {
             throw new AuthenticationServiceException(ex.toString(), ex);
@@ -119,7 +118,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         LOG.debug("in authenticateFromProperties");
         Authentication retval = null;
 
-        User uinfo = config.getSecurityConfig().getBasicConfiguration().findUser(name);
+        User uinfo = config.getSecurityConfig().findUser(name);
         if (uinfo != null) {
             String storedPassword = uinfo.getPassword();
             if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {

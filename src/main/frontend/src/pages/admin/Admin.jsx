@@ -748,9 +748,9 @@ const Admin = () => {
         editTitle: getText("Edit user"),
         delTitle: getText("Delete user"),
         className: "entrygrid-100-175",
-        onAdd: authData.allowUserEdit ? addUser : null,
-        onEdit: authData.allowUserEdit ? editUser : null,
-        onDelete: authData.allowUserEdit ? deleteSelectedUser : null,
+        onAdd: authData.allowUserAdd ? addUser : null,
+        onEdit: editUser,
+        onDelete: authData.allowUserDelete ? deleteSelectedUser : null,
         displayConfig: [
             {
                 label: getText("User ID:"),

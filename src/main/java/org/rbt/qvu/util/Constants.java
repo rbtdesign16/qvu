@@ -27,14 +27,14 @@ public class Constants {
     public static final String SAML_SECURITY_TYPE = "saml";
     
     
-    public static final String DEFAULT_ROLE_ATTRIBUTE_NAME = "role";
     public static final String DEFAULT_ADMINISTRATOR_ROLE = "administrator";
     public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
     public static final String DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
     public static final String DEFAULT_USER_ROLE = "user";
     
     public static final String DEFAULT_ADMIN_USER = "admin";
-
+    public static final String DEFAULT_SAML_ROLE_ATTRIBUTE_NAME = "Role";
+    
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";
     public static final String NONE = "none";

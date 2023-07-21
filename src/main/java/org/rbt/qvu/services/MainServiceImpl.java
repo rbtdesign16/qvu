@@ -7,7 +7,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,16 +21,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
-import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.Config;
 import org.rbt.qvu.util.FileHandler;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
 import org.rbt.qvu.dto.AuthData;
-import org.rbt.qvu.util.AuthHelper;
-import static org.rbt.qvu.util.AuthHelper.isFirstNameAttribute;
-import static org.rbt.qvu.util.AuthHelper.isLastNameAttribute;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.ConfigBuilder;
@@ -105,55 +98,23 @@ public class MainServiceImpl implements MainService {
             LOG.debug("authetication=" + auth);
         }
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
-            String userId = auth.getName();
+            retval.setCurrentUser(getCurrentUser());
             SecurityConfiguration scfg = config.getSecurityConfig();
             retval.setInitialSetupRequired(config.isInitialSetupRequired());
-            if (auth.getPrincipal() instanceof DefaultOAuth2User) {
-                DefaultOAuth2User oauser = (DefaultOAuth2User) auth.getPrincipal();
-                if (StringUtils.isNotEmpty(oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME))) {
-                    userId = oauser.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
-                }
-            }
-
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
-             // users and roles are defined via json
+            // users and roles are defined via json
             if (authService != null) { // if we have a service defined we will try to loaf from there
                 retval.getAllRoles().addAll(authService.getAllRoles());
                 retval.getAllUsers().addAll(authService.getAllUsers());
-            }  else {
+            } else {
                 retval.getAllRoles().addAll(scfg.getRoles());
                 if (scfg.isFileBasedSecurity()) {
                     retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
                 }
             }
 
-
             Collections.sort(retval.getAllRoles(), new RoleComparator());
-
-            // if we have users loaded try to find user based
-            // on incoming user id
-            if (StringUtils.isNotEmpty(userId)) {
-                for (User u : retval.getAllUsers()) {
-                    if (userId.equalsIgnoreCase(u.getUserId())) {
-                        retval.setCurrentUser(u);
-                        break;
-                    }
-                }
-                if (retval.getCurrentUser() == null) {
-                    User user = new User();
-                    user.setUserId(userId);
-                    retval.setCurrentUser(user);
-                }
-
-                if (retval.getCurrentUser() != null) {
-                    if (auth.getPrincipal() instanceof Saml2AuthenticatedPrincipal) {
-                        loadUserAttributes(retval.getCurrentUser(), ((Saml2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-                    } else if (auth.getPrincipal() instanceof OAuth2AuthenticatedPrincipal) {
-                        loadUserAttributes(retval.getCurrentUser(), ((OAuth2AuthenticatedPrincipal) auth.getPrincipal()).getAttributes());
-                    }
-                }
-            }
 
             retval.setAllowUserEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
@@ -191,56 +152,6 @@ public class MainServiceImpl implements MainService {
         }
 
         return retval;
-    }
-
-    private void loadUserAttributes(User user, Map attributes) {
-        for (Object o : attributes.keySet()) {
-            Object val = attributes.get(o);
-            if (val != null) {
-                String att = o.toString();
-                if (val instanceof Collection) {
-                    int indx = 0;
-                    for (Object o2 : (Collection) val) {
-                        String val2 = o2.toString();
-                        if (AuthHelper.isRealmAccess(att)) {
-                            user.getRoles().addAll(AuthHelper.getRolesFromRealmAccess(val2));
-                        } else if (AuthHelper.isRoleAttribute(config.getSecurityConfig(), att)) {
-                            user.getRoles().add(AuthHelper.formatRoleAttribute(val2));
-                        } else {
-                            String attName = AuthHelper.formatAttributeName(att);
-
-                            if (AuthHelper.isLastNameAttribute(att)) {
-                                user.setLastName(val2);
-                            } else if (AuthHelper.isFirstNameAttribute(attName)) {
-                                user.setFirstName(val2);
-                            } else {
-                                if (indx == 0) {
-                                    user.getAttributes().add(new UserAttribute(AuthHelper.formatAttributeName(att), val2));
-                                } else {
-                                    user.getAttributes().add(new UserAttribute(AuthHelper.formatAttributeName(att) + indx, val2));
-                                }
-                            }
-
-                            indx++;
-                        }
-                    }
-                } else {
-                    if (isLastNameAttribute(att)) {
-                        user.setLastName(val.toString());
-                    } else if (isFirstNameAttribute(att)) {
-                        user.setFirstName(val.toString());
-                    } else {
-                        if (AuthHelper.isRealmAccess(att)) {
-                            user.getRoles().addAll(AuthHelper.getRolesFromRealmAccess(val.toString()));
-                        } else if (AuthHelper.isRoleAttribute(config.getSecurityConfig(), att)) {
-                            user.getRoles().add(AuthHelper.formatRoleAttribute(val.toString()));
-                        } else {
-                            user.getAttributes().add(new UserAttribute(AuthHelper.formatAttributeName(att), val.toString()));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -771,7 +682,9 @@ public class MainServiceImpl implements MainService {
                 if (o instanceof User) {
                     retval = (User) o;
                 } else if (o instanceof DefaultSaml2AuthenticatedPrincipal) {
-                    retval = toUser((DefaultSaml2AuthenticatedPrincipal)o);
+                    retval = toUser((DefaultSaml2AuthenticatedPrincipal) o);
+                } else if (o instanceof DefaultOAuth2User) {
+                    retval = toUser((DefaultOAuth2User) o);
                 }
             }
         }
@@ -779,12 +692,24 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    
     private User toUser(DefaultSaml2AuthenticatedPrincipal u) {
         User retval = new User();
         retval.setUserId(u.getName());
-        List <String> roles = u.getAttribute(config.getSecurityConfig().getSamlConfiguration().getRoleAttributeName());
+
+        String roleAttribute = config.getSecurityConfig().getSamlConfiguration().getUserRolesAttributeName();
+
+        if (StringUtils.isEmpty(roleAttribute)) {
+            roleAttribute = Constants.DEFAULT_SAML_ROLE_ATTRIBUTE_NAME;
+        }
+
+        List<String> roles = u.getAttribute(roleAttribute);
         retval.setRoles(roles);
+        return retval;
+    }
+
+    private User toUser(DefaultOAuth2User u) {
+        User retval = new User();
+        retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
         return retval;
     }
 

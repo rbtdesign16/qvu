@@ -25,7 +25,6 @@ public class SecurityConfiguration {
     private static Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
     private String authenticatorServiceClassName;
     private String securityType;
-    private String roleAttributeName = Constants.DEFAULT_ROLE_ATTRIBUTE_NAME;
     private boolean allowServiceSave = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
@@ -92,14 +91,6 @@ public class SecurityConfiguration {
     
     public boolean isBasic() {
         return Constants.BASIC_SECURITY_TYPE.equals(this.securityType);
-    }
-
-    public String getRoleAttributeName() {
-        return roleAttributeName;
-    }
-
-    public void setRoleAttributeName(String roleAttributeName) {
-        this.roleAttributeName = roleAttributeName;
     }
 
     public boolean isAllowServiceSave() {

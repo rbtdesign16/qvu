@@ -24,7 +24,7 @@ import {INFO,
 
 import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
 
-        const QueryDesign = () => {
+const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
     const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns} = useQueryDesign();
     const {getText} = useLang();

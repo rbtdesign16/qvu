@@ -10,6 +10,7 @@ package org.rbt.qvu.dto;
  */
 public class SqlFilterColumn {
     private String datasource;
+    private String tableAlias;
     private String tableName;
     private String columnName;
     private String openParenthesis;
@@ -17,6 +18,7 @@ public class SqlFilterColumn {
     private String andOr;
     private String comparisonOperator;
     private String comparisonValue;
+    private String path;
 
     public String getDatasource() {
         return datasource;
@@ -80,6 +82,22 @@ public class SqlFilterColumn {
 
     public void setAndOr(String andOr) {
         this.andOr = andOr;
+    }
+
+    public String getTableAlias() {
+        return tableAlias;
+    }
+
+    public void setTableAlias(String tableAlias) {
+        this.tableAlias = tableAlias;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
     
     

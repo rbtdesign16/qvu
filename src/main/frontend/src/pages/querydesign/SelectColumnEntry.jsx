@@ -110,9 +110,6 @@ const SelectColumnEntry = (props) => {
         }
     };
 
-    const onChange = (e) => {
-    };
-
     const getAggregateFunctions = () => {
         let funcs = getAggregateFunctionsByDataType(columnData.dataType);
 

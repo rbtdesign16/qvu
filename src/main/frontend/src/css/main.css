@@ -443,3 +443,9 @@ select {
 textarea {
   resize: none;
 }
+
+
+.query-filter-hdr {
+    border-bottom: solid 1px var(--default-border-color);
+    width: 100%;
+}

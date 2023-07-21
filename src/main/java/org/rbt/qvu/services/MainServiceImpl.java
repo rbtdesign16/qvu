@@ -65,6 +65,7 @@ import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.QuerySelectTreeBuilder;
 import org.rbt.qvu.util.RoleComparator;
+import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -116,14 +117,17 @@ public class MainServiceImpl implements MainService {
 
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
 
-            // users and roles are defined via json
-            if (scfg.isFileBasedSecurity()) {
-                retval.getAllRoles().addAll(scfg.getBasicConfiguration().getRoles());
-                retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
-            } else if (authService != null) { // if we have a service defined we will try to loaf from there
+             // users and roles are defined via json
+            if (authService != null) { // if we have a service defined we will try to loaf from there
                 retval.getAllRoles().addAll(authService.getAllRoles());
                 retval.getAllUsers().addAll(authService.getAllUsers());
+            }  else {
+                retval.getAllRoles().addAll(scfg.getRoles());
+                if (scfg.isFileBasedSecurity()) {
+                    retval.setAllUsers(scfg.getBasicConfiguration().getUsers());
+                }
             }
+
 
             Collections.sort(retval.getAllRoles(), new RoleComparator());
 
@@ -151,7 +155,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
 
-            retval.setAllowUserRoleEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
+            retval.setAllowUserEdit(scfg.isFileBasedSecurity() || scfg.isAllowServiceSave());
 
             String alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_ADMINISTRATOR_ROLE);
             if (StringUtils.isNotEmpty(alias)) {
@@ -763,12 +767,24 @@ public class MainServiceImpl implements MainService {
 
         if (auth != null) {
             Object o = auth.getPrincipal();
-
-            if ((o != null) && (o instanceof User)) {
-                retval = (User) o;
+            if (o != null) {
+                if (o instanceof User) {
+                    retval = (User) o;
+                } else if (o instanceof DefaultSaml2AuthenticatedPrincipal) {
+                    retval = toUser((DefaultSaml2AuthenticatedPrincipal)o);
+                }
             }
         }
 
+        return retval;
+    }
+
+    
+    private User toUser(DefaultSaml2AuthenticatedPrincipal u) {
+        User retval = new User();
+        retval.setUserId(u.getName());
+        List <String> roles = u.getAttribute(config.getSecurityConfig().getSamlConfiguration().getRoleAttributeName());
+        retval.setRoles(roles);
         return retval;
     }
 

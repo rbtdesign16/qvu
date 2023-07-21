@@ -7,9 +7,7 @@ package org.rbt.qvu.configuration.security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
-import org.rbt.qvu.util.RoleComparator;
 import org.rbt.qvu.util.UserComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +30,6 @@ public class BasicConfiguration {
     }
 
     private List<User> users = new ArrayList<>();
-    private List<Role> roles = new ArrayList<>();
 
     public List<User> getUsers() {
         return users;
@@ -41,15 +38,6 @@ public class BasicConfiguration {
     public void setUsers(List<User> users) {
         this.users = users;
         Collections.sort(this.users, new UserComparator());
-    }
-
-    public List<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
-        Collections.sort(this.roles, new RoleComparator());
     }
 
     public User findUser(String userId) {
@@ -65,22 +53,8 @@ public class BasicConfiguration {
         return retval;
     }
 
-    public Role findName(String name) {
-        Role retval = null;
-        Role r = new Role();
-        r.setName(name);
-        int indx = Collections.binarySearch(roles, r, new RoleComparator());
-
-        if (indx > -1) {
-            retval = roles.get(indx);
-        }
-
-        return retval;
-    }
-
     public void postConstruct() {
         LOG.debug("in BasicConfiguration.postConstruct()");
-        Collections.sort(this.roles, new RoleComparator());
         Collections.sort(this.users, new UserComparator());
     }
 

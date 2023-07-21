@@ -321,7 +321,7 @@ public class FileHandler {
 
                 if (securityConfig != null) {
                     int indx = -1;
-                    List<Role> roles = securityConfig.getBasicConfiguration().getRoles();
+                    List<Role> roles = securityConfig.getRoles();
                     for (int i = 0; i < roles.size(); ++i) {
                         Role r = roles.get(i);
                         if (r.getName().equalsIgnoreCase(role.getName())) {
@@ -416,7 +416,7 @@ public class FileHandler {
                 securityConfig = gson.fromJson(new String(bytes), SecurityConfiguration.class);
 
                 if (securityConfig != null) {
-                    Iterator<Role> it = securityConfig.getBasicConfiguration().getRoles().iterator();
+                    Iterator<Role> it = securityConfig.getRoles().iterator();
                     while (it.hasNext()) {
                         Role r = it.next();
                         if (r.getName().equalsIgnoreCase(roleName)) {
@@ -545,7 +545,7 @@ public class FileHandler {
                 u.setNewRecord(false);
             }
 
-            for (Role r : securityConfig.getBasicConfiguration().getRoles()) {
+            for (Role r : securityConfig.getRoles()) {
                 r.setNewRecord(false);
             }
         }

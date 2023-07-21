@@ -694,9 +694,9 @@ const Admin = () => {
         addTitle: getText("Add role"),
         editTitle: getText("Edit role"),
         delTitle: getText("Delete role"),
-        onAdd: authData.allowUserRoleEdit ? addRole : null,
-        onEdit: authData.allowUserRoleEdit ? editRole : null,
-        onDelete: authData.allowUserRoleEdit ? deleteSelectedRole : null,
+        onAdd: addRole,
+        onEdit: editRole,
+        onDelete: deleteSelectedRole,
         displayConfig: [
             {
                 label: getText("Name:"),
@@ -748,9 +748,9 @@ const Admin = () => {
         editTitle: getText("Edit user"),
         delTitle: getText("Delete user"),
         className: "entrygrid-100-175",
-        onAdd: authData.allowUserRoleEdit ? addUser : null,
-        onEdit: authData.allowUserRoleEdit ? editUser : null,
-        onDelete: authData.allowUserRoleEdit ? deleteSelectedUser : null,
+        onAdd: authData.allowUserEdit ? addUser : null,
+        onEdit: authData.allowUserEdit ? editUser : null,
+        onDelete: authData.allowUserEdit ? deleteSelectedUser : null,
         displayConfig: [
             {
                 label: getText("User ID:"),

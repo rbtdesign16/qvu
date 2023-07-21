@@ -4,11 +4,16 @@
  */
 package org.rbt.qvu.configuration.security;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.util.RoleComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +31,7 @@ public class SecurityConfiguration {
     private OidcConfiguration oidcConfiguration;
     private BasicConfiguration basicConfiguration;
     private Map<String, String> roleAliases = new HashMap<>();
+    private List<Role> roles = new ArrayList<>();
     private long lastUpdated;
 
     
@@ -109,11 +115,14 @@ public class SecurityConfiguration {
         if (basicConfiguration != null) {
             basicConfiguration.postConstruct();
         }
+        
+        Collections.sort(this.roles, new RoleComparator());
+
     }
    
     public boolean isFileBasedSecurity() {
         boolean retval = false;
-        if (basicConfiguration != null) {
+        if (this.isBasic()) {
             retval = basicConfiguration.isFileBasedSecurity();
         }
         
@@ -143,4 +152,28 @@ public class SecurityConfiguration {
     public boolean isBasicConfig() {
         return Constants.BASIC_SECURITY_TYPE.equals(securityType);
     }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+        Collections.sort(this.roles, new RoleComparator());
+    }
+
+    public Role findRoleName(String name) {
+        Role retval = null;
+        Role r = new Role();
+        r.setName(name);
+        int indx = Collections.binarySearch(roles, r, new RoleComparator());
+
+        if (indx > -1) {
+            retval = roles.get(indx);
+        }
+
+        return retval;
+    }
+
+
 }

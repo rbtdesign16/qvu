@@ -1,7 +1,0 @@
-{
-    "securityType": "saml",
-    "queryDocumentsFolder": "c:/dev/qvu/queries",
-    "reportDocumentsFolder": "c:/dev/qvu/reports",
-    "securityConfigurationFile": "c:/dev/projects/qvu/src/main/resources/example-security-config.json",
-    "databaseConfigurationFile": "c:/dev/projects/qvu/src/main/resources/example-database-config.json"
-}

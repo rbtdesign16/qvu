@@ -54,13 +54,16 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             LOG.info("authenticatorClass=" + authenticatorClass);
 
             // if no authenticator service then load from config file
-            if (securityConfig.isFileBasedSecurity()) {
-                users = securityConfig.getBasicConfiguration().getUsers();
-                roles = securityConfig.getBasicConfiguration().getRoles();
-            } else if (securityConfig.getAuthenticatorService() != null) {
+            if (securityConfig.getAuthenticatorService() != null) {
                 users = securityConfig.getAuthenticatorService().getAllUsers();
                 roles = securityConfig.getAuthenticatorService().getAllRoles();
+            } else {
+                roles = securityConfig.getRoles();
+                if (securityConfig.isFileBasedSecurity()) {
+                    users = securityConfig.getBasicConfiguration().getUsers();
+                }
             }
+
             Collections.sort(users, new UserComparator());
             Collections.sort(roles, new RoleComparator());
         } catch (Exception ex) {

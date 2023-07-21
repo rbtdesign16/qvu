@@ -29,9 +29,6 @@ public class Config {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default document group\", \"defaultGroup\": true, \"roles\":[]}]}";
     
-    @Value("#{systemProperties['force.init'] ?: false}")
-    private boolean forceInit;
-
     @Value("#{systemProperties['repository.folder'] ?: '-'}")
     private String repositoryFolder;
 
@@ -48,7 +45,7 @@ public class Config {
     private void init() {
         LOG.info(" in Config.init()");
         try {
-            initialSetupRequired = "-".equals(repositoryFolder) || forceInit;
+            initialSetupRequired = "-".equals(repositoryFolder);
 
             // indicates initial setup required
             if (initialSetupRequired) {
@@ -65,7 +62,6 @@ public class Config {
                 securityConfig.setSecurityType(securityType);
             }
 
-            LOG.info("force.init=" + forceInit);
             LOG.info("repository.folder=" + repositoryFolder);
             LOG.info("security.type=" + securityType);
             LOG.info("inital setup required: " + initialSetupRequired);
@@ -82,6 +78,7 @@ public class Config {
     public void loadConfiguration() throws Exception {
         langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
         securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
+        
         datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
         
         String dgfile = getDocumentGroupsConfigurationFileName();

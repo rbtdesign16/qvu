@@ -36,6 +36,4 @@ public class OidcConfiguration {
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
-
-
 }

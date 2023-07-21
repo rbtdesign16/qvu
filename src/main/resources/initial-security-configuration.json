@@ -1,21 +1,22 @@
 {
-  "authenticatorServiceClassName": "",
-  "securityType": "basic",
-  "roleAttributeName": "role",
-  "roleAliases": {
+    "authenticatorServiceClassName": "",
+    "securityType": "basic",
+    "roleAttributeName": "role",
+    "roleAliases": {
         "administrator": "administrator role",
         "query designer": "query designer alias",
         "report designer": "report designer alias",
         "user": "user alias"
-  },
-  
-  "allowServiceSave": false,
+    },
+
+    "allowServiceSave": false,
     "samlConfiguration": {
         "idpUrl": "",
         "signAssertions": true,
         "spEntityId": "",
         "signingCertFileName": "",
-        "signingKeyFileName": ""
+        "signingKeyFileName": "",
+        "roleAttributeName": "Role"
     },
     "oidcConfiguration": {
         "issuerLocationUrl": "",
@@ -46,20 +47,20 @@
                     "query designer"
                 ]
             }
-        ],
-        "roles": [
-            {
-                "name": "administrator",
-                "description": "adminsitrator role"
-            },
-            {
-                "name": "query designer",
-                "description": "query designer role"
-            },
-            {
-                "name": "report designer",
-                "description": "report designer role"
-            }
         ]
-    }
+    },
+    "roles": [
+        {
+            "name": "administrator",
+            "description": "adminsitrator role"
+        },
+        {
+            "name": "query designer",
+            "description": "query designer role"
+        },
+        {
+            "name": "report designer",
+            "description": "report designer role"
+        }
+    ]
 }

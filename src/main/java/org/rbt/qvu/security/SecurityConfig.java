@@ -42,7 +42,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -78,8 +77,9 @@ public class SecurityConfig {
         RelyingPartyRegistration relyingPartyRegistration = null;
         SamlConfiguration samlConfig = config.getSecurityConfig().getSamlConfiguration();
         if (samlConfig.isSignAssertions()) {
+            String keyFileName = samlConfig.getSigningKeyFileName();
             final Saml2X509Credential credentials
-                    = Saml2X509Credential.signing(getPrivateKey(samlConfig.getSigningKeyFileName()),
+                    = Saml2X509Credential.signing(getPrivateKey(keyFileName),
                             getCertificate(samlConfig.getSigningCertFileName()));
             relyingPartyRegistration = RelyingPartyRegistrations
                     .fromMetadataLocation(samlConfig.getIdpUrl())

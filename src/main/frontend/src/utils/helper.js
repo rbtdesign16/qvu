@@ -26,6 +26,7 @@ export const INFO_TEXT_COLOR = "#4682B4";
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";
 export const REPORT_DESIGNER_ROLE = "report designer";
+export const BASE_ROLES = [ADMINISTRATOR_ROLE, QUERY_DESIGNER_ROLE, REPORT_DESIGNER_ROLE];
 
 export const TYPE_PASSWORD = "password";
 export const TYPE_DATE = "date";

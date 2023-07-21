@@ -24,7 +24,8 @@ import {
         checkEntryFields,
         updateJsonArray,
         findInArray,
-        replaceTokens} from "../../utils/helper";
+        replaceTokens,
+        BASE_ROLES} from "../../utils/helper";
 
 import {
         saveDatasource,
@@ -686,6 +687,11 @@ const Admin = () => {
         ]
     };
 
+    const isRoleReadOnly = (indx) => {
+        return BASE_ROLES.includes(authData.allRoles[indx].name);
+    };
+    
+
     const rolesConfig = {
         title: getText("Roles"),
         width: "325px",
@@ -697,6 +703,7 @@ const Admin = () => {
         onAdd: addRole,
         onEdit: editRole,
         onDelete: deleteSelectedRole,
+        isReadOnly: isRoleReadOnly,
         displayConfig: [
             {
                 label: getText("Name:"),

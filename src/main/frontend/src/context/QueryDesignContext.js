@@ -70,7 +70,9 @@ export const QueryDesignProvider = ({ children }) => {
                     path: path,
                     customSql: "",
                     showInResults: true,
-                    nodeId: selectedColumnIds[i]
+                    nodeId: selectedColumnIds[i],
+                    from,
+                    setFrom
                 });
             }
         }

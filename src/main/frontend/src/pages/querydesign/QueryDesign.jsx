@@ -80,7 +80,15 @@ const QueryDesign = () => {
             setDatasource(null);
         }
     };
-
+    
+    const isSqlAvailable = () => {
+        return (
+            selectColumns 
+                && (selectColumns.length > 0) 
+                && filterColumns 
+                && (filterColumns.length > 0));
+    };
+    
     useEffect(() => {
         setTreeViewData(null);
         setDatasource(null);
@@ -105,9 +113,10 @@ const QueryDesign = () => {
                         <Tab eventKey="fil" title={getText("Filter")}>
                             <QueryFilter/>
                         </Tab>
+                        {isSqlAvailable() && 
                         <Tab eventKey="sql" title={getText("SQL")}>
                             <QuerySql/>
-                        </Tab>
+                        </Tab>}
                     </Tabs>
                 </SplitterPanel>
             </Splitter>);

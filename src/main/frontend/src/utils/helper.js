@@ -72,8 +72,8 @@ export const JDBC_TYPE_NCLOB = 2011;
 export const JDBC_TYPE_TIME_WITH_TIMEZONE = 2013;
 export const JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE = 2014;
 
-export const LEFT_PARENTHESIS = ["(", "((", "((("];
-export const RIGHT_PARENTHESIS = [")", "))", ")))"];
+export const LEFT_PARENTHESIS = ["", "(", "((", "((("];
+export const RIGHT_PARENTHESIS = ["", ")", "))", ")))"];
 export const AND_OR = ["and", "or"];
 export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", "in", "null", "not null", "like"];
 export const UNARY_COMPARISON_OPERATORS = ["null", "not null"];
@@ -296,6 +296,7 @@ export const isDataTypeDateTime = (type) => {
         || (type === JDBC_TYPE_TIME_WITH_TIMEZONE)
         || (type === JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE));
 };
+
 
 export const isDataTypeString = (type) => {
     return (( type === JDBC_TYPE_CHAR)

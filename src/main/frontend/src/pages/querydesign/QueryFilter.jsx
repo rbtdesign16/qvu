@@ -10,21 +10,21 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import { MdOutlineAddBox } from 'react-icons/md';
 import FilterEntry from "./FilterEntry";
-import { BIG_ICON_SIZE } from "../../utils/helper";
+import { BIG_ICON_SIZE} from "../../utils/helper";
 
 const QueryFilter = () => {
     const {authData, setAuthData} = useAuth();
-    const {selectColumns, 
+    const {selectColumns,
         filterColumns,
         setFilterColumns,
         formatPathForDisplay} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [selectColumn, setSelectColumn] = useState(null);
-    
+
     const addFilterColumn = () => {
         let fc = [...filterColumns];
-        
+
         fc.push({
             datasource: selectColumn.datasource,
             tableAlias: selectColumn.tableAlias,
@@ -38,10 +38,10 @@ const QueryFilter = () => {
             comparisonValue: ""
 
         });
-        
+
         setFilterColumns(fc);
     };
-    
+
     const getOptionTitle = (s) => {
         return getText("Table Alias:", " ") + s.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(s.path);
     };
@@ -49,7 +49,7 @@ const QueryFilter = () => {
     const loadSelectColumns = () => {
         return selectColumns.map(s => <option title={getOptionTitle(s)} value={s.path}>{s.displayName}</option>);
     };
-    
+
     const setSelectedColumn = (e) => {
         for (let i = 0; i < selectColumns.length; ++i) {
             if (e.target.value === selectColumns[i].path) {
@@ -58,20 +58,20 @@ const QueryFilter = () => {
             }
         }
     };
-    
+
     const loadFilterEntries = () => {
         return filterColumns.map((fc, indx) => <FilterEntry filterData={fc} index={indx}/>);
     };
-    
+
     return <div className="query-filter-panel">
-            <div className="filter-header">
-                <span title={getText("Add filter column")}>
-                    <MdOutlineAddBox style={{ marginBottom: "5px"}} size={BIG_ICON_SIZE} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>
-                </span>
-                <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
-            </div>
-            <div>{loadFilterEntries()}</div>
-         </div>;
+        <div className="filter-header">
+            <span title={getText("Add filter column")}>
+                <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} disabled={!selectColumn} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>
+            </span>
+            <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
+        </div>
+        <div>{loadFilterEntries()}</div>
+    </div>;
 };
-    
+
 export default QueryFilter;

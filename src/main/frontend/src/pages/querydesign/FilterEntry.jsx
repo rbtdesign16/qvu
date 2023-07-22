@@ -16,7 +16,11 @@ import {
     RIGHT_PARENTHESIS,
     AND_OR,
     COMPARISON_OPERATORS,
-    UNARY_COMPARISON_OPERATORS} from "../../utils/helper";
+    UNARY_COMPARISON_OPERATORS,
+    isDataTypeString,
+    isDataTypeNumeric,
+    isDataTypeDateTime
+} from "../../utils/helper";
 
 const FilterEntry = (props) => {
     const {filterData, index} = props;
@@ -145,6 +149,21 @@ const FilterEntry = (props) => {
         filterData[e.target.name] = val;
     };
 
+    const getComparisonInput = () => {
+        let columnData = findColumnData();
+        
+        if (columnData) {
+            if (isDataTypeString(columnData.dataType)) {
+                return <input type="text" name="comparisonValue" style={{width: "98%"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
+            } else if (isDataTypeNumeric(columnData.dataType)) {
+                return <input type="number" name="comparisonValue" style={{width: "120px"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
+            } else if (isDataTypeDateTime(columnData.dataType)) {
+                return <input type="date" name="comparisonValue" style style={{width: "95%px"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue}/>;
+            }
+        } else {
+            return <input type="text" name="comparisonValue" size={20} defaultValue={filterData.comparisonValue} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
+        }
+    }
     const isComparisonValueDisabled = () => {
         if (filterData && filterData.comparisonOperator) {
             return UNARY_COMPARISON_OPERATORS.includes(filterData.comparisonOperator);
@@ -162,7 +181,7 @@ const FilterEntry = (props) => {
             <td><select name="leftParenthesis" onChange={e => onChange(e)}>{loadLeftParenthesis()}</select></td>
             <td>{filterData.columnName}</td>
             <td><select name="comparisonOperator" onChange={e => onChange(e)}>{loadFilterComparisonOperators()}</select></td>
-            <td><input type="text" name="comparisonValue" onBlur={e => onChange(e)} disabled={isComparisonValueDisabled()} defaultValue={filterData.comparisonValue}/></td>
+            <td>{getComparisonInput()}</td>
             <td><select name="rightParenthesis" onChange={e => onChange(e)}>{loadRightParenthesis()}</select></td>
             </tr>;
     };

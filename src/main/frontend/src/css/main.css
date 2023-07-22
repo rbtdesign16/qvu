@@ -445,7 +445,32 @@ textarea {
 }
 
 
-.query-filter-hdr {
+.query-filter-panel {
     border-bottom: solid 1px var(--default-border-color);
     width: 100%;
 }
+
+.query-filter-panel .filter-header {
+    border-bottom: 2px solid var(--default-border-color);
+    width: 100%;
+    margin-bottom: 2px
+    
+}
+
+.query-filter-panel .filter-title {
+    border: 1px solid var(--default-border-color);
+    text-align: left;
+    font-size: var(--default-fount-size);
+    color: var(--default-font-color);
+    white-space: nowrap;
+}
+
+.query-filter-panel .filter-table {
+      border-collapse: collapse;
+}
+
+.query-filter-panel th, td {
+    border-bottom: 1px solid var(--default-border-color);
+    padding-bottom: 3px;
+}
+

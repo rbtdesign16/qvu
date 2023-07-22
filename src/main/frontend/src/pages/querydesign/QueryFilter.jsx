@@ -10,7 +10,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import { MdOutlineAddBox } from 'react-icons/md';
 import FilterEntry from "./FilterEntry";
-import { SMALL_ICON_SIZE } from "../../utils/helper";
+import { BIG_ICON_SIZE } from "../../utils/helper";
 
 const QueryFilter = () => {
     const {authData, setAuthData} = useAuth();
@@ -29,7 +29,7 @@ const QueryFilter = () => {
             datasource: selectColumn.datasource,
             tableAlias: selectColumn.tableAlias,
             tableName: selectColumn.tableName,
-            columnName: selectColumn.columnName,
+            columnName: selectColumn.displayName,
             path: selectColumn.path,
             openParenthesis: "",
             closeParenthesis: "",
@@ -63,13 +63,15 @@ const QueryFilter = () => {
         return filterColumns.map((fc, indx) => <FilterEntry filterData={fc} index={indx}/>);
     };
     
-    return  <div>
-        <div className="query-filter-hdr">
-            <span title={getText("Add filter column")}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/></span>
-           <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
-         </div>
-        <div>{loadFilterEntries()}</div>
-    </div>
-}
+    return <div className="query-filter-panel">
+            <div className="filter-header">
+                <span title={getText("Add filter column")}>
+                    <MdOutlineAddBox style={{ marginBottom: "5px"}} size={BIG_ICON_SIZE} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>
+                </span>
+                <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
+            </div>
+            <div>{loadFilterEntries()}</div>
+         </div>;
+};
     
 export default QueryFilter;

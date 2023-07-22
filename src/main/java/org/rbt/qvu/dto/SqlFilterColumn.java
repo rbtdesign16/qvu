@@ -19,6 +19,7 @@ public class SqlFilterColumn {
     private String comparisonOperator;
     private String comparisonValue;
     private String path;
+    private String customSql;
 
     public String getDatasource() {
         return datasource;
@@ -98,6 +99,14 @@ public class SqlFilterColumn {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getCustomSql() {
+        return customSql;
+    }
+
+    public void setCustomSql(String customSql) {
+        this.customSql = customSql;
     }
     
     

@@ -474,3 +474,19 @@ textarea {
     padding-bottom: 3px;
 }
 
+
+.sql-clause-name {
+    font-size: var(--sql-clause-name-font-size);
+    font-weight: var(--sql-clause-name-font-weight);
+    color: var(--sql-clause-name-color);
+    margin: 0;
+    padding: 0;
+}
+
+.sql-clause-column {
+    font-size: var(--sql-clause-column-font-size);
+    font-weight: var(--sql-clause-column-font-weight);
+    color: var(--sql-clause-column-color);
+    margin: 0;
+    padding: 0;
+}

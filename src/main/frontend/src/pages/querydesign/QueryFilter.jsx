@@ -51,12 +51,16 @@ const QueryFilter = () => {
     };
 
     const setSelectedColumn = (e) => {
+        let selcol = null;
         for (let i = 0; i < selectColumns.length; ++i) {
             if (e.target.value === selectColumns[i].path) {
-                setSelectColumn(selectColumns[i]);
+                selcol =  selectColumns[i];
                 break;
             }
         }
+        
+        setSelectColumn(selcol);
+        
     };
 
     const loadFilterEntries = () => {
@@ -66,7 +70,8 @@ const QueryFilter = () => {
     return <div className="query-filter-panel">
         <div className="filter-header">
             <span title={getText("Add filter column")}>
-                <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} disabled={!selectColumn} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>
+                {!selectColumn  ? <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} disabled={true} className="icon-m-dis"/>
+                    : <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>}
             </span>
             <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
         </div>

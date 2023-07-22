@@ -10,12 +10,34 @@ import useHelp from "../../context/HelpContext";
 import {
     isDataTypeString,
     isDataTypeNumeric,
-    isDataTypeDateTime
-} from "../../utils/helper";
-
+    isDataTypeDateTime,
+    isSqlOrderByRequired,
+    isSqlGroupByRequired
+    } from "../../utils/helper";
 
 const SqlDisplay = (props) => {
-    return <span>this is sql</span>;
+    const {selectColumns, filterColumns, from} = useQueryDesign();
+
+    const getSelectColumns = () => {
+        return selectColumns.map((s, indx) => {
+            let comma = ",";
+
+            if (indx === (selectColumns.length - 1)) {
+                comma = "";
+            }
+
+            return <pre className="sql-clause-column">    {s.tableAlias + "." + s.columnName + comma}</pre>;
+        });
+    };
+
+    return <div>
+        <pre className="sql-clause-name">SELECT</pre>
+        { getSelectColumns()}
+        <pre className="sql-clause-name">FROM</pre>
+        <pre className="sql-clause-name">WHERE</pre>
+        {isSqlOrderByRequired(selectColumns) && <pre className="sql-clause-name">ORDER BY</pre>}
+        {isSqlGroupByRequired(selectColumns) && <pre className="sql-clause-name">GROUP BY</pre>}
+    </div>;
 };
 
 SqlDisplay.propTypes = {

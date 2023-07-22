@@ -316,3 +316,31 @@ export const isDataTypeFloat = (type, decimalDigits) => {
         return decimalDigits > 0;
     }
 };
+
+export const isSqlOrderByRequired = (selectColumns) => {
+    if (selectColumns) {
+        for (let i = 0; i < selectColumns.length; ++i) {
+           if (selectColumns[i].sortPosition > 0) {
+                return true;
+            }
+        }
+    }
+};
+
+export const isSqlGroupByRequired = (selectColumns) => {
+    if (selectColumns) {
+        let agg= false;
+        let nonagg = false;
+        for (let i = 0; i < selectColumns.length; ++i) {
+            if (selectColumns[i].aggregateFunction) {
+                agg = true;
+            } else {
+                nonagg = true;
+            }
+            
+            if (agg && nonagg) {
+                return true;
+            }
+        }
+    }
+};

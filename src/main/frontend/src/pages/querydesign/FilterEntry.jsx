@@ -152,7 +152,10 @@ const FilterEntry = (props) => {
     const getComparisonInput = () => {
         let columnData = findColumnData();
         
-        if (columnData) {
+        if (isComparisonValueDisabled()) {
+            filterData.comparisonValue = "";
+            return <input type="text" name="comparisonValue" style={{width: "98%"}} disabled />;
+        } else if (columnData) {
             if (isDataTypeString(columnData.dataType)) {
                 return <input type="text" name="comparisonValue" style={{width: "98%"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
             } else if (isDataTypeNumeric(columnData.dataType)) {
@@ -161,9 +164,10 @@ const FilterEntry = (props) => {
                 return <input type="date" name="comparisonValue" style style={{width: "95%px"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue}/>;
             }
         } else {
-            return <input type="text" name="comparisonValue" size={20} defaultValue={filterData.comparisonValue} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
+            return <input type="text" name="comparisonValue" tyle={{width: "98%"}} defaultValue={filterData.comparisonValue} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
         }
     }
+    
     const isComparisonValueDisabled = () => {
         if (filterData && filterData.comparisonOperator) {
             return UNARY_COMPARISON_OPERATORS.includes(filterData.comparisonOperator);

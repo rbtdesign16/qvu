@@ -105,7 +105,7 @@ const QueryDesign = () => {
                     <DataSelectTree/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="query-design-cont">
-                    <Button size="sm" style={{marginRight: "150px", float: "right"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
+                    <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}}onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
                     <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
                         <Tab eventKey="dsel" title={getText("Data")}>
                             <SelectColumnList className="select-column-list"/>
@@ -115,7 +115,7 @@ const QueryDesign = () => {
                         </Tab>
                         {isSqlAvailable() && 
                         <Tab eventKey="sql" title={getText("SQL")}>
-                            <QuerySql/>
+                            <QuerySql />
                         </Tab>}
                     </Tabs>
                 </SplitterPanel>

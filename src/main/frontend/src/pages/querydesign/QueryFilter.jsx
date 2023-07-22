@@ -21,7 +21,7 @@ const QueryFilter = () => {
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [selectColumn, setSelectColumn] = useState(null);
-
+    
     const addFilterColumn = () => {
         let fc = [...filterColumns];
 

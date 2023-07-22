@@ -10,8 +10,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectedTableIds, setSelectedTableIds] = useState([]);
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
-    const [from, setFrom] = useState([]);
-    
+    const [fromClause, setFromClause] = useState(null);
 
     const updateSelectColumns = async (scols) => {
         let cols = [];
@@ -71,13 +70,13 @@ export const QueryDesignProvider = ({ children }) => {
                     customSql: "",
                     showInResults: true,
                     nodeId: selectedColumnIds[i],
-                    from,
-                    setFrom
+                    fromClause,
+                    setFromClause
                 });
             }
         }
 
-        setFrom(buildFromRecords([...tablePathSet], cols));
+        setFromClause(await buildFromRecords([...tablePathSet], cols));
         setSelectColumns(cols);
     };
     
@@ -300,12 +299,12 @@ export const QueryDesignProvider = ({ children }) => {
                     selectedTableIds,
                     baseTable,
                     selectColumns,
-                    from,
+                    fromClause,
                     filterColumns,
                     setDatasource,
                     setTreeViewData,
                     setSelectedColumnIds,
-                    setFrom,
+                    setFromClause,
                     setSelectedTableIds,
                     setBaseTable,
                     setSelectColumns,

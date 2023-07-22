@@ -12,7 +12,7 @@ const SelectColumnList = () => {
 
     const getColumnData = () => {
         if (selectColumns) {
-            return selectColumns.map((data, index) => <SelectColumnEntry index={index} columnData={data}/>);
+            return selectColumns.map((d, index) => <SelectColumnEntry index={index}/>);
         } else {
             return "";
         }

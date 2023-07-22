@@ -12,7 +12,7 @@ import {AiOutlineFileAdd, AiOutlineDelete, AiOutlineCaretDown, AiOutlineCaretUp,
 import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
-    const {columnData, index} = props;
+    const {index} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {selectColumns,
@@ -25,6 +25,7 @@ const SelectColumnEntry = (props) => {
     const getHelpText = () => {
         let pkindex = -1;
 
+        let columnData = selectColumns[index];
         if (columnData.pkindex) {
             pkindex = Number(columnData.pkindex);
         }
@@ -51,7 +52,7 @@ const SelectColumnEntry = (props) => {
 
     const duplicateEntry = async () => {
         let s = [...selectColumns];
-        let item = {...columnData};
+        let item = s[index];
         item.isdup = true;
         if (index < (s.length - 1)) {
             s.splice(index, 0, item);
@@ -63,7 +64,7 @@ const SelectColumnEntry = (props) => {
     };
 
     const copyColumnName = () => {
-        navigator.clipboard.writeText(columnData.tableAlias + "." + columnData.columnName);
+        navigator.clipboard.writeText(selectColumns[index].tableAlias + "." + selectColumns[index].columnName);
     };
 
     const moveUp = () => {
@@ -83,20 +84,20 @@ const SelectColumnEntry = (props) => {
     };
 
     const remove = async () => {
-        if (await confirm(getText("Remove:", " " + columnData.displayName + "?"))) {
+        if (await confirm(getText("Remove:", " " + selectColumns[index].displayName + "?"))) {
             let s = [...selectColumns];
             s.splice(index, 1);
 
             let cnt = 0;
             for (let i = 0; i < s.length; ++i) {
-                if (s[i].path === columnData.path) {
+                if (s[i].path === selectColumns[index].path) {
                     cnt++;
                     break;
                 }
             }
 
             if (cnt === 0) {
-                let indx = selectedColumnIds.findIndex((element) => element === columnData.nodeId);
+                let indx = selectedColumnIds.findIndex((element) => element === selectColumns[index].nodeId);
 
                 if (indx > -1) {
                     let sids = [...selectedColumnIds];
@@ -111,11 +112,11 @@ const SelectColumnEntry = (props) => {
     };
 
     const getAggregateFunctions = () => {
-        let funcs = getAggregateFunctionsByDataType(columnData.dataType);
+        let funcs = getAggregateFunctionsByDataType(selectColumns[index].dataType);
 
         if (funcs) {
             return funcs.map(f => {
-                if (columnData.aggregateFunction && (columnData.aggregateFunction === f)) {
+                if (selectColumns[index].aggregateFunction && (selectColumns[index].aggregateFunction === f)) {
                     return <option value={f} selected>{f}</option>;
                 } else {
                     return <option value={f}>{f}</option>;
@@ -125,7 +126,7 @@ const SelectColumnEntry = (props) => {
     };
     
     const getHeaderTitle = () => {
-        return getText("Table Alias:", " ") + columnData.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(columnData.path);
+        return getText("Table Alias:", " ") + selectColumns[index].tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(selectColumns[index].path);
     };
     
     const handleDragStart = (e) => {
@@ -153,6 +154,19 @@ const SelectColumnEntry = (props) => {
         e.dataTransfer.dropEffect = "move";
      };
 
+    const onChange = (e) => {
+        let sel = [...selectColumns];
+        let c = sel[index];
+        if (e.target.name === "showInResults") {
+            c.showInResults = e.target.checked;
+        } else if (e.target.selectedIndex) {
+            c[e.target.name] = e.target.options[e.target.selectedIndex].value;
+        } else {
+            c[e.target.name] = e.target.value;
+        }
+        
+        setSelectColumns(sel);
+    };
     
     return <div key={"cse-" + index} className="select-column-entry">
         <div draggable={true} 
@@ -162,7 +176,7 @@ const SelectColumnEntry = (props) => {
             onDragOver={e => handleDragOver(e)} className="detail-hdr">
             <span>
                 <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
-                <span title={getHeaderTitle()} >{columnData.displayName}</span>
+                <span title={getHeaderTitle()} >{selectColumns[index].displayName}</span>
             </span>
         </div>
     
@@ -176,24 +190,22 @@ const SelectColumnEntry = (props) => {
             <div title={getText("Remove entry")}><AiOutlineDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></div>
         </div>
         <div className="detail">
-            <div style={{paddingLeft: "10px"}} ><input type="checkbox" name="showInResults" defaultChecked={columnData.showInResults} onChange={e => onChange(e)}/><label className="ck-label">{getText("Show in Results")}</label></div>
+            <div style={{paddingLeft: "10px"}} ><input type="checkbox" name="showInResults" defaultChecked={selectColumns[index].showInResults} onChange={e => onChange(e)}/><label className="ck-label">{getText("Show in Results")}</label></div>
             <div className="entrygrid-selcolentry">
-                <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={columnData.displayName} onChange={e => onChange(e)}/></div>
-                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(columnData.sortPosition) > 0 ? columnData.sortPosition : ""} onChange={e => onChange(e)}/></div>
-                <div className="label">{getText("Function:")}</div><div className="data-field"><select name="aggregateFunction"  onChange={e => onChange(e, indx)}><option selected={!columnData.aggregateFunction} value=""></option>{getAggregateFunctions()}</select></div>
+                <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={selectColumns[index].displayName} onChange={e => onChange(e)}/></div>
+                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(selectColumns[index].sortPosition) > 0 ? selectColumns[index].sortPosition : ""} onChange={e => onChange(e)}/></div>
+                <div className="label">{getText("Function:")}</div><div className="data-field"><select name="aggregateFunction"  onChange={e => onChange(e)}><option selected={!selectColumns[index].aggregateFunction} value=""></option>{getAggregateFunctions()}</select></div>
             </div>
             <div style={{marginLeft: "25px"}}>
                 <div className="label-l">{getText("Custom SQL")}</div>
-                <textarea cols={70} rows={2} name="customSql" onBlur={e => onChange(e)} defaultValue={columnData.customSql}/>
+                <textarea cols={70} rows={2} name="customSql" onBlur={e => onChange(e)} defaultValue={selectColumns[index].customSql}/>
             </div>
         </div>
     </div>
 };
 
 SelectColumnEntry.propTypes = {
-    columnData: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired
-
 };
 
 

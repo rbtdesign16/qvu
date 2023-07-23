@@ -20,6 +20,14 @@ export const DataHandlerProvider = ({ children }) => {
         }
     };
 
+    const getDatabaseType = (datasourceName) => {
+        for (let i = 0; i < datasources.length; ++i) {
+            if (datasourceName === datasources[i].datasourceName) {
+                return datasources[i].databaseType;
+            }
+        }
+    };
+    
     return (
             <DataHandlerContext.Provider
                 value={{datasources, 
@@ -29,7 +37,8 @@ export const DataHandlerProvider = ({ children }) => {
                     datasourceTableNames, 
                     setDatasourceTableNames,
                     documentGroups,
-                    setDocumentGroups}}>
+                    setDocumentGroups,
+                    getDatabaseType}}>
                 {children}
             </DataHandlerContext.Provider>
             );

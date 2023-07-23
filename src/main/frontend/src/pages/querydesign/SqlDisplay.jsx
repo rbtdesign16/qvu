@@ -6,12 +6,17 @@ import React, { useState, useEffect } from 'react';
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
+import useDataHandler from "../../context/DataHandlerContext";
 import {
     isSqlOrderByRequired,
     isSqlGroupByRequired,
     isDataTypeString,
     isDataTypeDateTime,
-    UNARY_COMPARISON_OPERATORS
+    UNARY_COMPARISON_OPERATORS,
+    DB_TYPE_MYSQL,
+    DB_TYPE_SQLSERVER,
+    DB_TYPE_ORACLE,
+    DB_TYPE_POSTGRES
 } from "../../utils/helper";
 
 const SqlDisplay = (props) => {
@@ -21,7 +26,8 @@ const SqlDisplay = (props) => {
         fromClause,
         updateSelectColumns} = useQueryDesign();
 
-
+    const {getDatabaseType} = useDataHandler();
+    
     const getColumnName = (s) => {
         let retval = "";
 
@@ -172,16 +178,42 @@ const SqlDisplay = (props) => {
         return retval;
     };
     
+    const formatDateInClause = (input, dbType) => {
+        let parts = input.split(",");
+        
+        let comma = "";
+        let retval = "";
+        for (let i = 0; i < parts.length; ++i) {
+            retval += comma;
+            retval += getDateComparisonValue(f, dbtype);
+            comma = ",";
+        }
+        
+        return retval;
+    };
+
+    
+    const getDateComparisonValue = (f, dbtype) => {
+        switch(dbtype) {
+            case DB_TYPE_ORACLE:
+                return "TO_DATE('" + f.comparisonValue + "', 'YYYY_MM_DD')";
+            default:
+               return  "'" + f.comparisonValue + "'";
+       }       
+    };
+    
     const getComparisonValue = (f) => {
          if (f.comparisonValue) {
             if (f.comparisonOperator === "in") {
                 if (isDataTypeString(f.dataType)) {
                     return formatStringInClause(f.comparisonValue);
-                } else {
+                } else if (isDataTypeDateTime(f.dataType)) {
+                    return formatDateInClause(f.comparisonValue, getDatabaseType(f.datasource));
+                } else {    
                     return f.comparisonOperator;
                 }
             } else if (isDataTypeString(f.dataType) || isDataTypeDateTime(f.dataType)) {
-                return "'" + f.comparisonValue + "'";
+                return getDateComparisonValue(f, getDatabaseType(f.datasource));
             } else {
                 return f.comparisonValue;
             }
@@ -194,15 +226,23 @@ const SqlDisplay = (props) => {
         
     const getWhereColumns = () => {
         return filterColumns.map(f => {
-            return <pre className="sql-clause-column">{"    " 
-                + getAndOr(f) 
-                + getOpenParenthesis(f)  
-                + f.tableAlias + "." + f.columnName 
-                + " " 
-                + f.comparisonOperator 
-                + " " 
-                + getComparisonValue(f)  
-                + getCloseParenthesis(f)}</pre>;
+            if (f.customSql) {
+                return <pre className="sql-clause-column">{"    " 
+                   + getAndOr(f) 
+                   + getOpenParenthesis(f)  
+                   + f.customSql
+                   + getCloseParenthesis(f)}</pre>;
+            } else { 
+                return <pre className="sql-clause-column">{"    " 
+                    + getAndOr(f) 
+                    + getOpenParenthesis(f)  
+                    + f.tableAlias + "." + f.columnName 
+                    + " " 
+                    + f.comparisonOperator 
+                    + " " 
+                    + getComparisonValue(f)  
+                    + getCloseParenthesis(f)}</pre>;
+            }
         });
     };
 

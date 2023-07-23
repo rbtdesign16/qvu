@@ -78,11 +78,14 @@ export const AND_OR = ["and", "or"];
 export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", "in", "null", "not null", "like"];
 export const UNARY_COMPARISON_OPERATORS = ["null", "not null"];
 
-
-
 export const NUMBER_AGGREATE_FUNCTIONS = ["min", "max", "sum", "avg", "count"];
 export const DATE_TIME_AGGREGATE_FUNCTIONS = ["min", "max", "count"];
 export const STRING_AGGREATE_FUNCTIONS = ["count"];
+
+ export const DB_TYPE_MYSQL = "MySQL";
+ export const DB_TYPE_SQLSERVER = "Microsoft SQL Server";
+ export const DB_TYPE_ORACLE = "Oracle";
+ export const DB_TYPE_POSTGRES = "PostgreSQL";
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;

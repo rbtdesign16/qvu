@@ -132,7 +132,8 @@ const FilterEntry = (props) => {
 
     const onChange = (e) => {
         let val = "";
-        if (e.target.options) {
+        
+        if (e.target.selectedIndex > -1) {
             val = e.target.options[e.target.selectedIndex].value;
         } else {
             val = e.target.value;

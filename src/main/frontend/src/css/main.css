@@ -403,8 +403,8 @@ select {
 
 .select-column-entry .detail {
     display: inline-block;
+     height: 150px;
     width: calc(100% - 25px);
-    height: 150px;
     float: right;
 }
 

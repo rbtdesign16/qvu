@@ -12,8 +12,8 @@ import { AiOutlineDelete } from "react-icons/ai";
 import {
     SMALL_ICON_SIZE,
     confirm,
-    LEFT_PARENTHESIS,
-    RIGHT_PARENTHESIS,
+    OPEN_PARENTHESIS,
+    CLOSE_PARENTHESIS,
     AND_OR,
     COMPARISON_OPERATORS,
     UNARY_COMPARISON_OPERATORS,
@@ -23,7 +23,7 @@ import {
 } from "../../utils/helper";
 
 const FilterEntry = (props) => {
-    const {filterData, index} = props;
+    const {index} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {
@@ -98,47 +98,39 @@ const FilterEntry = (props) => {
         }
     };
 
-    const findColumnData = () => {
-        for (let i = 0; i < selectColumns.length; ++i) {
-            if (selectColumns[i].path === filterData.path) {
-                return selectColumns[i];
-            }
-        }
-    }
-
     const getHeaderTitle = () => {
-        return getText("Table Alias:", " ") + filterData.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(filterData.path);
+        return getText("Table Alias:", " ") + filterColumns[index].tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(filterColumns[index].path);
     };
 
     const loadAndOr = () => {
         if (index === 0) {
             return <option value=""></option>;
         } else {
-            return AND_OR.map(ao => <option value={ao} selected={(ao === filterData.andOr)}>{ao}</option>);
+            return AND_OR.map(ao => <option value={ao} selected={(ao === filterColumns[index].andOr)}>{ao}</option>);
         }
     }
 
-    const loadLeftParenthesis = () => {
-        return LEFT_PARENTHESIS.map(p => <option value={p} selected={(p === filterData.leftParenthesis)}>{p}</option>);
+    const loadOpenParenthesis = () => {
+        return OPEN_PARENTHESIS.map(p => <option value={p} selected={(p === filterColumns[index].leftParenthesis)}>{p}</option>);
     };
 
-    const loadRightParenthesis = () => {
-        return RIGHT_PARENTHESIS.map(p => <option value={p} selected={(p === filterData.leftParenthesis)}>{p}</option>);
+    const loadCloseParenthesis = () => {
+        return CLOSE_PARENTHESIS.map(p => <option value={p} selected={(p === filterColumns[index].leftParenthesis)}>{p}</option>);
     };
 
     const loadFilterComparisonOperators = () => {
-        return COMPARISON_OPERATORS.map(o => <option value={o} selected={(o === filterData.comparisonOperator)}>{o}</option>);
+        return COMPARISON_OPERATORS.map(o => <option value={o} selected={(o === filterColumns[index].comparisonOperator)}>{o}</option>);
     };
 
     const remove = async () => {
-        if (await confirm(getText("Remove:", " " + filterData.columnName + "?"))) {
+        if (await confirm(getText("Remove:", " " + filterColumns[index].columnName + "?"))) {
             let s = [...filterColumns];
             s.splice(index, 1);
             setFilterColumns(s);
         }
     };
 
-    const onChange = (e, ) => {
+    const onChange = (e) => {
         let val = "";
         if (e.target.options) {
             val = e.target.options[e.target.selectedIndex].value;
@@ -146,31 +138,30 @@ const FilterEntry = (props) => {
             val = e.target.value;
         }
 
-        filterData[e.target.name] = val;
+        let f = [...filterColumns];
+        
+        f[index][e.target.name] = val;
+        setFilterColumns(f);
     };
 
     const getComparisonInput = () => {
-        let columnData = findColumnData();
-        
-        if (isComparisonValueDisabled()) {
-            filterData.comparisonValue = "";
+         if (isComparisonValueDisabled()) {
+            filterColumns[index].comparisonValue = "";
             return <input type="text" name="comparisonValue" style={{width: "98%"}} disabled />;
-        } else if (columnData) {
-            if (isDataTypeString(columnData.dataType)) {
-                return <input type="text" name="comparisonValue" style={{width: "98%"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
-            } else if (isDataTypeNumeric(columnData.dataType)) {
-                return <input type="number" name="comparisonValue" style={{width: "120px"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
-            } else if (isDataTypeDateTime(columnData.dataType)) {
-                return <input type="date" name="comparisonValue" style style={{width: "95%px"}} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue}/>;
-            }
         } else {
-            return <input type="text" name="comparisonValue" tyle={{width: "98%"}} defaultValue={filterData.comparisonValue} onChange={e => onChange(e)} defaultValue={filterData.comparisonValue} />;
+            if (isDataTypeString(filterColumns[index].dataType)) {
+                return <input type="text" name="comparisonValue" onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filterColumns[index].comparisonValue} />;
+            } else if (isDataTypeNumeric(filterColumns[index].dataType)) {
+                return <input type="number" name="comparisonValue" onBlur={e => onChange(e)}  style={{width: "120px"}} defaultValue={filterColumns[index].comparisonValue} />;
+            } else if (isDataTypeDateTime(filterColumns[index].dataType)) {
+                return <input type="date" name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%px"}}  defaultValue={filterColumns[index].comparisonValue}/>;
+            }
         }
     }
     
     const isComparisonValueDisabled = () => {
-        if (filterData && filterData.comparisonOperator) {
-            return UNARY_COMPARISON_OPERATORS.includes(filterData.comparisonOperator);
+        if (filterColumns[index].comparisonOperator) {
+            return UNARY_COMPARISON_OPERATORS.includes(filterColumns[index].comparisonOperator);
         }
     };
 
@@ -181,12 +172,12 @@ const FilterEntry = (props) => {
     const getDetail = () => {
         return <tr style={{paddingLeft: "10px"}}>
             <td title={getText("Remove entry")}><AiOutlineDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
-            <td><select style={{width: "100%"}} name="andOr" onChange={e => onChange(e)} disabled={(index === 0)}>{loadAndOr()}</select></td>
-            <td><select name="leftParenthesis" onChange={e => onChange(e)}>{loadLeftParenthesis()}</select></td>
-            <td>{filterData.columnName}</td>
+            <td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={(index === 0)}>{loadAndOr()}</select></td>
+            <td><select name="openParenthesis" onChange={e => onChange(e)}>{loadOpenParenthesis()}</select></td>
+            <td>{filterColumns[index].columnName}</td>
             <td><select name="comparisonOperator" onChange={e => onChange(e)}>{loadFilterComparisonOperators()}</select></td>
             <td>{getComparisonInput()}</td>
-            <td><select name="rightParenthesis" onChange={e => onChange(e)}>{loadRightParenthesis()}</select></td>
+            <td><select name="closeParenthesis" onChange={e => onChange(e)}>{loadCloseParenthesis()}</select></td>
             </tr>;
     };
 
@@ -194,7 +185,7 @@ const FilterEntry = (props) => {
         <div className="filter-title" id={"fil-" + index}>
             <span>
                 <MdHelpOutline style={{marginBottom: "5px"}} className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
-                <span title={getHeaderTitle()} >{findColumnData().displayName}</span>
+                <span title={getHeaderTitle()} >{filterColumns[index].displayName}</span>
             </span>
         </div>
         <table className="filter-table">
@@ -203,7 +194,7 @@ const FilterEntry = (props) => {
         </table>
         <div style={{marginLeft: "25px"}}>
             <div className="label-l">{getText("Custom SQL")}</div>
-            <textarea cols={70} rows={2} name="customSql" onBlur={e => onChange(e)} defaultValue={filterData.customSql}/>
+            <textarea cols={70} rows={2} name="customSql" onBlur={e => onChange(e)} defaultValue={filterColumns[index].customSql}/>
         </div>
     </div>
 };

@@ -17,6 +17,7 @@ public class SqlSelectColumn {
     private String columnName;
     private String displayName;
     private int sortPosition = -1;
+    private String sortDirection;
     private int pkIndex;
     private boolean showInResults = true;
     private String aggregateFunction;
@@ -126,6 +127,14 @@ public class SqlSelectColumn {
     public void setShowInResults(boolean showInResults) {
         this.showInResults = showInResults;
     }
-    
-    
+
+    public String getSortDirection() {
+        return sortDirection;
+    }
+
+    public void setSortDirection(String sortDirection) {
+        this.sortDirection = sortDirection;
+    }
+
+
 }

@@ -13,6 +13,8 @@ public class SqlFilterColumn {
     private String tableAlias;
     private String tableName;
     private String columnName;
+    private String displayName;
+    private int dataType;
     private String openParenthesis;
     private String closeParenthesis;
     private String andOr;
@@ -107,6 +109,22 @@ public class SqlFilterColumn {
 
     public void setCustomSql(String customSql) {
         this.customSql = customSql;
+    }
+
+    public int getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(int dataType) {
+        this.dataType = dataType;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
     
     

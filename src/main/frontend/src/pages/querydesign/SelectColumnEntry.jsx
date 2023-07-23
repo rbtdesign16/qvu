@@ -124,17 +124,31 @@ const SelectColumnEntry = (props) => {
             });
         }
     };
-    
+
+    const getSortDirection = () => {
+        let dir = ["", "asc", "desc"];
+
+        return dir.map(d => {
+            if (selectColumns[index].sortDirection === d) {
+                return <option value={d} selected>{d}</option>;
+            } else {
+                return <option value={d}>{d}</option>;
+            }
+        });
+
+    };
+
+
     const getHeaderTitle = () => {
         return getText("Table Alias:", " ") + selectColumns[index].tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(selectColumns[index].path);
     };
-    
+
     const handleDragStart = (e) => {
         e.dataTransfer.setData("text/plain", "" + index);
         e.dataTransfer.effectAllowed = "move";
     };
 
-    const handleDrop= (e) => {
+    const handleDrop = (e) => {
         let el = document.elementFromPoint(e.clientX, e.clientY);
         if (el && el.id && el.id.startsWith("hdr-")) {
             let dindx = Number(el.id.replace("hdr-", ""));
@@ -145,14 +159,14 @@ const SelectColumnEntry = (props) => {
                 scols.splice(sindx, 1);
                 scols.splice(dindx, 0, col);
                 setSelectColumns(scols);
-           }
-       }
+            }
+        }
     };
-    
+
     const handleDragOver = (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
-     };
+    };
 
     const onChange = (e) => {
         let sel = [...selectColumns];
@@ -164,16 +178,16 @@ const SelectColumnEntry = (props) => {
         } else {
             c[e.target.name] = e.target.value;
         }
-        
+
         setSelectColumns(sel);
     };
-    
+
     return <div key={"cse-" + index} className="select-column-entry">
         <div draggable={true} 
-            id={"hdr-" + index}  
-            onDragStart={e => handleDragStart(e)} 
-            onDrop={e => handleDrop(e)} 
-            onDragOver={e => handleDragOver(e)} className="detail-hdr">
+             id={"hdr-" + index}  
+             onDragStart={e => handleDragStart(e)} 
+             onDrop={e => handleDrop(e)} 
+             onDragOver={e => handleDragOver(e)} className="detail-hdr">
             <span>
                 <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
                 <span title={getHeaderTitle()} >{selectColumns[index].displayName}</span>
@@ -181,7 +195,7 @@ const SelectColumnEntry = (props) => {
         </div>
     
         <div className="tab platinum-b">
-           <span title={getText("Duplicate entry")}><AiOutlineFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
+            <span title={getText("Duplicate entry")}><AiOutlineFileAdd className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => duplicateEntry()} /></span>
             <span title={getText("Copy column name")}><AiOutlineCopy className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => copyColumnName()} /></span>
             <div style={{paddingTop: "10%"}}>
                 {(index > 0) && <span title={getText("Move up")}><AiOutlineCaretUp className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveUp()} /></span>}
@@ -194,6 +208,7 @@ const SelectColumnEntry = (props) => {
             <div className="entrygrid-selcolentry">
                 <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={selectColumns[index].displayName} onChange={e => onChange(e)}/></div>
                 <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(selectColumns[index].sortPosition) > 0 ? selectColumns[index].sortPosition : ""} onChange={e => onChange(e)}/></div>
+                <div className="label">{getText("Asc/Desc:")}</div><div className="data-field"><select name="sortDirection"  onChange={e => onChange(e)}><option selected={!selectColumns[index].sortDirection} value=""></option>{getSortDirection()}</select></div>
                 <div className="label">{getText("Function:")}</div><div className="data-field"><select name="aggregateFunction"  onChange={e => onChange(e)}><option selected={!selectColumns[index].aggregateFunction} value=""></option>{getAggregateFunctions()}</select></div>
             </div>
             <div style={{marginLeft: "25px"}}>

@@ -7,11 +7,11 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
 import {
-    isDataTypeString,
-    isDataTypeNumeric,
-    isDataTypeDateTime,
     isSqlOrderByRequired,
-    isSqlGroupByRequired
+    isSqlGroupByRequired,
+    isDataTypeString,
+    isDataTypeDateTime,
+    UNARY_COMPARISON_OPERATORS
 } from "../../utils/helper";
 
 const SqlDisplay = (props) => {
@@ -73,6 +73,43 @@ const SqlDisplay = (props) => {
         return retval;
     };
 
+    const getOrderBy = () => {
+        let retval = " ";
+        let ob = [];
+        for (let i = 0; i < selectColumns.length; ++i) {
+            if (selectColumns[i].sortPosition > 0) {
+                ob.push(selectColumns[i]);
+            }
+        }
+
+        let comma = "";
+        
+        ob.sort((a, b) => a.sortPosition - b.sortPosition);
+        ob.map(s => {
+            retval += (comma + s.tableAlias + "." + s.columnName + (s.sortDirection === "desc" ? " desc" : ""));
+            comma = ", ";
+        });
+
+        return <pre className="sql-clause-column">{"    " + retval}</pre>;
+    };
+    
+    const getGroupBy = () => {
+        let gb = [];
+        for (let i = 0; i < selectColumns.length; ++i) {
+            if (!selectColumns[i].aggregateFunction) {
+                gb.push(selectColumns[i]);
+            }
+        }
+        
+        return gb.map((c, indx) => {
+            if (indx < (gb.length - 1)) {
+                return <pre className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName + ","}</pre>;
+            } else {
+                return <pre className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName}</pre>;
+            }
+        });
+    };
+
     const getFromColumns = () => {
         if (fromClause && Array.isArray(fromClause)) {
              return fromClause.map((f, indx) => {
@@ -93,6 +130,82 @@ const SqlDisplay = (props) => {
         }
 
     };
+    
+    const getAndOr = (f) => {
+        if (f.andOr) {
+            return " " + f.andOr + " ";
+        } else {
+            return "";
+        }
+    };
+    
+    
+    const getOpenParenthesis = (f) => {
+        if (f.openParenthesis) {
+            return f.openParenthesis;
+        } else {
+            return "";
+        }
+    };
+    
+    const getCloseParenthesis = (f) => {
+        if (f.closeParenthesis) {
+            return f.closeParenthesis;
+        } else {
+            return "";
+        }
+    };
+    
+    const formatStringInClause = (input) => {
+        let parts = input.split(",");
+        
+        let comma = "";
+        let retval = "";
+        for (let i = 0; i < parts.length; ++i) {
+            retval += comma;
+            retval += "'";
+            retval += parts[i];
+            retval += "'";
+            comma = ",";
+        }
+        
+        return retval;
+    };
+    
+    const getComparisonValue = (f) => {
+         if (f.comparisonValue) {
+            if (f.comparisonOperator === "in") {
+                if (isDataTypeString(f.dataType)) {
+                    return formatStringInClause(f.comparisonValue);
+                } else {
+                    return f.comparisonOperator;
+                }
+            } else if (isDataTypeString(f.dataType) || isDataTypeDateTime(f.dataType)) {
+                return "'" + f.comparisonValue + "'";
+            } else {
+                return f.comparisonValue;
+            }
+        } else if (UNARY_COMPARISON_OPERATORS.includes(f.comparisonOperator)) {
+            return "";
+        } else {
+            return "?";
+        }
+    };
+        
+    const getWhereColumns = () => {
+        return filterColumns.map(f => {
+            return <pre className="sql-clause-column">{"    " 
+                + getAndOr(f) 
+                + getOpenParenthesis(f)  
+                + f.tableAlias + "." + f.columnName 
+                + " " 
+                + f.comparisonOperator 
+                + " " 
+                + getComparisonValue(f)  
+                + getCloseParenthesis(f)}</pre>;
+        });
+    };
+
 
     return <div>
         <pre className="sql-clause-name">SELECT</pre>
@@ -100,8 +213,11 @@ const SqlDisplay = (props) => {
         <pre className="sql-clause-name">FROM</pre>
         { getFromColumns()}
         <pre className="sql-clause-name">WHERE</pre>
-        {isSqlOrderByRequired(selectColumns) && <pre className="sql-clause-name">ORDER BY</pre>}
+        { getWhereColumns()}
+        {isSqlOrderByRequired(selectColumns) && <pre className="sql-clause-name">ORDER BY</pre> }
+        {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
         {isSqlGroupByRequired(selectColumns) && <pre className="sql-clause-name">GROUP BY</pre>}
+        {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
     </div>;
 };
 

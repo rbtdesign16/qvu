@@ -139,7 +139,7 @@ const SqlDisplay = (props) => {
     
     const getAndOr = (f) => {
         if (f.andOr) {
-            return " " + f.andOr + " ";
+            return "    " + f.andOr + " ";
         } else {
             return "";
         }
@@ -166,14 +166,16 @@ const SqlDisplay = (props) => {
         let parts = input.split(",");
         
         let comma = "";
-        let retval = "";
+        let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
             retval += comma;
             retval += "'";
-            retval += parts[i];
+            retval += parts[i].trim();
             retval += "'";
             comma = ",";
         }
+        
+        retval += ")";
         
         return retval;
     };
@@ -182,12 +184,14 @@ const SqlDisplay = (props) => {
         let parts = input.split(",");
         
         let comma = "";
-        let retval = "";
+        let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
             retval += comma;
-            retval += getDateComparisonValue(f, dbtype);
+            retval += getDateComparisonValue(parts[i].trim(), dbtype);
             comma = ",";
         }
+        
+        retval += ")";
         
         return retval;
     };

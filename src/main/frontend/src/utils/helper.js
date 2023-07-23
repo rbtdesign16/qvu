@@ -75,8 +75,8 @@ export const JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE = 2014;
 export const OPEN_PARENTHESIS = ["", "(", "((", "((("];
 export const CLOSE_PARENTHESIS = ["", ")", "))", ")))"];
 export const AND_OR = ["and", "or"];
-export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", "in", "null", "not null", "like"];
-export const UNARY_COMPARISON_OPERATORS = ["null", "not null"];
+export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", "in", "is null", "is not null", "like"];
+export const UNARY_COMPARISON_OPERATORS = ["is null", "is not null"];
 
 export const NUMBER_AGGREATE_FUNCTIONS = ["min", "max", "sum", "avg", "count"];
 export const DATE_TIME_AGGREGATE_FUNCTIONS = ["min", "max", "count"];

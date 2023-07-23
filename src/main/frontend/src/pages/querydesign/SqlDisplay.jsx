@@ -26,7 +26,7 @@ const SqlDisplay = (props) => {
         fromClause,
         updateSelectColumns} = useQueryDesign();
 
-    const {getDatabaseType} = useDataHandler();
+    const { getDatabaseType } = useDataHandler();
     
     const getColumnName = (s) => {
         let retval = "";
@@ -128,7 +128,11 @@ const SqlDisplay = (props) => {
                 if (indx === 0) {
                     return <pre className="sql-clause-column">    <span className="crimson-f">{f.table}</span> {" " + f.alias}</pre>;
                 } else {
-                    return <pre className="sql-clause-column">       {joinType}<span className="crimson-f">{f.table}</span> {" " + f.alias + " ON " + getJoinColumns(f)}</pre>;
+                    return <pre className="sql-clause-column">
+                        {"    " + joinType}
+                    <span className="crimson-f">{f.table}</span>
+                    {" " + f.alias + " "}
+                    <span className="sql-clause-name">ON</span>{" " + getJoinColumns(f)}</pre>;
                 }
             });
         } else {
@@ -139,7 +143,7 @@ const SqlDisplay = (props) => {
     
     const getAndOr = (f) => {
         if (f.andOr) {
-            return "    " + f.andOr + " ";
+            return "    " + f.andOr.toUpperCase() + " ";
         } else {
             return "";
         }
@@ -231,21 +235,20 @@ const SqlDisplay = (props) => {
     const getWhereColumns = () => {
         return filterColumns.map(f => {
             if (f.customSql) {
-                return <pre className="sql-clause-column">{"    " 
-                   + getAndOr(f) 
-                   + getOpenParenthesis(f)  
-                   + f.customSql
-                   + getCloseParenthesis(f)}</pre>;
+                return <pre className="sql-clause-column">                     
+                    <span color="sql-clause-name">{getAndOr(f)}</span>
+                     {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}</pre>;
             } else { 
-                return <pre className="sql-clause-column">{"    " 
-                    + getAndOr(f) 
-                    + getOpenParenthesis(f)  
-                    + f.tableAlias + "." + f.columnName 
-                    + " " 
-                    + f.comparisonOperator 
-                    + " " 
-                    + getComparisonValue(f)  
-                    + getCloseParenthesis(f)}</pre>;
+                return <pre className="sql-clause-column">
+                    <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
+                    {getOpenParenthesis(f)  
+                      + f.tableAlias + "." + f.columnName 
+                      + " " 
+                      + f.comparisonOperator 
+                      + " " 
+                      + getComparisonValue(f)  
+                      + getCloseParenthesis(f)}
+                </pre>;
             }
         });
     };

@@ -19,6 +19,10 @@
     --sql-clause-column-font-size: 12pt;
     --sql-clause-column-font-weight: 600;
 
+    --sql-clause-oper-color: #FFC000;
+    --sql-clause-oper-font-size: 12pt;
+    --sql-clause-oper-font-weight: 600;
+
     --header-background: linear-gradient(90deg, rgba(0,245,255,1) 0%, rgba(66,209,226,1) 0%, rgba(12,22,87,1) 100%, rgba(0,0,0,1) 100%);;
     
     --footer-background-color: gainsboro;

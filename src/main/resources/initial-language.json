@@ -187,6 +187,7 @@
         "errorCode-5": "$1 document $2 not found",
         "Save Document": "Save $1 Document",
         "Document saved": "Document $1 saved",
-        "Saving document": "Saving document $1"
+        "Saving document": "Saving document $1",
+        "Copy sql to clipboard": "Copy sql to clipboard"
     }
 }

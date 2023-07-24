@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
+import {AiOutlineCopy} from "react-icons/ai";
 import useDataHandler from "../../context/DataHandlerContext";
 import {
     isSqlOrderByRequired,
@@ -16,7 +17,8 @@ import {
     DB_TYPE_MYSQL,
     DB_TYPE_SQLSERVER,
     DB_TYPE_ORACLE,
-    DB_TYPE_POSTGRES
+    DB_TYPE_POSTGRES,
+    MEDIUM_ICON_SIZE
 } from "../../utils/helper";
 
 const SqlDisplay = (props) => {
@@ -25,7 +27,7 @@ const SqlDisplay = (props) => {
         filterColumns, 
         fromClause,
         updateSelectColumns} = useQueryDesign();
-
+    const {getText } = useLang();
     const { getDatabaseType } = useDataHandler();
     
     const getColumnName = (s) => {
@@ -256,8 +258,25 @@ const SqlDisplay = (props) => {
         });
     };
 
+    const copySqlToClipboard = () => {
+        window.getSelection().selectAllChildren(
+            document.getElementById("sql-display")
+        );
 
-    return <div>
+        document.execCommand('copy');
+        
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+            document.selection.empty();
+        }
+    };
+
+    return <div id="sql-display">
+        <span style={{float: "right", marginRight: "30px"}} title={getText("Copy sql to clipboard")}>
+            <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
+        </span>
+
         <div className="sql-clause-name">SELECT</div>
         { getSelectColumns()}
         <div className="sql-clause-name">FROM</div>

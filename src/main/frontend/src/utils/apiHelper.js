@@ -312,4 +312,15 @@ export const loadDatasourceTableNames = async (datasource) => {
     }
 };
 
+export const saveDocument = async (d) => {
+    try {
+        let res = await axios.post(getApiURL() + "/document/save", d, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 

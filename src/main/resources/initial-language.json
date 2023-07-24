@@ -165,8 +165,6 @@
         "Copy column name": "Copy column name",
         "Table Alias:": "Table Alias:",
         "Show in Results":"Show in Results",
-        "Save Query Document": "Save Query Document",
-        
         "Add group": "Add group",
         "Create new group": "Create new group",
         "Update group": "Update group",
@@ -186,6 +184,9 @@
         "Roles": "Roles",
         "Datasources": "Datasources",
         "Users": "Users",
-        "errorCode-5": "$1 document $2 not found"
+        "errorCode-5": "$1 document $2 not found",
+        "Save Document": "Save $1 Document",
+        "Document saved": "Document $1 saved",
+        "Saving document": "Saving document $1"
     }
 }

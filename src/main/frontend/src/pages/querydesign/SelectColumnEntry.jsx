@@ -7,6 +7,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
 import useHelp from "../../context/HelpContext";
+import NumberEntry from "../../widgets/NumberEntry";
 import { MdHelpOutline } from "react-icons/md";
 import {AiOutlineFileAdd, AiOutlineDelete, AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineCopy} from "react-icons/ai";
 import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType} from "../../utils/helper";
@@ -207,7 +208,7 @@ const SelectColumnEntry = (props) => {
             <div style={{paddingLeft: "10px"}} ><input type="checkbox" name="showInResults" defaultChecked={selectColumns[index].showInResults} onChange={e => onChange(e)}/><label className="ck-label">{getText("Show in Results")}</label></div>
             <div className="entrygrid-selcolentry">
                 <div className="label">{getText("Display Name:")}</div><div className="data-field"><input type="text" name="displayName" size={20} defaultValue={selectColumns[index].displayName} onChange={e => onChange(e)}/></div>
-                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><input type="number" name="sortPosition"  defaultValue={(selectColumns[index].sortPosition) > 0 ? selectColumns[index].sortPosition : ""} onChange={e => onChange(e)}/></div>
+                <div className="label">{getText("Sort Position:")}</div><div className="data-field"><NumberEntry min={1} max={20} name="sortPosition"  defaultValue={(selectColumns[index].sortPosition) > 0 ? selectColumns[index].sortPosition : ""} onChange={e => onChange(e)}/></div>
                 <div className="label">{getText("Asc/Desc:")}</div><div className="data-field"><select name="sortDirection"  onChange={e => onChange(e)}><option selected={!selectColumns[index].sortDirection} value=""></option>{getSortDirection()}</select></div>
                 <div className="label">{getText("Function:")}</div><div className="data-field"><select name="aggregateFunction"  onChange={e => onChange(e)}><option selected={!selectColumns[index].aggregateFunction} value=""></option>{getAggregateFunctions()}</select></div>
             </div>

@@ -17,10 +17,9 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.InitialSetup;
-import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QuerySelectNode;
-import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
@@ -185,18 +184,12 @@ public class MainController {
         return service.getDatasourceTableNames(datasourceName);
     }
 
-    @PostMapping("api/v1/document/query/save")
-    public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc) {
-        LOG.debug("in saveQueryDocument()");
-        return service.saveQueryDocument(doc);
+    @PostMapping("api/v1/document/save")
+    public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper doc) {
+        LOG.debug("in saveDocument()");
+        return service.saveDocument(doc);
     }
     
-    @PostMapping("api/v1/document/report/save")
-    public OperationResult<ReportDocument> saveReportDocument(@RequestBody ReportDocument doc) {
-        LOG.debug("in saveReportDocument()");
-        return service.saveReportDocument(doc);
-    }
-
     @DeleteMapping("api/v1/document/delete/{type}/{group}/{name}")
     public OperationResult deleteDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
         return service.deleteDocument(type, group, name);

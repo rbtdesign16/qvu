@@ -26,7 +26,7 @@ public class QueryDocument {
     private boolean newRecord;
     private List<SqlSelectColumn> selectColumns = new ArrayList<>();
     private List<SqlFilterColumn> filterColumns = new ArrayList<>();
-    private List<SqlFrom> fromRecords = new ArrayList<>();
+    private List<SqlFrom> fromClause = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -84,12 +84,12 @@ public class QueryDocument {
         this.filterColumns = filterColumns;
     }
 
-    public List<SqlFrom> getFromRecords() {
-        return fromRecords;
+    public List<SqlFrom> getFromClause() {
+        return fromClause;
     }
 
-    public void setFromRecords(List<SqlFrom> fromRecords) {
-        this.fromRecords = fromRecords;
+    public void setFromClause(List<SqlFrom> fromClause) {
+        this.fromClause = fromClause;
     }
 
     public String getUpdatedBy() {
@@ -107,8 +107,6 @@ public class QueryDocument {
     public void setLastUpdated(Timestamp lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
-    
-    
 
     public String getPath() {
         return path;

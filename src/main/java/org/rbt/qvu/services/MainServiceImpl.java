@@ -40,6 +40,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
@@ -876,54 +877,51 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    @Override
     public OperationResult getDocument(String type, String group, String name) {
         return fileHandler.getDocument(type, group, name);
     }
 
     @Override
-    public OperationResult<QueryDocument> saveQueryDocument(@RequestBody QueryDocument doc) {
-        OperationResult retval = new OperationResult();
+    public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper docWrapper) {
+        OperationResult<DocumentWrapper> retval = new OperationResult();
         try {
-            User curuser = getCurrentUser();
-
-            if (doc.getCreateDate() == null) {
-                doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
-                doc.setCreatedBy(curuser.getName());
-            } else {
-                doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
-                doc.setUpdatedBy(curuser.getName());
+             if (docWrapper.getReportDocument() != null) {
+                ReportDocument doc = docWrapper.getReportDocument();
+                if (doc.getCreateDate() == null) {
+                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                    doc.setCreatedBy(docWrapper.getUserId());
+                } else {
+                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setUpdatedBy(docWrapper.getUserId());
+                }
+                
+                OperationResult<ReportDocument> opr = fileHandler.saveReportDocument(doc);
+                
+                docWrapper.setReportDocument(opr.getResult());
+                retval.setErrorCode(opr.getErrorCode());
+                retval.setMessage(opr.getMessage());
+            } else if (docWrapper.getQueryDocument() != null) {
+                QueryDocument doc = docWrapper.getQueryDocument();
+                if (doc.getCreateDate() == null) {
+                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                    doc.setCreatedBy(docWrapper.getUserId());
+                } else {
+                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setUpdatedBy(docWrapper.getUserId());
+                }
+                OperationResult<QueryDocument> opr = fileHandler.saveQueryDocument(doc);
+                docWrapper.setQueryDocument(opr.getResult());
+                retval.setErrorCode(opr.getErrorCode());
+                retval.setMessage(opr.getMessage());
             }
-
-            retval = fileHandler.saveQueryDocument(doc);
+                
+            retval.setResult(docWrapper);
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         }
 
         return retval;
-
-    }
-
-    @Override
-    public OperationResult<ReportDocument> saveReportDocument(@RequestBody ReportDocument doc) {
-        OperationResult retval = new OperationResult();
-        try {
-            User curuser = getCurrentUser();
-
-            if (doc.getCreateDate() == null) {
-                doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
-                doc.setCreatedBy(curuser.getName());
-            } else {
-                doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
-                doc.setUpdatedBy(curuser.getName());
-            }
-
-            retval = fileHandler.saveReportDocument(doc);
-        } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
-        }
-
-        return retval;
-
     }
 
     @Override

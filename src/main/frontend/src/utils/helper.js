@@ -9,6 +9,7 @@ export function confirm(confirmation, options = {}) {
 }
 
 export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^" < "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
+
 export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";
@@ -17,6 +18,11 @@ export const SUCCESS_MESSAGE_TIMEOUT = 5000;
 export const DEFAULT_SUCCESS_TITLE = "Success";
 export const DEFAULT_ERROR_TITLE = "Error";
 export const DEFAULT_WARN_TITLE = "Warning";
+
+export const DEFAULT_DOCUMENT_GROUP = "general";
+export const QUERY_DOCUMENT_TYPE = "query";
+export const REPORT_DOCUMENT_TYPE = "report";
+
 
 export const ERROR_BACKGROUND_COLOR = "pink";
 export const ERROR_TEXT_COLOR = "crimson";
@@ -42,28 +48,28 @@ export const BIG_ICON_SIZE = 25;
 export const NODE_TYPE_ROOT = "r";
 export const NODE_TYPE_TABLE = "t";
 export const NODE_TYPE_COLUMN = "c";
-export const NODE_TYPE_IMPORTED_FOREIGNKEY= "ifk";
-export const NODE_TYPE_EXPORTED_FOREIGNKEY= "efk";
-    
-export const JDBC_TYPE_TINYINT =  -6;
-export const JDBC_TYPE_SMALLINT=   5;
-export const JDBC_TYPE_INTEGER =   4;
-export const JDBC_TYPE_BIGINT  =  -5;
-export const JDBC_TYPE_REAL=   7;
-export const JDBC_TYPE_DOUBLE  =   8;
-export const JDBC_TYPE_NUMERIC =   2;
-export const JDBC_TYPE_DECIMAL =   3;
-export const JDBC_TYPE_CHAR=   1;
-export const JDBC_TYPE_VARCHAR =  12;
-export const JDBC_TYPE_LONGVARCHAR =  -1;
-export const JDBC_TYPE_DATE=  91;
-export const JDBC_TYPE_TIME=  92;
-export const JDBC_TYPE_TIMESTAMP   =  93;
-export const JDBC_TYPE_BINARY  =  -2;
-export const JDBC_TYPE_VARBINARY   =  -3;
-export const JDBC_TYPE_LONGVARBINARY   =  -4;
-export const JDBC_TYPE_BLOB= 2004;
-export const JDBC_TYPE_CLOB= 2005;
+export const NODE_TYPE_IMPORTED_FOREIGNKEY = "ifk";
+export const NODE_TYPE_EXPORTED_FOREIGNKEY = "efk";
+
+export const JDBC_TYPE_TINYINT = -6;
+export const JDBC_TYPE_SMALLINT = 5;
+export const JDBC_TYPE_INTEGER = 4;
+export const JDBC_TYPE_BIGINT = -5;
+export const JDBC_TYPE_REAL = 7;
+export const JDBC_TYPE_DOUBLE = 8;
+export const JDBC_TYPE_NUMERIC = 2;
+export const JDBC_TYPE_DECIMAL = 3;
+export const JDBC_TYPE_CHAR = 1;
+export const JDBC_TYPE_VARCHAR = 12;
+export const JDBC_TYPE_LONGVARCHAR = -1;
+export const JDBC_TYPE_DATE = 91;
+export const JDBC_TYPE_TIME = 92;
+export const JDBC_TYPE_TIMESTAMP = 93;
+export const JDBC_TYPE_BINARY = -2;
+export const JDBC_TYPE_VARBINARY = -3;
+export const JDBC_TYPE_LONGVARBINARY = -4;
+export const JDBC_TYPE_BLOB = 2004;
+export const JDBC_TYPE_CLOB = 2005;
 export const JDBC_TYPE_BOOLEAN = 16;
 export const JDBC_TYPE_NCHAR = -15;
 export const JDBC_TYPE_NVARCHAR = -9;
@@ -82,10 +88,14 @@ export const NUMBER_AGGREATE_FUNCTIONS = ["min", "max", "sum", "avg", "count"];
 export const DATE_TIME_AGGREGATE_FUNCTIONS = ["min", "max", "count"];
 export const STRING_AGGREATE_FUNCTIONS = ["count"];
 
- export const DB_TYPE_MYSQL = "MySQL";
- export const DB_TYPE_SQLSERVER = "Microsoft SQL Server";
- export const DB_TYPE_ORACLE = "Oracle";
- export const DB_TYPE_POSTGRES = "PostgreSQL";
+export const DB_TYPE_MYSQL = "MySQL";
+export const DB_TYPE_SQLSERVER = "Microsoft SQL Server";
+export const DB_TYPE_ORACLE = "Oracle";
+export const DB_TYPE_POSTGRES = "PostgreSQL";
+
+export const ALLOWED_NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "enter", "minus", "period", "arrowleft", "arrowright", "arrowup", "arrowdown", "backspace", "tab", "delete", "insert"];
+export const NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "minus"];
+export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
@@ -243,7 +253,7 @@ export const replaceTokens = (msg, tokens) => {
             msg = msg.replace("$" + (i + 1), tokens[i]);
         }
     }
-    
+
     return msg;
 };
 
@@ -257,7 +267,8 @@ export const intersection = (a, b) => {
 
 export const findInArray = (items, fieldName, value) => {
     if (items) {
-        for (let i = 0; i < items.length; ++i) {
+        for (let i = 0;
+        i < items.length; ++i) {
             if (items[i][fieldName] === value) {
                 return items[i];
             }
@@ -269,7 +280,7 @@ export const findInArray = (items, fieldName, value) => {
 export const getUUID = () => {
     return uuid();
 };
-    
+
 export const getAggregateFunctionsByDataType = (dataType) => {
     if (isDataTypeNumeric(dataType)) {
         return NUMBER_AGGREATE_FUNCTIONS;
@@ -283,35 +294,35 @@ export const getAggregateFunctionsByDataType = (dataType) => {
 
 export const isDataTypeNumeric = (type) => {
     return ((type === JDBC_TYPE_TINYINT)
-        || (type === JDBC_TYPE_SMALLINT)
-        || (type === JDBC_TYPE_INTEGER)
-        || (type === JDBC_TYPE_BIGINT)
-        || (type === JDBC_TYPE_REAL)
-        || (type === JDBC_TYPE_DOUBLE)
-        || (type === JDBC_TYPE_NUMERIC)
-        || (type === JDBC_TYPE_DECIMAL));
+            || (type === JDBC_TYPE_SMALLINT)
+            || (type === JDBC_TYPE_INTEGER)
+            || (type === JDBC_TYPE_BIGINT)
+            || (type === JDBC_TYPE_REAL)
+            || (type === JDBC_TYPE_DOUBLE)
+            || (type === JDBC_TYPE_NUMERIC)
+            || (type === JDBC_TYPE_DECIMAL));
 };
 
 export const isDataTypeDateTime = (type) => {
     return ((type === JDBC_TYPE_DATE)
-        || (type === JDBC_TYPE_TIME)
-        || (type === JDBC_TYPE_TIMESTAMP)
-        || (type === JDBC_TYPE_TIME_WITH_TIMEZONE)
-        || (type === JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE));
+            || (type === JDBC_TYPE_TIME)
+            || (type === JDBC_TYPE_TIMESTAMP)
+            || (type === JDBC_TYPE_TIME_WITH_TIMEZONE)
+            || (type === JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE));
 };
 
 
 export const isDataTypeString = (type) => {
-    return (( type === JDBC_TYPE_CHAR)
-        || (type === JDBC_TYPE_VARCHAR)
-        || (type === JDBC_TYPE_LONGVARCHAR)
-        || (type === JDBC_TYPE_CLOB)
-        || (type === JDBC_TYPE_NCHAR)
-        || (type === JDBC_TYPE_NVARCHAR)
-        || (type === JDBC_TYPE_LONGNVARCHAR)
-        || (type === JDBC_TYPE_NCLOB));
+    return ((type === JDBC_TYPE_CHAR)
+            || (type === JDBC_TYPE_VARCHAR)
+            || (type === JDBC_TYPE_LONGVARCHAR)
+            || (type === JDBC_TYPE_CLOB)
+            || (type === JDBC_TYPE_NCHAR)
+            || (type === JDBC_TYPE_NVARCHAR)
+            || (type === JDBC_TYPE_LONGNVARCHAR)
+            || (type === JDBC_TYPE_NCLOB));
 };
-    
+
 export const isDataTypeFloat = (type, decimalDigits) => {
     if ((type === JDBC_TYPE_REAL) || (type === JDBC_TYPE_DOUBLE)) {
         return true;
@@ -322,8 +333,9 @@ export const isDataTypeFloat = (type, decimalDigits) => {
 
 export const isSqlOrderByRequired = (selectColumns) => {
     if (selectColumns) {
-        for (let i = 0; i < selectColumns.length; ++i) {
-           if (selectColumns[i].sortPosition > 0) {
+        for (let i = 0;
+        i < selectColumns.length; ++i) {
+            if (selectColumns[i].sortPosition > 0) {
                 return true;
             }
         }
@@ -332,7 +344,7 @@ export const isSqlOrderByRequired = (selectColumns) => {
 
 export const isSqlGroupByRequired = (selectColumns) => {
     if (selectColumns) {
-        let agg= false;
+        let agg = false;
         let nonagg = false;
         for (let i = 0; i < selectColumns.length; ++i) {
             if (selectColumns[i].aggregateFunction) {
@@ -340,10 +352,38 @@ export const isSqlGroupByRequired = (selectColumns) => {
             } else {
                 nonagg = true;
             }
-            
+
             if (agg && nonagg) {
                 return true;
             }
         }
     }
+};
+
+export const isAlphanumeric = (str) => {
+    return /^[a-zA-Z0-9]+$/.test(str);
+};
+
+export const isAllowedNumericKey = (e) => {
+    let code = e.code.toLowerCase();
+    let val = e.target.value;
+    let pos = e.target.selectionStart;
+    if (code && (ALLOWED_NUMERIC_KEYS.includes(e.key) || ALLOWED_NUMERIC_KEYS.includes(code))) {
+        if (code === "period") {
+            return (!val.includes(".") && (pos > 0));
+        } else if (code === "minus") {
+            return isEmpty(val) || (!val.includes("-") && (pos === 0));
+        } else {
+            return true;
+        }
+    }
+};
+
+export const isNumericEntry = (e) => {
+    let code = e.code.toLowerCase();
+    return (code && (NUMERIC_KEYS.includes(e.key) || NUMERIC_KEYS.includes(code)));
+};
+
+export const isDigit = (e) => {
+    return DIGITS.includes(e.key);
 };

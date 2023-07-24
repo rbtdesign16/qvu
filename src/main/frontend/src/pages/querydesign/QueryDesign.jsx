@@ -13,23 +13,32 @@ import useDataHandler from "../../context/DataHandlerContext";
 import SelectColumnList from "./SelectColumnList";
 import QueryFilter from "./QueryFilter";
 import QuerySql from "./QuerySql";
+import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
-import {INFO,
-        WARN,
-        ERROR,
-        DEFAULT_ERROR_TITLE} from "../../utils/helper";
+import {
+    SUCCESS,
+    INFO,
+    WARN,
+    ERROR,
+    DEFAULT_ERROR_TITLE,
+    DEFAULT_DOCUMENT_GROUP,
+    QUERY_DOCUMENT_TYPE,
+    replaceTokens} from "../../utils/helper";
 
-import { getDatasourceTreeViewData, isApiError } from "../../utils/apiHelper"
+import { getDatasourceTreeViewData, 
+    isApiError,
+    saveDocument} from "../../utils/apiHelper"
 
 const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns} = useQueryDesign();
+    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns, baseTable, fromClause} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
+    const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
 
     const loadDatasourceOptions = () => {
         if (datasources) {
@@ -60,6 +69,47 @@ const QueryDesign = () => {
 
     const isSaveEnabled = () => {
         return  isValidSelectColumns() && isValidFilterColumns();
+    };
+    
+    const hideShowSave = () => {
+        setShowSaveDocument({show: false, type: QUERY_DOCUMENT_TYPE});
+    }
+    
+    const onSaveDocument = () => {
+        setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave});
+    };
+    
+    const saveQueryDocument = async (name, group) => {
+        let userId = authData.currentUser.userId;
+        let actionTimestamp = new Date().toISOString();
+        showMessage(INFO, replaceTokens(getText("Saving document", "..."), [name]), null, true);
+        let docWrapper = {
+            userId: authData.currentUser.userId,
+            actionTimestamp: actionTimestamp,
+            queryDocument: {
+                   name: name,
+                   createdBy: userId,
+                   updatedBy: userId,
+                   createDate: actionTimestamp,
+                   lastUpdated: actionTimestamp,
+                   datasource: datasource,
+                   baseTable: baseTable,
+                   documentGroupName: group,
+                   newRecord: true,
+                   selectColumns: selectColumns,
+                   filterColumns: filterColumns,
+                   fromClause: fromClause
+              }
+          };
+          
+          let res = await saveDocument(docWrapper);
+           if (isApiError(res)) {
+              showMessage(ERROR, res.message);
+          } else {
+              showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
+              hideShowSave();
+          }
+              
     };
     
     const onDatasourceChange = async (e) => {
@@ -105,6 +155,7 @@ const QueryDesign = () => {
                     <DataSelectTree/>
                 </SplitterPanel>
                 <SplitterPanel size={75} className="query-design-cont">
+                    <SaveDocumentModal config={showSaveDocument}/>
                     <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}}onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
                     <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
                         <Tab eventKey="dsel" title={getText("Data")}>

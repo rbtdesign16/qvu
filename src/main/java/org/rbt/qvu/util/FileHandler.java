@@ -539,7 +539,7 @@ public class FileHandler {
 
         securityConfig.setLastUpdated(System.currentTimeMillis());
 
-    // make sure all records are marked as not new
+        // make sure all records are marked as not new
         for (User u : securityConfig.getUsers()) {
             u.setNewRecord(false);
         }
@@ -587,21 +587,29 @@ public class FileHandler {
         OperationResult<QueryDocument> retval = new OperationResult();
 
         try {
-            File folder =  config.getDocumentGroupsFolder(doc.getDocumentGroupName());
+            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName());
             File originalFile = null;
-            
+
             // if new document group
-            if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName()) 
+            if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName())
                     && !doc.getSavedDocumentGroupName().equals(doc.getDocumentGroupName())) {
                 originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName()).getPath()
                         + File.separator + QUERY_FOLDER + File.separator + doc.getName());
             }
 
+            String fileName = folder.getPath() + File.separator + QUERY_FOLDER + File.separator + doc.getName();
+            if (!fileName.endsWith(".json")) {
+                fileName = fileName + ".json";
+            }
+
+            File docFile = new File(fileName);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
-            File docFile = new File(folder.getPath() + File.separator + QUERY_FOLDER + File.separator + doc.getName());
+            if (!docFile.getParentFile().exists()) {
+                docFile.getParentFile().mkdirs();
+            }
 
             if (doc.isNewRecord() && docFile.exists()) {
                 retval.setErrorCode(OperationResult.RECORD_EXISTS);
@@ -624,14 +632,20 @@ public class FileHandler {
 
             doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
 
-            try (FileOutputStream fos = new FileOutputStream(docFile); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                fos.write(getGson(true).toJson(doc).getBytes());
-                // if originalFile is not null then we need to delete it
-                // because we are storing document in new location
-                if (originalFile != null) {
-                    FileUtils.delete(originalFile);
+            if (docFile.exists()) {
+                try (FileOutputStream fos = new FileOutputStream(docFile); 
+                        FileChannel channel = fos.getChannel(); 
+                        FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(doc).getBytes());
+                    // if originalFile is not null then we need to delete it
+                    // because we are storing document in new location
+                    if (originalFile != null) {
+                        FileUtils.delete(originalFile);
+                    }
+
                 }
-                    
+            } else {
+                FileUtils.writeStringToFile(docFile, getGson(true).toJson(doc), "UTF-8");
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();
@@ -642,16 +656,16 @@ public class FileHandler {
 
         return retval;
     }
-    
+
     public OperationResult<ReportDocument> saveReportDocument(ReportDocument doc) {
         OperationResult<ReportDocument> retval = new OperationResult();
 
         try {
-            File folder =  config.getDocumentGroupsFolder(doc.getDocumentGroupName());
+            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName());
             File originalFile = null;
-            
+
             // if new document group
-            if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName()) 
+            if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName())
                     && !doc.getSavedDocumentGroupName().equals(doc.getDocumentGroupName())) {
                 originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName()).getPath()
                         + File.separator + REPORT_FOLDER + File.separator + doc.getName());
@@ -691,7 +705,7 @@ public class FileHandler {
                 if (originalFile != null) {
                     FileUtils.delete(originalFile);
                 }
-                    
+
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();
@@ -702,7 +716,6 @@ public class FileHandler {
 
         return retval;
     }
-
 
     public OperationResult deleteDocument(String type, String group, String name) {
         OperationResult retval = new OperationResult();

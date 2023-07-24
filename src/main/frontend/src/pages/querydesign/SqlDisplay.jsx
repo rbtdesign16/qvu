@@ -73,6 +73,7 @@ const SqlDisplay = (props) => {
         let comma = "";
         for (let i = 0; i < f.fromColumns.length; ++i) {
             retval += comma + f.alias  + "." + f.toColumns[i] + " = " + f.fromAlias + "." + f.fromColumns[i];
+            comma = ", ";
         }
         retval += ")\n";
         
@@ -204,7 +205,7 @@ const SqlDisplay = (props) => {
     const getDateComparisonValue = (f, dbtype) => {
         switch(dbtype) {
             case DB_TYPE_ORACLE:
-                return "TO_DATE('" + f.comparisonValue + "', 'YYYY_MM_DD')";
+                return "TO_DATE('" + f.comparisonValue + "', 'YYYY-MM-DD')";
             default:
                return  "'" + f.comparisonValue + "'";
        }       
@@ -220,8 +221,10 @@ const SqlDisplay = (props) => {
                 } else {    
                     return f.comparisonOperator;
                 }
-            } else if (isDataTypeString(f.dataType) || isDataTypeDateTime(f.dataType)) {
+            } else if (isDataTypeDateTime(f.dataType)) {
                 return getDateComparisonValue(f, getDatabaseType(f.datasource));
+            } else if (isDataTypeString(f.dataType)) {
+                return "'" + f.comparisonValue + "'";
             } else {
                 return f.comparisonValue;
             }

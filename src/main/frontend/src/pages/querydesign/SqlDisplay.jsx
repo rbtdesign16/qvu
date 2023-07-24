@@ -64,7 +64,7 @@ const SqlDisplay = (props) => {
                 comma = "";
             }
 
-            return <pre className="sql-clause-column">    {getColumnName(s) + getDisplayName(s) + comma}</pre>;
+            return <div className="sql-clause-column">    {getColumnName(s) + getDisplayName(s) + comma}</div>;
         });
     };
 
@@ -75,9 +75,9 @@ const SqlDisplay = (props) => {
             retval += comma + f.alias  + "." + f.toColumns[i] + " = " + f.fromAlias + "." + f.fromColumns[i];
             comma = ", ";
         }
-        retval += ")\n";
+        retval += ")";
         
-        return retval;
+        return <div className="sql-clause-column">{retval}</div>;
     };
 
     const getOrderBy = () => {
@@ -97,7 +97,7 @@ const SqlDisplay = (props) => {
             comma = ", ";
         });
 
-        return <pre className="sql-clause-column">{"    " + retval}</pre>;
+        return <div className="sql-clause-column">{"    " + retval}</div>;
     };
     
     const getGroupBy = () => {
@@ -110,9 +110,9 @@ const SqlDisplay = (props) => {
         
         return gb.map((c, indx) => {
             if (indx < (gb.length - 1)) {
-                return <pre className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName + ","}</pre>;
+                return <div className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName + ","}</div>;
             } else {
-                return <pre className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName}</pre>;
+                return <div className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName}</div>;
             }
         });
     };
@@ -127,13 +127,13 @@ const SqlDisplay = (props) => {
                 }
                 
                 if (indx === 0) {
-                    return <pre className="sql-clause-column">    <span className="crimson-f">{f.table}</span> {" " + f.alias}</pre>;
+                    return <div className="sql-clause-column">    <span className="crimson-f">{f.table}</span> {" " + f.alias}</div>;
                 } else {
-                    return <pre className="sql-clause-column">
+                    return <div className="sql-clause-column">
                         {"    " + joinType}
                     <span className="crimson-f">{f.table}</span>
                     {" " + f.alias + " "}
-                    <span className="sql-clause-name">ON</span>{" " + getJoinColumns(f)}</pre>;
+                    <span className="sql-clause-name">{"ON "}</span>{getJoinColumns(f)}</div>;
                 }
             });
         } else {
@@ -192,7 +192,7 @@ const SqlDisplay = (props) => {
         let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
             retval += comma;
-            retval += getDateComparisonValue(parts[i].trim(), dbtype);
+            retval += getDateComparisonValue(parts[i].trim(), dbType);
             comma = ",";
         }
         
@@ -202,8 +202,8 @@ const SqlDisplay = (props) => {
     };
 
     
-    const getDateComparisonValue = (f, dbtype) => {
-        switch(dbtype) {
+    const getDateComparisonValue = (f, dbType) => {
+        switch(dbType) {
             case DB_TYPE_ORACLE:
                 return "TO_DATE('" + f.comparisonValue + "', 'YYYY-MM-DD')";
             default:
@@ -258,15 +258,15 @@ const SqlDisplay = (props) => {
 
 
     return <div>
-        <pre className="sql-clause-name">SELECT</pre>
+        <div className="sql-clause-name">SELECT</div>
         { getSelectColumns()}
-        <pre className="sql-clause-name">FROM</pre>
+        <div className="sql-clause-name">FROM</div>
         { getFromColumns()}
-        <pre className="sql-clause-name">WHERE</pre>
+        <div className="sql-clause-name">WHERE</div>
         { getWhereColumns()}
-        {isSqlOrderByRequired(selectColumns) && <pre className="sql-clause-name">ORDER BY</pre> }
+        {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
         {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
-        {isSqlGroupByRequired(selectColumns) && <pre className="sql-clause-name">GROUP BY</pre>}
+        {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
         {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
     </div>;
 };

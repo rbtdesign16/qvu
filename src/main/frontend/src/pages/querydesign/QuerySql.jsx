@@ -6,18 +6,21 @@ import React, { useState } from 'react';
 import useMessage from "../../context/MessageContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
+import useQueryDesign from "../../context/QueryDesignContext";
 import SqlDisplay from "./SqlDisplay";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 
 const QuerySql = () => {
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const {splitter1Sizes} = useQueryDesign();
      const {showHelp} = useHelp();
-    return (<Splitter stateKey={"sql"} layout="vertical" stateStorage={"local"} guttorSize={8}>
-        <SplitterPanel minSize={5} size={75} className="flex align-items-center justify-content-center">
+     
+     return (<Splitter layout="vertical" stateKey={"sql"} stateStorage={"local"} guttorSize={8}>
+        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="sql-display-cont">
             <SqlDisplay/>
         </SplitterPanel>
-        <SplitterPanel size={25} className="query-design-cont">
+        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="flex align-items-center justify-content-center">
             <div>this is the sql results</div>
         </SplitterPanel>
     </Splitter>);

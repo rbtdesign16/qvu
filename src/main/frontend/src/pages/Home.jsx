@@ -79,7 +79,7 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
                 <Message/>
                 <Help/>
                 <Header version={version}/>
-                <div className="tab-container">
+                <div className="tab-container" style={{overflow: "hidden"}}>
                     { getBody() }
                 </div>
                 <Footer copyright={copyright} authData={authData} />

@@ -11,6 +11,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [selectColumns, setSelectColumns] = useState([]);
     const [filterColumns, setFilterColumns] = useState([]);
     const [fromClause, setFromClause] = useState(null);
+    const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
 
     const updateSelectColumns = async (scols) => {
         let cols = [];
@@ -310,7 +311,9 @@ export const QueryDesignProvider = ({ children }) => {
                     setSelectColumns,
                     setFilterColumns,
                     updateSelectColumns,
-                    formatPathForDisplay}}>
+                    formatPathForDisplay,
+                    splitter1Sizes,
+                    setSplitter1Sizes}}>
                 {children}
             </QueryDesignContext.Provider>
             );

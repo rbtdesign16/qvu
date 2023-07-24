@@ -34,7 +34,16 @@ import { getDatasourceTreeViewData,
 
 const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns, baseTable, fromClause} = useQueryDesign();
+    const {setTreeViewData, 
+        treeViewData, 
+        setDatasource, 
+        datasource, 
+        selectColumns, 
+        filterColumns, 
+        baseTable, 
+        fromClause,
+        splitter1Sizes,
+        setSplitter1Sizes} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -139,14 +148,19 @@ const QueryDesign = () => {
                 && (filterColumns.length > 0));
     };
     
+    
+    const onResizeEnd = (e) => {
+        setSplitter1Sizes(e.sizes);
+    };
+    
     useEffect(() => {
         setTreeViewData(null);
         setDatasource(null);
     }, [datasources]);
 
     return (
-            <Splitter stateKey={"qdesign"} stateStorage={"local"} guttorSize={8}>
-                <SplitterPanel minSize={5} size={25} className="flex align-items-center justify-content-center">
+            <Splitter onResizeEnd={onResizeEnd}  guttorSize={8}>
+                <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
                     <label className="ck-label">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                         <option value="" selected={!datasource}></option>                           
@@ -154,7 +168,7 @@ const QueryDesign = () => {
                     </select>
                     <DataSelectTree/>
                 </SplitterPanel>
-                <SplitterPanel size={75} className="query-design-cont">
+                <SplitterPanel size={splitter1Sizes[1]} className="query-design-cont">
                     <SaveDocumentModal config={showSaveDocument}/>
                     <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}}onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
                     <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">

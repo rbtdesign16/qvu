@@ -32,7 +32,7 @@ const SqlDisplay = (props) => {
         fromClause,
         updateSelectColumns,
         isParameterEntryRequired,
-        buildDocument} = useQueryDesign();
+        buildRunDocument} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
@@ -291,14 +291,14 @@ const SqlDisplay = (props) => {
     };
     
     const runQueryWithParameters = async (params) => {
-        let res = await runQuery(buildDocument(), params);
+        let res = await runQuery(buildRunDocument(), params);
     };
 
     const runQuery = async () => {
         if (isParameterEntryRequired()) {
             showParamEntry();
         } else {
-            let res = await runQuery(buildDocument());
+            let res = await runQuery(buildRunDocument());
         }
     };
     

@@ -19,6 +19,8 @@ import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QueryResult;
+import org.rbt.qvu.dto.QueryRunWrapper;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
@@ -198,6 +200,12 @@ public class MainController {
     @GetMapping("api/v1/document/{type}/{group}/{name}")
     public OperationResult getDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
         return service.getDocument(type, group, name);
+    }
+    
+    @PostMapping("api/v1/query/document/run")
+    public OperationResult<QueryResult> runQuery(@RequestBody QueryRunWrapper runWrapper) {
+        LOG.debug("in runQuery()");
+        return service.runQuery(runWrapper);
     }
 
 }

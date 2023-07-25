@@ -90,4 +90,7 @@ public class Constants {
     public static final String TABLE_CACHE_NAME = "table.cache";
     public static final String TABLE_SETTINGS_CACHE_NAME = "table.settings.cache";
     public static final int TABLE_CACHE_ENTRIES = 200;
+    
+    public static final String INNER_JOIN = "inner";
+    public static final String OUTER_JOIN = "outer";
 }

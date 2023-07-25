@@ -11,8 +11,9 @@ import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.InitialSetup;
+import org.rbt.qvu.dto.QueryResult;
+import org.rbt.qvu.dto.QueryRunWrapper;
 import org.rbt.qvu.dto.QuerySelectNode;
-import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
@@ -50,5 +51,7 @@ public interface MainService {
     public OperationResult getDocument(String type, String group, String name);
     public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper doc);
     public OperationResult deleteDocument(String type, String group, String name);
+    public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper);
+ 
 
 }

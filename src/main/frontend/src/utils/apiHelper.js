@@ -326,7 +326,7 @@ export const saveDocument = async (d) => {
 export const runQuery = async (doc, params) => {
     try {
         let runWrapper = {
-            parameterss: params,
+            parameters: params,
             document: doc
         }
         

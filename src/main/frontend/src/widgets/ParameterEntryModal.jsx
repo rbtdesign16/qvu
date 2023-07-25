@@ -75,9 +75,7 @@ const ParameterEntryModal = (props) => {
     };
     
     const onChange = (e) => {
-        console.log("----------->" + e.target.id);
         let indx = Number(e.target.id.replace("f-", ""));
-       console.log("----------->indx" + indx);
         
         let params = [...parameters];
         params[indx] = e.target.value;
@@ -93,10 +91,22 @@ const ParameterEntryModal = (props) => {
             </div>;
         });
     };
+    
+    const runQuery = () => {
+        let entryFields = getRequiredEntryFields();
+        let params = [];
+        for (let i = 0; i < parameters.length; ++i) {
+            params.push({
+                value: parameters[i],
+                dataType: entryFields[i].dataType
+            });
+        }
         
+        config.runQuery(params);
+    }
+    
     const onShow = () => {
         let entryFields = getRequiredEntryFields();
-        console.log("---------->" + JSON.stringify(entryFields));
         let params = [];
         for (let i = 0; i < entryFields.length; ++i) {
           params.push("");
@@ -123,7 +133,7 @@ const ParameterEntryModal = (props) => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>Cancel</Button>
-                        <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => config.runQuery(parameters)}>{getText("Run")}</Button>
+                        <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => runQuery()}>{getText("Run")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

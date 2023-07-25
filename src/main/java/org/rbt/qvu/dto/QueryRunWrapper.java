@@ -12,16 +12,17 @@ import java.util.List;
  * @author rbtuc
  */
 public class QueryRunWrapper {
-    private List<String> parameters = new ArrayList<>();
+    private List<QueryParameter> parameters = new ArrayList<>();
     private QueryDocument document;
 
-    public List<String> getParameters() {
+    public List<QueryParameter> getParameters() {
         return parameters;
     }
 
-    public void setParameters(List<String> parameters) {
+    public void setParameters(List<QueryParameter> parameters) {
         this.parameters = parameters;
     }
+
 
     public QueryDocument getDocument() {
         return document;

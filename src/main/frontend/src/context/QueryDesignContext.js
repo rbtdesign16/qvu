@@ -314,10 +314,15 @@ export const QueryDesignProvider = ({ children }) => {
         }
     };
         
-    const buildDocument = () => {
+    const buildRunDocument = (docname) => {
         return {
-        }
-    }
+           name: docname,
+           datasource: datasource,
+           selectColumns: selectColumns,
+           filterColumns: filterColumns,
+           fromClause: fromClause
+        };
+    };
     
     useEffect(() => {
         updateSelectColumns();
@@ -347,7 +352,7 @@ export const QueryDesignProvider = ({ children }) => {
                     setSplitter1Sizes,
                     isParameterEntryRequired,
                     getFilterComparisonInput,
-                    buildDocument}}>
+                    buildRunDocument}}>
                 {children}
             </QueryDesignContext.Provider>
             );

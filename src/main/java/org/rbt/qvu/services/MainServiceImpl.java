@@ -4,8 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +47,9 @@ import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
+import org.rbt.qvu.dto.QueryParameter;
+import org.rbt.qvu.dto.QueryResult;
+import org.rbt.qvu.dto.QueryRunWrapper;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.ReportDocument;
 import org.rbt.qvu.dto.Table;
@@ -927,6 +933,73 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult deleteDocument(String type, String group, String name) {
         return fileHandler.deleteDocument(type, group, name);
+    }
+
+    
+    private QueryResult getQueryResult(ResultSet res) throws SQLException {
+        QueryResult retval = new QueryResult();
+        
+        ResultSetMetaData rmd = res.getMetaData();
+        
+        for (int i = 0; i < rmd.getColumnCount(); ++i) {
+            retval.getHeader().add(rmd.getColumnName(i+1));
+            retval.getColumnTypes().add(rmd.getColumnType(i+1));
+        }
+        
+        while (res.next()) {
+            List<Object> row = new ArrayList<>();
+            
+            for (int i = 0; i < rmd.getColumnCount(); ++i) {
+                row.add(res.getObject(i));
+            }
+            
+            retval.getData().add(row);
+        }
+        
+        
+        return retval;
+    }
+    
+    public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
+        OperationResult<QueryResult> retval = new OperationResult<>();
+        
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet res = null;
+        
+        try {
+            conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
+            String sql = DBHelper.getSelect(runWrapper);
+            if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                stmt = ps;
+                for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
+                    QueryParameter p = runWrapper.getParameters().get(i);
+                    if (DBHelper.isDataTypeString(p.getDataType()) 
+                        || DBHelper.isDataTypeDateTime(p.getDataType())) {
+                        ps.setString(i+1, p.getValue());
+                    } else if (DBHelper.isDataTypeNumeric(p.getDataType())) {
+                    }
+                }
+                res = ps.executeQuery();
+            } else {
+                stmt = conn.createStatement();
+                res = stmt.executeQuery(sql);
+            }
+            
+            retval.setResult(getQueryResult(res));
+         }
+        
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Helper.populateResultError(retval, ex);
+        }
+        
+        finally {
+            DBHelper.closeConnection(conn, stmt, res);
+        }  
+        
+        return retval;
     }
 
 }

@@ -7,6 +7,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
 import useHelp from "../../context/HelpContext";
+import NumberEntry from "../../widgets/NumberEntry"
 import { MdHelpOutline } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import {
@@ -153,7 +154,7 @@ const FilterEntry = (props) => {
             if (isDataTypeString(filterColumns[index].dataType)) {
                 return <input type="text" name="comparisonValue" onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filterColumns[index].comparisonValue} />;
             } else if (isDataTypeNumeric(filterColumns[index].dataType)) {
-                return <input type="number" name="comparisonValue" onBlur={e => onChange(e)}  style={{width: "120px"}} defaultValue={filterColumns[index].comparisonValue} />;
+                return <NumberEntry name="comparisonValue" onChange={e => onChange(e)} defaultValue={filterColumns[index].comparisonValue} />;
             } else if (isDataTypeDateTime(filterColumns[index].dataType)) {
                 return <input type="date" name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%px"}}  defaultValue={filterColumns[index].comparisonValue}/>;
             }

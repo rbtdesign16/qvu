@@ -360,8 +360,23 @@ export const isSqlGroupByRequired = (selectColumns) => {
     }
 };
 
-export const isAlphanumeric = (str) => {
-    return /^[a-zA-Z0-9]+$/.test(str);
+
+export const isValidFilenameKey = (e) => {
+    if (isEmpty(e.target.value)) {
+        return isAlpha(e);
+    } else if (!isAlphanumeric(e) && (e.code.toLowerCase() !== "minus")) {
+        return false;
+    } else {
+        return true;
+    }
+};
+
+export const isAlpha = (e) => {
+    return /^[a-zA-Z]+$/.test(e.key);
+};
+
+export const isAlphanumeric = (e) => {
+    return /^[a-zA-Z0-9]+$/.test(e.key);
 };
 
 export const isAllowedNumericKey = (e) => {

@@ -188,6 +188,7 @@
         "Save Document": "Save $1 Document",
         "Document saved": "Document $1 saved",
         "Saving document": "Saving document $1",
-        "Copy sql to clipboard": "Copy sql to clipboard"
+        "Copy sql to clipboard": "Copy sql to clipboard",
+        "Run query": "Run query"
     }
 }

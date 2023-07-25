@@ -55,8 +55,8 @@ public class FileHandler {
     @Autowired
     private DataSources dbDatasources;
 
-    private final Gson gson = new Gson();
-    private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").disableHtmlEscaping().create();
+    private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").disableHtmlEscaping().create();
 
     public Gson getGson() {
         return getGson(false);

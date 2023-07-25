@@ -20,15 +20,11 @@ import {
     isNotEmpty} from "../utils/helper";
 
 
-const SaveDocumentModal = (props) => {
+const ParameterEntryModal = (props) => {
     const {config} = props;
-    const {authData} = useAuth();
-    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns, baseTable, fromClause} = useQueryDesign();
+    const {filterColumns} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
-    const {datasources, documentGroups} = useDataHandler();
-    const [documentName, setDocumentName] = useState(null);
-    const [groupName, setGroupName] = useState(DEFAULT_DOCUMENT_GROUP);
     
     const getTitle = () => {
         return replaceTokens(getText("Save Document"), [config.type]);
@@ -36,31 +32,18 @@ const SaveDocumentModal = (props) => {
     
     const onHide = () => {
         config.hide();
-    }
-    
-    const loadDocumentGroups = (e) => {
-        return documentGroups.map(g => {
-            if (groupName === g.name) {
-                return <option value={g.name} selected>{g.name}</option>;
-            } else {
-                return <option value={g.name}>{g.name}</option>;
-            }
-        });
     };
     
-    const setName = (e) => {
-        setDocumentName(e.targe.value);
-    };
-    
-    const isValidNameKey = (e) => {
-      if (!isValidFilenameKey(e)) {
-          e.preventDefault(e);
-      }   
-    };
-    
-    const canSave = () => {
+    const canRun = () => {
         return isNotEmpty(documentName) && isNotEmpty(groupName);
     };
+
+    const getParamterInputFields = () =>
+        return <div className="entrygrid-100-150">
+            return { getInputFields()}
+                            <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
+                            <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroup(e)}>{ loadDocumentGroups()}</select></div>
+        </div>
 
     return (
             <div className="static-modal">
@@ -74,6 +57,7 @@ const SaveDocumentModal = (props) => {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="entrygrid-100-150">
+                            { getParameterInputFields()}
                             <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
                             <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroup(e)}>{ loadDocumentGroups()}</select></div>
                         </div>

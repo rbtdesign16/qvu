@@ -7,29 +7,31 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
 import {AiOutlineCopy} from "react-icons/ai";
+import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import {
-    isSqlOrderByRequired,
-    isSqlGroupByRequired,
-    isDataTypeString,
-    isDataTypeDateTime,
-    UNARY_COMPARISON_OPERATORS,
-    DB_TYPE_MYSQL,
-    DB_TYPE_SQLSERVER,
-    DB_TYPE_ORACLE,
-    DB_TYPE_POSTGRES,
-    MEDIUM_ICON_SIZE
-} from "../../utils/helper";
+isSqlOrderByRequired,
+        isSqlGroupByRequired,
+        isDataTypeString,
+        isDataTypeDateTime,
+        UNARY_COMPARISON_OPERATORS,
+        DB_TYPE_MYSQL,
+        DB_TYPE_SQLSERVER,
+        DB_TYPE_ORACLE,
+        DB_TYPE_POSTGRES,
+        MEDIUM_ICON_SIZE,
+        isEmpty
+        } from "../../utils/helper";
 
 const SqlDisplay = (props) => {
     const {
-        selectColumns, 
-        filterColumns, 
+        selectColumns,
+        filterColumns,
         fromClause,
         updateSelectColumns} = useQueryDesign();
-    const {getText } = useLang();
-    const { getDatabaseType } = useDataHandler();
-    
+    const {getText} = useLang();
+    const {getDatabaseType} = useDataHandler();
+
     const getColumnName = (s) => {
         let retval = "";
 
@@ -45,19 +47,19 @@ const SqlDisplay = (props) => {
 
         return retval;
     };
-    
-    
+
+
     const getDisplayName = (s) => {
         let retval = "";
-        
+
         if (s.displayName) {
             retval += (" AS \"" + s.displayName + "\"");
         }
-        
+
         return retval;
     }
-        
-        
+
+
     const getSelectColumns = () => {
         return selectColumns.map((s, indx) => {
             let comma = ",";
@@ -74,11 +76,11 @@ const SqlDisplay = (props) => {
         let retval = "(";
         let comma = "";
         for (let i = 0; i < f.fromColumns.length; ++i) {
-            retval += comma + f.alias  + "." + f.toColumns[i] + " = " + f.fromAlias + "." + f.fromColumns[i];
+            retval += comma + f.alias + "." + f.toColumns[i] + " = " + f.fromAlias + "." + f.fromColumns[i];
             comma = ", ";
         }
         retval += ")";
-        
+
         return <div className="sql-clause-column">{retval}</div>;
     };
 
@@ -92,7 +94,7 @@ const SqlDisplay = (props) => {
         }
 
         let comma = "";
-        
+
         ob.sort((a, b) => a.sortPosition - b.sortPosition);
         ob.map(s => {
             retval += (comma + s.tableAlias + "." + s.columnName + (s.sortDirection === "desc" ? " desc" : ""));
@@ -101,7 +103,7 @@ const SqlDisplay = (props) => {
 
         return <div className="sql-clause-column">{"    " + retval}</div>;
     };
-    
+
     const getGroupBy = () => {
         let gb = [];
         for (let i = 0; i < selectColumns.length; ++i) {
@@ -109,7 +111,7 @@ const SqlDisplay = (props) => {
                 gb.push(selectColumns[i]);
             }
         }
-        
+
         return gb.map((c, indx) => {
             if (indx < (gb.length - 1)) {
                 return <div className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName + ","}</div>;
@@ -121,21 +123,21 @@ const SqlDisplay = (props) => {
 
     const getFromColumns = () => {
         if (fromClause && Array.isArray(fromClause)) {
-             return fromClause.map((f, indx) => {
+            return fromClause.map((f, indx) => {
                 let joinType = " join ";
-                
+
                 if (f.joinType === "outer") {
                     joinType = " left outer join ";
                 }
-                
+
                 if (indx === 0) {
                     return <div className="sql-clause-column">    <span className="crimson-f">{f.table}</span> {" " + f.alias}</div>;
                 } else {
                     return <div className="sql-clause-column">
                         {"    " + joinType}
-                    <span className="crimson-f">{f.table}</span>
-                    {" " + f.alias + " "}
-                    <span className="sql-clause-name">{"ON "}</span>{getJoinColumns(f)}</div>;
+                        <span className="crimson-f">{f.table}</span>
+                        {" " + f.alias + " "}
+                        <span className="sql-clause-name">{"ON "}</span>{getJoinColumns(f)}</div>;
                 }
             });
         } else {
@@ -143,7 +145,7 @@ const SqlDisplay = (props) => {
         }
 
     };
-    
+
     const getAndOr = (f) => {
         if (f.andOr) {
             return "    " + f.andOr.toUpperCase() + " ";
@@ -151,8 +153,8 @@ const SqlDisplay = (props) => {
             return "";
         }
     };
-    
-    
+
+
     const getOpenParenthesis = (f) => {
         if (f.openParenthesis) {
             return f.openParenthesis;
@@ -160,7 +162,7 @@ const SqlDisplay = (props) => {
             return "";
         }
     };
-    
+
     const getCloseParenthesis = (f) => {
         if (f.closeParenthesis) {
             return f.closeParenthesis;
@@ -168,10 +170,10 @@ const SqlDisplay = (props) => {
             return "";
         }
     };
-    
+
     const formatStringInClause = (input) => {
         let parts = input.split(",");
-        
+
         let comma = "";
         let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
@@ -181,15 +183,15 @@ const SqlDisplay = (props) => {
             retval += "'";
             comma = ",";
         }
-        
+
         retval += ")";
-        
+
         return retval;
     };
-    
+
     const formatDateInClause = (input, dbType) => {
         let parts = input.split(",");
-        
+
         let comma = "";
         let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
@@ -197,30 +199,30 @@ const SqlDisplay = (props) => {
             retval += getDateComparisonValue(parts[i].trim(), dbType);
             comma = ",";
         }
-        
+
         retval += ")";
-        
+
         return retval;
     };
 
-    
+
     const getDateComparisonValue = (f, dbType) => {
-        switch(dbType) {
+        switch (dbType) {
             case DB_TYPE_ORACLE:
                 return "TO_DATE('" + f.comparisonValue + "', 'YYYY-MM-DD')";
             default:
-               return  "'" + f.comparisonValue + "'";
-       }       
+                return  "'" + f.comparisonValue + "'";
+        }
     };
-    
+
     const getComparisonValue = (f) => {
-         if (f.comparisonValue) {
+        if (f.comparisonValue) {
             if (f.comparisonOperator === "in") {
                 if (isDataTypeString(f.dataType)) {
                     return formatStringInClause(f.comparisonValue);
                 } else if (isDataTypeDateTime(f.dataType)) {
                     return formatDateInClause(f.comparisonValue, getDatabaseType(f.datasource));
-                } else {    
+                } else {
                     return f.comparisonOperator;
                 }
             } else if (isDataTypeDateTime(f.dataType)) {
@@ -236,57 +238,76 @@ const SqlDisplay = (props) => {
             return "?";
         }
     };
-        
+
     const getWhereColumns = () => {
         return filterColumns.map(f => {
             if (f.customSql) {
                 return <pre className="sql-clause-column">                     
-                    <span color="sql-clause-name">{getAndOr(f)}</span>
-                     {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}</pre>;
-            } else { 
+                                <span color="sql-clause-name">{getAndOr(f)}</span>
+                                 {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}</pre>;
+            } else {
                 return <pre className="sql-clause-column">
-                    <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
-                    {getOpenParenthesis(f)  
-                      + f.tableAlias + "." + f.columnName 
-                      + " " 
-                      + f.comparisonOperator 
-                      + " " 
-                      + getComparisonValue(f)  
-                      + getCloseParenthesis(f)}
-                </pre>;
+                                <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
+                                {getOpenParenthesis(f)
+                                                + f.tableAlias + "." + f.columnName
+                                                + " "
+                                                + f.comparisonOperator
+                                                + " "
+                                                + getComparisonValue(f)
+                                                + getCloseParenthesis(f)}
+            </pre>;
             }
         });
     };
 
     const copySqlToClipboard = () => {
         window.getSelection().selectAllChildren(
-            document.getElementById("sql-display")
-        );
+                document.getElementById("sql-display")
+                );
 
         document.execCommand('copy');
-        
+
         if (window.getSelection) {
             window.getSelection().removeAllRanges();
         } else if (document.selection) {
             document.selection.empty();
         }
     };
+    
+    const isParameterEntryRequired = () => {
+        for (let i = 0; i < filterColumns.length; ++i) {
+            if (!UNARY_COMPARISON_OPERATORS.includes(filterColumns[i].comparisonOperator) && isEmpty(filterColumns[i].comparisonValue)) {
+                return true;
+            }
+        }
+    }
+    
+    const runQuery = () => {
+        if (isParameterEntryRequired()) {
+            alert("parameter input required");
+        } else {
+        }
+    }
 
     return <div id="sql-display">
-        <span style={{float: "right", marginRight: "30px"}} title={getText("Copy sql to clipboard")}>
-            <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
+        <span style={{float: "right", marginRight: "30px"}}>
+            <span  title={getText("Copy sql to clipboard")} style={{marginRight: "10px"}}>
+                <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
+            </span>
+            <span  title={getText("Run query")} >
+                <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runQuery()} />
+            </span>
         </span>
-
         <div className="sql-clause-name">SELECT</div>
-        { getSelectColumns()}
+            { getSelectColumns()}
         <div className="sql-clause-name">FROM</div>
-        { getFromColumns()}
+            { getFromColumns()}
         <div className="sql-clause-name">WHERE</div>
-        { getWhereColumns()}
-        {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
-        {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
-        {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
-        {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
+            { getWhereColumns()}
+            {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
+            {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
+            {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
+            {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
     </div>;
 };
 

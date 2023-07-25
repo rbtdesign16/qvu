@@ -17,10 +17,7 @@ import {
     CLOSE_PARENTHESIS,
     AND_OR,
     COMPARISON_OPERATORS,
-    UNARY_COMPARISON_OPERATORS,
-    isDataTypeString,
-    isDataTypeNumeric,
-    isDataTypeDateTime
+    UNARY_COMPARISON_OPERATORS
 } from "../../utils/helper";
 
 const FilterEntry = (props) => {
@@ -32,7 +29,8 @@ const FilterEntry = (props) => {
         setFilterColumns,
         selectColumns,
         setSelectColumns,
-        formatPathForDisplay
+        formatPathForDisplay,
+        getFilterComparisonInput
     } = useQueryDesign();
 
     const COLUMN_DEFS = [
@@ -151,13 +149,7 @@ const FilterEntry = (props) => {
             filterColumns[index].comparisonValue = "";
             return <input type="text" name="comparisonValue" style={{width: "98%"}} disabled />;
         } else {
-            if (isDataTypeString(filterColumns[index].dataType)) {
-                return <input type="text" name="comparisonValue" onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filterColumns[index].comparisonValue} />;
-            } else if (isDataTypeNumeric(filterColumns[index].dataType)) {
-                return <NumberEntry name="comparisonValue" onChange={e => onChange(e)} defaultValue={filterColumns[index].comparisonValue} />;
-            } else if (isDataTypeDateTime(filterColumns[index].dataType)) {
-                return <input type="date" name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%px"}}  defaultValue={filterColumns[index].comparisonValue}/>;
-            }
+            return getFilterComparisonInput(filterColumns[index], index, onChange);
         }
     }
     

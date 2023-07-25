@@ -323,4 +323,20 @@ export const saveDocument = async (d) => {
     }
 };
 
+export const runQuery = async (doc, params) => {
+    try {
+        let runWrapper = {
+            parameterss: params,
+            document: doc
+        }
+        
+        let res = await axios.post(getApiURL() + "/query/document/run", runWrapper, hconfig);
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+};
+
 

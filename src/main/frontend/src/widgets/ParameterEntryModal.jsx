@@ -17,17 +17,19 @@ import {
     DEFAULT_DOCUMENT_GROUP, 
     MODAL_TITLE_SIZE,
     isValidFilenameKey,
-    isNotEmpty} from "../utils/helper";
+    isEmpty,
+    UNARY_COMPARISON_OPERATORS} from "../utils/helper";
 
 
 const ParameterEntryModal = (props) => {
     const {config} = props;
-    const {filterColumns} = useQueryDesign();
+    const {filterColumns, getFilterComparisonInput} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const [parameters, setParameters] = useState(null);
     
     const getTitle = () => {
-        return replaceTokens(getText("Save Document"), [config.type]);
+        return getText("Run query");
     };
     
     const onHide = () => {
@@ -35,44 +37,101 @@ const ParameterEntryModal = (props) => {
     };
     
     const canRun = () => {
-        return isNotEmpty(documentName) && isNotEmpty(groupName);
+        if (!parameters) {
+            return false;
+        } else {
+            for (let i = 0; i < parameters.length; ++i) {
+                if (isEmpty(parameters[i])) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     };
 
-    const getParamterInputFields = () =>
-        return <div className="entrygrid-100-150">
-            return { getInputFields()}
-                            <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
-                            <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroup(e)}>{ loadDocumentGroups()}</select></div>
-        </div>
-
+    const getRequiredEntryFields = () => {
+        let retval = [];
+        
+        for (let i = 0; i < filterColumns.length; ++i) {
+            if (!UNARY_COMPARISON_OPERATORS.includes(filterColumns[i].comparisonOperator) 
+                    && isEmpty(filterColumns[i].comparisonValue)) {
+                retval.push(filterColumns[i]);
+            }
+        }
+        return retval;
+    };
+    
+    const getLabel = (filter) => {
+        let txt = "";
+        
+        if (filter.andOr) {
+            txt += filter.andOr + " ";
+        }
+        
+        txt += filter.displayName + " " + filter.comparisonOperator;
+        
+        return <div className="label">{txt}</div>
+    };
+    
+    const onChange = (e) => {
+        console.log("----------->" + e.target.id);
+        let indx = Number(e.target.id.replace("f-", ""));
+       console.log("----------->indx" + indx);
+        
+        let params = [...parameters];
+        params[indx] = e.target.value;
+        
+        setParameters(params);
+    };
+    
+    const getParameterInputFields = () => {
+       let entryFields = getRequiredEntryFields();
+        return entryFields.map((f, indx) => { 
+            return <div className="entrygrid-225-150">
+                <div className="label">{getLabel(f)}</div><div>{getFilterComparisonInput(f, indx, onChange)}</div>
+            </div>;
+        });
+    };
+        
+    const onShow = () => {
+        let entryFields = getRequiredEntryFields();
+        console.log("---------->" + JSON.stringify(entryFields));
+        let params = [];
+        for (let i = 0; i < entryFields.length; ++i) {
+          params.push("");
+        }
+        
+         setParameters(params);
+    };
+    
     return (
             <div className="static-modal">
                 <Modal animation={false} 
                        show={config.show} 
                        onHide={onHide}
+                       onShow={onShow}
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="entrygrid-100-150">
+                        <div>
                             { getParameterInputFields()}
-                            <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
-                            <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroup(e)}>{ loadDocumentGroups()}</select></div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>Cancel</Button>
-                        <Button size="sm" variant="primary" disabled={!canSave()}  type="submit" onClick={() => config.saveDocument(documentName, groupName)}>{getText("Save")}</Button>
+                        <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => config.runQuery(parameters)}>{getText("Run")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
             );
 };
 
-SaveDocumentModal.propTypes = {
-    config: PropTypes.object.isRequired,
+ParameterEntryModal.propTypes = {
+    config: PropTypes.object.isRequired
 };
 
-export default SaveDocumentModal;
+export default ParameterEntryModal;

@@ -1,5 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-
+import {
+    UNARY_COMPARISON_OPERATORS,
+    isDataTypeString,
+    isDataTypeNumeric,
+    isDataTypeDateTime,
+    isEmpty
+    } from "../utils/helper";
+import NumberEntry from "../widgets/NumberEntry";
 export const QueryDesignContext = createContext();
 
 export const QueryDesignProvider = ({ children }) => {
@@ -288,6 +295,30 @@ export const QueryDesignProvider = ({ children }) => {
 
     };
 
+    const isParameterEntryRequired = () => {
+        for (let i = 0; i < filterColumns.length; ++i) {
+            if (!UNARY_COMPARISON_OPERATORS.includes(filterColumns[i].comparisonOperator) && isEmpty(filterColumns[i].comparisonValue)) {
+                return true;
+            }
+        }
+    };
+    
+    const getFilterComparisonInput = (filter, indx, onChange) => {
+        let id = "f-" + indx;
+        if (isDataTypeString(filter.dataType)) {
+            return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+        } else if (isDataTypeNumeric(filter.dataType)) {
+            return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
+        } else if (isDataTypeDateTime(filter.dataType)) {
+            return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
+        }
+    };
+        
+    const buildDocument = () => {
+        return {
+        }
+    }
+    
     useEffect(() => {
         updateSelectColumns();
     }, [selectedColumnIds]);
@@ -313,7 +344,10 @@ export const QueryDesignProvider = ({ children }) => {
                     updateSelectColumns,
                     formatPathForDisplay,
                     splitter1Sizes,
-                    setSplitter1Sizes}}>
+                    setSplitter1Sizes,
+                    isParameterEntryRequired,
+                    getFilterComparisonInput,
+                    buildDocument}}>
                 {children}
             </QueryDesignContext.Provider>
             );

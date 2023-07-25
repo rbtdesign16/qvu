@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {isAllowedNumericKey, isNumericEntry, isDigit} from "../utils/helper";
 
 const NumberEntry = (props) => {
-    const {name, onChange, defaultValue, min, max} = props;
+    const {name, onChange, defaultValue, min, max, id} = props;
 
     const onKey = (e) => {
         let ok = isAllowedNumericKey(e);
@@ -45,7 +45,7 @@ const NumberEntry = (props) => {
 
     return (
             <span>
-                <input type="text" min={min} max={max} 
+                <input id={id ? id : "ne"} type="text" min={min} max={max} 
                        name={name} style={{width: "90px"}} onKeyDown={e => onKey(e)} 
                        onBlur={e => onChange(e)} defaultValue={defaultValue}/>
             </span>

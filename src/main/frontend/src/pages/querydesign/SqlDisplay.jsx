@@ -9,6 +9,7 @@ import useHelp from "../../context/HelpContext";
 import {AiOutlineCopy} from "react-icons/ai";
 import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
+import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
 isSqlOrderByRequired,
         isSqlGroupByRequired,
@@ -22,15 +23,19 @@ isSqlOrderByRequired,
         MEDIUM_ICON_SIZE,
         isEmpty
         } from "../../utils/helper";
+import {runQuery} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
     const {
         selectColumns,
         filterColumns,
         fromClause,
-        updateSelectColumns} = useQueryDesign();
+        updateSelectColumns,
+        isParameterEntryRequired,
+        buildDocument} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
+    const [showParameterEntry, setShowParameterEntry] = useState({show: false});
 
     const getColumnName = (s) => {
         let retval = "";
@@ -57,7 +62,7 @@ const SqlDisplay = (props) => {
         }
 
         return retval;
-    }
+    };
 
 
     const getSelectColumns = () => {
@@ -242,20 +247,21 @@ const SqlDisplay = (props) => {
     const getWhereColumns = () => {
         return filterColumns.map(f => {
             if (f.customSql) {
-                return <pre className="sql-clause-column">                     
-                                <span color="sql-clause-name">{getAndOr(f)}</span>
-                                 {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}</pre>;
+                return <div className="sql-clause-column">                     
+                    <span color="sql-clause-name">{getAndOr(f)}</span>
+                     {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
+                </div>;
             } else {
-                return <pre className="sql-clause-column">
-                                <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
-                                {getOpenParenthesis(f)
-                                                + f.tableAlias + "." + f.columnName
-                                                + " "
-                                                + f.comparisonOperator
-                                                + " "
-                                                + getComparisonValue(f)
-                                                + getCloseParenthesis(f)}
-            </pre>;
+                return <div className="sql-clause-column">
+                    <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
+                    {getOpenParenthesis(f)
+                        + f.tableAlias + "." + f.columnName
+                        + " "
+                        + f.comparisonOperator
+                        + " "
+                        + getComparisonValue(f)
+                        + getCloseParenthesis(f)}
+                    </div>;           
             }
         });
     };
@@ -274,23 +280,31 @@ const SqlDisplay = (props) => {
         }
     };
     
-    const isParameterEntryRequired = () => {
-        for (let i = 0; i < filterColumns.length; ++i) {
-            if (!UNARY_COMPARISON_OPERATORS.includes(filterColumns[i].comparisonOperator) && isEmpty(filterColumns[i].comparisonValue)) {
-                return true;
-            }
-        }
-    }
     
-    const runQuery = () => {
-        if (isParameterEntryRequired()) {
-            alert("parameter input required");
-        } else {
-        }
-    }
+    
+    const hideParameterEntry = () => {
+        setShowParameterEntry({show: false});
+    };
+    
+    const showParamEntry = () => {
+        setShowParameterEntry({show: true, hide: hideParameterEntry, runQuery: runQueryWithParameters});
+    };
+    
+    const runQueryWithParameters = async (params) => {
+        let res = await runQuery(buildDocument(), params);
+    };
 
+    const runQuery = async () => {
+        if (isParameterEntryRequired()) {
+            showParamEntry();
+        } else {
+            let res = await runQuery(buildDocument());
+        }
+    };
+    
     return <div id="sql-display">
-        <span style={{float: "right", marginRight: "30px"}}>
+        <ParameterEntryModal config={showParameterEntry}/>
+        <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
             <span  title={getText("Copy sql to clipboard")} style={{marginRight: "10px"}}>
                 <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
             </span>

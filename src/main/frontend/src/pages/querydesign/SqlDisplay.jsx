@@ -21,8 +21,9 @@ isSqlOrderByRequired,
         DB_TYPE_ORACLE,
         DB_TYPE_POSTGRES,
         MEDIUM_ICON_SIZE,
-        isEmpty
-        } from "../../utils/helper";
+        isEmpty,
+        SQL_KEYWORDS
+} from "../../utils/helper";
 import {runQuery} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -248,48 +249,69 @@ const SqlDisplay = (props) => {
         return filterColumns.map(f => {
             if (f.customSql) {
                 return <div className="sql-clause-column">                     
-                    <span color="sql-clause-name">{getAndOr(f)}</span>
-                     {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
-                </div>;
+                <span color="sql-clause-name">{getAndOr(f)}</span>
+                {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
+            </div>;
             } else {
                 return <div className="sql-clause-column">
                     <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
                     {getOpenParenthesis(f)
-                        + f.tableAlias + "." + f.columnName
-                        + " "
-                        + f.comparisonOperator
-                        + " "
-                        + getComparisonValue(f)
-                        + getCloseParenthesis(f)}
-                    </div>;           
+                                                + f.tableAlias + "." + f.columnName
+                                                + " "
+                                                + f.comparisonOperator
+                                                + " "
+                                                + getComparisonValue(f)
+                                                + getCloseParenthesis(f)}
+                </div>;
             }
         });
     };
 
     const copySqlToClipboard = () => {
-        window.getSelection().selectAllChildren(
-                document.getElementById("sql-display")
-                );
+        window.getSelection().selectAllChildren(document.getElementById("sql-display"));
 
-        document.execCommand('copy');
+        let sql = window.getSelection().toString();
+
+        let lines = sql.split(/\r?\n|\r|\n/g);
 
         if (window.getSelection) {
             window.getSelection().removeAllRanges();
         } else if (document.selection) {
             document.selection.empty();
         }
+
+        let output = "";
+        for (let i = 0; i < lines.length; ++i) {
+           let l = lines[i].trim();
+            if (isSqlKeyword(l)) {
+                output += (l + "\n");
+            } else {
+                output += ("     " + l + "\n");
+            }
+        }
+  
+        navigator.clipboard.writeText(output);
+
     };
-    
-    
-    
+
+
+    const isSqlKeyword = (s) => {
+        for (let i = 0; i < SQL_KEYWORDS.length; ++i) {
+            if (s === SQL_KEYWORDS[i]) {
+                return true;
+            }
+        }
+    }
+
+
     const hideParameterEntry = () => {
         setShowParameterEntry({show: false});
     };
-    
+
     const showParamEntry = () => {
         setShowParameterEntry({show: true, hide: hideParameterEntry, runQuery: runQueryWithParameters});
     };
-    
+
     const runQueryWithParameters = async (params) => {
         let res = await runQuery(buildRunDocument(), params);
     };
@@ -301,7 +323,7 @@ const SqlDisplay = (props) => {
             let res = await runQuery(buildRunDocument());
         }
     };
-    
+
     return <div id="sql-display">
         <ParameterEntryModal config={showParameterEntry}/>
         <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
@@ -313,15 +335,15 @@ const SqlDisplay = (props) => {
             </span>
         </span>
         <div className="sql-clause-name">SELECT</div>
-            { getSelectColumns()}
+        { getSelectColumns()}
         <div className="sql-clause-name">FROM</div>
-            { getFromColumns()}
+        { getFromColumns()}
         <div className="sql-clause-name">WHERE</div>
-            { getWhereColumns()}
-            {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
-            {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
-            {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
-            {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
+        { getWhereColumns()}
+        {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
+        {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
+        {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
+        {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
     </div>;
 };
 

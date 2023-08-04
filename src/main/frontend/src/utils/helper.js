@@ -23,6 +23,7 @@ export const DEFAULT_DOCUMENT_GROUP = "general";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 
+export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY"];
 
 export const ERROR_BACKGROUND_COLOR = "pink";
 export const ERROR_TEXT_COLOR = "crimson";

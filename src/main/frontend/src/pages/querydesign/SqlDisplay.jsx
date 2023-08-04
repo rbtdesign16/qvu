@@ -11,18 +11,19 @@ import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
-isSqlOrderByRequired,
-        isSqlGroupByRequired,
-        isDataTypeString,
-        isDataTypeDateTime,
-        UNARY_COMPARISON_OPERATORS,
-        DB_TYPE_MYSQL,
-        DB_TYPE_SQLSERVER,
-        DB_TYPE_ORACLE,
-        DB_TYPE_POSTGRES,
-        MEDIUM_ICON_SIZE,
-        isEmpty,
-        SQL_KEYWORDS
+    isSqlOrderByRequired,
+    isSqlGroupByRequired,
+    isDataTypeString,
+    isDataTypeDateTime,
+    UNARY_COMPARISON_OPERATORS,
+    DB_TYPE_MYSQL,
+    DB_TYPE_SQLSERVER,
+    DB_TYPE_ORACLE,
+    DB_TYPE_POSTGRES,
+    MEDIUM_ICON_SIZE,
+    isEmpty,
+    SQL_KEYWORDS,
+    getQuotedIdentifier
 } from "../../utils/helper";
 import {runQuery} from "../../utils/apiHelper";
 
@@ -33,10 +34,13 @@ const SqlDisplay = (props) => {
         fromClause,
         updateSelectColumns,
         isParameterEntryRequired,
-        buildRunDocument} = useQueryDesign();
+        buildRunDocument, 
+        datasource} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
+    
+    let quotedIdentifier = getQuotedIdentifier(getDatabaseType(datasource));
 
     const getColumnName = (s) => {
         let retval = "";
@@ -45,7 +49,7 @@ const SqlDisplay = (props) => {
             retval += (s.aggregateFunction + "(");
         }
 
-        retval += (s.tableAlias + "." + s.columnName);
+        retval += (withQuotes(s.tableAlias) + "." + withQuotes(s.columnName));
 
         if (s.aggregateFunction) {
             retval += ")";
@@ -59,13 +63,16 @@ const SqlDisplay = (props) => {
         let retval = "";
 
         if (s.displayName) {
-            retval += (" AS \"" + s.displayName + "\"");
+            retval += (" AS " + withQuotes(s.displayName));
         }
 
         return retval;
     };
 
-
+    const withQuotes = (input) => {
+        return quotedIdentifier + input + quotedIdentifier;
+    };
+    
     const getSelectColumns = () => {
         return selectColumns.map((s, indx) => {
             let comma = ",";
@@ -82,7 +89,7 @@ const SqlDisplay = (props) => {
         let retval = "(";
         let comma = "";
         for (let i = 0; i < f.fromColumns.length; ++i) {
-            retval += comma + f.alias + "." + f.toColumns[i] + " = " + f.fromAlias + "." + f.fromColumns[i];
+            retval += comma + withQuotes(f.alias) + "." + withQuotes(f.toColumns[i]) + " = " + withQuotes(f.fromAlias) + "." + withQuotes(f.fromColumns[i]);
             comma = ", ";
         }
         retval += ")";
@@ -103,7 +110,7 @@ const SqlDisplay = (props) => {
 
         ob.sort((a, b) => a.sortPosition - b.sortPosition);
         ob.map(s => {
-            retval += (comma + s.tableAlias + "." + s.columnName + (s.sortDirection === "desc" ? " desc" : ""));
+            retval += (comma + withQuotes(s.tableAlias) + "." + withQuotes(s.columnName) + (s.sortDirection === "desc" ? " desc" : ""));
             comma = ", ";
         });
 
@@ -120,9 +127,9 @@ const SqlDisplay = (props) => {
 
         return gb.map((c, indx) => {
             if (indx < (gb.length - 1)) {
-                return <div className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName + ","}</div>;
+                return <div className="sql-clause-column">{"    " + withQuotes(c.tableAlias) + "." + withQuotes(c.columnName) + ","}</div>;
             } else {
-                return <div className="sql-clause-column">{"    " + c.tableAlias + "." + c.columnName}</div>;
+                return <div className="sql-clause-column">{"    " + withQuotes(c.tableAlias) + "." + withQuotes(c.columnName)}</div>;
             }
         });
     };
@@ -137,12 +144,12 @@ const SqlDisplay = (props) => {
                 }
 
                 if (indx === 0) {
-                    return <div className="sql-clause-column">    <span className="crimson-f">{f.table}</span> {" " + f.alias}</div>;
+                    return <div className="sql-clause-column">    <span className="crimson-f">{withQuotes(f.table)}</span> {" " + withQuotes(f.alias)}</div>;
                 } else {
                     return <div className="sql-clause-column">
                         {"    " + joinType}
-                        <span className="crimson-f">{f.table}</span>
-                        {" " + f.alias + " "}
+                        <span className="crimson-f">{withQuotes(f.table)}</span>
+                        {" " + withQuotes(f.alias) + " "}
                         <span className="sql-clause-name">{"ON "}</span>{getJoinColumns(f)}</div>;
                 }
             });
@@ -256,7 +263,7 @@ const SqlDisplay = (props) => {
                 return <div className="sql-clause-column">
                     <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
                     {getOpenParenthesis(f)
-                                                + f.tableAlias + "." + f.columnName
+                                                + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
                                                 + " "
                                                 + f.comparisonOperator
                                                 + " "
@@ -339,10 +346,10 @@ const SqlDisplay = (props) => {
         { getFromColumns()}
         <div className="sql-clause-name">WHERE</div>
         { getWhereColumns()}
-        {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
-        {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
         {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
         {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
+        {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
+        {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
     </div>;
 };
 

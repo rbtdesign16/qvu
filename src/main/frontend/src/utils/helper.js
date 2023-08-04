@@ -403,3 +403,15 @@ export const isNumericEntry = (e) => {
 export const isDigit = (e) => {
     return DIGITS.includes(e.key);
 };
+
+export const getQuotedIdentifier = (dbType) => {
+    
+    switch (dbType) {
+        case DB_TYPE_MYSQL:
+            return "`"; 
+        case DB_TYPE_SQLSERVER:
+        case DB_TYPE_ORACLE:
+        case DB_TYPE_POSTGRES:
+            return "\"";
+    }
+};

@@ -970,6 +970,8 @@ public class MainServiceImpl implements MainService {
         try {
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
             String sql = DBHelper.getSelect(runWrapper);
+            
+            
             if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 stmt = ps;

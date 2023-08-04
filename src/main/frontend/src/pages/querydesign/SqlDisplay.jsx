@@ -294,7 +294,6 @@ const SqlDisplay = (props) => {
 
     };
 
-
     const isSqlKeyword = (s) => {
         for (let i = 0; i < SQL_KEYWORDS.length; ++i) {
             if (s === SQL_KEYWORDS[i]) {

@@ -63,15 +63,7 @@ const ParameterEntryModal = (props) => {
     };
     
     const getLabel = (filter) => {
-        let txt = "";
-        
-        if (filter.andOr) {
-            txt += filter.andOr + " ";
-        }
-        
-        txt += filter.displayName + " " + filter.comparisonOperator;
-        
-        return <div className="label">{txt}</div>
+         return <div className="label">{filter.displayName + " " + filter.comparisonOperator}</div>;
     };
     
     const onChange = (e) => {
@@ -86,7 +78,7 @@ const ParameterEntryModal = (props) => {
     const getParameterInputFields = () => {
        let entryFields = getRequiredEntryFields();
         return entryFields.map((f, indx) => { 
-            return <div className="entrygrid-225-150">
+            return <div className="entrygrid-225-225">
                 <div className="label">{getLabel(f)}</div><div>{getFilterComparisonInput(f, indx, onChange)}</div>
             </div>;
         });

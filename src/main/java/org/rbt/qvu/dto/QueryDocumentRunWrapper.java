@@ -11,10 +11,9 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class QueryRunWrapper {
+public class QueryDocumentRunWrapper {
     private List<QueryParameter> parameters = new ArrayList<>();
-    private String documentName;
-    private String groupName;
+    private QueryDocument document;
 
     public List<QueryParameter> getParameters() {
         return parameters;
@@ -24,20 +23,15 @@ public class QueryRunWrapper {
         this.parameters = parameters;
     }
 
-    public String getDocumentName() {
-        return documentName;
+
+    public QueryDocument getDocument() {
+        return document;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
+    public void setDocument(QueryDocument document) {
+        this.document = document;
     }
-
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
+    
+    
+    
 }

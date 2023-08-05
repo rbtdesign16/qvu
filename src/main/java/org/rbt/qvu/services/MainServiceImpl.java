@@ -49,6 +49,7 @@ import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QueryParameter;
 import org.rbt.qvu.dto.QueryResult;
+import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.QueryRunWrapper;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.ReportDocument;
@@ -81,6 +82,9 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private FileHandler fileHandler;
 
+    @Autowired 
+    private DBHelper dbHelper;
+    
     private DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
     private CacheHelper cacheHelper = new CacheHelper();
@@ -194,7 +198,7 @@ public class MainServiceImpl implements MainService {
         Connection conn = null;
         ResultSet res = null;
         try {
-            conn = DBHelper.getConnection(datasource);
+            conn = dbHelper.getConnection(datasource);
             DatabaseMetaData dmd = conn.getMetaData();
             res = dmd.getSchemas();
         } catch (Exception ex) {
@@ -203,7 +207,7 @@ public class MainServiceImpl implements MainService {
                     Errors.getMessage(Errors.DB_CONNECTION_FAILED),
                     new String[]{datasource.getDatasourceName(), ex.toString()}));
         } finally {
-            DBHelper.closeConnection(conn, null, res);
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -499,7 +503,7 @@ public class MainServiceImpl implements MainService {
             retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
             retval.setMessage(ex.toString());
         } finally {
-            DBHelper.closeConnection(conn, null, res);
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -527,7 +531,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
     }
 
@@ -556,7 +560,7 @@ public class MainServiceImpl implements MainService {
                 }
             }
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
     }
 
@@ -590,7 +594,7 @@ public class MainServiceImpl implements MainService {
                 fk.getToColumns().add(toColumn);
             }
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
 
         return retval;
@@ -625,7 +629,7 @@ public class MainServiceImpl implements MainService {
                 fk.getToColumns().add(toColumn);
             }
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
 
         return retval;
@@ -655,7 +659,7 @@ public class MainServiceImpl implements MainService {
             }
 
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
 
         return retval;
@@ -727,7 +731,7 @@ public class MainServiceImpl implements MainService {
                 conn = qvuds.getConnection(datasourceName);
 
                 if (conn == null) {
-                    conn = DBHelper.getConnection(ds);
+                    conn = dbHelper.getConnection(ds);
                 }
 
                 DatabaseMetaData dmd = conn.getMetaData();
@@ -746,7 +750,7 @@ public class MainServiceImpl implements MainService {
         } catch (Exception ex) {
             Errors.populateError(retval, ex);
         } finally {
-            DBHelper.closeConnection(conn, null, res);
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -763,7 +767,7 @@ public class MainServiceImpl implements MainService {
             conn = qvuds.getConnection(ds.getDatasourceName());
 
             if (conn == null) {
-                conn = DBHelper.getConnection(ds);
+                conn = dbHelper.getConnection(ds);
             }
 
             Map<String, TableSettings> tamap = new HashMap();
@@ -798,7 +802,7 @@ public class MainServiceImpl implements MainService {
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         } finally {
-            DBHelper.closeConnection(conn, null, res);
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -815,7 +819,7 @@ public class MainServiceImpl implements MainService {
                 retval.add(res.getString(4));
             }
         } finally {
-            DBHelper.closeConnection(null, null, res);
+            dbHelper.closeConnection(null, null, res);
         }
 
         return retval;
@@ -832,7 +836,7 @@ public class MainServiceImpl implements MainService {
             conn = qvuds.getConnection(ds.getDatasourceName());
 
             if (conn == null) {
-                conn = DBHelper.getConnection(ds);
+                conn = dbHelper.getConnection(ds);
             }
 
             TableSettings tset = null;
@@ -877,7 +881,7 @@ public class MainServiceImpl implements MainService {
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         } finally {
-            DBHelper.closeConnection(conn, null, res);
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -959,8 +963,24 @@ public class MainServiceImpl implements MainService {
         
         return retval;
     }
-    
+
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
+        OperationResult<QueryDocument> res = fileHandler.getDocument(FileHandler.QUERY_FOLDER, runWrapper.getGroupName(), runWrapper.getDocumentName());
+    
+        if (res.isSuccess()) {
+            QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
+            wrapper.setDocument(res.getResult());
+            wrapper.setParameters(runWrapper.getParameters());
+            return runQuery(wrapper);
+        } else {
+            OperationResult<QueryResult> retval = new OperationResult<>();
+            retval.setErrorCode(res.getErrorCode());
+            retval.setMessage(res.getMessage());
+            return retval;
+        }
+    }
+    
+    public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
         OperationResult<QueryResult> retval = new OperationResult<>();
         
         Connection conn = null;
@@ -971,7 +991,7 @@ public class MainServiceImpl implements MainService {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(runWrapper.getDocument().getDatasource());
             runWrapper.getDocument().setDatabaseType(ds.getDatabaseType());
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
-            String sql = DBHelper.getSelect(runWrapper);
+            String sql = dbHelper.getSelect(runWrapper);
             
             
             if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
@@ -979,10 +999,10 @@ public class MainServiceImpl implements MainService {
                 stmt = ps;
                 for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
                     QueryParameter p = runWrapper.getParameters().get(i);
-                    if (DBHelper.isDataTypeString(p.getDataType()) 
-                        || DBHelper.isDataTypeDateTime(p.getDataType())) {
+                    if (dbHelper.isDataTypeString(p.getDataType()) 
+                        || dbHelper.isDataTypeDateTime(p.getDataType())) {
                         ps.setString(i+1, p.getValue());
-                    } else if (DBHelper.isDataTypeNumeric(p.getDataType())) {
+                    } else if (dbHelper.isDataTypeNumeric(p.getDataType())) {
                     }
                 }
                 res = ps.executeQuery();
@@ -1000,7 +1020,7 @@ public class MainServiceImpl implements MainService {
         }
         
         finally {
-            DBHelper.closeConnection(conn, stmt, res);
+            dbHelper.closeConnection(conn, stmt, res);
         }  
         
         return retval;

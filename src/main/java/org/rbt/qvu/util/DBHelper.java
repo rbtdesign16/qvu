@@ -109,6 +109,16 @@ public class DBHelper {
     public static Connection getConnection(DataSourceConfiguration datasource) throws Exception {
         return DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(), datasource.getPassword());
     }
+    
+    public static String withQuotes(String dbType, String input) {
+        StringBuilder retval = new StringBuilder();
+        
+        retval.append(getQuotedIdentifier(dbType));
+        retval.append(input);
+        retval.append(getQuotedIdentifier(dbType));
+        
+        return retval.toString();
+    }
 
     public static String getSelect(QueryRunWrapper runWrapper) {
         StringBuilder retval = new StringBuilder();
@@ -117,6 +127,7 @@ public class DBHelper {
 
         String comma = "";
 
+        String dbType = runWrapper.getDocument().getDatabaseType();
         boolean aggColumn = false;
         boolean nonAggColumn = false;
         List<SqlSelectColumn> orderBy = new ArrayList<>();
@@ -133,9 +144,9 @@ public class DBHelper {
                 } else {
                     nonAggColumn = true;
                 }
-                retval.append(c.getTableAlias());
+                retval.append(withQuotes(dbType, c.getTableAlias()));
                 retval.append(".");
-                retval.append(c.getColumnName());
+                retval.append(withQuotes(dbType, c.getColumnName()));
                 if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
                     retval.append(")");
                 }
@@ -159,27 +170,30 @@ public class DBHelper {
                 }
             }
 
-            retval.append(c.getTable());
+            retval.append(withQuotes(dbType, c.getTable()));
             retval.append(" ");
-            retval.append(c.getAlias());
-            retval.append(" on (");
+            retval.append(withQuotes(dbType, c.getAlias()));
+            
+            if ((c.getToColumns() != null) && !c.getToColumns().isEmpty()) {
+                retval.append(" on (");
 
-            for (int i = 0; i < c.getToColumns().size(); ++i) {
-                String toColumn = c.getToColumns().get(i);
-                String fromColumn = c.getToColumns().get(i);
+                for (int i = 0; i < c.getToColumns().size(); ++i) {
+                    String toColumn = c.getToColumns().get(i);
+                    String fromColumn = c.getToColumns().get(i);
 
-                retval.append(c.getAlias());
-                retval.append(".");
-                retval.append(toColumn);
+                    retval.append(withQuotes(dbType, c.getAlias()));
+                    retval.append(".");
+                    retval.append(withQuotes(dbType, toColumn));
 
-                retval.append(" = ");
+                    retval.append(" = ");
 
-                retval.append(c.getFromAlias());
-                retval.append(".");
-                retval.append(fromColumn);
+                    retval.append(withQuotes(dbType, c.getFromAlias()));
+                    retval.append(".");
+                    retval.append(withQuotes(dbType, fromColumn));
+                }
+
+                retval.append(")");
             }
-
-            retval.append(")");
         }
 
         retval.append(" where ");
@@ -195,16 +209,16 @@ public class DBHelper {
                 retval.append(c.getOpenParenthesis());
             }
             
-            retval.append(c.getTableAlias());
+            retval.append(withQuotes(dbType, c.getTableAlias()));
             retval.append(".");
-            retval.append(c.getColumnName());
+            retval.append(withQuotes(dbType, c.getColumnName()));
             retval.append(" ");
             
             retval.append(c.getComparisonOperator());
             retval.append(" ");
             
             if (!UNARY_OPERATORS_SET.contains(c.getComparisonOperator())) {
-                retval.append(getComparisonValue(c, indx));
+                retval.append(getComparisonValue(dbType, c, indx));
                 if (StringUtils.isEmpty(c.getComparisonValue())) {
                     indx++;
                 }
@@ -219,9 +233,9 @@ public class DBHelper {
             for (SqlSelectColumn c  : runWrapper.getDocument().getSelectColumns()) {
                 if (StringUtils.isEmpty(c.getAggregateFunction())) {
                     retval.append(comma);
-                    retval.append(c.getTableAlias());
+                    retval.append(withQuotes(dbType, c.getTableAlias()));
                     retval.append(".");
-                    retval.append(c.getColumnName());
+                    retval.append(withQuotes(dbType, c.getColumnName()));
                     comma = ", ";
                 }
             }
@@ -239,9 +253,9 @@ public class DBHelper {
             retval.append(" order by ");
             for (SqlSelectColumn c : orderBy) {
                 retval.append(comma);
-                retval.append(c.getTableAlias());
+                retval.append(withQuotes(dbType, c.getTableAlias()));
                 retval.append(".");
-                retval.append(c.getColumnName());
+                retval.append(withQuotes(dbType, c.getColumnName()));
                 retval.append(" ");
                 
                 if (StringUtils.isNotEmpty(c.getSortDirection())) {
@@ -260,14 +274,14 @@ public class DBHelper {
         return retval.toString();
     }
 
-    public static String getComparisonValue(SqlFilterColumn c, int indx) {
+    public static String getComparisonValue(String dbType, SqlFilterColumn c, int indx) {
         StringBuilder retval = new StringBuilder();
         if (StringUtils.isNotEmpty(c.getCustomSql())) {
             retval.append(c.getCustomSql());
         } else {
             if (isDataTypeString(c.getDataType())) {
                 if (StringUtils.isEmpty(c.getComparisonValue())) {
-                    retval.append(getDatabasePlaceholder(c.getDatasource(), indx));
+                    retval.append(getDatabasePlaceholder(dbType, indx));
                 } else {
                     retval.append("'");
                     retval.append(c.getComparisonValue());
@@ -275,15 +289,15 @@ public class DBHelper {
                 }
             } else if (isDataTypeNumeric(c.getDataType())) {
                 if (StringUtils.isEmpty(c.getComparisonValue())) {
-                    retval.append(getDatabasePlaceholder(c.getDatasource(), indx));
+                    retval.append(getDatabasePlaceholder(dbType, indx));
                 } else {
                     retval.append(c.getComparisonValue());
                 }
             } else if (isDataTypeDateTime(c.getDataType())) {
-                if (DB_TYPE_ORACLE.equals(c.getDatasource())) {
+                if (DB_TYPE_ORACLE.equals(dbType)) {
                     retval.append("TO_DATE(");
                     if (StringUtils.isEmpty(c.getComparisonValue())) {
-                        retval.append(getDatabasePlaceholder(c.getDatasource(), indx));
+                        retval.append(getDatabasePlaceholder(dbType, indx));
                     } else {
                         retval.append("'");
                         retval.append(c.getComparisonValue());
@@ -292,7 +306,7 @@ public class DBHelper {
                     retval.append(", 'YYYY-MM-DD')");
                 } else {
                     if (StringUtils.isEmpty(c.getComparisonValue())) {
-                        retval.append(getDatabasePlaceholder(c.getDatasource(), indx));
+                        retval.append(getDatabasePlaceholder(dbType, indx));
                     } else {
                         retval.append("'");
                         retval.append(c.getComparisonValue());
@@ -305,9 +319,9 @@ public class DBHelper {
         return retval.toString();
     }
     
-    public static String getDatabasePlaceholder(String datasource, int indx) {
+    public static String getDatabasePlaceholder(String dbType, int indx) {
         String retval = null;
-        switch(datasource) {
+        switch(dbType) {
             case DB_TYPE_ORACLE:
             case DB_TYPE_MYSQL:
             case DB_TYPE_SQLSERVER:
@@ -323,4 +337,17 @@ public class DBHelper {
         
         return retval;
     }
-}
+    
+    public static String getQuotedIdentifier(String dbType) {
+        switch (dbType) {
+            case DB_TYPE_MYSQL:
+                return "`"; 
+            case DB_TYPE_SQLSERVER:
+            case DB_TYPE_ORACLE:
+            case DB_TYPE_POSTGRES:
+                return "\"";
+            default:
+                return "\"";
+        }
+    }
+};

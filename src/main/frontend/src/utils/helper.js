@@ -405,7 +405,6 @@ export const isDigit = (e) => {
 };
 
 export const getQuotedIdentifier = (dbType) => {
-    
     switch (dbType) {
         case DB_TYPE_MYSQL:
             return "`"; 

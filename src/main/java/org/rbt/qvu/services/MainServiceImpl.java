@@ -968,6 +968,8 @@ public class MainServiceImpl implements MainService {
         ResultSet res = null;
         
         try {
+            DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(runWrapper.getDocument().getDatasource());
+            runWrapper.getDocument().setDatabaseType(ds.getDatabaseType());
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
             String sql = DBHelper.getSelect(runWrapper);
             

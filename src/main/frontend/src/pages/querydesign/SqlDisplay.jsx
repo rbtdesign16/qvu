@@ -11,20 +11,20 @@ import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
-    isSqlOrderByRequired,
-    isSqlGroupByRequired,
-    isDataTypeString,
-    isDataTypeDateTime,
-    UNARY_COMPARISON_OPERATORS,
-    DB_TYPE_MYSQL,
-    DB_TYPE_SQLSERVER,
-    DB_TYPE_ORACLE,
-    DB_TYPE_POSTGRES,
-    MEDIUM_ICON_SIZE,
-    isEmpty,
-    SQL_KEYWORDS,
-    getQuotedIdentifier
-} from "../../utils/helper";
+isSqlOrderByRequired,
+        isSqlGroupByRequired,
+        isDataTypeString,
+        isDataTypeDateTime,
+        UNARY_COMPARISON_OPERATORS,
+        DB_TYPE_MYSQL,
+        DB_TYPE_SQLSERVER,
+        DB_TYPE_ORACLE,
+        DB_TYPE_POSTGRES,
+        MEDIUM_ICON_SIZE,
+        isEmpty,
+        SQL_KEYWORDS,
+        getQuotedIdentifier
+        } from "../../utils/helper";
 import {runQuery} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -34,12 +34,12 @@ const SqlDisplay = (props) => {
         fromClause,
         updateSelectColumns,
         isParameterEntryRequired,
-        buildRunDocument, 
+        buildRunDocument,
         datasource} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
-    
+
     let quotedIdentifier = getQuotedIdentifier(getDatabaseType(datasource));
 
     const getColumnName = (s) => {
@@ -72,7 +72,7 @@ const SqlDisplay = (props) => {
     const withQuotes = (input) => {
         return quotedIdentifier + input + quotedIdentifier;
     };
-    
+
     const getSelectColumns = () => {
         return selectColumns.map((s, indx) => {
             let comma = ",";
@@ -289,14 +289,14 @@ const SqlDisplay = (props) => {
 
         let output = "";
         for (let i = 0; i < lines.length; ++i) {
-           let l = lines[i].trim();
+            let l = lines[i].trim();
             if (isSqlKeyword(l)) {
                 output += (l + "\n");
             } else {
                 output += ("     " + l + "\n");
             }
         }
-  
+
         navigator.clipboard.writeText(output);
 
     };
@@ -322,7 +322,7 @@ const SqlDisplay = (props) => {
         let res = await runQuery(buildRunDocument(), params);
     };
 
-    const runQuery = async () => {
+    const runLocalQuery = async () => {
         if (isParameterEntryRequired()) {
             showParamEntry();
         } else {
@@ -337,7 +337,7 @@ const SqlDisplay = (props) => {
                 <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
             </span>
             <span  title={getText("Run query")} >
-                <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runQuery()} />
+                <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runLocalQuery()} />
             </span>
         </span>
         <div className="sql-clause-name">SELECT</div>

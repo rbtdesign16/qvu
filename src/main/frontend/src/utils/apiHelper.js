@@ -328,9 +328,10 @@ export const runQuery = async (doc, params) => {
         let runWrapper = {
             parameters: params,
             document: doc
-        }
+        };
         
         let res = await axios.post(getApiURL() + "/query/document/run", runWrapper, hconfig);
+
         if (res) {
             return res.data;
         }

@@ -22,6 +22,7 @@ public class QueryDocument {
     private Timestamp createDate;
     private Timestamp lastUpdated;
     private String datasource;
+    private String databaseType;
     private String baseTable;
     private String savedDocumentGroupName;
     private String documentGroupName;
@@ -140,6 +141,14 @@ public class QueryDocument {
 
     public void setSavedDocumentGroupName(String savedDocumentGroupName) {
         this.savedDocumentGroupName = savedDocumentGroupName;
+    }
+
+    public String getDatabaseType() {
+        return databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
     }
     
     

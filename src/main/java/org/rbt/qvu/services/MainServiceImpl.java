@@ -948,13 +948,27 @@ public class MainServiceImpl implements MainService {
         for (int i = 0; i < rmd.getColumnCount(); ++i) {
             retval.getHeader().add(rmd.getColumnName(i+1));
             retval.getColumnTypes().add(rmd.getColumnType(i+1));
+            retval.getColumnWidths().add(0);
         }
+        
+        
         
         while (res.next()) {
             List<Object> row = new ArrayList<>();
             
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
-                row.add(res.getObject(i+1));
+                Object o = res.getObject(i+1);
+                
+                if (o != null) {
+                    Integer len = o.toString().length();
+                    Integer curLength = retval.getColumnWidths().get(i);
+                   
+                    if (len > curLength) {
+                        retval.getColumnWidths().set(i, len);
+                    }
+                }
+                
+                row.add(o);
             }
             
             retval.getData().add(row);

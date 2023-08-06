@@ -954,7 +954,7 @@ public class MainServiceImpl implements MainService {
             List<Object> row = new ArrayList<>();
             
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
-                row.add(res.getObject(i));
+                row.add(res.getObject(i+1));
             }
             
             retval.getData().add(row);

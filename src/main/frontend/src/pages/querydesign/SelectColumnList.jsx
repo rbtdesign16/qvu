@@ -6,9 +6,9 @@ import React, { useState } from 'react';
 import SelectColumnEntry from "./SelectColumnEntry";
 import useQueryDesign from "../../context/QueryDesignContext";
 
+
 const SelectColumnList = () => {
-    const {selectColumns, setSelectedColumns} = useQueryDesign();
-    
+    const {selectColumns, setSelectedColumns, selectedColumnIds} = useQueryDesign();
 
     const getColumnData = () => {
         if (selectColumns) {

@@ -85,6 +85,30 @@ export const QueryDesignProvider = ({ children }) => {
         }
 
         setFromClause(await buildFromRecords([...tablePathSet], cols));
+        
+        let pSet = new Set();
+        
+        for (let i = 0; i < cols.length; ++i) {
+            pSet.add(cols[i].path);
+        }
+        
+        if (filterColumns && (filterColumns.length > 0)) {
+            let fc = [];
+            for (let i = 0; i < filterColumns.length; ++i) {
+                if (pSet.has(filterColumns[i].path)) {
+                    fc.push(filterColumns[i]);
+                }
+            }
+            
+            if (filterColumns.length !== fc.length) {
+                if (fc.length > 0) {
+                    fc[0].andOr = "";
+                }
+                setFilterColumns(fc);
+            }
+        }
+        
+        
         setSelectColumns(cols);
     };
     

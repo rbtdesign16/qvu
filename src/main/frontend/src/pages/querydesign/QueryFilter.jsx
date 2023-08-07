@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
@@ -17,7 +17,8 @@ const QueryFilter = () => {
     const {selectColumns,
         filterColumns,
         setFilterColumns,
-        formatPathForDisplay} = useQueryDesign();
+        formatPathForDisplay, 
+        selectedColumnIds} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const [selectColumn, setSelectColumn] = useState(null);
@@ -68,6 +69,7 @@ const QueryFilter = () => {
     const loadFilterEntries = () => {
         return filterColumns.map((fc, indx) => <FilterEntry filterData={fc} index={indx}/>);
     };
+    
 
     return <div className="query-filter-panel">
         <div className="filter-header">

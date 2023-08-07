@@ -142,7 +142,7 @@ const DataSelectTree = (props) => {
         for (let i = 0; i < selectedTableIds.length; ++i) {
             treeViewData[selectedTableIds[i]].metadata.jointype = "";
         }
-    }
+    };
 
     const getSelectedTableIds = (ids) => {
         let tset = new Set();

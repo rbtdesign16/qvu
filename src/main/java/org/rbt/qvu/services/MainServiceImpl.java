@@ -994,6 +994,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    @Override
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
         OperationResult<QueryDocument> res = fileHandler.getDocument(FileHandler.QUERY_FOLDER, runWrapper.getGroupName(), runWrapper.getDocumentName());
 
@@ -1010,6 +1011,7 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+    @Override
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
         OperationResult<QueryResult> retval = new OperationResult<>();
 

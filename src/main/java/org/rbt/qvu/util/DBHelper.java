@@ -41,6 +41,11 @@ public class DBHelper {
     public static final String DB_TYPE_POSTGRES = "PostgreSQL";
     public static final String[] UNARY_OPERATORS = {"is not null", "is null"};
     public static final Set<String> UNARY_OPERATORS_SET = new HashSet<>();
+    public static final int DEFAULT_NUMBER_DISPLAY_COLUMN_WIDTH = 8;
+    public static final int DEFAULT_DATETIME_DISPLAY_COLUMN_WIDTH = 18;
+    public static final int DEFAULT_STRING_DISPLAY_COLUMN_WIDTH = 50;
+    public static final int DEFAULT_MAX_DISPLAY_COLUMN_WIDTH = 200;
+    public static final int DEFAULT_DISPLAY_COLUMN_WIDTH = 50;
 
     public static final String[] DATABASE_TYPES = {
         DBHelper.DB_TYPE_MYSQL,

@@ -82,9 +82,9 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private FileHandler fileHandler;
 
-    @Autowired 
+    @Autowired
     private DBHelper dbHelper;
-    
+
     private DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
     private CacheHelper cacheHelper = new CacheHelper();
@@ -110,7 +110,7 @@ public class MainServiceImpl implements MainService {
             boolean localUser = isLocalUser();
             retval.setAllowUserAdd(localUser);
             retval.setAllowUserDelete(localUser);
-            
+
             SecurityConfiguration scfg = config.getSecurityConfig();
             retval.setInitialSetupRequired(config.isInitialSetupRequired());
             SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
@@ -664,10 +664,10 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private boolean isLocalUser() {
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       return (auth.getPrincipal() instanceof User);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (auth.getPrincipal() instanceof User);
     }
 
     private User getCurrentUser() {
@@ -693,10 +693,10 @@ public class MainServiceImpl implements MainService {
     private SecurityConfiguration getSecurityConfig() {
         return config.getSecurityConfig();
     }
-    
+
     private User toUser(DefaultSaml2AuthenticatedPrincipal u) {
         User retval = getSecurityConfig().findUser(u.getName());
-        
+
         if (retval == null) {
             retval = new User();
             retval.setUserId(u.getName());
@@ -708,7 +708,7 @@ public class MainServiceImpl implements MainService {
 
     private User toUser(DefaultOAuth2User u) {
         User retval = getSecurityConfig().findUser(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
-        
+
         if (retval == null) {
             retval = new User();
             retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
@@ -896,7 +896,7 @@ public class MainServiceImpl implements MainService {
     public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper docWrapper) {
         OperationResult<DocumentWrapper> retval = new OperationResult();
         try {
-             if (docWrapper.getReportDocument() != null) {
+            if (docWrapper.getReportDocument() != null) {
                 ReportDocument doc = docWrapper.getReportDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
@@ -905,9 +905,9 @@ public class MainServiceImpl implements MainService {
                     doc.setLastUpdated(docWrapper.getActionTimestamp());
                     doc.setUpdatedBy(docWrapper.getUserId());
                 }
-                
+
                 OperationResult<ReportDocument> opr = fileHandler.saveReportDocument(doc);
-                
+
                 docWrapper.setReportDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
@@ -925,7 +925,7 @@ public class MainServiceImpl implements MainService {
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
             }
-                
+
             retval.setResult(docWrapper);
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
@@ -939,63 +939,64 @@ public class MainServiceImpl implements MainService {
         return fileHandler.deleteDocument(type, group, name);
     }
 
-    
     private QueryResult getQueryResult(ResultSet res) throws SQLException {
         QueryResult retval = new QueryResult();
-        
+
         ResultSetMetaData rmd = res.getMetaData();
-        
-        for (int i = 0; i < rmd.getColumnCount(); ++i) {
-            retval.getHeader().add(rmd.getColumnName(i+1));
-            retval.getColumnTypes().add(rmd.getColumnType(i+1));
-            retval.getInitialColumnWidth().add(0);
+
+        int[] cwidths = new int[rmd.getColumnCount()];
+        for (int i = 0; i < cwidths.length; ++i) {
+            retval.getHeader().add(rmd.getColumnName(i + 1));
+            retval.getColumnTypes().add(rmd.getColumnType(i + 1));
         }
-        
-        
-        int rowcnt = 0;
-        
+
         while (res.next()) {
             List<Object> row = new ArrayList<>();
-            
+
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
-                Object o = res.getObject(i+1);
+                Object o = res.getObject(i + 1);
                 if (o != null) {
-                    Integer len = o.toString().length();
-                    Integer cur = retval.getInitialColumnWidth().get(i);
-                   
-                    if (len > cur) {
-                        retval.getInitialColumnWidth().set(i, len + cur);
-                        rowcnt++;
-                    }
+                     cwidths[i] =  cwidths[i] + o.toString().length();
                 }
-                
+
                 row.add(o);
             }
-            
             retval.getData().add(row);
         }
-        
+
+        Integer rowcnt = retval.getData().size();
         if (rowcnt > 0) {
-            for (Integer i = 0; i < retval.getInitialColumnWidth().size(); ++i) {
-                double d = retval.getInitialColumnWidth().get(i);
-                Double avg = Math.ceil(d/rowcnt);
-                
+            for (Integer i = 0; i < cwidths.length; ++i) {
                 Integer hdrlen = (retval.getHeader().get(i).length() + 4);
-                if (avg.intValue() > hdrlen) {
-                    retval.getInitialColumnWidth().set(i, avg.intValue());
+
+                int type = retval.getColumnTypes().get(i);
+                if (dbHelper.isDataTypeDateTime(type)) {
+                    cwidths[i] = DBHelper.DEFAULT_DATETIME_DISPLAY_COLUMN_WIDTH;
+                } else if (dbHelper.isDataTypeNumeric(type)) {
+                    cwidths[i] = DBHelper.DEFAULT_NUMBER_DISPLAY_COLUMN_WIDTH;
+                } else if (dbHelper.isDataTypeString(type)) {
+                    int avg = cwidths[i] / rowcnt;
+                    if (avg == 0) {
+                        avg = hdrlen;
+                    }
+                    cwidths[i] = Math.min(avg, DBHelper.DEFAULT_MAX_DISPLAY_COLUMN_WIDTH);
                 } else {
-                    retval.getInitialColumnWidth().set(i, hdrlen);
+                    cwidths[i] = DBHelper.DEFAULT_DISPLAY_COLUMN_WIDTH;
                 }
-                    
+
+                if (hdrlen > cwidths[i]) {
+                    cwidths[i] = hdrlen;
+                }
+                retval.getInitialColumnWidth().add(cwidths[i]);
             }
         }
-        
+
         return retval;
     }
 
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
         OperationResult<QueryDocument> res = fileHandler.getDocument(FileHandler.QUERY_FOLDER, runWrapper.getGroupName(), runWrapper.getDocumentName());
-    
+
         if (res.isSuccess()) {
             QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
             wrapper.setDocument(res.getResult());
@@ -1008,29 +1009,28 @@ public class MainServiceImpl implements MainService {
             return retval;
         }
     }
-    
+
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
         OperationResult<QueryResult> retval = new OperationResult<>();
-        
+
         Connection conn = null;
         Statement stmt = null;
         ResultSet res = null;
-        
+
         try {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(runWrapper.getDocument().getDatasource());
             runWrapper.getDocument().setDatabaseType(ds.getDatabaseType());
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
             String sql = dbHelper.getSelect(runWrapper);
-            
-            
+
             if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 stmt = ps;
                 for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
                     QueryParameter p = runWrapper.getParameters().get(i);
-                    if (dbHelper.isDataTypeString(p.getDataType()) 
-                        || dbHelper.isDataTypeDateTime(p.getDataType())) {
-                        ps.setString(i+1, p.getValue());
+                    if (dbHelper.isDataTypeString(p.getDataType())
+                            || dbHelper.isDataTypeDateTime(p.getDataType())) {
+                        ps.setString(i + 1, p.getValue());
                     } else if (dbHelper.isDataTypeNumeric(p.getDataType())) {
                     }
                 }
@@ -1039,19 +1039,15 @@ public class MainServiceImpl implements MainService {
                 stmt = conn.createStatement();
                 res = stmt.executeQuery(sql);
             }
-            
+
             retval.setResult(getQueryResult(res));
-         }
-        
-        catch (Exception ex) {
+        } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
-        }
-        
-        finally {
+        } finally {
             dbHelper.closeConnection(conn, stmt, res);
-        }  
-        
+        }
+
         return retval;
     }
 

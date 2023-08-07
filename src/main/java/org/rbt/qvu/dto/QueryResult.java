@@ -14,7 +14,7 @@ import java.util.List;
 public class QueryResult {
     private List<String> header = new ArrayList<>();
     private List<Integer> columnTypes = new ArrayList<>();
-    private List<Integer> columnWidths = new ArrayList<>();
+    private List<Integer> initialColumnWidth = new ArrayList<>();
     private List<List<Object>> data = new ArrayList<>();
 
     public List<String> getHeader() {
@@ -41,13 +41,13 @@ public class QueryResult {
         this.data = data;
     }
 
-    public List<Integer> getColumnWidths() {
-        return columnWidths;
+    public List<Integer> getInitialColumnWidth() {
+        return initialColumnWidth;
     }
 
-    public void setColumnWidths(List<Integer> columnWidths) {
-        this.columnWidths = columnWidths;
+    public void setInitialColumnWidth(List<Integer> initialColumnWidth) {
+        this.initialColumnWidth = initialColumnWidth;
     }
-    
-    
+
+
 }

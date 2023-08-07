@@ -948,23 +948,24 @@ public class MainServiceImpl implements MainService {
         for (int i = 0; i < rmd.getColumnCount(); ++i) {
             retval.getHeader().add(rmd.getColumnName(i+1));
             retval.getColumnTypes().add(rmd.getColumnType(i+1));
-            retval.getColumnWidths().add(0);
+            retval.getInitialColumnWidth().add(0);
         }
         
         
+        int rowcnt = 0;
         
         while (res.next()) {
             List<Object> row = new ArrayList<>();
             
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
                 Object o = res.getObject(i+1);
-                
                 if (o != null) {
                     Integer len = o.toString().length();
-                    Integer curLength = retval.getColumnWidths().get(i);
+                    Integer cur = retval.getInitialColumnWidth().get(i);
                    
-                    if (len > curLength) {
-                        retval.getColumnWidths().set(i, len);
+                    if (len > cur) {
+                        retval.getInitialColumnWidth().set(i, len + cur);
+                        rowcnt++;
                     }
                 }
                 
@@ -974,6 +975,20 @@ public class MainServiceImpl implements MainService {
             retval.getData().add(row);
         }
         
+        if (rowcnt > 0) {
+            for (Integer i = 0; i < retval.getInitialColumnWidth().size(); ++i) {
+                double d = retval.getInitialColumnWidth().get(i);
+                Double avg = Math.ceil(d/rowcnt);
+                
+                Integer hdrlen = (retval.getHeader().get(i).length() + 4);
+                if (avg.intValue() > hdrlen) {
+                    retval.getInitialColumnWidth().set(i, avg.intValue());
+                } else {
+                    retval.getInitialColumnWidth().set(i, hdrlen);
+                }
+                    
+            }
+        }
         
         return retval;
     }

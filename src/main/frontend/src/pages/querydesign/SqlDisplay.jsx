@@ -327,6 +327,7 @@ const SqlDisplay = (props) => {
             showParamEntry();
         } else {
             let res = await runQuery(buildRunDocument());
+            console.log("----->" + JSON.stringify(res.result));
         }
     };
 

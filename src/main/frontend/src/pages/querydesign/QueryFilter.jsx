@@ -19,7 +19,7 @@ const QueryFilter = () => {
         setFilterColumns,
         formatPathForDisplay} = useQueryDesign();
     const {getText} = useLang();
-    const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const {showMessage, hideMessage} = useMessage();
     const [selectColumn, setSelectColumn] = useState(null);
     
     const addFilterColumn = () => {

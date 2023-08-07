@@ -45,7 +45,7 @@ const QueryDesign = () => {
         splitter1Sizes,
         setSplitter1Sizes} = useQueryDesign();
     const {getText} = useLang();
-    const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
 

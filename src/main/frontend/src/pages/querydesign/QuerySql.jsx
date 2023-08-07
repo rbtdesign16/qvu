@@ -12,7 +12,7 @@ import { Splitter, SplitterPanel } from 'primereact/splitter';
 
 const QuerySql = () => {
     const {getText} = useLang();
-    const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const {showMessage, hideMessage} = useMessage();
     const {splitter1Sizes} = useQueryDesign();
      const {showHelp} = useHelp();
      

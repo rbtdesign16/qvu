@@ -6,26 +6,28 @@ import React, { useState, useEffect } from 'react';
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
+import useMessage from "../../context/MessageContext";
 import {AiOutlineCopy} from "react-icons/ai";
 import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
-isSqlOrderByRequired,
-        isSqlGroupByRequired,
-        isDataTypeString,
-        isDataTypeDateTime,
-        UNARY_COMPARISON_OPERATORS,
-        DB_TYPE_MYSQL,
-        DB_TYPE_SQLSERVER,
-        DB_TYPE_ORACLE,
-        DB_TYPE_POSTGRES,
-        MEDIUM_ICON_SIZE,
-        isEmpty,
-        SQL_KEYWORDS,
-        getQuotedIdentifier
-        } from "../../utils/helper";
-import {runQuery} from "../../utils/apiHelper";
+    isSqlOrderByRequired,
+    isSqlGroupByRequired,
+    isDataTypeString,
+    isDataTypeDateTime,
+    UNARY_COMPARISON_OPERATORS,
+    DB_TYPE_MYSQL,
+    DB_TYPE_SQLSERVER,
+    DB_TYPE_ORACLE,
+    DB_TYPE_POSTGRES,
+    MEDIUM_ICON_SIZE,
+    isEmpty,
+    SQL_KEYWORDS,
+    getQuotedIdentifier,
+    INFO,
+    ERROR} from "../../utils/helper";
+import {runQuery, isApiError} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
     const {
@@ -39,6 +41,8 @@ const SqlDisplay = (props) => {
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
+    const {showMessage, hideMessage} = useMessage();
+    const [queryResults, setQueryResults] = useState({});
 
     let quotedIdentifier = getQuotedIdentifier(getDatabaseType(datasource));
 
@@ -319,15 +323,30 @@ const SqlDisplay = (props) => {
     };
 
     const runQueryWithParameters = async (params) => {
+        showMessage(INFO, getText("Running query", "...",), true);
         let res = await runQuery(buildRunDocument(), params);
+        
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            hideMessage();
+        }
+        setQueryResults(res.result);
     };
 
     const runLocalQuery = async () => {
         if (isParameterEntryRequired()) {
             showParamEntry();
         } else {
+            showMessage(INFO, getText("Running query", "...",), true);
             let res = await runQuery(buildRunDocument());
-            console.log("----->" + JSON.stringify(res.result));
+            
+            if (isApiError(res)) {
+                showMessage(ERROR, res.message);
+            } else {
+                hideMessage();
+            }
+            setQueryResults(res.result);
         }
     };
 

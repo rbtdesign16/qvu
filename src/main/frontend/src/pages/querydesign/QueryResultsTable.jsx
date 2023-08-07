@@ -4,27 +4,26 @@
  */
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import useLang from "../context/LangContext";
-import useQueryDesign from "../context/QueryDesignContext";
+import useQueryDesign from "../../context/QueryDesignContext";
 
 
 const QueryResultsTable = (props) => {
     const {queryResults} = useQueryDesign();
 
     const getHeaderColumns = () => {
-        return queryResults.header.map(h => <th style="{{width:h.width}} >{h.title}</h>);
+        return queryResults.header.map(h => <th style={{width:h.width}} >{h.title}</th>);
     };
     
     const getHeader = () => {
-        return <tr>{ getHeaderColumns()}</tr>
+        return <tr>{ getHeaderColumns()}</tr>;
     };
 
     const getColumnDetail = (row) => {
-        return row.map((coldata, indx) => <td>{coldata}</td>);
+        return row.map((coldata) => <td>{coldata}</td>);
     };
     
     const getDetail = () => {
-        return <tr>{ config.data.map(r => getColumnDetail(r))}</tr>
+        return <tr>{ queryResults.data.map(r => getColumnDetail(r))}</tr>;
     };
 
     

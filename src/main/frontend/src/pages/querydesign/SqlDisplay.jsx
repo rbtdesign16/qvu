@@ -37,12 +37,12 @@ const SqlDisplay = (props) => {
         updateSelectColumns,
         isParameterEntryRequired,
         buildRunDocument,
-        datasource} = useQueryDesign();
+        datasource, 
+        setQueryResults} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
     const {showMessage, hideMessage} = useMessage();
-    const [queryResults, setQueryResults] = useState({});
 
     let quotedIdentifier = getQuotedIdentifier(getDatabaseType(datasource));
 

@@ -965,6 +965,7 @@ public class MainServiceImpl implements MainService {
         }
 
         Integer rowcnt = retval.getData().size();
+        retval.setRowCount(rowcnt);
         if (rowcnt > 0) {
             for (Integer i = 0; i < cwidths.length; ++i) {
                 Integer hdrlen = (retval.getHeader().get(i).length() + 4);

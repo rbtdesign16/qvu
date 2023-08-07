@@ -12,6 +12,7 @@ import java.util.List;
  * @author rbtuc
  */
 public class QueryResult {
+    private Integer rowCount;
     private List<String> header = new ArrayList<>();
     private List<Integer> columnTypes = new ArrayList<>();
     private List<Integer> initialColumnWidth = new ArrayList<>();
@@ -47,6 +48,14 @@ public class QueryResult {
 
     public void setInitialColumnWidth(List<Integer> initialColumnWidth) {
         this.initialColumnWidth = initialColumnWidth;
+    }
+
+    public Integer getRowCount() {
+        return rowCount;
+    }
+
+    public void setRowCount(Integer rowCount) {
+        this.rowCount = rowCount;
     }
 
 

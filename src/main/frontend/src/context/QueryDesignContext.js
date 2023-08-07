@@ -19,6 +19,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [filterColumns, setFilterColumns] = useState([]);
     const [fromClause, setFromClause] = useState(null);
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
+    const [queryResults, setQueryResults] = useState({header: [], data: []});
 
     const updateSelectColumns = async (scols) => {
         let cols = [];
@@ -376,7 +377,9 @@ export const QueryDesignProvider = ({ children }) => {
                     setSplitter1Sizes,
                     isParameterEntryRequired,
                     getFilterComparisonInput,
-                    buildRunDocument}}>
+                    buildRunDocument,
+                    queryResults,
+                    setQueryResults}}>
                 {children}
             </QueryDesignContext.Provider>
             );

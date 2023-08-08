@@ -506,3 +506,17 @@ textarea {
     color: var(--sql-clause-column-color);
     overflow: hidden;
 }
+
+.query-results-table {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+
+.query-results-cont {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+

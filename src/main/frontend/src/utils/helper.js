@@ -30,6 +30,16 @@ export const ERROR_TEXT_COLOR = "crimson";
 export const SUCCESS_TEXT_COLOR = "#228b22";
 export const INFO_TEXT_COLOR = "#4682B4";
 
+export const QUERY_RESULTS_TABLE_HEADER_BKCOLOR = "#B6D0E2";  // powder blue
+export const QUERY_RESULTS_TABLE_HEADER_FORECOLOR = "#2F4F4F"; // dark slate gray
+export const QUERY_RESULTS_TABLE_HEADER_FONTSIZE = "12pt";
+export const QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT = "600";
+
+export const QUERY_RESULTS_TABLE_DETAIL_BKCOLOR = "white";  
+export const QUERY_RESULTS_TABLE_DETAIL_FORECOLOR = "#2F4F4F"; // dark slate gray
+export const QUERY_RESULTS_TABLE_DETAIL_FONTSIZE = "11pt";
+export const QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT = "400";
+
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";
 export const REPORT_DESIGNER_ROLE = "report designer";
@@ -45,6 +55,8 @@ export const MODAL_TITLE_SIZE = "h5";
 export const SMALL_ICON_SIZE = 18;
 export const MEDIUM_ICON_SIZE = 20;
 export const BIG_ICON_SIZE = 25;
+
+export const DEFAULT_PIXELS_PER_CHARACTER = 12;
 
 export const NODE_TYPE_ROOT = "r";
 export const NODE_TYPE_TABLE = "t";
@@ -445,7 +457,7 @@ export const updateAndOr = (fc) => {
                 fc[i].andOr = "";
                 firstHaving = false;
             } else if (!fc[i].andOr) {
-                fc[i].andOr = "and";
+                fc[i].andOr = AND_OR[0];
             }
         }
 
@@ -454,7 +466,7 @@ export const updateAndOr = (fc) => {
                 fc[i].andOr = "";
                 firstWhere = false;
             } else if (!fc[i].andOr) {
-                fc[i].andOr = "and";
+                fc[i].andOr = AND_OR[0];
             }
         }
     }

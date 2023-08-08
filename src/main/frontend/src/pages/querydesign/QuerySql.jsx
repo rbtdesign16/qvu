@@ -22,8 +22,8 @@ const QuerySql = () => {
         <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="sql-display-cont">
             <SqlDisplay/>
         </SplitterPanel>
-        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="flex align-items-center justify-content-center">
-            <div>{queryResults ? <QueryResultsTable/> : getText("no query results")}</div>
+        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="query-results-cont">
+            <QueryResultsTable/>
         </SplitterPanel>
     </Splitter>);
 };

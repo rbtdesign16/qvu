@@ -23,7 +23,7 @@ export const DEFAULT_DOCUMENT_GROUP = "general";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 
-export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY"];
+export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING"];
 
 export const ERROR_BACKGROUND_COLOR = "pink";
 export const ERROR_TEXT_COLOR = "crimson";
@@ -361,6 +361,27 @@ export const isSqlGroupByRequired = (selectColumns) => {
     }
 };
 
+export const isSqlHavingRequired = (filterColumns) => {
+    if (filterColumns) {
+        for (let i = 0;
+        i < filterColumns.length; ++i) {
+            if (filterColumns[i].aggregateFunction) {
+                return true;
+            }
+        }
+    }
+};
+
+export const isSqlWhereRequired = (filterColumns) => {
+    if (filterColumns) {
+        for (let i = 0;
+        i < filterColumns.length; ++i) {
+            if (!filterColumns[i].aggregateFunction) {
+                return true;
+            }
+        }
+    }
+};
 
 export const isValidFilenameKey = (e) => {
     if (isEmpty(e.target.value)) {
@@ -407,10 +428,34 @@ export const isDigit = (e) => {
 export const getQuotedIdentifier = (dbType) => {
     switch (dbType) {
         case DB_TYPE_MYSQL:
-            return "`"; 
+            return "`";
         case DB_TYPE_SQLSERVER:
         case DB_TYPE_ORACLE:
         case DB_TYPE_POSTGRES:
             return "\"";
+    }
+};
+
+export const updateAndOr = (fc) => {
+    let firstWhere = true;
+    let firstHaving = true;
+    for (let i = 0; i < fc.length; ++i) {
+        if (fc[i].aggregateFunction) {
+            if (firstHaving) {
+                fc[i].andOr = "";
+                firstHaving = false;
+            } else if (!fc[i].andOr) {
+                fc[i].andOr = "and";
+            }
+        }
+
+        if (!fc[i].aggregateFunction) {
+            if (firstWhere) {
+                fc[i].andOr = "";
+                firstWhere = false;
+            } else if (!fc[i].andOr) {
+                fc[i].andOr = "and";
+            }
+        }
     }
 };

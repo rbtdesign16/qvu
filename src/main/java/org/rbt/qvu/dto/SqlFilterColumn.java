@@ -22,6 +22,7 @@ public class SqlFilterColumn {
     private String comparisonValue;
     private String path;
     private String customSql;
+    private String aggregateFunction;
 
     public String getDatasource() {
         return datasource;
@@ -125,6 +126,14 @@ public class SqlFilterColumn {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getAggregateFunction() {
+        return aggregateFunction;
+    }
+
+    public void setAggregateFunction(String aggregateFunction) {
+        this.aggregateFunction = aggregateFunction;
     }
     
     

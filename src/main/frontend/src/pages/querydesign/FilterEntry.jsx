@@ -30,7 +30,8 @@ const FilterEntry = (props) => {
         selectColumns,
         setSelectColumns,
         formatPathForDisplay,
-        getFilterComparisonInput
+        getFilterComparisonInput,
+        getColumnNameForDisplay
     } = useQueryDesign();
 
     const COLUMN_DEFS = [
@@ -102,7 +103,7 @@ const FilterEntry = (props) => {
     };
 
     const loadAndOr = () => {
-        if (index === 0) {
+        if (!filterColumns[index].andOr) {
             return <option value=""></option>;
         } else {
             return AND_OR.map(ao => <option value={ao} selected={(ao === filterColumns[index].andOr)}>{ao}</option>);
@@ -166,9 +167,9 @@ const FilterEntry = (props) => {
     const getDetail = () => {
         return <tr style={{paddingLeft: "10px"}}>
             <td title={getText("Remove entry")}><AiOutlineDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
-            <td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={(index === 0)}>{loadAndOr()}</select></td>
+            <td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={!filterColumns[index].andOr}>{loadAndOr()}</select></td>
             <td><select name="openParenthesis" onChange={e => onChange(e)}>{loadOpenParenthesis()}</select></td>
-            <td>{filterColumns[index].columnName}</td>
+            <td><span className="fc-name">{getColumnNameForDisplay(filterColumns[index])}</span></td>
             <td><select name="comparisonOperator" onChange={e => onChange(e)}>{loadFilterComparisonOperators()}</select></td>
             <td>{getComparisonInput()}</td>
             <td><select name="closeParenthesis" onChange={e => onChange(e)}>{loadCloseParenthesis()}</select></td>
@@ -179,7 +180,7 @@ const FilterEntry = (props) => {
         <div className="filter-title" id={"fil-" + index}>
             <span>
                 <MdHelpOutline style={{marginBottom: "5px"}} className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
-                <span title={getHeaderTitle()} >{filterColumns[index].displayName}</span>
+                <span title={getHeaderTitle()} >{getColumnNameForDisplay(filterColumns[index])}</span>
             </span>
         </div>
         <table className="filter-table">

@@ -14,6 +14,8 @@ import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
     isSqlOrderByRequired,
     isSqlGroupByRequired,
+    isSqlHavingRequired,
+    isSqlWhereRequired,
     isDataTypeString,
     isDataTypeDateTime,
     UNARY_COMPARISON_OPERATORS,
@@ -256,24 +258,48 @@ const SqlDisplay = (props) => {
         }
     };
 
-    const getWhereColumns = () => {
+    const getHavingColumns = () => {
         return filterColumns.map(f => {
+            if (f.aggregateFunction) {
+                return <div className="sql-clause-column">
+                    <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
+                    {
+                        getOpenParenthesis(f)
+                        + f.aggregateFunction
+                        + "("
+                        + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
+                        + ") "
+                        + f.comparisonOperator
+                        + " "
+                        + getComparisonValue(f)
+                        + getCloseParenthesis(f)}
+                </div>;
+            } else {
+                return "";
+            }
+        });
+    };
+    
+    const getWhereColumns = () => {
+        return filterColumns.map((f) => {
             if (f.customSql) {
                 return <div className="sql-clause-column">                     
                 <span color="sql-clause-name">{getAndOr(f)}</span>
                 {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
             </div>;
-            } else {
+            } else if (!f.aggregateFunction) {
                 return <div className="sql-clause-column">
                     <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
                     {getOpenParenthesis(f)
-                                                + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
-                                                + " "
-                                                + f.comparisonOperator
-                                                + " "
-                                                + getComparisonValue(f)
-                                                + getCloseParenthesis(f)}
+                        + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
+                        + " "
+                        + f.comparisonOperator
+                        + " "
+                        + getComparisonValue(f)
+                        + getCloseParenthesis(f)}
                 </div>;
+            } else {
+                return "";
             }
         });
     };
@@ -311,8 +337,7 @@ const SqlDisplay = (props) => {
                 return true;
             }
         }
-    }
-
+    };
 
     const hideParameterEntry = () => {
         setShowParameterEntry({show: false});
@@ -364,10 +389,12 @@ const SqlDisplay = (props) => {
         { getSelectColumns()}
         <div className="sql-clause-name">FROM</div>
         { getFromColumns()}
-        <div className="sql-clause-name">WHERE</div>
-        { getWhereColumns()}
+        {isSqlWhereRequired(filterColumns) && <div className="sql-clause-name">WHERE</div>}
+        {isSqlWhereRequired(filterColumns) ? getWhereColumns() : ""}
         {isSqlGroupByRequired(selectColumns) && <div className="sql-clause-name">GROUP BY</div>}
         {isSqlGroupByRequired(selectColumns) ? getGroupBy() : ""}
+        {isSqlHavingRequired(filterColumns) && <div className="sql-clause-name">HAVING</div>}
+        {isSqlHavingRequired(filterColumns) ? getHavingColumns() : ""}
         {isSqlOrderByRequired(selectColumns) && <div className="sql-clause-name">ORDER BY</div> }
         {isSqlOrderByRequired(selectColumns) ? getOrderBy() : ""}
     </div>;

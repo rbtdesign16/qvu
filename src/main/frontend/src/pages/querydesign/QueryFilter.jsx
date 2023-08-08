@@ -10,7 +10,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import { MdOutlineAddBox } from 'react-icons/md';
 import FilterEntry from "./FilterEntry";
-import { BIG_ICON_SIZE} from "../../utils/helper";
+import { BIG_ICON_SIZE, updateAndOr} from "../../utils/helper";
 
 const QueryFilter = () => {
     const {authData, setAuthData} = useAuth();
@@ -18,7 +18,8 @@ const QueryFilter = () => {
         filterColumns,
         setFilterColumns,
         formatPathForDisplay, 
-        selectedColumnIds} = useQueryDesign();
+        selectedColumnIds,
+        getColumnNameForDisplay} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const [selectColumn, setSelectColumn] = useState(null);
@@ -33,24 +34,29 @@ const QueryFilter = () => {
             displayName: selectColumn.displayName,
             columnName: selectColumn.columnName,
             dataType: selectColumn.dataType,
+            aggregateFunction: selectColumn.aggregateFunction,
             path: selectColumn.path,
             openParenthesis: "",
             closeParenthesis: "",
-            andOr: (fc.length > 0) ? "and" : "",
             comparisonOperator: "=",
             comparisonValue: ""
 
         });
 
+        updateAndOr(fc);
+
         setFilterColumns(fc);
     };
 
     const getOptionTitle = (s) => {
-        return getText("Table Alias:", " ") + s.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(s.path);
+        return getText("Table Alias:", " ") + s.tableAlias + "\n" 
+            + (s.aggregateFunction ? "Function: " + s.aggregateFunction : "")
+            + getText("Path:", " ") + formatPathForDisplay(s.path);
     };
 
+   
     const loadSelectColumns = () => {
-        return selectColumns.map(s => <option title={getOptionTitle(s)} value={s.path}>{s.displayName}</option>);
+        return selectColumns.map(s => <option title={getOptionTitle(s)} value={s.path}>{getColumnNameForDisplay(s)}</option>);
     };
 
     const setSelectedColumn = (e) => {

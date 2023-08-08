@@ -500,3 +500,9 @@ textarea {
     width: 800px;
     height: 100%;
 }
+
+.fc-name {
+    padding-left: 3px;
+    color: var(--sql-clause-column-color);
+    overflow: hidden;
+}

@@ -4,7 +4,8 @@ import {
     isDataTypeString,
     isDataTypeNumeric,
     isDataTypeDateTime,
-    isEmpty
+    isEmpty,
+    updateAndOr
     } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 export const QueryDesignContext = createContext();
@@ -21,6 +22,22 @@ export const QueryDesignProvider = ({ children }) => {
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
     const [queryResults, setQueryResults] = useState({header: [], data: []});
 
+    const getColumnNameForDisplay = (s) => {
+        let retval = "";
+
+        if (s.aggregateFunction) {
+            retval += (s.aggregateFunction + "(");
+        }
+
+        retval += s.displayName;
+
+        if (s.aggregateFunction) {
+            retval += ")";
+        }
+
+        return retval;
+    };
+    
     const updateSelectColumns = async (scols) => {
         let cols = [];
         let cMap = new Map();
@@ -102,9 +119,7 @@ export const QueryDesignProvider = ({ children }) => {
             }
             
             if (filterColumns.length !== fc.length) {
-                if (fc.length > 0) {
-                    fc[0].andOr = "";
-                }
+                updateAndOr(fc);
                 setFilterColumns(fc);
             }
         }
@@ -379,7 +394,8 @@ export const QueryDesignProvider = ({ children }) => {
                     getFilterComparisonInput,
                     buildRunDocument,
                     queryResults,
-                    setQueryResults}}>
+                    setQueryResults,
+                    getColumnNameForDisplay}}>
                 {children}
             </QueryDesignContext.Provider>
             );

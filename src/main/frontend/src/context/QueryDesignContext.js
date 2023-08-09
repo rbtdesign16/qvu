@@ -364,9 +364,24 @@ export const QueryDesignProvider = ({ children }) => {
         };
     };
     
+    const clearData = () => {
+        setBaseTable(null);
+        setSelectedColumnIds([]);
+        setSelectedTableIds([]);
+        setSelectColumns([]);
+        setFilterColumns([]);
+        setFromClause(null);
+        setQueryResults({header: [], data: []});
+    }
+    
     useEffect(() => {
         updateSelectColumns();
     }, [selectedColumnIds]);
+    
+    useEffect(() => {
+        clearData();
+    }, [datasource]);
+    
     return (
             <QueryDesignContext.Provider
                 value={{

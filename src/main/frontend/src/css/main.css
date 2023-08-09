@@ -327,7 +327,8 @@ select {
 }
 
 .ds-sel {
-    width: 100%;
+    margin-left: 5px;
+    width: calc(100% - 10px);
     min-width: 0;
 }
 

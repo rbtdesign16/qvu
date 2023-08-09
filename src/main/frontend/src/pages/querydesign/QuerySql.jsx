@@ -10,7 +10,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import SqlDisplay from "./SqlDisplay";
 import QueryResultsTable from "./QueryResultsTable"
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-
+import { SPLITTER_GUTTER_SIZE } from "../../utils/helper"
 const QuerySql = () => {
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
@@ -18,7 +18,7 @@ const QuerySql = () => {
     const {showHelp} = useHelp();
     const {queryResults} = useQueryDesign();
 
-    return (<Splitter layout="vertical" stateKey={"sql"} stateStorage={"local"} guttorSize={8}>
+    return (<Splitter layout="vertical" stateKey={"sql"} stateStorage={"local"} gutterSize={SPLITTER_GUTTER_SIZE}>
         <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="sql-display-cont">
             <SqlDisplay/>
         </SplitterPanel>

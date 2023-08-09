@@ -26,7 +26,8 @@ import {
     DEFAULT_ERROR_TITLE,
     DEFAULT_DOCUMENT_GROUP,
     QUERY_DOCUMENT_TYPE,
-    replaceTokens} from "../../utils/helper";
+    replaceTokens,
+    SPLITTER_GUTTER_SIZE} from "../../utils/helper";
 
 import { getDatasourceTreeViewData, 
     isApiError,
@@ -159,7 +160,7 @@ const QueryDesign = () => {
     }, [datasources]);
 
     return (
-            <Splitter onResizeEnd={onResizeEnd}  guttorSize={8}>
+            <Splitter onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
                 <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
                     <label className="ck-label">{getText("Datasource")}</label>
                     <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
@@ -170,7 +171,7 @@ const QueryDesign = () => {
                 </SplitterPanel>
                 <SplitterPanel size={splitter1Sizes[1]} className="query-design-cont">
                     <SaveDocumentModal config={showSaveDocument}/>
-                    <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}}onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
+                    <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
                     <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
                         <Tab eventKey="dsel" title={getText("Data")}>
                             <SelectColumnList className="select-column-list"/>

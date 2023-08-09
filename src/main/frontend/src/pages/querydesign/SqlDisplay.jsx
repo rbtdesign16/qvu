@@ -7,7 +7,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
 import useMessage from "../../context/MessageContext";
-import {AiOutlineCopy} from "react-icons/ai";
+import {AiOutlineCopy, AiOutlineFileExcel} from "react-icons/ai";
 import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
@@ -40,6 +40,7 @@ const SqlDisplay = (props) => {
         isParameterEntryRequired,
         buildRunDocument,
         datasource, 
+        queryResults,
         setQueryResults} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
@@ -375,11 +376,21 @@ const SqlDisplay = (props) => {
         }
     };
 
+    const haveQueryResults = () => {
+        return queryResults && queryResults.data && queryResults.data.length > 0;
+    }
+    
+    const exportToExcel = () => {
+    }
     return <div id="sql-display">
         <ParameterEntryModal config={showParameterEntry}/>
         <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
             <span  title={getText("Copy sql to clipboard")} style={{marginRight: "10px"}}>
                 <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
+            </span>
+            <span  title={getText("Export to excel")} style={{marginRight: "10px"}}>
+                {haveQueryResults() ? <AiOutlineFileExcel className="icon-s cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => exportToExcel()} />
+                    : <AiOutlineFileExcel className="icon-s-dis" size={MEDIUM_ICON_SIZE + 2} />}
             </span>
             <span  title={getText("Run query")} >
                 <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runLocalQuery()} />

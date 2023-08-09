@@ -191,6 +191,7 @@
         "Copy sql to clipboard": "Copy sql to clipboard",
         "Run query": "Run query",
         "no query results": "no query results",
-        "Running query": "Runnig query"
+        "Running query": "Runnig query",
+        "Export to excel": "Export to excel"
     }
 }

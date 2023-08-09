@@ -12,6 +12,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     color: #3EA055;
 }
 
+.gray-f {
+    color: darkslategray;
+}
+
 .red-f {
     color: red;
 }

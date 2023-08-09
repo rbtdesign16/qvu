@@ -28,6 +28,9 @@ import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
 import org.rbt.qvu.util.DBHelper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -216,4 +219,15 @@ public class MainController {
         LOG.debug("in runQuery()");
         return service.runQuery(runWrapper);
     }
+
+    @PostMapping("api/v1/query/excel/export")
+    public HttpEntity<byte[]> exportToExcel(@RequestBody QueryResult queryResult) {
+        LOG.debug("in exportToExcel()");
+        byte[] excelContent = service.exportToExcel(queryResult);
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=my_file.xls");
+        header.setContentLength(excelContent.length);
+        return new HttpEntity<>(excelContent, header);
+   }
 }

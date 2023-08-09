@@ -54,5 +54,6 @@ public interface MainService {
     public OperationResult deleteDocument(String type, String group, String name);
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper);
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper);
+    public byte[] exportToExcel(QueryResult result);
 
 }

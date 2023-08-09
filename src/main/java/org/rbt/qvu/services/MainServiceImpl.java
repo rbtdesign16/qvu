@@ -1,6 +1,7 @@
 package org.rbt.qvu.services;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -21,6 +22,14 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.util.AreaReference;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFTable;
+import org.apache.poi.xssf.usermodel.XSSFTableStyleInfo;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
@@ -956,7 +965,7 @@ public class MainServiceImpl implements MainService {
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
                 Object o = res.getObject(i + 1);
                 if (o != null) {
-                     cwidths[i] =  cwidths[i] + o.toString().length();
+                    cwidths[i] = cwidths[i] + o.toString().length();
                 }
 
                 row.add(o);
@@ -1054,4 +1063,70 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    @Override
+    public byte[] exportToExcel(QueryResult result) {
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet sheet = wb.createSheet();
+
+        // Set which area the table should be placed in
+        AreaReference reference = wb.getCreationHelper().createAreaReference(
+                new CellReference(0, 0), new CellReference(2, 2));
+
+        // Create
+        XSSFTable table = sheet.createTable(reference);
+        table.setName("Test");
+        table.setDisplayName("Test_Table");
+
+        // For now, create the initial style in a low-level way
+        table.getCTTable().addNewTableStyleInfo();
+        table.getCTTable().getTableStyleInfo().setName("TableStyleMedium2");
+
+        // Style the table
+        XSSFTableStyleInfo style = (XSSFTableStyleInfo) table.getStyle();
+        style.setName("TableStyleMedium2");
+        style.setShowColumnStripes(false);
+        style.setShowRowStripes(true);
+        style.setFirstColumn(false);
+        style.setLastColumn(false);
+        style.setShowRowStripes(true);
+        style.setShowColumnStripes(true);
+
+        // Set the values for the table
+        XSSFRow row;
+        XSSFCell cell;
+        for (int i = 0; i < 3; i++) {
+            // Create row
+            row = sheet.createRow(i);
+            for (int j = 0; j < 3; j++) {
+                // Create cell
+                cell = row.createCell(j);
+                if (i == 0) {
+                    cell.setCellValue("Column" + (j + 1));
+                } else {
+                    cell.setCellValue((i + 1.0) * (j + 1.0));
+                }
+            }
+        }
+
+        
+        byte[] retval = null;
+        // Save
+        ByteArrayOutputStream bos = null;
+        
+        try {
+            bos = new ByteArrayOutputStream();
+            wb.write(bos);
+            retval = bos.toByteArray();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        } finally {
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (Exception ex) {};
+            }
+        }
+      
+        return retval;
+    }
 }

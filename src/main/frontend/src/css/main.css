@@ -525,3 +525,10 @@ textarea {
     overflow-x: auto;
 }
 
+.info-txt {
+    margin-top: 30px;
+    margin-left: 30px;
+    font-size: var(--default-label-font-size);
+    font-weight: var(--default-label-font-weight);
+    color: var(--default-label-font-color);
+}

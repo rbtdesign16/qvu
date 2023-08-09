@@ -5,22 +5,24 @@
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import useQueryDesign from "../../context/QueryDesignContext";
+import useLang from "../../context/LangContext";
 import {
-isDataTypeNumeric,
-        isDataTypeString,
-        isDataTypeDateTime,
-        DEFAULT_PIXELS_PER_CHARACTER,
-        QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-        QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-        QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
-        QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT,
-        QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-        QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-        QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
-        QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT} from "../../utils/helper";
+    isDataTypeNumeric,
+    isDataTypeString,
+    isDataTypeDateTime,
+    DEFAULT_PIXELS_PER_CHARACTER,
+    QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
+    QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
+    QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
+    QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT,
+    QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
+    QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
+    QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
+    QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT} from "../../utils/helper";
 
 const QueryResultsTable = () => {
     const {queryResults} = useQueryDesign();
+    const {getText} = useLang();
 
     const getHeaderColumns = () => {
         return queryResults.header.map(h => <div>{h}</div>);
@@ -120,7 +122,7 @@ const QueryResultsTable = () => {
             <div style={getFooterStyle()}>{getFooter()}</div>
         </div>;
     } else {
-        return "";
+        return <div className="info-txt">{getText("no query results")}</div>;
     }
 };
 

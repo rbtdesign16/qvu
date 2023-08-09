@@ -509,14 +509,18 @@ textarea {
 
 .query-results-table {
     position: relative;
-    width: 100%;
     height: 100%;
 }
 
+.query-results-table-body {
+    height: calc(100% - 24px);
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 
 .query-results-cont {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
+    overflow-y: hidden;
+    overflow-x: auto;
 }
 

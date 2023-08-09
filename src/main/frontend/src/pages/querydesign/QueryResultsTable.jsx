@@ -26,12 +26,12 @@ const QueryResultsTable = () => {
         return queryResults.header.map(h => <div>{h}</div>);
     };
 
-    const getColumnDetail = (row, styles) => {
-        return row.map((coldata, indx) => <div style={styles[indx]}>{coldata}</div>);
+    const getColumnDetail = (row, columnStyles) => {
+        return row.map((coldata, indx) => <div style={columnStyles[indx]}>{coldata}</div>);
     };
 
-    const getDetail = (styles) => {
-        return <div style={getDetailStyle()} >{ queryResults.data.map(r => getColumnDetail(r, styles))}</div>;
+    const getDetail = (detailStyle, columnStyles) => {
+        return queryResults.data.map(r => <div style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
     };
 
     const getFooter = () => {
@@ -53,6 +53,7 @@ const QueryResultsTable = () => {
         return {
             display: "grid",
             gridTemplateColumns: getGridWidths(),
+            position: "sticky",
             textAlign: "center",
             border: "solid 1px #191970",
             color: QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
@@ -111,12 +112,10 @@ const QueryResultsTable = () => {
     };
 
     if (queryResults && queryResults.initialColumnWidth) {
-        let detailStyles = getDetailColumnStyles();
-
         return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
             <div style={getHeaderStyle()}>{getHeaderColumns()}</div>
-            <div style={getDetailStyle()}>
-                {getDetail(detailStyles)}
+            <div className="query-results-table-body">
+                {getDetail(getDetailStyle(), getDetailColumnStyles())}
             </div>
             <div style={getFooterStyle()}>{getFooter()}</div>
         </div>;

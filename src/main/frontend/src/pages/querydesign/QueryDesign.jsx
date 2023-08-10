@@ -19,29 +19,29 @@ import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import {
-    SUCCESS,
-    INFO,
-    WARN,
-    ERROR,
-    DEFAULT_ERROR_TITLE,
-    DEFAULT_DOCUMENT_GROUP,
-    QUERY_DOCUMENT_TYPE,
-    replaceTokens,
-    SPLITTER_GUTTER_SIZE} from "../../utils/helper";
+SUCCESS,
+        INFO,
+        WARN,
+        ERROR,
+        DEFAULT_ERROR_TITLE,
+        DEFAULT_DOCUMENT_GROUP,
+        QUERY_DOCUMENT_TYPE,
+        replaceTokens,
+        SPLITTER_GUTTER_SIZE} from "../../utils/helper";
 
-import { getDatasourceTreeViewData, 
-    isApiError,
-    saveDocument} from "../../utils/apiHelper"
+import { getDatasourceTreeViewData,
+        isApiError,
+        saveDocument} from "../../utils/apiHelper"
 
-const QueryDesign = () => {
+        const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
-    const {setTreeViewData, 
-        treeViewData, 
-        setDatasource, 
-        datasource, 
-        selectColumns, 
-        filterColumns, 
-        baseTable, 
+    const {setTreeViewData,
+        treeViewData,
+        setDatasource,
+        datasource,
+        selectColumns,
+        filterColumns,
+        baseTable,
         fromClause,
         splitter1Sizes,
         setSplitter1Sizes} = useQueryDesign();
@@ -72,7 +72,7 @@ const QueryDesign = () => {
     const isValidSelectColumns = () => {
         return (selectColumns && (selectColumns.length > 0));
     };
-    
+
     const isValidFilterColumns = () => {
         return (filterColumns && (filterColumns.length > 0));
     };
@@ -80,15 +80,15 @@ const QueryDesign = () => {
     const isSaveEnabled = () => {
         return  isValidSelectColumns() && isValidFilterColumns();
     };
-    
+
     const hideShowSave = () => {
         setShowSaveDocument({show: false, type: QUERY_DOCUMENT_TYPE});
     }
-    
+
     const onSaveDocument = () => {
         setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave});
     };
-    
+
     const saveQueryDocument = async (name, group) => {
         let userId = authData.currentUser.userId;
         let actionTimestamp = new Date().toISOString();
@@ -97,31 +97,31 @@ const QueryDesign = () => {
             userId: authData.currentUser.userId,
             actionTimestamp: actionTimestamp,
             queryDocument: {
-                   name: name,
-                   createdBy: userId,
-                   updatedBy: userId,
-                   createDate: actionTimestamp,
-                   lastUpdated: actionTimestamp,
-                   datasource: datasource,
-                   baseTable: baseTable,
-                   documentGroupName: group,
-                   newRecord: true,
-                   selectColumns: selectColumns,
-                   filterColumns: filterColumns,
-                   fromClause: fromClause
-              }
-          };
-          
-          let res = await saveDocument(docWrapper);
-           if (isApiError(res)) {
-              showMessage(ERROR, res.message);
-          } else {
-              showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
-              hideShowSave();
-          }
-              
+                name: name,
+                createdBy: userId,
+                updatedBy: userId,
+                createDate: actionTimestamp,
+                lastUpdated: actionTimestamp,
+                datasource: datasource,
+                baseTable: baseTable,
+                documentGroupName: group,
+                newRecord: true,
+                selectColumns: selectColumns,
+                filterColumns: filterColumns,
+                fromClause: fromClause
+            }
+        };
+
+        let res = await saveDocument(docWrapper);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
+            hideShowSave();
+        }
+
     };
-    
+
     const onDatasourceChange = async (e) => {
         let ds = e.target.options[e.target.selectedIndex].value;
         if (ds) {
@@ -140,19 +140,22 @@ const QueryDesign = () => {
             setDatasource(null);
         }
     };
-    
+
     const isSqlAvailable = () => {
         return (
-            selectColumns 
-                && (selectColumns.length > 0) 
-                && filterColumns 
+                selectColumns
+                && (selectColumns.length > 0)
+                && filterColumns
                 && (filterColumns.length > 0));
     };
-    
-    
+
+
     const onResizeEnd = (e) => {
         setSplitter1Sizes(e.sizes);
     };
+
+    const onLOadDocument = () => {
+    }
     
     useEffect(() => {
         setTreeViewData(null);
@@ -160,32 +163,36 @@ const QueryDesign = () => {
     }, [datasources]);
 
     return (
-            <Splitter onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
-                <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
-                    <label className="ck-label">{getText("Datasource")}</label>
-                    <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
-                        <option value="" selected={!datasource}></option>                           
-                        {loadDatasourceOptions()}
-                    </select>
-                    <DataSelectTree/>
-                </SplitterPanel>
-                <SplitterPanel size={splitter1Sizes[1]} className="query-design-cont">
-                    <SaveDocumentModal config={showSaveDocument}/>
-                    <Button size="sm"  disabled={!isSaveEnabled()} style={{marginRight: "150px", float: "right"}} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
-                    <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
-                        <Tab eventKey="dsel" title={getText("Data")}>
-                            <SelectColumnList className="select-column-list"/>
-                        </Tab> 
-                        <Tab eventKey="fil" title={getText("Filter")}>
-                            <QueryFilter/>
-                        </Tab>
-                        {isSqlAvailable() && 
-                        <Tab eventKey="sql" title={getText("SQL")}>
-                            <QuerySql />
-                        </Tab>}
-                    </Tabs>
-                </SplitterPanel>
-            </Splitter>);
+            <div>
+                <SaveDocumentModal config={showSaveDocument}/>
+                <Button size="sm"  style={{marginLeft: "10px", marginBottom: "2px"}} onClick={() => onLoadDocument()}>{getText("Load Query Document")}</Button>
+                <Button size="sm"  style={{marginLeft: "10px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
+            
+                <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
+                    <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
+                        <label className="ck-label">{getText("Datasource")}</label>
+                        <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
+                            <option value="" selected={!datasource}></option>                           
+                            {loadDatasourceOptions()}
+                        </select>
+                        <DataSelectTree/>
+                    </SplitterPanel>
+                    <SplitterPanel size={splitter1Sizes[1]} className="query-design-cont">
+                        <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
+                            <Tab eventKey="dsel" title={getText("Data")}>
+                                <SelectColumnList className="select-column-list"/>
+                            </Tab> 
+                            <Tab eventKey="fil" title={getText("Filter")}>
+                                <QueryFilter/>
+                            </Tab>
+                            {isSqlAvailable() &&
+                            <Tab eventKey="sql" title={getText("SQL")}>
+                                <QuerySql />
+                            </Tab>}
+                        </Tabs>
+                    </SplitterPanel>
+                </Splitter>
+            </div>);
 
 };
 

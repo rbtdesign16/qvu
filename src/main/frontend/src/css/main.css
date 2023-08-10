@@ -116,7 +116,7 @@ body {
 .tab-container {
     width: 100%;
     margin-top: 5px;
-    height: calc(100% - 60px);
+    height: calc(100% - 70px);
     position: absolute;
     overflow: auto;
 }
@@ -322,7 +322,6 @@ select {
     border: 1px solid var(--default-border-color);
     color: var(--default-font-color);
     width: 100%;
-    height: calc(100% - 70px) !important;
     position: absolute;
 }
 
@@ -514,7 +513,7 @@ textarea {
 }
 
 .query-results-table-body {
-    height: calc(100% - 24px);
+    height: calc(100% - 30px);
     width: 100%;
     overflow-y: auto;
     overflow-x: hidden;

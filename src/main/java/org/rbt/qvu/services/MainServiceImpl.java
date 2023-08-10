@@ -1128,41 +1128,43 @@ public class MainServiceImpl implements MainService {
                     // Create cell
                     cell = row.createCell(j);
                     Object val = rowdata.get(j);
-                    switch (columnTypes.get(j)) {
-                        case java.sql.Types.TINYINT:
-                        case java.sql.Types.SMALLINT:
-                        case java.sql.Types.INTEGER:
-                        case java.sql.Types.BIGINT:
-                        case java.sql.Types.REAL:
-                        case java.sql.Types.DOUBLE:
-                        case java.sql.Types.NUMERIC:
-                        case java.sql.Types.DECIMAL:
-                            cell.setCellValue((val != null) ? Double.valueOf(val.toString()) : null);
-                            break;
-                        case java.sql.Types.DATE:
-                            cell.setCellValue(Helper.getDate(val));
-                            break;
-                        case java.sql.Types.TIME:
-                        case java.sql.Types.TIME_WITH_TIMEZONE:
-                            cell.setCellValue(Helper.getTime(val));
-                            break;
-                        case java.sql.Types.TIMESTAMP:
-                        case java.sql.Types.TIMESTAMP_WITH_TIMEZONE:
-                            cell.setCellValue(Helper.getTimestamp(val));
-                            break;
-                        case java.sql.Types.CHAR:
-                        case java.sql.Types.VARCHAR:
-                        case java.sql.Types.LONGVARCHAR:
-                        case java.sql.Types.CLOB:
-                        case java.sql.Types.NCHAR:
-                        case java.sql.Types.NVARCHAR:
-                        case java.sql.Types.LONGNVARCHAR:
-                        case java.sql.Types.NCLOB:
-                            cell.setCellValue((val != null) ? val.toString() : null);
-                            break;
-                        default:
-                            cell.setCellValue((val != null) ? val.toString() : null);
-                            break;
+                    if (val != null) {
+                        switch (columnTypes.get(j)) {
+                            case java.sql.Types.TINYINT:
+                            case java.sql.Types.SMALLINT:
+                            case java.sql.Types.INTEGER:
+                            case java.sql.Types.BIGINT:
+                            case java.sql.Types.REAL:
+                            case java.sql.Types.DOUBLE:
+                            case java.sql.Types.NUMERIC:
+                            case java.sql.Types.DECIMAL:
+                                cell.setCellValue(Double.valueOf(val.toString()));
+                                break;
+                            case java.sql.Types.DATE:
+                                cell.setCellValue(Helper.getDate(val));
+                                break;
+                            case java.sql.Types.TIME:
+                            case java.sql.Types.TIME_WITH_TIMEZONE:
+                                cell.setCellValue(Helper.getTime(val));
+                                break;
+                            case java.sql.Types.TIMESTAMP:
+                            case java.sql.Types.TIMESTAMP_WITH_TIMEZONE:
+                                cell.setCellValue(Helper.getTimestamp(val));
+                                break;
+                            case java.sql.Types.CHAR:
+                            case java.sql.Types.VARCHAR:
+                            case java.sql.Types.LONGVARCHAR:
+                            case java.sql.Types.CLOB:
+                            case java.sql.Types.NCHAR:
+                            case java.sql.Types.NVARCHAR:
+                            case java.sql.Types.LONGNVARCHAR:
+                            case java.sql.Types.NCLOB:
+                                cell.setCellValue(val.toString());
+                                break;
+                            default:
+                                cell.setCellValue(val.toString());
+                                break;
+                        }
                     }
                 }
             }

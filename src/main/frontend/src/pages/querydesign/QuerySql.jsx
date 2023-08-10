@@ -18,7 +18,7 @@ const QuerySql = () => {
     const {showHelp} = useHelp();
     const {queryResults} = useQueryDesign();
 
-    return (<Splitter layout="vertical" stateKey={"sql"} stateStorage={"local"} gutterSize={SPLITTER_GUTTER_SIZE}>
+    return (<Splitter style={{height: "calc(100% - 70px)"}} layout="vertical" stateKey={"sql"} stateStorage={"local"} gutterSize={SPLITTER_GUTTER_SIZE}>
         <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="sql-display-cont">
             <SqlDisplay/>
         </SplitterPanel>

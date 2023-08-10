@@ -10,9 +10,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,9 +21,17 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -79,7 +84,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Service
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
-    
+
     @Autowired
     private DataSources qvuds;
 
@@ -965,7 +970,7 @@ public class MainServiceImpl implements MainService {
 
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
                 Object o = res.getObject(i + 1);
-                
+
                 if (o != null) {
                     cwidths[i] = cwidths[i] + o.toString().length();
                 }
@@ -1067,93 +1072,116 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public byte[] exportToExcel(ExcelExportWrapper wrapper) {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        
-        String name = wrapper.getName();
-        if (StringUtils.isEmpty(name)) {
-            name = "excel=export-" + Constants.FILE_TS_FORMAT.format(new Date()) + ".xlsx";
-        }
-        
-        XSSFSheet sheet = wb.createSheet(name);
- 
-        // Set the values for the table
-        XSSFRow row;
-        XSSFCell cell;
-        int rownum = 0;
-        row = sheet.createRow(rownum++);
-        List<String> header = wrapper.getQueryResults().getHeader();
-        for (int i = 0; i < header.size(); ++i) {
-            cell = row.createCell(i);
-            cell.setCellValue(header.get(i));
-        }
-
-        List<Integer> columnTypes = wrapper.getQueryResults().getColumnTypes();
-        List<List<Object>> data = wrapper.getQueryResults().getData();
-        for (int i = 0; i < data.size(); ++i) {
-            row = sheet.createRow(rownum++);
-            List<Object> rowdata = data.get(i);
-            for (int j = 0; j < rowdata.size(); j++) {
-                // Create cell
-                cell = row.createCell(j);
-                Object val = rowdata.get(j);
-                switch (columnTypes.get(j)) {
-                    case java.sql.Types.TINYINT:
-                    case java.sql.Types.SMALLINT:
-                    case java.sql.Types.INTEGER:
-                    case java.sql.Types.BIGINT:
-                    case java.sql.Types.REAL:
-                    case java.sql.Types.DOUBLE:
-                    case java.sql.Types.NUMERIC:
-                    case java.sql.Types.DECIMAL:
-                        cell.setCellValue((val != null) ? Double.valueOf(val.toString()) : null);
-                        break;
-                    case java.sql.Types.DATE:
-                        cell.setCellValue(Helper.getDate(val));
-                        break;
-                    case java.sql.Types.TIME:
-                    case java.sql.Types.TIME_WITH_TIMEZONE:
-                        cell.setCellValue(Helper.getTime(val));
-                        break;
-                    case java.sql.Types.TIMESTAMP:
-                    case java.sql.Types.TIMESTAMP_WITH_TIMEZONE:
-                        cell.setCellValue(Helper.getTimestamp(val));
-                        break;
-                    case java.sql.Types.CHAR:
-                    case java.sql.Types.VARCHAR:
-                    case java.sql.Types.LONGVARCHAR:
-                    case java.sql.Types.CLOB:
-                    case java.sql.Types.NCHAR:
-                    case java.sql.Types.NVARCHAR:
-                    case java.sql.Types.LONGNVARCHAR:
-                    case java.sql.Types.NCLOB:
-                        cell.setCellValue((val != null) ? val.toString() : null);
-                        break;
-                    default:
-                        cell.setCellValue((val != null) ? val.toString() : null);
-                        break;
-                }
-            }
-        }
-
-        
         byte[] retval = null;
         // Save
         ByteArrayOutputStream bos = null;
-         try {
+        try {
+
+            XSSFWorkbook wb = new XSSFWorkbook();
+
+            String name = wrapper.getName();
+            if (StringUtils.isEmpty(name)) {
+                name = "export-" + Constants.FILE_TS_FORMAT.format(new Date()) + ".xlsx";
+            }
+
+            XSSFSheet sheet = wb.createSheet(name);
+
+            XSSFCellStyle headerStyle = wb.createCellStyle();
+            Font headerFont = wb.createFont();
+            headerStyle.setBorderLeft(BorderStyle.THIN);
+            headerStyle.setBorderTop(BorderStyle.THIN);
+            headerStyle.setBorderRight(BorderStyle.THIN);
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            
+            headerStyle.setAlignment(HorizontalAlignment.CENTER);
+            headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            byte[] rgbB = Hex.decodeHex(wrapper.getHeaderBackgroundColor().substring(1));
+            XSSFColor color = new XSSFColor(rgbB, null);
+            headerStyle.setFillForegroundColor(color);
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            headerFont.setBold(true);
+
+            headerFont.setFontHeightInPoints((short) wrapper.getHeaderFontSize());
+            rgbB = Hex.decodeHex(wrapper.getHeaderFontColor().substring(1));
+            headerFont.setColor( new XSSFColor(rgbB, null).getIndex());
+            headerStyle.setFont(headerFont);
+            
+            XSSFRow row;
+            XSSFCell cell;
+            int rownum = 0;
+            row = sheet.createRow(rownum++);
+            List<String> header = wrapper.getQueryResults().getHeader();
+            for (int i = 0; i < header.size(); ++i) {
+                cell = row.createCell(i);
+                cell.setCellValue(header.get(i));
+                cell.setCellStyle(headerStyle);
+                sheet.setColumnWidth(i, 25 * Constants.DEFAULT_PIXELS_PER_CHARACTER * wrapper.getQueryResults().getInitialColumnWidths().get(i));
+            }
+
+            List<Integer> columnTypes = wrapper.getQueryResults().getColumnTypes();
+            List<List<Object>> data = wrapper.getQueryResults().getData();
+            for (int i = 0; i < data.size(); ++i) {
+                row = sheet.createRow(rownum++);
+                List<Object> rowdata = data.get(i);
+                for (int j = 0; j < rowdata.size(); j++) {
+                    // Create cell
+                    cell = row.createCell(j);
+                    Object val = rowdata.get(j);
+                    switch (columnTypes.get(j)) {
+                        case java.sql.Types.TINYINT:
+                        case java.sql.Types.SMALLINT:
+                        case java.sql.Types.INTEGER:
+                        case java.sql.Types.BIGINT:
+                        case java.sql.Types.REAL:
+                        case java.sql.Types.DOUBLE:
+                        case java.sql.Types.NUMERIC:
+                        case java.sql.Types.DECIMAL:
+                            cell.setCellValue((val != null) ? Double.valueOf(val.toString()) : null);
+                            break;
+                        case java.sql.Types.DATE:
+                            cell.setCellValue(Helper.getDate(val));
+                            break;
+                        case java.sql.Types.TIME:
+                        case java.sql.Types.TIME_WITH_TIMEZONE:
+                            cell.setCellValue(Helper.getTime(val));
+                            break;
+                        case java.sql.Types.TIMESTAMP:
+                        case java.sql.Types.TIMESTAMP_WITH_TIMEZONE:
+                            cell.setCellValue(Helper.getTimestamp(val));
+                            break;
+                        case java.sql.Types.CHAR:
+                        case java.sql.Types.VARCHAR:
+                        case java.sql.Types.LONGVARCHAR:
+                        case java.sql.Types.CLOB:
+                        case java.sql.Types.NCHAR:
+                        case java.sql.Types.NVARCHAR:
+                        case java.sql.Types.LONGNVARCHAR:
+                        case java.sql.Types.NCLOB:
+                            cell.setCellValue((val != null) ? val.toString() : null);
+                            break;
+                        default:
+                            cell.setCellValue((val != null) ? val.toString() : null);
+                            break;
+                    }
+                }
+            }
+
             bos = new ByteArrayOutputStream();
             wb.write(bos);
             retval = bos.toByteArray();
-            System.out.println("------------>xxx");
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         } finally {
             if (bos != null) {
                 try {
                     bos.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
         }
-      
+
         return retval;
     }
+
 }

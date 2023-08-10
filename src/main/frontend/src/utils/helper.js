@@ -30,7 +30,7 @@ export const ERROR_TEXT_COLOR = "crimson";
 export const SUCCESS_TEXT_COLOR = "#228b22";
 export const INFO_TEXT_COLOR = "#4682B4";
 
-export const QUERY_RESULTS_TABLE_HEADER_BKCOLOR = "#B6D0E2";  // powder blue
+export const QUERY_RESULTS_TABLE_HEADER_BKCOLOR = "#85C1E9";  // powder blue
 export const QUERY_RESULTS_TABLE_HEADER_FORECOLOR = "#2F4F4F"; // dark slate gray
 export const QUERY_RESULTS_TABLE_HEADER_FONTSIZE = "12pt";
 export const QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT = "600";

@@ -10,6 +10,7 @@ import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentWrapper;
+import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryResult;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
@@ -54,6 +55,6 @@ public interface MainService {
     public OperationResult deleteDocument(String type, String group, String name);
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper);
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper);
-    public byte[] exportToExcel(QueryResult result);
+    public byte[] exportToExcel(ExcelExportWrapper wrapper);
 
 }

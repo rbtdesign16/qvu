@@ -28,8 +28,15 @@ import {
     SQL_KEYWORDS,
     getQuotedIdentifier,
     INFO,
-    ERROR} from "../../utils/helper";
-import {runQuery, isApiError} from "../../utils/apiHelper";
+    ERROR,
+    QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
+    QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
+    QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
+    QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
+    QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
+    QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
+    loadDocumentFromBlob } from "../../utils/helper";
+import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
     const {
@@ -372,16 +379,33 @@ const SqlDisplay = (props) => {
             } else {
                 hideMessage();
             }
+            
             setQueryResults(res.result);
         }
     };
 
     const haveQueryResults = () => {
         return queryResults && queryResults.data && queryResults.data.length > 0;
-    }
+    };
     
-    const exportToExcel = () => {
-    }
+     const excelExport = async () => {
+          let wrapper = {
+            queryResults: queryResults,
+            headerFontColor: QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
+            headerBackgroundColor: QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
+            headerFontSize: QUERY_RESULTS_TABLE_HEADER_FONTSIZE.replace("pt", ""),
+            detailFontColor: QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
+            detailBackgroundColor: QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
+            detailFontSize: QUERY_RESULTS_TABLE_DETAIL_FONTSIZE.replace("pt", "")
+        };
+        
+        let res = await exportToExcel(wrapper);
+        let blob = new Blob([res.data], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          });
+        loadDocumentFromBlob("excel-export.xlsx", blob);
+    };
+    
     return <div id="sql-display">
         <ParameterEntryModal config={showParameterEntry}/>
         <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
@@ -389,7 +413,7 @@ const SqlDisplay = (props) => {
                 <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
             </span>
             <span  title={getText("Export to excel")} style={{marginRight: "10px"}}>
-                {haveQueryResults() ? <AiOutlineFileExcel className="icon-s cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => exportToExcel()} />
+                {haveQueryResults() ? <AiOutlineFileExcel className="icon-s cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => excelExport()} />
                     : <AiOutlineFileExcel className="icon-s-dis" size={MEDIUM_ICON_SIZE + 2} />}
             </span>
             <span  title={getText("Run query")} >

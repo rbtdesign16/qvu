@@ -35,7 +35,7 @@ export const QUERY_RESULTS_TABLE_HEADER_FORECOLOR = "#2F4F4F"; // dark slate gra
 export const QUERY_RESULTS_TABLE_HEADER_FONTSIZE = "12pt";
 export const QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT = "600";
 
-export const QUERY_RESULTS_TABLE_DETAIL_BKCOLOR = "white";  
+export const QUERY_RESULTS_TABLE_DETAIL_BKCOLOR = "white";
 export const QUERY_RESULTS_TABLE_DETAIL_FORECOLOR = "#2F4F4F"; // dark slate gray
 export const QUERY_RESULTS_TABLE_DETAIL_FONTSIZE = "11pt";
 export const QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT = "400";
@@ -414,17 +414,21 @@ export const isAlphanumeric = (e) => {
 };
 
 export const isAllowedNumericKey = (e) => {
-    let code = e.code.toLowerCase();
-    let val = e.target.value;
-    let pos = e.target.selectionStart;
-    if (code && (ALLOWED_NUMERIC_KEYS.includes(e.key) || ALLOWED_NUMERIC_KEYS.includes(code))) {
-        if (code === "period") {
-            return (!val.includes(".") && (pos > 0));
-        } else if (code === "minus") {
-            return isEmpty(val) || (!val.includes("-") && (pos === 0));
-        } else {
-            return true;
+    if (e && e.code) {
+        let code = e.code.toLowerCase();
+        let val = e.target.value;
+        let pos = e.target.selectionStart;
+        if (code && (ALLOWED_NUMERIC_KEYS.includes(e.key) || ALLOWED_NUMERIC_KEYS.includes(code))) {
+            if (code === "period") {
+                return (!val.includes(".") && (pos > 0));
+            } else if (code === "minus") {
+                return isEmpty(val) || (!val.includes("-") && (pos === 0));
+            } else {
+                return true;
+            }
         }
+    } else {
+        return false;
     }
 };
 
@@ -471,3 +475,41 @@ export const updateAndOr = (fc) => {
         }
     }
 };
+
+export const getDisplayDate = (input) => {
+    let retval = input;
+
+    if (retval) {
+        if (input.length > 9) {
+            retval = input.substring(0, 10);
+        }
+    }
+
+    return retval;
+};
+
+export const getDisplayTimestamp = (input) => {
+    let retval = input;
+
+    if (retval) {
+        if (input.length > 19) {
+            retval = input.substring(0, 19).replace("T", " ");
+        }
+    }
+
+    return retval;
+};
+
+export const getDisplayTime = (input) => {
+    let retval = input;
+
+    if (retval) {
+        let pos = input.indexOf("T");
+        if ((pos > -1) && (input.length > 17)) {
+            retval = input.substring(pos + 2, 8);
+        }
+    }
+
+    return retval;
+};
+

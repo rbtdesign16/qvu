@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +18,9 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
  * @author rbtuc
  */
 public class Constants {
+    public static final SimpleDateFormat FILE_TS_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     // environment variables for ecternal config 
     public static final String SECURITY_TYPE_PROPERTY = "security.type";

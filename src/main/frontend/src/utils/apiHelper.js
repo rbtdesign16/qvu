@@ -341,3 +341,10 @@ export const runQuery = async (doc, params) => {
 };
 
 
+export const exportToExcel = async (excelExport) => {
+    try {
+        return await axios.post(getApiURL() + "/query/excel/export", excelExport, {responseType: "arraybuffer"});
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e};
+    }
+}

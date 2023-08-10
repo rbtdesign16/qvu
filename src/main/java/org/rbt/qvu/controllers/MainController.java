@@ -18,6 +18,7 @@ import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentWrapper;
+import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryResult;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
@@ -221,9 +222,9 @@ public class MainController {
     }
 
     @PostMapping("api/v1/query/excel/export")
-    public HttpEntity<byte[]> exportToExcel(@RequestBody QueryResult queryResult) {
+    public HttpEntity<byte[]> exportToExcel(@RequestBody ExcelExportWrapper wrapper) {
         LOG.debug("in exportToExcel()");
-        byte[] excelContent = service.exportToExcel(queryResult);
+        byte[] excelContent = service.exportToExcel(wrapper);
         HttpHeaders header = new HttpHeaders();
         header.setContentType(new MediaType("application", "vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
         header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=my_file.xls");

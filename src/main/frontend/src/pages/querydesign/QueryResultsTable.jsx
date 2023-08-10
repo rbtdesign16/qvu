@@ -7,33 +7,61 @@ import Button from "react-bootstrap/Button";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import {
-    isDataTypeNumeric,
-    isDataTypeString,
-    isDataTypeDateTime,
-    DEFAULT_PIXELS_PER_CHARACTER,
-    QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-    QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-    QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
-    QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT,
-    QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-    QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-    QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
-    QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT} from "../../utils/helper";
+isDataTypeNumeric,
+        isDataTypeString,
+        isDataTypeDateTime,
+        getDisplayDate,
+        getDisplayTimestamp,
+        getDisplayTime,
+        JDBC_TYPE_DATE,
+        JDBC_TYPE_TIME,
+        JDBC_TYPE_TIMESTAMP,
+        JDBC_TYPE_TIME_WITH_TIMEZONE,
+        JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
+        DEFAULT_PIXELS_PER_CHARACTER,
+        QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
+        QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
+        QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
+        QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT,
+        QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
+        QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
+        QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
+        QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT} from "../../utils/helper";
 
 const QueryResultsTable = () => {
     const {queryResults} = useQueryDesign();
     const {getText} = useLang();
+    const {data, initialColumnWidths, columnTypes, header} = queryResults;
 
     const getHeaderColumns = () => {
         return queryResults.header.map(h => <div>{h}</div>);
     };
 
+    const getDisplayData = (coldata, indx) => {
+        switch (columnTypes[indx]) {
+            case JDBC_TYPE_DATE:
+                return getDisplayDate(coldata);
+            case JDBC_TYPE_TIME:
+            case JDBC_TYPE_TIME_WITH_TIMEZONE:
+                return getDisplayTime(coldata);
+            case JDBC_TYPE_TIMESTAMP:
+            case JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE:
+                return getDisplayTimestamp(coldata);
+            default:
+                return coldata;
+
+        }
+    }
+
     const getColumnDetail = (row, columnStyles) => {
-        return row.map((coldata, indx) => <div style={columnStyles[indx]}>{coldata}</div>);
+
+        return row.map((coldata, indx) => {
+            return <div style={columnStyles[indx]}>{getDisplayData(coldata, indx)}</div>;
+        });
     };
 
     const getDetail = (detailStyle, columnStyles) => {
-        return queryResults.data.map(r => <div style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
+        return data.map(r => <div style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
     };
 
     const getFooter = () => {
@@ -43,8 +71,8 @@ const QueryResultsTable = () => {
     const getGridWidths = () => {
         let retval = "";
         let space = "";
-        for (let i = 0; i < queryResults.initialColumnWidth.length; ++i) {
-            retval += (space + (DEFAULT_PIXELS_PER_CHARACTER * queryResults.initialColumnWidth[i]) + "px");
+        for (let i = 0; i < initialColumnWidths.length; ++i) {
+            retval += (space + (DEFAULT_PIXELS_PER_CHARACTER * initialColumnWidths[i]) + "px");
             space = " ";
         }
 
@@ -92,10 +120,10 @@ const QueryResultsTable = () => {
     const getDetailColumnStyles = () => {
         let retval = [];
 
-        for (let i = 0; i < queryResults.columnTypes.length; ++i) {
+        for (let i = 0; i < columnTypes.length; ++i) {
             retval.push({
                 border: "solid 1px darkslategray",
-                textAlign: getTextAlign(queryResults.columnTypes[i]),
+                textAlign: getTextAlign(columnTypes[i]),
                 padding: "3px",
                 overflow: "hidden"
             });
@@ -106,14 +134,14 @@ const QueryResultsTable = () => {
 
     const getTableWidth = () => {
         let retval = 0;
-        for (let i = 0; i < queryResults.initialColumnWidth.length; ++i) {
-            retval += (DEFAULT_PIXELS_PER_CHARACTER * queryResults.initialColumnWidth[i]);
+        for (let i = 0; i < initialColumnWidths.length; ++i) {
+            retval += (DEFAULT_PIXELS_PER_CHARACTER * initialColumnWidths[i]);
         }
 
         return retval;
     };
 
-    if (queryResults && queryResults.initialColumnWidth) {
+    if (initialColumnWidths) {
         return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
             <div style={getHeaderStyle()}>{getHeaderColumns()}</div>
             <div className="query-results-table-body">

@@ -10,8 +10,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.rbt.qvu.configuration.database.DataSources;
@@ -22,13 +26,9 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.util.AreaReference;
-import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFTable;
-import org.apache.poi.xssf.usermodel.XSSFTableStyleInfo;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
@@ -53,6 +53,7 @@ import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentWrapper;
+import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
@@ -78,7 +79,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Service
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
-
+    
     @Autowired
     private DataSources qvuds;
 
@@ -94,9 +95,9 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private DBHelper dbHelper;
 
-    private DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
+    private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
-    private CacheHelper cacheHelper = new CacheHelper();
+    private final CacheHelper cacheHelper = new CacheHelper();
 
     @PostConstruct
     private void init() {
@@ -319,7 +320,7 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public String loadLang(String langkey) {
-        String retval = "";
+        String retval;
         Map<String, String> langMap = config.getLangResources().get(langkey);
         if (langMap == null) {
             retval = fileHandler.getGson(true).toJson(config.getLangResources().get(Constants.DEFAULT_LANGUAGE_KEY));
@@ -519,7 +520,7 @@ public class MainServiceImpl implements MainService {
     }
 
     private void setIndexColumns(DatabaseMetaData dmd, Table t) throws Exception {
-        ResultSet res = null;
+        ResultSet res;
         Map<String, Column> cmap = new HashMap<>();
         for (Column c : t.getColumns()) {
             cmap.put(c.getName().toLowerCase(), c);
@@ -964,6 +965,7 @@ public class MainServiceImpl implements MainService {
 
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
                 Object o = res.getObject(i + 1);
+                
                 if (o != null) {
                     cwidths[i] = cwidths[i] + o.toString().length();
                 }
@@ -997,7 +999,7 @@ public class MainServiceImpl implements MainService {
                 if (hdrlen > cwidths[i]) {
                     cwidths[i] = hdrlen;
                 }
-                retval.getInitialColumnWidth().add(cwidths[i]);
+                retval.getInitialColumnWidths().add(cwidths[i]);
             }
         }
 
@@ -1064,46 +1066,71 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public byte[] exportToExcel(QueryResult result) {
+    public byte[] exportToExcel(ExcelExportWrapper wrapper) {
         XSSFWorkbook wb = new XSSFWorkbook();
-        XSSFSheet sheet = wb.createSheet();
-
-        // Set which area the table should be placed in
-        AreaReference reference = wb.getCreationHelper().createAreaReference(
-                new CellReference(0, 0), new CellReference(2, 2));
-
-        // Create
-        XSSFTable table = sheet.createTable(reference);
-        table.setName("Test");
-        table.setDisplayName("Test_Table");
-
-        // For now, create the initial style in a low-level way
-        table.getCTTable().addNewTableStyleInfo();
-        table.getCTTable().getTableStyleInfo().setName("TableStyleMedium2");
-
-        // Style the table
-        XSSFTableStyleInfo style = (XSSFTableStyleInfo) table.getStyle();
-        style.setName("TableStyleMedium2");
-        style.setShowColumnStripes(false);
-        style.setShowRowStripes(true);
-        style.setFirstColumn(false);
-        style.setLastColumn(false);
-        style.setShowRowStripes(true);
-        style.setShowColumnStripes(true);
-
+        
+        String name = wrapper.getName();
+        if (StringUtils.isEmpty(name)) {
+            name = "excel=export-" + Constants.FILE_TS_FORMAT.format(new Date()) + ".xlsx";
+        }
+        
+        XSSFSheet sheet = wb.createSheet(name);
+ 
         // Set the values for the table
         XSSFRow row;
         XSSFCell cell;
-        for (int i = 0; i < 3; i++) {
-            // Create row
-            row = sheet.createRow(i);
-            for (int j = 0; j < 3; j++) {
+        int rownum = 0;
+        row = sheet.createRow(rownum++);
+        List<String> header = wrapper.getQueryResults().getHeader();
+        for (int i = 0; i < header.size(); ++i) {
+            cell = row.createCell(i);
+            cell.setCellValue(header.get(i));
+        }
+
+        List<Integer> columnTypes = wrapper.getQueryResults().getColumnTypes();
+        List<List<Object>> data = wrapper.getQueryResults().getData();
+        for (int i = 0; i < data.size(); ++i) {
+            row = sheet.createRow(rownum++);
+            List<Object> rowdata = data.get(i);
+            for (int j = 0; j < rowdata.size(); j++) {
                 // Create cell
                 cell = row.createCell(j);
-                if (i == 0) {
-                    cell.setCellValue("Column" + (j + 1));
-                } else {
-                    cell.setCellValue((i + 1.0) * (j + 1.0));
+                Object val = rowdata.get(j);
+                switch (columnTypes.get(j)) {
+                    case java.sql.Types.TINYINT:
+                    case java.sql.Types.SMALLINT:
+                    case java.sql.Types.INTEGER:
+                    case java.sql.Types.BIGINT:
+                    case java.sql.Types.REAL:
+                    case java.sql.Types.DOUBLE:
+                    case java.sql.Types.NUMERIC:
+                    case java.sql.Types.DECIMAL:
+                        cell.setCellValue((val != null) ? Double.valueOf(val.toString()) : null);
+                        break;
+                    case java.sql.Types.DATE:
+                        cell.setCellValue(Helper.getDate(val));
+                        break;
+                    case java.sql.Types.TIME:
+                    case java.sql.Types.TIME_WITH_TIMEZONE:
+                        cell.setCellValue(Helper.getTime(val));
+                        break;
+                    case java.sql.Types.TIMESTAMP:
+                    case java.sql.Types.TIMESTAMP_WITH_TIMEZONE:
+                        cell.setCellValue(Helper.getTimestamp(val));
+                        break;
+                    case java.sql.Types.CHAR:
+                    case java.sql.Types.VARCHAR:
+                    case java.sql.Types.LONGVARCHAR:
+                    case java.sql.Types.CLOB:
+                    case java.sql.Types.NCHAR:
+                    case java.sql.Types.NVARCHAR:
+                    case java.sql.Types.LONGNVARCHAR:
+                    case java.sql.Types.NCLOB:
+                        cell.setCellValue((val != null) ? val.toString() : null);
+                        break;
+                    default:
+                        cell.setCellValue((val != null) ? val.toString() : null);
+                        break;
                 }
             }
         }
@@ -1112,11 +1139,11 @@ public class MainServiceImpl implements MainService {
         byte[] retval = null;
         // Save
         ByteArrayOutputStream bos = null;
-        
-        try {
+         try {
             bos = new ByteArrayOutputStream();
             wb.write(bos);
             retval = bos.toByteArray();
+            System.out.println("------------>xxx");
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         } finally {

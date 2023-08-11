@@ -88,7 +88,7 @@ import { getDatasourceTreeViewData,
 
     const hideShowSave = () => {
         setShowSaveDocument({show: false, type: QUERY_DOCUMENT_TYPE});
-    }
+    };
 
     const onSaveDocument = () => {
         setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave});
@@ -160,7 +160,7 @@ import { getDatasourceTreeViewData,
     };
 
     const loadDocument = (docinfo) => {
-    }
+    };
     
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});
@@ -181,7 +181,7 @@ import { getDatasourceTreeViewData,
                 + ",    " 
                 + getText("Document", ":  ")
                 + currentDocument.name;
-    }
+    };
     
     useEffect(() => {
         setTreeViewData(null);

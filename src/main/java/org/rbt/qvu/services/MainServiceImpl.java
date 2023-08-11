@@ -962,6 +962,7 @@ public class MainServiceImpl implements MainService {
         // rowcount 
         retval.getHeader().add("#");
         int[] cwidths = new int[rmd.getColumnCount()];
+        retval.getColumnTypes().add(java.sql.Types.INTEGER);
         for (int i = 0; i < cwidths.length; ++i) {
             String nm = rmd.getColumnLabel(i + 1);
             if (StringUtils.isEmpty(nm)) {
@@ -973,7 +974,6 @@ public class MainServiceImpl implements MainService {
 
         int rowcnt = 0;
         retval.getInitialColumnWidths().add(Constants.DEFAULT_ROW_NUMBER_WIDTH);
-        retval.getColumnTypes().add(java.sql.Types.INTEGER);
         while (res.next()) {
             List<Object> row = new ArrayList<>();
             

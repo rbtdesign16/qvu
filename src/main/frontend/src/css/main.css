@@ -422,6 +422,11 @@ select {
     overflow: hidden;
 }
 
+.query-design-cont .tab-content {
+    height: calc(100% - 60px); 
+    overflow: auto;
+}
+
 .multi-select {
     min-width: 275px;
     height: 28px;

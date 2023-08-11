@@ -164,6 +164,11 @@ public class DBHelper {
                 }
 
                 comma = ", ";
+                
+                if (StringUtils.isNotEmpty(c.getDisplayName())) {
+                    retval.append(" as ");
+                    retval.append(withQuotes(dbType, c.getDisplayName()));
+                }
 
                 if (c.getSortPosition() > 0) {
                     orderBy.add(c);

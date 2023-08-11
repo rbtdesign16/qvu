@@ -963,7 +963,11 @@ public class MainServiceImpl implements MainService {
         retval.getHeader().add("#");
         int[] cwidths = new int[rmd.getColumnCount()];
         for (int i = 0; i < cwidths.length; ++i) {
-            retval.getHeader().add(rmd.getColumnName(i + 1));
+            String nm = rmd.getColumnLabel(i + 1);
+            if (StringUtils.isEmpty(nm)) {
+                nm = rmd.getColumnName(i + 1);
+            }
+            retval.getHeader().add(nm);
             retval.getColumnTypes().add(rmd.getColumnType(i + 1));
         }
 

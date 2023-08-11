@@ -31,6 +31,7 @@ public class Constants {
     public static final String SAML_SECURITY_TYPE = "saml";
     
     public static final int DEFAULT_PIXELS_PER_CHARACTER = 12;
+    public static final int DEFAULT_ROW_NUMBER_WIDTH = 4;
     
     public static final String DEFAULT_ADMINISTRATOR_ROLE = "administrator";
     public static final String DEFAULT_QUERY_DESIGNER_ROLE = "query designer";

@@ -959,15 +959,23 @@ public class MainServiceImpl implements MainService {
 
         ResultSetMetaData rmd = res.getMetaData();
 
+        // rowcount 
+        retval.getHeader().add("#");
         int[] cwidths = new int[rmd.getColumnCount()];
         for (int i = 0; i < cwidths.length; ++i) {
             retval.getHeader().add(rmd.getColumnName(i + 1));
             retval.getColumnTypes().add(rmd.getColumnType(i + 1));
         }
 
+        int rowcnt = 0;
+        retval.getInitialColumnWidths().add(Constants.DEFAULT_ROW_NUMBER_WIDTH);
+        retval.getColumnTypes().add(java.sql.Types.INTEGER);
         while (res.next()) {
             List<Object> row = new ArrayList<>();
+            
+            row.add(rowcnt + 1);
 
+            rowcnt++;
             for (int i = 0; i < rmd.getColumnCount(); ++i) {
                 Object o = res.getObject(i + 1);
 
@@ -980,13 +988,12 @@ public class MainServiceImpl implements MainService {
             retval.getData().add(row);
         }
 
-        Integer rowcnt = retval.getData().size();
         retval.setRowCount(rowcnt);
         if (rowcnt > 0) {
             for (Integer i = 0; i < cwidths.length; ++i) {
-                Integer hdrlen = (retval.getHeader().get(i).length() + 4);
+                Integer hdrlen = (retval.getHeader().get(i+1).length() + 4);
 
-                int type = retval.getColumnTypes().get(i);
+                int type = retval.getColumnTypes().get(i + 1);
                 if (dbHelper.isDataTypeDateTime(type)) {
                     cwidths[i] = DBHelper.DEFAULT_DATETIME_DISPLAY_COLUMN_WIDTH;
                 } else if (dbHelper.isDataTypeNumeric(type)) {

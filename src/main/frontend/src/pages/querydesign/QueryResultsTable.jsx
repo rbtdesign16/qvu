@@ -103,11 +103,18 @@ const QueryResultsTable = () => {
         let retval = [];
 
         for (let i = 0; i < columnTypes.length; ++i) {
-            retval.push({
-                textAlign: getTextAlign(columnTypes[i])
-            });
-        }
+            if (i > 0) {
+                retval.push({
+                    textAlign: getTextAlign(columnTypes[i])
+                });
+            } else {
+                retval.push({
+                    textAlign: "center",
+                 });
 
+            }
+        }
+        
         return retval;
     };
 

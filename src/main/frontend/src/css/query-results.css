@@ -59,6 +59,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     border-right: var(--query-results-table-border);
 }
 
+.query-results-table-det > div:nth-child(1) {
+    border-right: var(--query-results-table-border);
+    background-color: var(--query-results-table-detail-rownum-bkcolor);
+}
+
 .query-results-table-body > div:nth-child(odd) {
     background-color: var(--query-results-table-detail-row-bkcolor1);
 }

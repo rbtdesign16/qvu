@@ -1006,6 +1006,10 @@ public class MainServiceImpl implements MainService {
                 }
                 retval.getInitialColumnWidths().add(cwidths[i]);
             }
+        } else {
+            for (Integer i = 0; i < cwidths.length; ++i) {
+                retval.getInitialColumnWidths().add(retval.getHeader().get(i).length() + 4);
+            }
         }
 
         return retval;

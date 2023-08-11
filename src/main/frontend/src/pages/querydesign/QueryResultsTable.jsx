@@ -142,6 +142,7 @@ const QueryResultsTable = () => {
     };
 
     if (initialColumnWidths) {
+        console.log("----->" + JSON.stringify(queryResults));
         return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
             <div style={getHeaderStyle()}>{getHeaderColumns()}</div>
             <div className="query-results-table-body">

@@ -98,7 +98,7 @@ const EditableDataList = (props) => {
     };
 
     return (
-            <div  className="editable-data-list" style={{width: listConfig.width, height: listConfig.height}}>
+            <div  className="editable-data-list" style={{width: listConfig.width}}>
                 <div className="title">
                     <span>{listConfig.title}</span>
                     {listConfig.onAdd &&

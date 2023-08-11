@@ -185,7 +185,6 @@
         "Datasources": "Datasources",
         "Users": "Users",
         "errorCode-5": "$1 document $2 not found",
-        "Save Document": "Save $1 Document",
         "Document saved": "Document $1 saved",
         "Saving document": "Saving document $1",
         "Copy sql to clipboard": "Copy sql to clipboard",
@@ -194,6 +193,17 @@
         "Running query": "Runnig query",
         "Export to excel": "Export to excel",
         "Data Select": "Data Select",
-        "Query Documents": "Query Documents"
+        "Query Documents": "Query Documents",
+        "Select query document": "Select query document",
+        "Select report document": "Select report document",
+        "default document name": "new-query-doc",
+        "Save Document": "Save Document",
+        "New Document": "New Document",
+        "Load": "Load",
+        "Save": "Save Document",
+        "New": "New",
+        "Load": "Load",
+        "Group": "Group",
+        "Document": "Document"
     }
 }

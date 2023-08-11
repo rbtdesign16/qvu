@@ -180,6 +180,12 @@ img {
     white-space: nowrap;
 }
 
+.query-design-tab {
+    position: absolute; 
+    height: 100%; 
+    width: 100%;
+}
+
 .editable-data-list {
     overflow: hidden;
     height: calc(100% - 20px) !important;
@@ -414,12 +420,6 @@ select {
     width: 100%;
     padding-top: 10px;
     overflow: hidden;
-}
-
-.query-design-cont .tab-content {
-    overflow: auto;
-    height: calc(100% - 60px);
-    width: 100%;
 }
 
 .multi-select {

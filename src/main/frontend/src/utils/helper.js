@@ -20,6 +20,7 @@ export const DEFAULT_ERROR_TITLE = "Error";
 export const DEFAULT_WARN_TITLE = "Warning";
 
 export const DEFAULT_DOCUMENT_GROUP = "general";
+export const DEFAULT_NEW_DOCUMENT_NAME = "default document name";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 

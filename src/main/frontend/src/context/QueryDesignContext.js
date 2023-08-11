@@ -5,12 +5,17 @@ import {
     isDataTypeNumeric,
     isDataTypeDateTime,
     isEmpty,
-    updateAndOr
+    updateAndOr,
+    DEFAULT_NEW_DOCUMENT_NAME, 
+    DEFAULT_DOCUMENT_GROUP
     } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
+import useLang from "./LangContext";
+
 export const QueryDesignContext = createContext();
 
 export const QueryDesignProvider = ({ children }) => {
+    const {getText} = useLang();
     const [datasource, setDatasource] = useState(null);
     const [treeViewData, setTreeViewData] = useState(null);
     const [baseTable, setBaseTable] = useState(null);
@@ -21,7 +26,10 @@ export const QueryDesignProvider = ({ children }) => {
     const [fromClause, setFromClause] = useState(null);
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
     const [queryResults, setQueryResults] = useState({header: [], data: []});
-
+    const [currentDocument, setCurrentDocument] = useState({
+        name: getText(DEFAULT_NEW_DOCUMENT_NAME), 
+        group: DEFAULT_DOCUMENT_GROUP
+    });
     const getColumnNameForDisplay = (s) => {
         let retval = "";
 
@@ -372,7 +380,17 @@ export const QueryDesignProvider = ({ children }) => {
         setFilterColumns([]);
         setFromClause(null);
         setQueryResults({header: [], data: []});
-    }
+    };
+    
+    const setNewDocument = () => {
+        setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME), 
+        group: DEFAULT_DOCUMENT_GROUP});
+        clearData();
+    };
+    
+    
+    const setDocument = (doc) => {
+    };  
     
     useEffect(() => {
         updateSelectColumns();
@@ -410,7 +428,11 @@ export const QueryDesignProvider = ({ children }) => {
                     buildRunDocument,
                     queryResults,
                     setQueryResults,
-                    getColumnNameForDisplay}}>
+                    getColumnNameForDisplay,
+                    setNewDocument,
+                    setDocument,
+                    currentDocument
+                }}>
                 {children}
             </QueryDesignContext.Provider>
             );

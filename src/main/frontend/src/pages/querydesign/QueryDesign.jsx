@@ -14,6 +14,7 @@ import SelectColumnList from "./SelectColumnList";
 import QueryFilter from "./QueryFilter";
 import QuerySql from "./QuerySql";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
+import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
@@ -44,11 +45,15 @@ import { getDatasourceTreeViewData,
         baseTable,
         fromClause,
         splitter1Sizes,
-        setSplitter1Sizes} = useQueryDesign();
+        setSplitter1Sizes,
+        currentDocument,
+        setNewDocument,
+        setDocument} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
+    const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
 
     const loadDatasourceOptions = () => {
         if (datasources) {
@@ -154,7 +159,28 @@ import { getDatasourceTreeViewData,
         setSplitter1Sizes(e.sizes);
     };
 
-    const onLOadDocument = () => {
+    const loadDocument = (docinfo) => {
+    }
+    
+    const hideDocumentSelect = () => {
+        setShowDocumentSelect({show: false});
+    };
+    
+    const onShowDocumentSelect = () => {
+        setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument});
+    };
+    
+    const onNewDocument = () => {
+        setNewDocument();
+    };
+    
+    const getDocumentInfo = () => {
+        return "    " 
+                + getText("Group", ":  ") 
+                + currentDocument.group 
+                + ",    " 
+                + getText("Document", ":  ")
+                + currentDocument.name;
     }
     
     useEffect(() => {
@@ -163,11 +189,13 @@ import { getDatasourceTreeViewData,
     }, [datasources]);
 
     return (
-            <div>
+            <div className="query-design-tab">
                 <SaveDocumentModal config={showSaveDocument}/>
-                <Button size="sm"  style={{marginLeft: "10px", marginBottom: "2px"}} onClick={() => onLoadDocument()}>{getText("Load Query Document")}</Button>
-                <Button size="sm"  style={{marginLeft: "10px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save Query Document")}</Button>
-            
+                <DocumentSelectModal config={showDocumentSelect}/>
+                <Button size="sm"  title={getText("Load Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
+                <Button size="sm"  title={getText("Save Document")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>
+                <Button size="sm"  title={getText("New Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewDocument()}>{getText("New")}</Button>
+                <span className="cobaltBlue-f">{getDocumentInfo()}</span>
                 <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
                     <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
                         <label className="ck-label">{getText("Datasource")}</label>

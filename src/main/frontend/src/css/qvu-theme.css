@@ -45,5 +45,18 @@
     --message-body-font-size: 12pt;
     
     --splash-font-size: 30pt;
-    --splash-font-color: "#2370AC";
+    --splash-font-color: #2370AC;
+    
+    
+   --query-results-table-border: solid 1px darkslategray;
+   --query-results-table-hdr-data-bkcolor: #85C1E9;
+   --query-results-table-hdr-forecolor: #2F4F4F;
+   --query-results-table-hdr-fontsize: 12pt;
+   --query-results-table-hdr-fontweight: 600;
+
+   --query-results-table-detail-row-bkcolor1: white;
+   --query-results-table-detail-row-bkcolor2: azure;
+   --query-results-table-detail-forecolor: #2F4F4F;
+   --query-results-table-detail-fontsize: 11pt;
+   --query-results-table-detail-fontweight: 400;
 }

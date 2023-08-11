@@ -1,0 +1,69 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Aug 11, 2023, 10:41:43 AM
+    Author     : rbtuc
+*/
+@import "qvu-theme.css";
+
+.query-results-cont {
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.query-results-table {
+    position: relative;
+    height: 100%;
+    border: var(--query-results-table-border)
+}
+
+.query-results-table-body {
+    height: calc(100% - 30px);
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.query-results-table-hdr {
+    display: grid;
+    grid-template-columns: 0;
+    position: sticky;
+    text-align: center;
+    color: var(--query-results-table-hdr-forecolor);
+    font-size: var(--query-results-table-hdr-fontsize);
+    font-weight: var(--query-results-table-hdr-fontweight);
+    border-bottom: var(--query-results-table-border);
+    text-align: center;
+}
+
+.query-results-table-hdr > div {
+    background-color: var(--query-results-table-hdr-data-bkcolor);
+    padding: 2px;
+    border-right: var(--query-results-table-border);
+}
+
+.query-results-table-det {
+    display: grid;
+    grid-template-columns: 0;
+    position: sticky;
+    color: var(--query-results-table-detail-forecolor);
+    font-size: var(--query-results-table-detail-fontsize);
+    font-weight: var(--query-results-table-detail-fontweight);
+    border-bottom: var(--query-results-table-border);
+}
+
+.query-results-table-det > div {
+    padding: 2px;
+    border-right: var(--query-results-table-border);
+}
+
+.query-results-table-body > div:nth-child(odd) {
+    background-color: var(--query-results-table-detail-row-bkcolor1);
+}
+
+.query-results-table-body > div:nth-child(even) {
+    background-color: var(--query-results-table-detail-row-bkcolor2);
+}
+

@@ -512,22 +512,7 @@ textarea {
     overflow: hidden;
 }
 
-.query-results-table {
-    position: relative;
-    height: 100%;
-}
 
-.query-results-table-body {
-    height: calc(100% - 30px);
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.query-results-cont {
-    overflow-y: hidden;
-    overflow-x: auto;
-}
 
 .info-txt {
     margin-top: 30px;

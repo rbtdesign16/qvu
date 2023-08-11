@@ -6,27 +6,22 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
+import "../../css/query-results.css";
+
 import {
-isDataTypeNumeric,
-        isDataTypeString,
-        isDataTypeDateTime,
-        getDisplayDate,
-        getDisplayTimestamp,
-        getDisplayTime,
-        JDBC_TYPE_DATE,
-        JDBC_TYPE_TIME,
-        JDBC_TYPE_TIMESTAMP,
-        JDBC_TYPE_TIME_WITH_TIMEZONE,
-        JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
-        DEFAULT_PIXELS_PER_CHARACTER,
-        QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-        QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-        QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
-        QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT,
-        QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-        QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-        QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
-        QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT} from "../../utils/helper";
+    isDataTypeNumeric,
+    isDataTypeString,
+    isDataTypeDateTime,
+    getDisplayDate,
+    getDisplayTimestamp,
+    getDisplayTime,
+    JDBC_TYPE_DATE,
+    JDBC_TYPE_TIME,
+    JDBC_TYPE_TIMESTAMP,
+    JDBC_TYPE_TIME_WITH_TIMEZONE,
+    JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
+    DEFAULT_PIXELS_PER_CHARACTER,
+} from "../../utils/helper";
 
 const QueryResultsTable = () => {
     const {queryResults} = useQueryDesign();
@@ -51,7 +46,7 @@ const QueryResultsTable = () => {
                 return coldata;
 
         }
-    }
+    };
 
     const getColumnDetail = (row, columnStyles) => {
 
@@ -61,7 +56,7 @@ const QueryResultsTable = () => {
     };
 
     const getDetail = (detailStyle, columnStyles) => {
-        return data.map(r => <div style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
+        return data.map(r => <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
     };
 
     const getFooter = () => {
@@ -81,26 +76,13 @@ const QueryResultsTable = () => {
 
     const getHeaderStyle = () => {
         return {
-            display: "grid",
             gridTemplateColumns: getGridWidths(),
-            position: "sticky",
-            textAlign: "center",
-            border: "solid 1px #191970",
-            color: QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-            background: QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-            fontSize: QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
-            fontWeight: QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT
         };
     };
 
     const getDetailStyle = () => {
         return {
-            display: "grid",
-            gridTemplateColumns: getGridWidths(),
-            color: QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-            background: QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-            fontSize: QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
-            fontWeight: QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT
+           gridTemplateColumns: getGridWidths()
         };
     };
 
@@ -122,10 +104,7 @@ const QueryResultsTable = () => {
 
         for (let i = 0; i < columnTypes.length; ++i) {
             retval.push({
-                border: "solid 1px darkslategray",
-                textAlign: getTextAlign(columnTypes[i]),
-                padding: "3px",
-                overflow: "hidden"
+                textAlign: getTextAlign(columnTypes[i])
             });
         }
 
@@ -143,7 +122,7 @@ const QueryResultsTable = () => {
 
     if (initialColumnWidths) {
         return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
-            <div style={getHeaderStyle()}>{getHeaderColumns()}</div>
+            <div className="query-results-table-hdr" style={getHeaderStyle()}>{getHeaderColumns()}</div>
             <div className="query-results-table-body">
                 {getDetail(getDetailStyle(), getDetailColumnStyles())}
             </div>

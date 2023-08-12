@@ -109,7 +109,7 @@ const QueryResultsTable = () => {
     };
     
     const getHeaderColumns = () => {
-        return queryResults.header.map((h, indx) => <div>{h}{getSortFilter(indx)}</div>);
+        return queryResults.header.map((h, indx) => <div id={"h" + indx}>{h}{getSortFilter(indx)}</div>);
     };
 
     const getDisplayData = (coldata, indx) => {

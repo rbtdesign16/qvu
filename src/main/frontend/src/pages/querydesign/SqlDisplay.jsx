@@ -29,12 +29,6 @@ import {
     getQuotedIdentifier,
     INFO,
     ERROR,
-    QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-    QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-    QUERY_RESULTS_TABLE_HEADER_FONTSIZE,
-    QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-    QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-    QUERY_RESULTS_TABLE_DETAIL_FONTSIZE,
     loadDocumentFromBlob } from "../../utils/helper";
 import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
@@ -389,20 +383,23 @@ const SqlDisplay = (props) => {
     };
     
      const excelExport = async () => {
+         let style = getComputedStyle(document.documentElement);
+                 
           let wrapper = {
             queryResults: queryResults,
-            headerFontColor: QUERY_RESULTS_TABLE_HEADER_FORECOLOR,
-            headerBackgroundColor: QUERY_RESULTS_TABLE_HEADER_BKCOLOR,
-            headerFontSize: QUERY_RESULTS_TABLE_HEADER_FONTSIZE.replace("pt", ""),
-            detailFontColor: QUERY_RESULTS_TABLE_DETAIL_FORECOLOR,
-            detailBackgroundColor: QUERY_RESULTS_TABLE_DETAIL_BKCOLOR,
-            detailFontSize: QUERY_RESULTS_TABLE_DETAIL_FONTSIZE.replace("pt", "")
+            headerFontColor: style.getPropertyValue('--query-results-table-hdr-forecolor'),
+            headerBackgroundColor: style.getPropertyValue('--query-results-table-hdr-data-bkcolor'),
+            headerFontSize: style.getPropertyValue('--query-results-table-hdr-fontsize').replace("pt", ""),
+            detailFontColor: style.getPropertyValue('--query-results-table-detail-forecolor'),
+            detailBackgroundColor: style.getPropertyValue('--query-results-table-detail-row-bkcolor1'),
+            detailFontSize: style.getPropertyValue('--query-results-table-detail-fontsize').replace("pt", "")
         };
         
         let res = await exportToExcel(wrapper);
         let blob = new Blob([res.data], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           });
+          
         loadDocumentFromBlob("excel-export.xlsx", blob);
     };
     

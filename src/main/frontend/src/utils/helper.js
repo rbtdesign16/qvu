@@ -35,17 +35,6 @@ export const COLOR_CRIMSON = "crimson";
 export const COLOR_COBALT_BLUE = "#0020C2";
 export const COLOR_BLACK = "black";
 
-
-export const QUERY_RESULTS_TABLE_HEADER_BKCOLOR = "#85C1E9";  // powder blue
-export const QUERY_RESULTS_TABLE_HEADER_FORECOLOR = "#2F4F4F"; // dark slate gray
-export const QUERY_RESULTS_TABLE_HEADER_FONTSIZE = "12pt";
-export const QUERY_RESULTS_TABLE_HEADER_FONTWEIGHT = "600";
-
-export const QUERY_RESULTS_TABLE_DETAIL_BKCOLOR = "white";
-export const QUERY_RESULTS_TABLE_DETAIL_FORECOLOR = "#2F4F4F"; // dark slate gray
-export const QUERY_RESULTS_TABLE_DETAIL_FONTSIZE = "11pt";
-export const QUERY_RESULTS_TABLE_DETAIL_FONTWEIGHT = "400";
-
 export const ADMINISTRATOR_ROLE = "administrator";
 export const QUERY_DESIGNER_ROLE = "query designer";
 export const REPORT_DESIGNER_ROLE = "report designer";

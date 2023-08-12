@@ -1127,11 +1127,12 @@ public class MainServiceImpl implements MainService {
             int rownum = 0;
             row = sheet.createRow(rownum++);
             List<String> header = wrapper.getQueryResults().getHeader();
-            for (int i = 0; i < header.size(); ++i) {
-                cell = row.createCell(i);
+            for (int i = 1; i < header.size(); ++i) {
+                // Create cell - skip first data entry - this results is row num
+                cell = row.createCell(i-1);
                 cell.setCellValue(header.get(i));
                 cell.setCellStyle(headerStyle);
-                sheet.setColumnWidth(i, 25 * Constants.DEFAULT_PIXELS_PER_CHARACTER * wrapper.getQueryResults().getInitialColumnWidths().get(i));
+                sheet.setColumnWidth(i-1, 25 * Constants.DEFAULT_PIXELS_PER_CHARACTER * wrapper.getQueryResults().getInitialColumnWidths().get(i));
             }
 
             List<Integer> columnTypes = wrapper.getQueryResults().getColumnTypes();
@@ -1139,9 +1140,9 @@ public class MainServiceImpl implements MainService {
             for (int i = 0; i < data.size(); ++i) {
                 row = sheet.createRow(rownum++);
                 List<Object> rowdata = data.get(i);
-                for (int j = 0; j < rowdata.size(); j++) {
-                    // Create cell
-                    cell = row.createCell(j);
+                for (int j = 1; j < rowdata.size(); j++) {
+                    // Create cell - skip first data entry - this results is row num
+                    cell = row.createCell(j-1);
                     Object val = rowdata.get(j);
                     if (val != null) {
                         switch (columnTypes.get(j)) {

@@ -382,6 +382,7 @@ export const QueryDesignProvider = ({ children }) => {
         setFilterColumns([]);
         setFromClause(null);
         setQueryResults({header: [], data: []});
+        setCurrentResultsSort({column: 0, direction: "asc"});
     };
     
     const setNewDocument = () => {

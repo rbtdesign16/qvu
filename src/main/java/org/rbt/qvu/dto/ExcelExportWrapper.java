@@ -14,7 +14,8 @@ public class ExcelExportWrapper {
     private String headerBackgroundColor;
     private int headerFontSize;
     private String detailFontColor;
-    private String detailBackgroundColor;
+    private String detailBackgroundColor1;
+    private String detailBackgroundColor2;
     private int detailFontSize;
     private String name;
 
@@ -58,14 +59,6 @@ public class ExcelExportWrapper {
         this.detailFontColor = detailFontColor;
     }
 
-    public String getDetailBackgroundColor() {
-        return detailBackgroundColor;
-    }
-
-    public void setDetailBackgroundColor(String detailBackgroundColor) {
-        this.detailBackgroundColor = detailBackgroundColor;
-    }
-
     public int getDetailFontSize() {
         return detailFontSize;
     }
@@ -80,6 +73,22 @@ public class ExcelExportWrapper {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDetailBackgroundColor1() {
+        return detailBackgroundColor1;
+    }
+
+    public void setDetailBackgroundColor1(String detailBackgroundColor1) {
+        this.detailBackgroundColor1 = detailBackgroundColor1;
+    }
+
+    public String getDetailBackgroundColor2() {
+        return detailBackgroundColor2;
+    }
+
+    public void setDetailBackgroundColor2(String detailBackgroundColor2) {
+        this.detailBackgroundColor2 = detailBackgroundColor2;
     }
     
     

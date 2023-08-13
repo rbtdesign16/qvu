@@ -1111,17 +1111,48 @@ public class MainServiceImpl implements MainService {
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
             headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            byte[] rgbB = Hex.decodeHex(wrapper.getHeaderBackgroundColor().substring(1));
+            byte[] rgbB = Hex.decodeHex(wrapper.getHeaderBackgroundColor());
             XSSFColor color = new XSSFColor(rgbB, null);
             headerStyle.setFillForegroundColor(color);
             headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             headerFont.setBold(true);
 
             headerFont.setFontHeightInPoints((short) wrapper.getHeaderFontSize());
-            rgbB = Hex.decodeHex(wrapper.getHeaderFontColor().substring(1));
+            rgbB = Hex.decodeHex(wrapper.getHeaderFontColor());
             headerFont.setColor( new XSSFColor(rgbB, null).getIndex());
             headerStyle.setFont(headerFont);
             
+            XSSFCellStyle detailStyle1 = wb.createCellStyle();
+            Font detailFont = wb.createFont();
+            detailStyle1.setBorderLeft(BorderStyle.THIN);
+            detailStyle1.setBorderTop(BorderStyle.THIN);
+            detailStyle1.setBorderRight(BorderStyle.THIN);
+            detailStyle1.setBorderBottom(BorderStyle.THIN);
+            
+            rgbB = Hex.decodeHex(wrapper.getDetailBackgroundColor1());
+            color = new XSSFColor(rgbB, null);
+            detailStyle1.setFillForegroundColor(color);
+            detailStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            detailFont.setFontHeightInPoints((short) wrapper.getDetailFontSize());
+            rgbB = Hex.decodeHex(wrapper.getDetailFontColor());
+            detailFont.setColor( new XSSFColor(rgbB, null).getIndex());
+            detailFont.setFontHeightInPoints((short) wrapper.getDetailFontSize());
+
+            detailStyle1.setFont(detailFont);
+
+
+            XSSFCellStyle detailStyle2 = wb.createCellStyle();
+            detailStyle2.setBorderLeft(BorderStyle.THIN);
+            detailStyle2.setBorderTop(BorderStyle.THIN);
+            detailStyle2.setBorderRight(BorderStyle.THIN);
+            detailStyle2.setBorderBottom(BorderStyle.THIN);
+            
+            rgbB = Hex.decodeHex(wrapper.getDetailBackgroundColor2());
+            color = new XSSFColor(rgbB, null);
+            detailStyle2.setFillForegroundColor(color);
+            detailStyle2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            detailStyle2.setFont(detailFont);
+
             XSSFRow row;
             XSSFCell cell;
             int rownum = 0;
@@ -1143,6 +1174,11 @@ public class MainServiceImpl implements MainService {
                 for (int j = 1; j < rowdata.size(); j++) {
                     // Create cell - skip first data entry - this results is row num
                     cell = row.createCell(j-1);
+                    if ((i % 2) == 0) {
+                        cell.setCellStyle(detailStyle1);
+                    } else {
+                        cell.setCellStyle(detailStyle2);
+                    }
                     Object val = rowdata.get(j);
                     if (val != null) {
                         switch (columnTypes.get(j)) {

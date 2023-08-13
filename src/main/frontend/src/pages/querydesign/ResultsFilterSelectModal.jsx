@@ -15,12 +15,12 @@ import {MODAL_TITLE_SIZE, isNotEmpty, doSortCompare} from "../../utils/helper";
 const ResultsFilterSelectModal = (props) => {
     const {config} = props;
     const {getText} = useLang();
-    const {queryResults, setColumnFilter} = useQueryDesign();
+    const {queryResults, currentFilters, setCurrentFilters} = useQueryDesign();
     const {data, columnTypes, header} = queryResults;
     
     const getTitle = () => {
         if (config && header && config.columnIndex) {
-            return getText("Filter for", " " + header[config.columnIndex].displayName ? header[config.columnIndex].displayName : header[config.columnIndex].columnName);
+            return getText("Filter for", " " + header[config.columnIndex]);
         } else {
             return "";
         }
@@ -30,7 +30,13 @@ const ResultsFilterSelectModal = (props) => {
         config.hide();
     };
     
-    const handleChecked = (e, val) => {
+    const onShow = () => {
+        if (currentFilters[config.columnIndex]) {
+            let ck = getCheckboxes();
+             for (let i = 0; i < ck.length; ++i) {
+                 ck[i].checked = currentFilters[config.columnIndex].includes(ck[i].name);
+             }
+         }
     };
     
     const getEntries = () => {
@@ -40,7 +46,7 @@ const ResultsFilterSelectModal = (props) => {
         
         if (data) {
             data.map(r => {
-                let val = r[config.columnIndex]
+                let val = r[config.columnIndex];
                 if (isNotEmpty(val)) {
                     if (!s.has(val)) {
                         values.push(val);
@@ -57,23 +63,52 @@ const ResultsFilterSelectModal = (props) => {
         if (values.length > 0) {
             return values.map((v, indx) => {
                 let id = "cb-" + indx;
-                return <div><input id={id} type="checkbox" onChange={e => handleChecked(e, v)}/><label className="ck-label" htmlFor={id}>{v}</label></div>;
+                return <div><input id={id} name={v} type="checkbox" onChange={e => handleChecked(e, v)}/><label className="ck-label" htmlFor={id}>{v}</label></div>;
             }); 
         } else {
             return "";
         }
     };
     
+    const getCheckboxes = () => {
+        return document.querySelectorAll('input[type=checkbox]');
+    };
+    
     const onApply = () => {
+        let selected = [];
+        let ck = getCheckboxes();
+        if (ck) {
+            for (let i = 0; i < ck.length; ++i) {
+                if (ck[i].checked) {
+                    selected.push(ck[i].name);
+                }
+            }
+            
+            let cf = {...currentFilters};
+            cf[config.columnIndex] = selected;
+            setCurrentFilters(cf);
+        }
+        
+        onHide();
     };
 
     const onReset = () => {
+        let cf = {...currentFilters};
+        cf[config.columnIndex] = "";
+        setCurrentFilters(cf);
+        let ck = getCheckboxes();
+        if (ck) {
+            for (let i = 0; i < ck.length; ++i) {
+                ck[i].checked = false;
+            }
+        }
     };
 
     return (
             <div className="static-modal">
                 <Modal animation={false} 
                        show={config.show} 
+                       onShow={onShow}
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>

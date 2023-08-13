@@ -143,6 +143,30 @@ export const setErrorMessage = (pre, msg) => {
     }
 };
 
+export const checkColorString = (input) => {
+    let retval = input;
+    if (input) {
+        if (!input.startsWith("#")) {
+            retval = getHexColor(input);
+        } else if (input.length === 4) {
+            retval = input + input.substring(1);
+        }
+    }
+    
+    return retval;
+}
+
+
+export const getHexColor = (colorStr) => {
+    var a = document.createElement('div');
+    a.style.color = colorStr;
+    var colors = window.getComputedStyle(document.body.appendChild(a)).color.match(/\d+/g).map(function (a) {
+        return parseInt(a, 10);
+    });
+    document.body.removeChild(a);
+    return (colors.length >= 3) ? '#' + (((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1)) : false;
+};
+
 export const checkEntryFields = (config) => {
     let retval = true;
     for (let i = 0; i < config.entryConfig.length; ++i) {

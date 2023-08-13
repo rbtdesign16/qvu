@@ -54,8 +54,8 @@
    --query-results-table-hdr-fontsize: 12pt;
    --query-results-table-hdr-fontweight: 600;
 
-   --query-results-table-detail-row-bkcolor1: white;
-   --query-results-table-detail-row-bkcolor2: azure;
+   --query-results-table-detail-row-bkcolor1: #FFFFFF;
+   --query-results-table-detail-row-bkcolor2: #F0FFFF;
    --query-results-table-detail-forecolor: #2F4F4F;
    --query-results-table-detail-fontsize: 11pt;
    --query-results-table-detail-fontweight: 400;

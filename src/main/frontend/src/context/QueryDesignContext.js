@@ -26,7 +26,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [filterColumns, setFilterColumns] = useState([]);
     const [fromClause, setFromClause] = useState(null);
     const [currentResultsSort, setCurrentResultsSort] = useState({column: 0, direction: "asc"});
-
+    const [currentFilters, setCurrentFilters] = useState({});
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
     const [queryResults, setQueryResults] = useState({header: [], data: []});
     const [currentDocument, setCurrentDocument] = useState({
@@ -384,6 +384,7 @@ export const QueryDesignProvider = ({ children }) => {
         setFromClause(null);
         setQueryResults({header: [], data: []});
         setCurrentResultsSort({column: 0, direction: "asc"});
+        setCurrentFilters({});
     };
 
     const setNewDocument = () => {
@@ -471,7 +472,9 @@ export const QueryDesignProvider = ({ children }) => {
                                 currentResultsSort,
                                 setCurrentResultsSort,
                                 doSort,
-                                isCurrentSort
+                                isCurrentSort,
+                                currentFilters,
+                                setCurrentFilters
                             }}>
                 {children}
             </QueryDesignContext.Provider>

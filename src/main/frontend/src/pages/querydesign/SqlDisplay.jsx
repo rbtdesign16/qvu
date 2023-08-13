@@ -12,24 +12,26 @@ import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
-    isSqlOrderByRequired,
-    isSqlGroupByRequired,
-    isSqlHavingRequired,
-    isSqlWhereRequired,
-    isDataTypeString,
-    isDataTypeDateTime,
-    UNARY_COMPARISON_OPERATORS,
-    DB_TYPE_MYSQL,
-    DB_TYPE_SQLSERVER,
-    DB_TYPE_ORACLE,
-    DB_TYPE_POSTGRES,
-    MEDIUM_ICON_SIZE,
-    isEmpty,
-    SQL_KEYWORDS,
-    getQuotedIdentifier,
-    INFO,
-    ERROR,
-    loadDocumentFromBlob } from "../../utils/helper";
+isSqlOrderByRequired,
+        isSqlGroupByRequired,
+        isSqlHavingRequired,
+        isSqlWhereRequired,
+        isDataTypeString,
+        isDataTypeDateTime,
+        UNARY_COMPARISON_OPERATORS,
+        DB_TYPE_MYSQL,
+        DB_TYPE_SQLSERVER,
+        DB_TYPE_ORACLE,
+        DB_TYPE_POSTGRES,
+        MEDIUM_ICON_SIZE,
+        isEmpty,
+        SQL_KEYWORDS,
+        getQuotedIdentifier,
+        INFO,
+        ERROR,
+        loadDocumentFromBlob,
+        checkColorString,
+        } from "../../utils/helper";
 import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -40,7 +42,7 @@ const SqlDisplay = (props) => {
         updateSelectColumns,
         isParameterEntryRequired,
         buildRunDocument,
-        datasource, 
+        datasource,
         queryResults,
         setQueryResults} = useQueryDesign();
     const {getText} = useLang();
@@ -264,41 +266,41 @@ const SqlDisplay = (props) => {
         return filterColumns.map(f => {
             if (f.aggregateFunction) {
                 return <div className="sql-clause-column">
-                    <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
-                    {
-                        getOpenParenthesis(f)
-                        + f.aggregateFunction
-                        + "("
-                        + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
-                        + ") "
-                        + f.comparisonOperator
-                        + " "
-                        + getComparisonValue(f)
-                        + getCloseParenthesis(f)}
-                </div>;
+                <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
+                {
+                                        getOpenParenthesis(f)
+                                                + f.aggregateFunction
+                                                + "("
+                                                + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
+                                                + ") "
+                                                + f.comparisonOperator
+                                                + " "
+                                                + getComparisonValue(f)
+                                                + getCloseParenthesis(f)}
+            </div>;
             } else {
                 return "";
             }
         });
     };
-    
+
     const getWhereColumns = () => {
         return filterColumns.map((f) => {
             if (f.customSql) {
                 return <div className="sql-clause-column">                     
-                <span color="sql-clause-name">{getAndOr(f)}</span>
-                {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
-            </div>;
+                    <span color="sql-clause-name">{getAndOr(f)}</span>
+                    {getOpenParenthesis(f) + f.customSql + getCloseParenthesis(f)}
+                </div>;
             } else if (!f.aggregateFunction) {
                 return <div className="sql-clause-column">
                     <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
                     {getOpenParenthesis(f)
-                        + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
-                        + " "
-                        + f.comparisonOperator
-                        + " "
-                        + getComparisonValue(f)
-                        + getCloseParenthesis(f)}
+                                                + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
+                                                + " "
+                                                + f.comparisonOperator
+                                                + " "
+                                                + getComparisonValue(f)
+                                                + getCloseParenthesis(f)}
                 </div>;
             } else {
                 return "";
@@ -350,9 +352,9 @@ const SqlDisplay = (props) => {
     };
 
     const runQueryWithParameters = async (params) => {
-        showMessage(INFO, getText("Running query", "...",), true);
+        showMessage(INFO, getText("Running query", "...", ), true);
         let res = await runQuery(buildRunDocument(), params);
-        
+
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
@@ -365,15 +367,15 @@ const SqlDisplay = (props) => {
         if (isParameterEntryRequired()) {
             showParamEntry();
         } else {
-            showMessage(INFO, getText("Running query", "...",), true);
+            showMessage(INFO, getText("Running query", "...", ), true);
             let res = await runQuery(buildRunDocument());
-            
+
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
                 hideMessage();
             }
-            
+
             setQueryResults(res.result);
         }
     };
@@ -381,28 +383,28 @@ const SqlDisplay = (props) => {
     const haveQueryResults = () => {
         return queryResults && queryResults.data && queryResults.data.length > 0;
     };
-    
-     const excelExport = async () => {
-         let style = getComputedStyle(document.documentElement);
-                 
-          let wrapper = {
+
+    const excelExport = async () => {
+        let style = getComputedStyle(document.documentElement);
+        let wrapper = {
             queryResults: queryResults,
-            headerFontColor: style.getPropertyValue('--query-results-table-hdr-forecolor'),
-            headerBackgroundColor: style.getPropertyValue('--query-results-table-hdr-data-bkcolor'),
+            headerFontColor: style.getPropertyValue('--query-results-table-hdr-forecolor').substring(1),
+            headerBackgroundColor: checkColorString(style.getPropertyValue('--query-results-table-hdr-data-bkcolor')).substring(1),
             headerFontSize: style.getPropertyValue('--query-results-table-hdr-fontsize').replace("pt", ""),
-            detailFontColor: style.getPropertyValue('--query-results-table-detail-forecolor'),
-            detailBackgroundColor: style.getPropertyValue('--query-results-table-detail-row-bkcolor1'),
+            detailFontColor: checkColorString(style.getPropertyValue('--query-results-table-detail-forecolor')).substring(1),
+            detailBackgroundColor1: checkColorString(style.getPropertyValue('--query-results-table-detail-row-bkcolor1')).substring(1),
+            detailBackgroundColor2: checkColorString(style.getPropertyValue('--query-results-table-detail-row-bkcolor2')).substring(1),
             detailFontSize: style.getPropertyValue('--query-results-table-detail-fontsize').replace("pt", "")
         };
-        
+
         let res = await exportToExcel(wrapper);
         let blob = new Blob([res.data], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          });
-          
+        });
+
         loadDocumentFromBlob("excel-export.xlsx", blob);
     };
-    
+
     return <div id="sql-display">
         <ParameterEntryModal config={showParameterEntry}/>
         <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
@@ -411,7 +413,7 @@ const SqlDisplay = (props) => {
             </span>
             <span  title={getText("Export to excel")} style={{marginRight: "10px"}}>
                 {haveQueryResults() ? <AiOutlineFileExcel className="icon-s cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => excelExport()} />
-                    : <AiOutlineFileExcel className="icon-s-dis" size={MEDIUM_ICON_SIZE + 2} />}
+                                : <AiOutlineFileExcel className="icon-s-dis" size={MEDIUM_ICON_SIZE + 2} />}
             </span>
             <span  title={getText("Run query")} >
                 <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runLocalQuery()} />

@@ -26,12 +26,17 @@ const JoinType = (props) => {
         }
     };
     
+    const onShow = () => {
+        setJoinType(config.joinType);
+    }
+    
     return ( 
         <div className="static-modal">
             <Modal animation={false} 
                    size="sm"
                    show={config.show} 
-                   aria-labelledby="contained-modal-title-vcenter"
+                   onShow={onShow}
+                aria-labelledby="contained-modal-title-vcenter"
                    centered
                    onHide={onHide}
                    backdrop={true} 
@@ -48,7 +53,7 @@ const JoinType = (props) => {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button size="sm" onClick={() => config.hide()}>Cancel</Button>
+                    <Button size="sm" onClick={() => config.hide()}>{getText("Cancel")}</Button>
                     <Button size="sm" variant="primary" type="submit" onClick={(e) => config.setJoinType(joinType, config.nodeId)}>{getText("Ok")}</Button>
                 </Modal.Footer>
             </Modal>

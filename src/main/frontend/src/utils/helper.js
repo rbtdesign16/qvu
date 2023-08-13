@@ -508,3 +508,21 @@ export const getDisplayTime = (input) => {
     return retval;
 };
 
+export const doSortCompare = (dataType, val1, val2) => {
+    if (isEmpty(val1) && val2) {
+        return -1;
+    } else if (isEmpty(val2) && val1) {
+        return 1;
+    } else {
+        if (isDataTypeNumeric(dataType)) {
+            return Number(val1) - Number(val2);
+        } else if (isDataTypeDateTime(dataType)) {
+            let t1 = new Date(val1);
+            let t2 = new Date(val2);
+            return t1 - t2;
+        } else {
+            return val1.localeCompare(val2);
+        }
+    }
+};
+

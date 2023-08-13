@@ -75,25 +75,17 @@ const DataSelectTree = (props) => {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
                     }
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
-                    if (selectedTableIds.includes(element.id)) {
-                        if (element.metadata.jointype === "inner") {
-                            return <img src="table_imp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                        } else {
-                            return <img src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                        }
+                    if (element.metadata.jointype === "inner") {
+                        return <img src="table_imp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     } else {
-                        return <img src="table_imp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        return <img src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     }
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
-                    if (selectedTableIds.includes(element.id)) {
-                        if (element.metadata.jointype === "inner") {
-                            return <img src="table_exp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                        } else {
-                            return <img src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                        }    
+                    if (element.metadata.jointype === "inner") {
+                        return <img src="table_exp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
                     } else {
-                        return <img src="table_exp.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                    }
+                        return <img src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                    }    
 
             }
         } else {
@@ -181,10 +173,8 @@ const DataSelectTree = (props) => {
                     break;
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
-                    if (selectedTableIds.includes(element.id)) {
-                        e.preventDefault();
-                        setShowJoinType({show: true, setJoinType: setJoinType, joinType: element.metadata.jointype, nodeId: element.id, hide: hideJoinType});
-                     }
+                    e.preventDefault();
+                    setShowJoinType({show: true, setJoinType: setJoinType, joinType: element.metadata.jointype, nodeId: element.id, hide: hideJoinType});
                     break;
             }
         }

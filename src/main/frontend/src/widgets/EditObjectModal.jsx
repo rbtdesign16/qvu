@@ -41,7 +41,7 @@ const EditObjectModal = (props) => {
                         <div>{config.addComponents ? config.addComponents() : ""}<EntryPanel config={config}/><div className="modal-error-msg" id={config.idPrefix + "error-msg"}></div></div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="sm" onClick={() => onHide() }>Cancel</Button>
+                        <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
                         <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config)}>{getOkLabel()}</Button>
                     </Modal.Footer>
                 </Modal>

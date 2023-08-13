@@ -204,6 +204,10 @@
         "New": "New",
         "Load": "Load",
         "Group": "Group",
-        "Document": "Document"
+        "Document": "Document",
+        "Filter for": "Filter for",
+        "Reset": "Reset",
+        "Apply": "Apply",
+        "Cancel": "Cancel"
     }
 }

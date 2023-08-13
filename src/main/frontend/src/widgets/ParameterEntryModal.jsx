@@ -124,7 +124,7 @@ const ParameterEntryModal = (props) => {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="sm" onClick={() => onHide() }>Cancel</Button>
+                        <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
                         <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => runQuery()}>{getText("Run")}</Button>
                     </Modal.Footer>
                 </Modal>

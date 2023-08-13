@@ -521,3 +521,10 @@ textarea {
     font-weight: var(--default-label-font-weight);
     color: var(--default-label-font-color);
 }
+
+.filter-values {
+    height: 400px;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

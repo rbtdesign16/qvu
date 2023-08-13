@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
+import ResultsFilterSelectModal from "./ResultsFilterSelectModal";
 import {AiFillCaretUp, AiFillCaretDown, AiFillFilter} from "react-icons/ai";
 import "../../css/query-results.css";
 
@@ -28,62 +29,27 @@ import {
 } from "../../utils/helper";
 
 const QueryResultsTable = () => {
-    const {queryResults, currentResultsSort, setCurrentResultsSort} = useQueryDesign();
+    const {queryResults, currentResultsSort, setCurrentResultsSort, doSort, isCurrentSort} = useQueryDesign();
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
-
+    const [showFilterModal, setShowFilterModal] = useState({show: false});
+    
     const sortFilterStyle = {
         display: "inline-grid",
         gridTemplateRows: "10px 10px",
-        gridTemplateColumns: "10px 1px",
+        gridTemplateColumns: "10px 10px",
         gridGap: "2px",
         float: "right"
     };
     
-       
-    const doSort = async (indx, type) => {
-        if (isCurrentSort(indx, type)) {
-            data.sort((a, b) => a[0] - b[0]);
-            setCurrentResultsSort({column: 0, direction: "asc"});
-        } else {    
-            data.sort((a, b) => {
-                let val1;
-                let val2
-                
-                if (type === "asc") {
-                    val1 = a[indx];
-                    val2 = b[indx];
-                } else {
-                    val1 = b[indx];
-                    val2 = a[indx];
-                }
-                if (isEmpty(val1) && val2) {
-                    return -1;
-                } else if (isEmpty(val2) && val1) {
-                    return 1;
-                } else {
-                    if (isDataTypeNumeric(columnTypes[indx])) {
-                        return Number(val1) - Number(val2);
-                    } else if (isDataTypeDateTime(columnTypes[indx])) {
-                        let t1 = new Date(val1);
-                        let t2 = new Date(val2);
-                        return t1 - t2;
-                    } else {
-                        return val1.localeCompare(val2);
-                    }
-                }
-            });
-            setCurrentResultsSort({column: indx, direction: type});
-        }
-   }    
- 
-    const filter = (colnum) => {
+    const hideFilterModal = () => {
+        setShowFilterModal({show: false});
     };
     
-    const isCurrentSort = (indx, type) => {
-        return ((currentResultsSort.column === indx) && (currentResultsSort.direction === type));
-    }
-
+    const filter = (colnum) => {
+        setShowFilterModal({show: true, columnIndex: colnum, hide: hideFilterModal});
+    };
+    
     const getSortColor = (indx, type) => {
         if (isCurrentSort(indx, type)) {
             return COLOR_CRIMSON;
@@ -101,7 +67,7 @@ const QueryResultsTable = () => {
             return <div style={sortFilterStyle}>
                 <AiFillCaretUp style={{gridRow: "1", gridColumn: "1", cursor: "pointer", color: getSortColor(indx, "asc")}} size={12} onClick={e => doSort(indx, "asc")}/>
                 <AiFillCaretDown style={{gridRow: "2", gridColumn: "1",  cursor: "pointer", color: getSortColor(indx, "desc")}} size={12} onClick={e => doSort(indx, "desc")}/>
-                <AiFillFilter style={{gridRow: "1/2", gridColumn: "2", marginTop: "5px",  cursor: "pointer", color: getFilterColor(indx)}} size={12} onClick={e => sortDescending(indx)}/>
+                <AiFillFilter style={{gridRow: "1/2", gridColumn: "2", marginTop: "5px",  cursor: "pointer", color: getFilterColor(indx)}} size={12} onClick={e => filter(indx)}/>
             </div>;
         } else {
             return "";
@@ -209,6 +175,7 @@ const QueryResultsTable = () => {
 
     if (initialColumnWidths) {
         return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
+            <ResultsFilterSelectModal config={showFilterModal}/>
             <div className="query-results-table-hdr" style={getHeaderStyle()}>{getHeaderColumns()}</div>
             <div className="query-results-table-body">
                 {getDetail(getDetailStyle(), getDetailColumnStyles())}

@@ -1,14 +1,15 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import {
-    UNARY_COMPARISON_OPERATORS,
-    isDataTypeString,
-    isDataTypeNumeric,
-    isDataTypeDateTime,
-    isEmpty,
-    updateAndOr,
-    DEFAULT_NEW_DOCUMENT_NAME, 
-    DEFAULT_DOCUMENT_GROUP
-    } from "../utils/helper";
+UNARY_COMPARISON_OPERATORS,
+        isDataTypeString,
+        isDataTypeNumeric,
+        isDataTypeDateTime,
+        isEmpty,
+        updateAndOr,
+        DEFAULT_NEW_DOCUMENT_NAME,
+        DEFAULT_DOCUMENT_GROUP,
+        doSortCompare
+} from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
 
@@ -29,7 +30,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
     const [queryResults, setQueryResults] = useState({header: [], data: []});
     const [currentDocument, setCurrentDocument] = useState({
-        name: getText(DEFAULT_NEW_DOCUMENT_NAME), 
+        name: getText(DEFAULT_NEW_DOCUMENT_NAME),
         group: DEFAULT_DOCUMENT_GROUP
     });
     const getColumnNameForDisplay = (s) => {
@@ -47,11 +48,11 @@ export const QueryDesignProvider = ({ children }) => {
 
         return retval;
     };
-    
+
     const updateSelectColumns = async (scols) => {
         let cols = [];
         let cMap = new Map();
-        
+
         if (!scols) {
             scols = [...selectColumns];
         }
@@ -60,11 +61,11 @@ export const QueryDesignProvider = ({ children }) => {
             // may have multiple columsn for same path
             // in the SelectColumnList
             let c = cMap.get(scols[i].path);
-            
+
             if (!c) {
                 c = [];
             }
-            
+
             c.push(scols[i]);
             cMap.set(scols[i].path, c);
         }
@@ -113,13 +114,13 @@ export const QueryDesignProvider = ({ children }) => {
         }
 
         setFromClause(await buildFromRecords([...tablePathSet], cols));
-        
+
         let pSet = new Set();
-        
+
         for (let i = 0; i < cols.length; ++i) {
             pSet.add(cols[i].path);
         }
-        
+
         if (filterColumns && (filterColumns.length > 0)) {
             let fc = [];
             for (let i = 0; i < filterColumns.length; ++i) {
@@ -127,60 +128,60 @@ export const QueryDesignProvider = ({ children }) => {
                     fc.push(filterColumns[i]);
                 }
             }
-            
+
             if (filterColumns.length !== fc.length) {
                 updateAndOr(fc);
                 setFilterColumns(fc);
             }
         }
-        
-        
+
+
         setSelectColumns(cols);
     };
-    
+
     const formatPathForDisplay = (path) => {
         let l = path.split("|");
-        
+
         for (let i = 0; i < l.length; ++i) {
             if (l[i].includes("{")) {
                 let pos1 = l[i].indexOf("{");
                 let pos2 = l[i].indexOf("}");
-                l[i] = l[i].substring(0, pos1) + l[i].substring(pos2+1);
+                l[i] = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
             }
         }
-        
-        
-            
+
+
+
         return l.join(" -> ");
     };
-    
+
     const getJoinFromColumns = (part) => {
         let pos1 = part.indexOf("[");
         let pos2 = part.indexOf("]");
-        
+
         let cols = part.substring(pos1 + 1, pos2).split(",");
-        
+
         let retval = [];
-        
+
         for (let i = 0; i < cols.length; ++i) {
-             retval.push(cols[i].substring(0, cols[i].indexOf("=")));
+            retval.push(cols[i].substring(0, cols[i].indexOf("=")));
         }
-        
+
         return retval;
     };
-    
+
     const getJoinToColumns = (part) => {
-       let pos1 = part.indexOf("[");
+        let pos1 = part.indexOf("[");
         let pos2 = part.indexOf("]");
-        
+
         let cols = part.substring(pos1 + 1, pos2).split(",");
-        
+
         let retval = [];
-        
+
         for (let i = 0; i < cols.length; ++i) {
-             retval.push(cols[i].substring(cols[i].indexOf("=") + 1));
+            retval.push(cols[i].substring(cols[i].indexOf("=") + 1));
         }
-        
+
         return retval;
     };
 
@@ -192,18 +193,18 @@ export const QueryDesignProvider = ({ children }) => {
             let pos1 = lastEntry.indexOf("{");
             let pos2 = lastEntry.indexOf("}");
             let pos3 = lastEntry.indexOf("@");
-            
+
             let fromColumns = getJoinFromColumns(lastEntry);
             let toColumns = getJoinToColumns(lastEntry);
-            
+
             return {
-               alias: alias,
-               fromAlias: parent.alias,
-               joinType: lastEntry.substring(pos3 + 1, pos2),
-               table: lastEntry.substring(0, pos1),
-               fromColumns: fromColumns,
-               toColumns: toColumns
-           };
+                alias: alias,
+                fromAlias: parent.alias,
+                joinType: lastEntry.substring(pos3 + 1, pos2),
+                table: lastEntry.substring(0, pos1),
+                fromColumns: fromColumns,
+                toColumns: toColumns
+            };
         }
     };
 
@@ -211,8 +212,8 @@ export const QueryDesignProvider = ({ children }) => {
         paths.sort((a, b) => {
             return (b.length - a.length);
         });
-        
-        
+
+
         let tindx = 0;
         // root table
         let retval = [];
@@ -222,16 +223,16 @@ export const QueryDesignProvider = ({ children }) => {
         });
 
         let jMap = new Map();
-       
+
         jMap.set(baseTable, retval[0]);
-            
+
         // break paths into unique join paths
         if (paths && (paths.length > 0) && (paths[0].indexOf("|") > -1)) {
             let requiredPaths = getRequiredJoinPaths(paths);
-            
+
             let tindx = 1;
             let pos = -1;
-            
+
             // create the from records based on the unique join paths
             for (let i = 0; i < requiredPaths.length; ++i) {
                 let parent = baseTable;
@@ -239,40 +240,40 @@ export const QueryDesignProvider = ({ children }) => {
                     let part;
                     pos = requiredPaths[i].indexOf("|", pos + 1);
                     if (pos > -1) {
-                       part = requiredPaths[i].substring(0, pos);
+                        part = requiredPaths[i].substring(0, pos);
                     } else {
-                       part = requiredPaths[i].substring(0, paths[i].length);
+                        part = requiredPaths[i].substring(0, paths[i].length);
                     }
-                    
+
                     if (!jMap.has(part)) {
                         let alias = ("t" + (tindx++));
                         let entry = getFromEntry(jMap.get(parent), part, alias);
- 
+
                         if (entry) {
                             jMap.set(part, entry);
                             retval.push(entry);
                         }
                     }
-                            
+
                     parent = part;
                 } while (pos > -1);
             }
         }
-        
+
         for (let i = 0; i < cols.length; ++i) {
             let cpath = cols[i].path;
             let tpath = cpath.substring(0, cpath.lastIndexOf("|"));
-            
+
             let jrec = jMap.get(tpath);
-            
+
             if (jrec) {
                 cols[i].tableAlias = jrec.alias;
             }
         }
-        
+
         return retval;
-     };
-    
+    };
+
     const getRequiredJoinPaths = (paths) => {
         let pSet = new Set();
         let pos = -1;
@@ -284,18 +285,18 @@ export const QueryDesignProvider = ({ children }) => {
                 } else {
                     pSet.add(paths[i], paths[i].substring(0, paths[i].length));
                 }
-             } while (pos > -1)
+            } while (pos > -1)
         }
 
         paths = [...pSet];
-        
+
         paths.sort();
 
         let remitems = [];
 
         for (let i = 0; i < paths.length; ++i) {
-            for (let j = i+1; j < paths.length; ++j) {
-                 if (paths[j].includes(paths[i])) {
+            for (let j = i + 1; j < paths.length; ++j) {
+                if (paths[j].includes(paths[i])) {
                     remitems.push(i);
                     break;
                 }
@@ -310,7 +311,7 @@ export const QueryDesignProvider = ({ children }) => {
         }
 
         retval.sort((a, b) => (b.length - a.length));
-        
+
         return retval;
     };
 
@@ -352,7 +353,7 @@ export const QueryDesignProvider = ({ children }) => {
             }
         }
     };
-    
+
     const getFilterComparisonInput = (filter, indx, onChange) => {
         let id = "f-" + indx;
         if (isDataTypeString(filter.dataType)) {
@@ -363,17 +364,17 @@ export const QueryDesignProvider = ({ children }) => {
             return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
         }
     };
-        
+
     const buildRunDocument = (docname) => {
         return {
-           name: docname,
-           datasource: datasource,
-           selectColumns: selectColumns,
-           filterColumns: filterColumns,
-           fromClause: fromClause
+            name: docname,
+            datasource: datasource,
+            selectColumns: selectColumns,
+            filterColumns: filterColumns,
+            fromClause: fromClause
         };
     };
-    
+
     const clearData = () => {
         setBaseTable(null);
         setSelectedColumnIds([]);
@@ -384,60 +385,94 @@ export const QueryDesignProvider = ({ children }) => {
         setQueryResults({header: [], data: []});
         setCurrentResultsSort({column: 0, direction: "asc"});
     };
-    
+
     const setNewDocument = () => {
-        setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME), 
-        group: DEFAULT_DOCUMENT_GROUP});
+        setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME),
+            group: DEFAULT_DOCUMENT_GROUP});
         clearData();
     };
-    
-    
+
+    const doSort = async (indx, type) => {
+        if (queryResults && queryResults.data) {
+            let data = queryResults.data;
+            let columnTypes = queryResults.columnTypes;
+            if (isCurrentSort(indx, type)) {
+                data.sort((a, b) => a[0] - b[0]);
+                setCurrentResultsSort({column: 0, direction: "asc"});
+            } else {
+                data.sort((a, b) => {
+                    let val1;
+                    let val2;
+
+                    if (type === "asc") {
+                        val1 = a[indx];
+                        val2 = b[indx];
+                    } else {
+                        val1 = b[indx];
+                        val2 = a[indx];
+                    }
+                    
+                    return doSortCompare(columnTypes[indx], val1, val2);
+                });
+                
+                setCurrentResultsSort({column: indx, direction: type});
+            }
+        }
+    };
+
+    const isCurrentSort = (indx, type) => {
+        return ((currentResultsSort.column === indx) && (currentResultsSort.direction === type));
+    };
+
+
     const setDocument = (doc) => {
-    };  
-    
+    };
+
     useEffect(() => {
         updateSelectColumns();
     }, [selectedColumnIds]);
-    
+
     useEffect(() => {
         clearData();
     }, [datasource]);
-    
+
     return (
             <QueryDesignContext.Provider
                 value={{
-                    datasource,
-                    treeViewData,
-                    selectedColumnIds,
-                    selectedTableIds,
-                    baseTable,
-                    selectColumns,
-                    fromClause,
-                    filterColumns,
-                    setDatasource,
-                    setTreeViewData,
-                    setSelectedColumnIds,
-                    setFromClause,
-                    setSelectedTableIds,
-                    setBaseTable,
-                    setSelectColumns,
-                    setFilterColumns,
-                    updateSelectColumns,
-                    formatPathForDisplay,
-                    splitter1Sizes,
-                    setSplitter1Sizes,
-                    isParameterEntryRequired,
-                    getFilterComparisonInput,
-                    buildRunDocument,
-                    queryResults,
-                    setQueryResults,
-                    getColumnNameForDisplay,
-                    setNewDocument,
-                    setDocument,
-                    currentDocument,
-                    currentResultsSort, 
-                    setCurrentResultsSort
-                }}>
+                                datasource,
+                                treeViewData,
+                                selectedColumnIds,
+                                selectedTableIds,
+                                baseTable,
+                                selectColumns,
+                                fromClause,
+                                filterColumns,
+                                setDatasource,
+                                setTreeViewData,
+                                setSelectedColumnIds,
+                                setFromClause,
+                                setSelectedTableIds,
+                                setBaseTable,
+                                setSelectColumns,
+                                setFilterColumns,
+                                updateSelectColumns,
+                                formatPathForDisplay,
+                                splitter1Sizes,
+                                setSplitter1Sizes,
+                                isParameterEntryRequired,
+                                getFilterComparisonInput,
+                                buildRunDocument,
+                                queryResults,
+                                setQueryResults,
+                                getColumnNameForDisplay,
+                                setNewDocument,
+                                setDocument,
+                                currentDocument,
+                                currentResultsSort,
+                                setCurrentResultsSort,
+                                doSort,
+                                isCurrentSort
+                            }}>
                 {children}
             </QueryDesignContext.Provider>
             );

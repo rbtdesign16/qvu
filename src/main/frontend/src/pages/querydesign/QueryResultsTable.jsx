@@ -35,7 +35,8 @@ const QueryResultsTable = () => {
         doSort, 
         isCurrentSort, 
         currentFilters, 
-        setCurrentFilters} = useQueryDesign();
+        setCurrentFilters,
+        isRowHidden} = useQueryDesign();
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
@@ -50,16 +51,6 @@ const QueryResultsTable = () => {
 
     const hideFilterModal = () => {
         setShowFilterModal({show: false});
-    };
-
-    const isRowHidden = (rowdata) => {
-        for (let i = 1; i < rowdata.length; ++i) {
-            if (currentFilters[i] && (currentFilters[i].length > 0)) {
-                if (!currentFilters[i].includes(String(rowdata[i]))) {
-                    return true;
-                }
-            }
-        }
     };
 
     const filter = (colnum) => {

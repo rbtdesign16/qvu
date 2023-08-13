@@ -48,6 +48,17 @@ export const QueryDesignProvider = ({ children }) => {
 
         return retval;
     };
+    
+    const isRowHidden = (rowdata) => {
+        for (let i = 1; i < rowdata.length; ++i) {
+            if (currentFilters[i] && (currentFilters[i].length > 0)) {
+                if (!currentFilters[i].includes(String(rowdata[i]))) {
+                    return true;
+                }
+            }
+        }
+    };
+
 
     const updateSelectColumns = async (scols) => {
         let cols = [];
@@ -474,7 +485,8 @@ export const QueryDesignProvider = ({ children }) => {
                                 doSort,
                                 isCurrentSort,
                                 currentFilters,
-                                setCurrentFilters
+                                setCurrentFilters,
+                                isRowHidden
                             }}>
                 {children}
             </QueryDesignContext.Provider>

@@ -44,7 +44,8 @@ const SqlDisplay = (props) => {
         buildRunDocument,
         datasource,
         queryResults,
-        setQueryResults} = useQueryDesign();
+        setQueryResults,
+        isRowHidden} = useQueryDesign();
     const {getText} = useLang();
     const {getDatabaseType} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
@@ -386,8 +387,19 @@ const SqlDisplay = (props) => {
 
     const excelExport = async () => {
         let style = getComputedStyle(document.documentElement);
+        let qr = {... queryResults};
+        
+        qr.data = [];
+        
+        // remove the hidden rows
+        queryResults.data.map(r => {
+            if (!isRowHidden(r)) {
+                qr.data.push(r);
+            }
+        });
+        
         let wrapper = {
-            queryResults: queryResults,
+            queryResults: qr,
             headerFontColor: style.getPropertyValue('--query-results-table-hdr-forecolor').substring(1),
             headerBackgroundColor: checkColorString(style.getPropertyValue('--query-results-table-hdr-data-bkcolor')).substring(1),
             headerFontSize: style.getPropertyValue('--query-results-table-hdr-fontsize').replace("pt", ""),

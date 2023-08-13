@@ -15,7 +15,7 @@ import {MODAL_TITLE_SIZE, isNotEmpty, doSortCompare} from "../../utils/helper";
 const ResultsFilterSelectModal = (props) => {
     const {config} = props;
     const {getText} = useLang();
-    const {queryResults, currentFilters, setCurrentFilters} = useQueryDesign();
+    const {queryResults, currentFilters, setCurrentFilters, isRowHidden} = useQueryDesign();
     const {data, columnTypes, header} = queryResults;
     
     const getTitle = () => {
@@ -46,14 +46,16 @@ const ResultsFilterSelectModal = (props) => {
         
         if (data) {
             data.map(r => {
-                let val = r[config.columnIndex];
-                if (isNotEmpty(val)) {
-                    if (!s.has(val)) {
-                        values.push(val);
-                        s.add(val);
+                if (!isRowHidden(r)) {
+                    let val = r[config.columnIndex];
+                    if (isNotEmpty(val)) {
+                        if (!s.has(val)) {
+                            values.push(val);
+                            s.add(val);
+                        }
+                    } else {
+                        haveEmpty = true;
                     }
-                } else {
-                    haveEmpty = true;
                 }
             });
 

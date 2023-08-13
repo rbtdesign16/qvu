@@ -57,7 +57,7 @@ const ResultsFilterSelectModal = (props) => {
         if (values.length > 0) {
             return values.map((v, indx) => {
                 let id = "cb-" + indx;
-                return <div><input id={id} type="checkbox" onChange={e => handleChecked(e, v)}/><label htmlFor={id}>{v}</label></div>;
+                return <div><input id={id} type="checkbox" onChange={e => handleChecked(e, v)}/><label className="ck-label" htmlFor={id}>{v}</label></div>;
             }); 
         } else {
             return "";

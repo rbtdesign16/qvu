@@ -28,7 +28,7 @@ const JoinType = (props) => {
     
     const onShow = () => {
         setJoinType(config.joinType);
-    }
+    };
     
     return ( 
         <div className="static-modal">

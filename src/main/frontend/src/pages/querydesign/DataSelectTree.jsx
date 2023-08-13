@@ -57,7 +57,23 @@ const DataSelectTree = (props) => {
         }
     };
 
-    const getIcon = (element) => {
+    const getFkIcon = (element, type) => {
+        if (selectedTableIds.includes(element.id)) {
+            if (element.metadata.jointype === "inner") {
+               return "table_" + type + "_inn_sel.png" 
+           } else {
+               return "table_" + type + "_sel.png" 
+           }
+       } else {
+           if (element.metadata.jointype === "inner") {
+               return "table_" + type + "_inn.png" 
+           } else {
+               return "table_" + type + ".png" 
+           }
+        }
+    }
+    
+     const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
             switch (String(element.metadata.type)) {
                 case NODE_TYPE_ROOT:
@@ -75,17 +91,9 @@ const DataSelectTree = (props) => {
                         return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
                     }
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
-                    if (element.metadata.jointype === "inner") {
-                        return <img src="table_imp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                    } else {
-                        return <img src="table_imp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                    }
-                case NODE_TYPE_EXPORTED_FOREIGNKEY:
-                    if (element.metadata.jointype === "inner") {
-                        return <img src="table_exp_inn_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                    } else {
-                        return <img src="table_exp_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
-                    }    
+                    return <img src={getFkIcon(element, "imp")} width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
+                    return <img src={getFkIcon(element, "exp")} width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
 
             }
         } else {

@@ -528,3 +528,11 @@ textarea {
     overflow-y: auto;
     overflow-x: hidden;
 }
+
+.filter-values > div:nth-child(odd) {
+    background-color: var(--query-results-table-detail-row-bkcolor1);
+}
+
+.filter-values > div:nth-child(even) {
+    background-color: var(--query-results-table-detail-row-bkcolor2);
+}

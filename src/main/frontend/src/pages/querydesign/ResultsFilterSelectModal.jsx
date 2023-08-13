@@ -63,7 +63,7 @@ const ResultsFilterSelectModal = (props) => {
         if (values.length > 0) {
             return values.map((v, indx) => {
                 let id = "cb-" + indx;
-                return <div><input id={id} name={v} type="checkbox" onChange={e => handleChecked(e, v)}/><label className="ck-label" htmlFor={id}>{v}</label></div>;
+                return <div><input id={id} name={v} type="checkbox"/><label className="ck-label" htmlFor={id}>{v}</label></div>;
             }); 
         } else {
             return "";
@@ -71,7 +71,7 @@ const ResultsFilterSelectModal = (props) => {
     };
     
     const getCheckboxes = () => {
-        return document.querySelectorAll('input[type=checkbox]');
+        return document.getElementById("fvals").querySelectorAll("input[type=checkbox]");
     };
     
     const onApply = () => {
@@ -89,7 +89,7 @@ const ResultsFilterSelectModal = (props) => {
             setCurrentFilters(cf);
         }
         
-        onHide();
+        config.hide();
     };
 
     const onReset = () => {
@@ -116,7 +116,7 @@ const ResultsFilterSelectModal = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="filter-values">{getEntries()}</div>
+                        <div id="fvals" className="filter-values">{getEntries()}</div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>

@@ -11,29 +11,35 @@ import {AiFillCaretUp, AiFillCaretDown, AiFillFilter} from "react-icons/ai";
 import "../../css/query-results.css";
 
 import {
-    isDataTypeNumeric,
-    isDataTypeString,
-    isDataTypeDateTime,
-    getDisplayDate,
-    getDisplayTimestamp,
-    getDisplayTime,
-    isEmpty,
-    JDBC_TYPE_DATE,
-    JDBC_TYPE_TIME,
-    JDBC_TYPE_TIMESTAMP,
-    JDBC_TYPE_TIME_WITH_TIMEZONE,
-    JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
-    DEFAULT_PIXELS_PER_CHARACTER,
-    COLOR_CRIMSON,
-    COLOR_BLACK
-} from "../../utils/helper";
+isDataTypeNumeric,
+        isDataTypeString,
+        isDataTypeDateTime,
+        getDisplayDate,
+        getDisplayTimestamp,
+        getDisplayTime,
+        isEmpty,
+        JDBC_TYPE_DATE,
+        JDBC_TYPE_TIME,
+        JDBC_TYPE_TIMESTAMP,
+        JDBC_TYPE_TIME_WITH_TIMEZONE,
+        JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
+        DEFAULT_PIXELS_PER_CHARACTER,
+        COLOR_CRIMSON,
+        COLOR_BLACK
+        } from "../../utils/helper";
 
 const QueryResultsTable = () => {
-    const {queryResults, currentResultsSort, setCurrentResultsSort, doSort, isCurrentSort} = useQueryDesign();
+    const {queryResults, 
+        currentResultsSort, 
+        setCurrentResultsSort, 
+        doSort, 
+        isCurrentSort, 
+        currentFilters, 
+        setCurrentFilters} = useQueryDesign();
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
-    
+
     const sortFilterStyle = {
         display: "inline-grid",
         gridTemplateRows: "10px 10px",
@@ -41,15 +47,25 @@ const QueryResultsTable = () => {
         gridGap: "2px",
         float: "right"
     };
-    
+
     const hideFilterModal = () => {
         setShowFilterModal({show: false});
     };
-    
+
+    const isRowHidden = (rowdata) => {
+        for (let i = 1; i < rowdata.length; ++i) {
+            if (currentFilters[i] && (currentFilters[i].length > 0)) {
+                if (!currentFilters[i].includes(String(rowdata[i]))) {
+                    return true;
+                }
+            }
+        }
+    };
+
     const filter = (colnum) => {
         setShowFilterModal({show: true, columnIndex: colnum, hide: hideFilterModal});
     };
-    
+
     const getSortColor = (indx, type) => {
         if (isCurrentSort(indx, type)) {
             return COLOR_CRIMSON;
@@ -57,23 +73,27 @@ const QueryResultsTable = () => {
             return COLOR_BLACK;
         }
     };
-    
+
     const getFilterColor = (indx) => {
+        if (currentFilters[indx] && (currentFilters[indx].length > 0)) {
+            return COLOR_CRIMSON;
+        } else {
+            return COLOR_BLACK;
+        }
     };
 
-    
     const getSortFilter = (indx) => {
         if (indx > 0) {
             return <div style={sortFilterStyle}>
                 <AiFillCaretUp style={{gridRow: "1", gridColumn: "1", cursor: "pointer", color: getSortColor(indx, "asc")}} size={12} onClick={e => doSort(indx, "asc")}/>
-                <AiFillCaretDown style={{gridRow: "2", gridColumn: "1",  cursor: "pointer", color: getSortColor(indx, "desc")}} size={12} onClick={e => doSort(indx, "desc")}/>
-                <AiFillFilter style={{gridRow: "1/2", gridColumn: "2", marginTop: "5px",  cursor: "pointer", color: getFilterColor(indx)}} size={12} onClick={e => filter(indx)}/>
+                <AiFillCaretDown style={{gridRow: "2", gridColumn: "1", cursor: "pointer", color: getSortColor(indx, "desc")}} size={12} onClick={e => doSort(indx, "desc")}/>
+                <AiFillFilter style={{gridRow: "1/2", gridColumn: "2", marginTop: "5px", cursor: "pointer", color: getFilterColor(indx)}} size={12} onClick={e => filter(indx)}/>
             </div>;
         } else {
             return "";
         }
     };
-    
+
     const getHeaderColumns = () => {
         return queryResults.header.map((h, indx) => <div id={"h" + indx}>{h}{getSortFilter(indx)}</div>);
     };
@@ -95,14 +115,17 @@ const QueryResultsTable = () => {
     };
 
     const getColumnDetail = (row, columnStyles) => {
-
-        return row.map((coldata, indx) => {
-            return <div style={columnStyles[indx]}>{getDisplayData(coldata, indx)}</div>;
-        });
+        return row.map((coldata, indx) => <div style={columnStyles[indx]}>{getDisplayData(coldata, indx)}</div>);
     };
 
     const getDetail = (detailStyle, columnStyles) => {
-        return data.map(r => <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>);
+        return data.map(r => {
+            if (isRowHidden(r)) {
+                return "";
+            } else {
+                return <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>;
+            }
+        });
     };
 
     const getFooter = () => {
@@ -128,7 +151,7 @@ const QueryResultsTable = () => {
 
     const getDetailStyle = () => {
         return {
-           gridTemplateColumns: getGridWidths()
+            gridTemplateColumns: getGridWidths()
         };
     };
 
@@ -155,12 +178,12 @@ const QueryResultsTable = () => {
                 });
             } else {
                 retval.push({
-                    textAlign: "center",
-                 });
+                    textAlign: "center"
+                });
 
             }
         }
-        
+
         return retval;
     };
 

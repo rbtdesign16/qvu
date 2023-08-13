@@ -89,32 +89,37 @@ const QueryResultsTable = () => {
         return queryResults.header.map((h, indx) => <div id={"h" + indx}>{h}{getSortFilter(indx)}</div>);
     };
 
-    const getDisplayData = (coldata, indx) => {
-        switch (columnTypes[indx]) {
-            case JDBC_TYPE_DATE:
-                return getDisplayDate(coldata);
-            case JDBC_TYPE_TIME:
-            case JDBC_TYPE_TIME_WITH_TIMEZONE:
-                return getDisplayTime(coldata);
-            case JDBC_TYPE_TIMESTAMP:
-            case JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE:
-                return getDisplayTimestamp(coldata);
-            default:
-                return coldata;
+    const getDisplayData = (coldata, rownum, indx) => {
+        if (indx === 0) {
+            return rownum;
+        } else {
 
+            switch (columnTypes[indx]) {
+                case JDBC_TYPE_DATE:
+                    return getDisplayDate(coldata);
+                case JDBC_TYPE_TIME:
+                case JDBC_TYPE_TIME_WITH_TIMEZONE:
+                    return getDisplayTime(coldata);
+                case JDBC_TYPE_TIMESTAMP:
+                case JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE:
+                    return getDisplayTimestamp(coldata);
+                default:
+                    return coldata;
+            }
         }
     };
 
-    const getColumnDetail = (row, columnStyles) => {
-        return row.map((coldata, indx) => <div style={columnStyles[indx]}>{getDisplayData(coldata, indx)}</div>);
+    const getColumnDetail = (row, rownum, columnStyles) => {
+        return row.map((coldata, indx) => <div style={columnStyles[indx]}>{getDisplayData(coldata, rownum, indx)}</div>);
     };
 
     const getDetail = (detailStyle, columnStyles) => {
+        let rownum = 1;
         return data.map(r => {
             if (isRowHidden(r)) {
                 return "";
             } else {
-                return <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, columnStyles)}</div>;
+                return <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, rownum++, columnStyles)}</div>;
             }
         });
     };

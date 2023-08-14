@@ -5,24 +5,27 @@
 import React, { useState } from 'react';
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"
+import TreeView from "react-accessible-treeview";
 import useMessage from "../context/MessageContext";
-import useAuth from "../context/AuthContext";
 import useLang from "../context/LangContext";
+import TreeArrowIcon from "../widgets/TreeArrowIcon"
+import { FcFolder, FcDocument } from  "react-icons/fc";
 import PropTypes from "prop-types";
 import {
     QUERY_DOCUMENT_TYPE,
+    SMALL_ICON_SIZE,
     REPORT_DOCUMENT_TYPE,
     MODAL_TITLE_SIZE} from "../utils/helper";
 
-
 const DocumentSelectModal = (props) => {
     const {config} = props;
-    const {authData} = useAuth();
     const {getText} = useLang();
-    const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
+    const {showMessage, hideMessage} = useMessage();
+    const [docData, setDocData] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]);
     
     const getTitle = () => {
-        switch(config.type) {
+        switch (config.type) {
             case QUERY_DOCUMENT_TYPE:
                 return getText("Select query document");
             case REPORT_DOCUMENT_TYPE:
@@ -31,16 +34,50 @@ const DocumentSelectModal = (props) => {
                 return getText("Select document");
         }
     };
-    
+
     const onHide = () => {
         config.hide();
     };
+
+    const onShow = () => {
+         setDocData(config.treeRoot);
+    };
     
+    const onClick = (element) => {
+        config.loadDocument(element.metadata.group, element.name);
+    };
+    
+    const getNode = (element, isBranch, isExpanded) => {
+        if (isBranch) {
+            return <span><TreeArrowIcon isOpen={isExpanded}/><span className="name"><FcFolder className="icon-s" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span></span>;
+        } else {
+            return <span style={{cursor: "pointer"}} className="name" onClick={(e) => onClick(element)}><FcDocument className="icon-s" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span>;
+        }
+    };
+
+     const nodeRenderer = (p) => {
+        const {element,
+            isBranch,
+            isExpanded,
+            isSelected,
+            getNodeProps,
+            level,
+            handleSelect,
+            handleExpand} = p;
+        return <div
+        {...getNodeProps({onClick: handleExpand})}
+        style={{marginLeft: 20 * (level - 1)}}
+        >
+        {getNode(element, isBranch, isExpanded)}
+    
+    </div>
+    };
 
     return (
             <div className="static-modal">
                 <Modal animation={false} 
-                       show={config.show} 
+                      show={config.show} 
+                       onShow={onShow}
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
@@ -48,7 +85,15 @@ const DocumentSelectModal = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                    <div>test</div>
+                    <div style={{height: "400px", width: "100%", overflow: "auto"}} className="tree-view">
+                    {docData && 
+                        <TreeView
+                            data={docData}
+                            propagateCollapse={true}
+                            multiSelect={false}
+                            selectedIds={[]}
+                            nodeRenderer={nodeRenderer}
+                            />}</div>
                     </Modal.Body>
                     <Modal.Footer>
                     </Modal.Footer>

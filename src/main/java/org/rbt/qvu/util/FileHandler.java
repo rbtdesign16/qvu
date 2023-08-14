@@ -734,5 +734,29 @@ public class FileHandler {
 
         return retval;
     }
+    
+    public List<String> getGroupDocumentNames(String type, String group) {
+        List <String> retval = new ArrayList();
+
+        File f = config.getDocumentGroupsFolder(group);
+
+        if (f.exists() && f.isDirectory()) {
+            f =  new File(f.getPath() + File.separator + type);
+            if (f.exists() && f.isDirectory()) {
+                File[] docs = f.listFiles();
+
+                if (docs != null) {
+                    for (File d : docs) {
+                        if (d.getName().toLowerCase().endsWith(".json")) {
+                            retval.add(d.getName());
+                        }
+                    }
+                }
+            }
+        }
+
+        Collections.sort(retval);
+        return retval;
+    }
 
 }

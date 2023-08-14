@@ -486,7 +486,9 @@ export const QueryDesignProvider = ({ children }) => {
                                 isCurrentSort,
                                 currentFilters,
                                 setCurrentFilters,
-                                isRowHidden
+                                isRowHidden,
+                                clearData,
+                                setCurrentDocument
                             }}>
                 {children}
             </QueryDesignContext.Provider>

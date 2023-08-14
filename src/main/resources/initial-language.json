@@ -208,6 +208,8 @@
         "Filter for": "Filter for",
         "Reset": "Reset",
         "Apply": "Apply",
-        "Cancel": "Cancel"
+        "Cancel": "Cancel",
+        "Loading available documents": "Loading available documents",
+        "Loading document": "Loading document"
     }
 }

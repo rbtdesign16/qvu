@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import TreeView from "react-accessible-treeview";
 import {FcTimeline, FcKey} from "react-icons/fc";
-import { FaSquare, FaCheckSquare, FaMinusSquare } from "react-icons/fa";
-import { IoMdArrowDropright } from "react-icons/io";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../..//context/LangContext";
 import JoinType from "./JoinType";
-import cx from "classnames";
+import TreeArrowIcon from "../../widgets/TreeArrowIcon"
+import TreeCheckboxIcon from "../../widgets/TreeCheckboxIcon"
 import PropTypes from "prop-types";
+
 import {
-NODE_TYPE_ROOT,
-        NODE_TYPE_TABLE,
-        NODE_TYPE_COLUMN,
-        NODE_TYPE_IMPORTED_FOREIGNKEY,
-        NODE_TYPE_EXPORTED_FOREIGNKEY,
-        SMALL_ICON_SIZE} from "../../utils/helper";
+    NODE_TYPE_ROOT,
+    NODE_TYPE_TABLE,
+    NODE_TYPE_COLUMN,
+    NODE_TYPE_IMPORTED_FOREIGNKEY,
+    NODE_TYPE_EXPORTED_FOREIGNKEY,
+    SMALL_ICON_SIZE} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
     const {getText} = useLang();
@@ -30,25 +30,7 @@ const DataSelectTree = (props) => {
         updateSelectColumns} = useQueryDesign();
     const [showJoinType, setShowJoinType] = useState({show: false});
     
-    const ArrowIcon = ({ isOpen, className }) => {
-        const baseClass = "arrow";
-        const classes = cx(
-                baseClass,
-                {[`${baseClass}--closed`]: !isOpen},
-                {[`${baseClass}--open`]: isOpen},
-                className
-                );
-        return <IoMdArrowDropright className={classes} />;
-    };
-
-    const CheckBoxIcon = ({ checked, ...rest }) => {
-        if (checked) {
-            return <FaCheckSquare {...rest} />;
-        } else {
-            return <FaSquare {...rest} />;
-    }
-    };
-
+    
     const getColumnLinks = (md) => {
         if (md.fromdiscols && md.todiscols) {
             return ": [" + md.fromdiscols + " -> " + md.todiscols + "]";
@@ -60,18 +42,18 @@ const DataSelectTree = (props) => {
     const getFkIcon = (element, type) => {
         if (selectedTableIds.includes(element.id)) {
             if (element.metadata.jointype === "inner") {
-               return "table_" + type + "_inn_sel.png" 
+               return "table_" + type + "_inn_sel.png";
            } else {
-               return "table_" + type + "_sel.png" 
+               return "table_" + type + "_sel.png"; 
            }
        } else {
            if (element.metadata.jointype === "inner") {
-               return "table_" + type + "_inn.png" 
+               return "table_" + type + "_inn.png";
            } else {
-               return "table_" + type + ".png" 
+               return "table_" + type + ".png";
            }
         }
-    }
+    };
     
      const getIcon = (element) => {
         if (element.metadata && element.metadata.type) {
@@ -190,9 +172,9 @@ const DataSelectTree = (props) => {
 
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><ArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}&nbsp;{element.name}{getColumnLinks(element.metadata)}</span></span>;
+            return <span><TreeArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}&nbsp;{element.name}{getColumnLinks(element.metadata)}</span></span>;
         } else {
-            return <span><CheckBoxIcon
+            return <span><TreeCheckboxIcon
                     className="checkbox-icon"
                     onClick={(e) => onClick(e, element, handleSelect, isSelected)}
                     checked={isSelected}/><span className="name" onClick={(e) => onClick(e, element, handleSelect, isSelected)}>{getIcon(element)}{element.name}</span></span>;

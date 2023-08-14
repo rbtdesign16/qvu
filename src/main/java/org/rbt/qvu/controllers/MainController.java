@@ -2,7 +2,6 @@ package org.rbt.qvu.controllers;
 
 import java.util.List;
 import javax.annotation.PostConstruct;
-
 import org.rbt.qvu.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +16,7 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.InitialSetup;
@@ -203,12 +203,6 @@ public class MainController {
         return service.deleteDocument(type, group, name);
     }
 
-    @GetMapping("api/v1/document/{type}/{group}/{name}")
-    public OperationResult getDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
-        LOG.debug("in getDocument(" + type + ", " + group + ", " + name + ")");
-        return service.getDocument(type, group, name);
-    }
-    
     @PostMapping("api/v1/query/design/run")
     public OperationResult<QueryResult> runQuery(@RequestBody QueryDocumentRunWrapper runWrapper) {
         LOG.debug("in runQuery()");
@@ -231,4 +225,18 @@ public class MainController {
         header.setContentLength(excelContent.length);
         return new HttpEntity<>(excelContent, header);
    }
+    
+    @GetMapping("api/v1/documents/currentuser/{documentType}")
+    public OperationResult<DocumentNode> getAvailableDocuments(@PathVariable String documentType) {
+        LOG.debug("in getAvailableDocuments(" + documentType + ")");
+        return service.getAvailableDocuments(documentType);
+    }
+
+    @GetMapping("api/v1/document/{type}/{group}/{name}")
+    public OperationResult getDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
+        LOG.debug("in getDocument(" + type + ", " + group + ", " + name + ")");
+        return service.getDocument(type, group, name);
+    }
+    
+
 }

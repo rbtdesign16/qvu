@@ -9,6 +9,7 @@ import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.InitialSetup;
@@ -56,5 +57,5 @@ public interface MainService {
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper);
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper);
     public byte[] exportToExcel(ExcelExportWrapper wrapper);
-
+    public OperationResult<DocumentNode> getAvailableDocuments(String documentType);
 }

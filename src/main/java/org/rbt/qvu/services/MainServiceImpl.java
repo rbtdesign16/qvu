@@ -57,6 +57,7 @@ import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
+import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.ForeignKey;
@@ -74,6 +75,7 @@ import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.CacheHelper;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.DatasourceSettingsHelper;
+import org.rbt.qvu.util.DocumentGroupComparator;
 import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.QuerySelectTreeBuilder;
@@ -1235,6 +1237,61 @@ public class MainServiceImpl implements MainService {
             }
         }
 
+        return retval;
+    }
+
+    
+    @Override
+    public OperationResult<DocumentNode> getAvailableDocuments(String documentType) {
+        OperationResult<DocumentNode> retval = new OperationResult<>();
+
+        long start = System.currentTimeMillis();
+        
+        User u = getCurrentUser();
+        
+        Set <String> hs = new HashSet(u.getRoles());
+        List <DocumentGroup> groups = config.getDocumentGroupsConfig().getDocumentGroups();
+        List <DocumentGroup> userDocGroups = new ArrayList();
+        for (DocumentGroup g : groups) {
+            if ((g.getRoles() == null) || g.getRoles().isEmpty()) {
+                userDocGroups.add(g);
+            } else {
+                for (String r : g.getRoles()) {
+                    if (hs.contains(r)) {
+                        userDocGroups.add(g);
+                        break;
+                    }
+                }
+            }
+        }
+         
+        
+        Collections.sort(userDocGroups, new DocumentGroupComparator());
+        
+        int id = 0;
+        DocumentNode rootNode = new DocumentNode(id++);
+        DocumentNode currentNode = null;
+        
+        for (DocumentGroup g : userDocGroups) {
+           if ((currentNode == null) || !g.getName().equals(currentNode.getMetadata().get("group"))) {
+               currentNode = new DocumentNode(id++);
+               currentNode.setName(g.getName());
+               rootNode.getChildren().add(currentNode);
+            }
+            List <String> fileNames =  fileHandler.getGroupDocumentNames(documentType, g.getName());
+        
+            for (String fname : fileNames) {
+                DocumentNode n = new DocumentNode(id++);
+                n.getMetadata().put("group", g.getName());
+                n.getMetadata().put("type", documentType);
+                n.setName(fname);
+                currentNode.getChildren().add(n);
+            }
+        }
+        
+        retval.setResult(rootNode);
+        
+        LOG.debug("getAvailableDocuments() - elapsed time: " + ((System.currentTimeMillis() - start) / 1000) + "sec");
         return retval;
     }
 

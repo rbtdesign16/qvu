@@ -20,19 +20,22 @@ import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import {
-SUCCESS,
-        INFO,
-        WARN,
-        ERROR,
-        DEFAULT_ERROR_TITLE,
-        DEFAULT_DOCUMENT_GROUP,
-        QUERY_DOCUMENT_TYPE,
-        replaceTokens,
-        SPLITTER_GUTTER_SIZE} from "../../utils/helper";
+    SUCCESS,
+    INFO,
+    WARN,
+    ERROR,
+    DEFAULT_ERROR_TITLE,
+    DEFAULT_DOCUMENT_GROUP,
+    QUERY_DOCUMENT_TYPE,
+    replaceTokens,
+    SPLITTER_GUTTER_SIZE} from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
-        saveDocument} from "../../utils/apiHelper"
+        saveDocument,
+        getAvailableDocuments,
+        isApiSuccess,
+        getDocument} from "../../utils/apiHelper"
 
         const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
@@ -48,7 +51,15 @@ import { getDatasourceTreeViewData,
         setSplitter1Sizes,
         currentDocument,
         setNewDocument,
-        setDocument} = useQueryDesign();
+        setDocument,
+        clearData,
+        setSelectedTableIds,
+        setSelectedColumnIds,
+        setBaseTable,
+        setSelectColumns,
+        setFilterColumns,
+        setFromClause,
+        setCurrentDocument} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -127,6 +138,7 @@ import { getDatasourceTreeViewData,
 
     };
 
+    
     const onDatasourceChange = async (e) => {
         let ds = e.target.options[e.target.selectedIndex].value;
         if (ds) {
@@ -135,8 +147,7 @@ import { getDatasourceTreeViewData,
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
-                let treeData = flattenTree(res.result);
-                setTreeViewData(treeData);
+                setTreeViewData(flattenTree(res.result));
                 setDatasource(ds);
                 hideMessage();
             }
@@ -159,15 +170,78 @@ import { getDatasourceTreeViewData,
         setSplitter1Sizes(e.sizes);
     };
 
-    const loadDocument = (docinfo) => {
-    };
+    const loadDocument = async (group, name) => {
+        hideDocumentSelect();
+        showMessage(INFO, getText("Loading document", " " + name + "..."), true);
+        let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            clearData();
+            let doc = res.result;
+            let tvd = treeViewData;
+            res = await getDatasourceTreeViewData(doc.datasource);
+            if (isApiError(res)) {
+                showMessage(ERROR, res.message);
+            } else {
+                let treeData = res.result;
+                let pSet = new Set();
+
+                for (let i = 0; i < doc.selectColumns.length; ++i) {
+                    pSet.add(doc.selectColumns[i].path);
+                }
+
+                let selIds = [];
+ 
+                let tids = new Set();
+                for (let i = 0; i < selIds.length; ++i) {
+                   let pid = tvd[selIds[i]].parent;
+
+                   while (pid) {
+                       tids.add(pid);
+                       pid = treeViewData[pid].parent;
+                   }
+               }
+
+
+                if (doc.datasource !== datasource) {
+                    setTreeViewData(tvd);
+                    setDatasource(doc.datasource);
+                }
+
+                setBaseTable(doc.baseTable);
+                setSelectedColumnIds(selIds);
+                setSelectedTableIds([...tids]);
+                setSelectColumns(doc.selectColumns);
+                setFilterColumns(doc.filterColumns);
+                setFromClause(doc.fromClause);
+
+                setCurrentDocument({
+                    name: doc.name,
+                    group: doc.documentGroupName
+                });
+
+                hideMessage();
+            }
+        }
+     };
     
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});
     };
     
-    const onShowDocumentSelect = () => {
-        setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument});
+    const onShowDocumentSelect = async () => {
+        showMessage(INFO, getText("Loading available documents", "..."), true);
+        
+        let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
+
+        hideMessage();
+        
+        if (isApiSuccess(res)) {
+            setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
+        } else {
+            showMessage(ERROR, res.message);
+        }
     };
     
     const onNewDocument = () => {

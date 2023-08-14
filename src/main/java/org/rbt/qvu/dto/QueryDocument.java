@@ -17,8 +17,6 @@ public class QueryDocument {
     private String path;
     private String createdBy;
     private String updatedBy;
-    
-    
     private Timestamp createDate;
     private Timestamp lastUpdated;
     private String datasource;

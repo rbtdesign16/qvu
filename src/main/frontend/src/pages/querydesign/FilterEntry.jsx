@@ -97,6 +97,14 @@ const FilterEntry = (props) => {
             }
         }
     };
+    
+    const findColumnData = () => {
+        for (let i = 0; i < selectColumns.length; ++i) {
+            if (selectColumns[i].path === filterColumns[index].path) {
+                return selectColumns[i];
+            }
+        }
+    }
 
     const getHeaderTitle = () => {
         return getText("Table Alias:", " ") + filterColumns[index].tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(filterColumns[index].path);

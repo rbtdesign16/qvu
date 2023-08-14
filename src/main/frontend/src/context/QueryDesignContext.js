@@ -60,7 +60,7 @@ export const QueryDesignProvider = ({ children }) => {
     };
 
 
-    const updateSelectColumns = async (scols) => {
+    const updateSelectColumns = (scols) => {
         let cols = [];
         let cMap = new Map();
 
@@ -124,7 +124,7 @@ export const QueryDesignProvider = ({ children }) => {
             }
         }
 
-        setFromClause(await buildFromRecords([...tablePathSet], cols));
+        setFromClause(buildFromRecords([...tablePathSet], cols));
 
         let pSet = new Set();
 
@@ -219,7 +219,7 @@ export const QueryDesignProvider = ({ children }) => {
         }
     };
 
-    const buildFromRecords = async (paths, cols) => {
+    const buildFromRecords = (paths, cols) => {
         paths.sort((a, b) => {
             return (b.length - a.length);
         });

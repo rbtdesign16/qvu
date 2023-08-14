@@ -28,7 +28,12 @@ import {
     DEFAULT_DOCUMENT_GROUP,
     QUERY_DOCUMENT_TYPE,
     replaceTokens,
-    SPLITTER_GUTTER_SIZE} from "../../utils/helper";
+    SPLITTER_GUTTER_SIZE,
+    NODE_TYPE_TABLE,
+    NODE_TYPE_COLUMN,
+    NODE_TYPE_IMPORTED_FOREIGNKEY,
+    NODE_TYPE_EXPORTED_FOREIGNKEY
+} from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
@@ -59,7 +64,8 @@ import { getDatasourceTreeViewData,
         setSelectColumns,
         setFilterColumns,
         setFromClause,
-        setCurrentDocument} = useQueryDesign();
+        setCurrentDocument,
+        updateSelectColumns} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -71,7 +77,7 @@ import { getDatasourceTreeViewData,
             return datasources.map(d => {
                 // handle acces by role if required
                 if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
-                    if (treeViewData && datasource && (d.datasourceName === datasource.datasourceName)) {
+                    if (treeViewData && datasource && (d.datasourceName === datasource)) {
                         return <option value={d.datasourceName} selected>{d.datasourceName}</option>;
                     } else {
                         return <option value={d.datasourceName}>{d.datasourceName}</option>;
@@ -170,6 +176,37 @@ import { getDatasourceTreeViewData,
         setSplitter1Sizes(e.sizes);
     };
 
+    const findNodeId = (parent, path) => {
+        let retval;
+        let parts = path.split("|");
+        
+        for (let i = 0; !retval && (i < parent.children.length); ++i) {
+            switch (String(parent.children[i].metadata.type)) {
+                case NODE_TYPE_TABLE:
+                    if (parts[0] === parent.children[i].metadata.dbname) {
+                        retval = findNodeId(parent.children[i], path.substring(path.indexOf("|") + 1));
+                    }
+                    break;
+                case NODE_TYPE_COLUMN:
+                    if (parts[0] === parent.children[i].metadata.dbname) {
+                        retval = parent.children[i].id;
+                    }
+                    break;
+                case NODE_TYPE_IMPORTED_FOREIGNKEY:
+                case NODE_TYPE_EXPORTED_FOREIGNKEY:
+                { 
+                    let pos = parts[0].indexOf("{");
+                    let nm = parts[0].substring(0, pos);
+                    if (nm === parent.children[i].metadata.dbname) {
+                        retval = findNodeId(parent.children[i], path.substring(path.indexOf("|") + 1));
+                    }
+                }
+            }
+        }
+        
+        return retval;
+     };
+    
     const loadDocument = async (group, name) => {
         hideDocumentSelect();
         showMessage(INFO, getText("Loading document", " " + name + "..."), true);
@@ -179,49 +216,50 @@ import { getDatasourceTreeViewData,
         } else {
             clearData();
             let doc = res.result;
-            let tvd = treeViewData;
             res = await getDatasourceTreeViewData(doc.datasource);
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
                 let treeData = res.result;
-                let pSet = new Set();
-
-                for (let i = 0; i < doc.selectColumns.length; ++i) {
-                    pSet.add(doc.selectColumns[i].path);
-                }
-
                 let selIds = [];
  
+                for (let i = 0; i < doc.selectColumns.length; ++i) {
+                    let nid = findNodeId(treeData, doc.selectColumns[i].path);
+                    
+                    if (nid) {
+                        if (!selIds.includes(nid)) {
+                            selIds.push(nid);
+                        }
+                    }
+                }
+
+                treeData = flattenTree(treeData);
                 let tids = new Set();
                 for (let i = 0; i < selIds.length; ++i) {
-                   let pid = tvd[selIds[i]].parent;
+                   let pid = treeData[selIds[i]].parent;
 
                    while (pid) {
                        tids.add(pid);
-                       pid = treeViewData[pid].parent;
+                       pid = treeData[pid].parent;
                    }
                }
 
-
-                if (doc.datasource !== datasource) {
-                    setTreeViewData(tvd);
-                    setDatasource(doc.datasource);
-                }
-
+                setDatasource(doc.datasource);
+                setTreeViewData(treeData);
                 setBaseTable(doc.baseTable);
-                setSelectedColumnIds(selIds);
-                setSelectedTableIds([...tids]);
                 setSelectColumns(doc.selectColumns);
                 setFilterColumns(doc.filterColumns);
                 setFromClause(doc.fromClause);
-
+                setSelectedColumnIds(selIds);
+                setSelectedTableIds([...tids]);
+                
                 setCurrentDocument({
                     name: doc.name,
                     group: doc.documentGroupName
                 });
 
                 hideMessage();
+                
             }
         }
      };

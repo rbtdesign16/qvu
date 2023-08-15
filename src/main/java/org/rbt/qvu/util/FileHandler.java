@@ -24,7 +24,7 @@ import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
 import org.rbt.qvu.client.utils.User;
-import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
@@ -50,7 +50,7 @@ public class FileHandler {
     public static final String QUERY_FOLDER = "query";
 
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     @Autowired
     private DataSources dbDatasources;

@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.SqlFilterColumn;
@@ -59,7 +59,7 @@ public class DBHelper {
     }
 
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     public boolean isDataTypeNumeric(int type) {
         return ((type == java.sql.Types.TINYINT)

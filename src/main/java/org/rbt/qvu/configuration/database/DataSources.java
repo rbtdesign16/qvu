@@ -16,7 +16,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ public class DataSources {
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
     
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     @PostConstruct
     private void init() {

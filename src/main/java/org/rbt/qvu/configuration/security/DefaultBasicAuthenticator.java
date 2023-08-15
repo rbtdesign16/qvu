@@ -13,7 +13,6 @@ import org.rbt.qvu.client.utils.DeleteException;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.SaveException;
-import org.rbt.qvu.client.utils.UserAttribute;
 import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;

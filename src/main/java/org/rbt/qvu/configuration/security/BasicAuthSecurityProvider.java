@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.Helper;
@@ -34,11 +34,10 @@ import org.rbt.qvu.util.UserComparator;
  */
 @Component
 public class BasicAuthSecurityProvider implements AuthenticationProvider {
-
     private static Logger LOG = LoggerFactory.getLogger(BasicAuthSecurityProvider.class);
 
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     private String authenticatorClass;
 

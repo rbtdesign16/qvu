@@ -39,7 +39,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
-import org.rbt.qvu.configuration.Config;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.util.FileHandler;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
@@ -92,7 +92,7 @@ public class MainServiceImpl implements MainService {
     private DataSources qvuds;
 
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     @Autowired
     private HttpServletRequest request;

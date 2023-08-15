@@ -2,9 +2,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.rbt.qvu.security;
+package org.rbt.qvu.configuration;
 
-import org.rbt.qvu.configuration.Config;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -22,12 +21,10 @@ import org.rbt.qvu.configuration.security.SamlConfiguration;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,8 +34,6 @@ import org.springframework.security.saml2.provider.service.registration.InMemory
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -48,19 +43,16 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+public class QvuConfiguration {
+    private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 
     @Autowired
-    private Config config;
+    private ConfigurationHelper config;
 
     @PostConstruct
     private void init() {
-        LOG.info("in SecurityConfig.init()");
+        LOG.info("in QvuConfiguration.init()");
     }
-
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
@@ -127,6 +119,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
+                .requiresChannel(channel -> 
+                    channel.anyRequest().requiresSecure())
                 .csrf(csrf -> csrf.disable());
 
         if (config.getSecurityType().contains(Constants.OIDC_SECURITY_TYPE)) {

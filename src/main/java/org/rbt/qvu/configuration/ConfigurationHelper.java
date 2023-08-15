@@ -4,13 +4,13 @@
  */
 package org.rbt.qvu.configuration;
 
+import org.rbt.qvu.util.ConfigBuilder;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.security.SecurityConfig;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component;
  * @author rbtuc
  */
 @Component("config")
-public class Config {
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
+public class ConfigurationHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
     private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default document group\", \"defaultGroup\": true, \"roles\":[]}]}";
     
     @Value("#{systemProperties['repository.folder'] ?: '-'}")

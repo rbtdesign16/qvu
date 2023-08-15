@@ -197,7 +197,7 @@ public class DBHelper {
 
                     for (int i = 0; i < c.getToColumns().size(); ++i) {
                         String toColumn = c.getToColumns().get(i);
-                        String fromColumn = c.getToColumns().get(i);
+                        String fromColumn = c.getFromColumns().get(i);
 
                         retval.append(withQuotes(dbType, c.getAlias()));
                         retval.append(".");

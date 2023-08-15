@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
@@ -1289,6 +1290,16 @@ public class MainServiceImpl implements MainService {
             }
         }
         
+        // remove any empty folders
+        Iterator <DocumentNode> it = rootNode.getChildren().iterator();
+        while (it.hasNext()) {
+            DocumentNode f = it.next();
+            
+            if ((f.getChildren() == null) || f.getChildren().isEmpty()) {
+                it.remove();
+            }
+        }
+    
         retval.setResult(rootNode);
         
         LOG.debug("getAvailableDocuments() - elapsed time: " + ((System.currentTimeMillis() - start) / 1000) + "sec");

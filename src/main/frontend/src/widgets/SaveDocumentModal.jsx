@@ -36,7 +36,7 @@ const SaveDocumentModal = (props) => {
     
     const onHide = () => {
         config.hide();
-    }
+    };
     
     const loadDocumentGroups = (e) => {
         return documentGroups.map(g => {
@@ -75,7 +75,7 @@ const SaveDocumentModal = (props) => {
                     <Modal.Body>
                         <div className="entrygrid-100-150">
                             <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
-                            <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroup(e)}>{ loadDocumentGroups()}</select></div>
+                            <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroupName(e.target.value)}>{ loadDocumentGroups()}</select></div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>

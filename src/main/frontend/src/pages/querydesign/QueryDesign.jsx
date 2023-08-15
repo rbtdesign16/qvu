@@ -116,7 +116,7 @@ import { getDatasourceTreeViewData,
         let actionTimestamp = new Date().toISOString();
         showMessage(INFO, replaceTokens(getText("Saving document", "..."), [name]), null, true);
         let docWrapper = {
-            userId: authData.currentUser.userId,
+            userId: userId,
             actionTimestamp: actionTimestamp,
             queryDocument: {
                 name: name,

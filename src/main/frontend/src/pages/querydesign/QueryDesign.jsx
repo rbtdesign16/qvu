@@ -209,7 +209,7 @@ import { getDatasourceTreeViewData,
     
     const loadDocument = async (group, name) => {
         hideDocumentSelect();
-        showMessage(INFO, getText("Loading document", " " + name + "..."), true);
+        showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
@@ -269,7 +269,7 @@ import { getDatasourceTreeViewData,
     };
     
     const onShowDocumentSelect = async () => {
-        showMessage(INFO, getText("Loading available documents", "..."), true);
+        showMessage(INFO, getText("Loading available documents", "..."), null, true);
         
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 

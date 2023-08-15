@@ -360,7 +360,7 @@ const SqlDisplay = (props) => {
     };
 
     const runQueryWithParameters = async (params) => {
-        showMessage(INFO, getText("Running query", "...", ), true);
+        showMessage(INFO, getText("Running query", "...", ), null, true);
         let res = await runQuery(buildRunDocument(), params);
 
         if (isApiError(res)) {
@@ -375,7 +375,7 @@ const SqlDisplay = (props) => {
         if (isParameterEntryRequired()) {
             showParamEntry();
         } else {
-            showMessage(INFO, getText("Running query", "...", ), true);
+            showMessage(INFO, getText("Running query", "...", ), null, true);
             let res = await runQuery(buildRunDocument());
 
             if (isApiError(res)) {

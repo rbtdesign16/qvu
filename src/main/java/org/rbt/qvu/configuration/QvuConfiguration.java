@@ -44,6 +44,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 
 @Configuration
 @EnableWebSecurity
+// load properties from external repository location 
 @PropertySource("file:${repository.folder}/config/application.properties")
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);

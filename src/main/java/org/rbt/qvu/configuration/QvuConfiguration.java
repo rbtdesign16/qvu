@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -43,6 +44,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 
 @Configuration
 @EnableWebSecurity
+@PropertySource("file:${repository.folder}/config/application.properties")
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 

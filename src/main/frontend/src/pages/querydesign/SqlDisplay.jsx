@@ -85,10 +85,17 @@ const SqlDisplay = (props) => {
     };
 
     const getSelectColumns = () => {
-        return selectColumns.map((s, indx) => {
+        let selcols = [];
+        for (let i = 0; i < selectColumns.length; ++i) {
+            if (selectColumns[i].showInResults) {
+                selcols.push(selectColumns[i]);
+            }
+        }
+        
+        return selcols.map((s, indx) => {
             let comma = ",";
 
-            if (indx === (selectColumns.length - 1)) {
+            if (indx === (selcols.length - 1)) {
                 comma = "";
             }
 

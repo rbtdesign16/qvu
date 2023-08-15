@@ -143,35 +143,37 @@ public class DBHelper {
             boolean nonAggColumn = false;
             List<SqlSelectColumn> orderBy = new ArrayList<>();
             for (SqlSelectColumn c : runWrapper.getDocument().getSelectColumns()) {
-                retval.append(comma);
+                if (c.isShowInResults()) {
+                    retval.append(comma);
 
-                if (StringUtils.isNotEmpty(c.getCustomSql())) {
-                    retval.append(c.getCustomSql());
-                } else {
-                    if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
-                        aggColumn = true;
-                        retval.append(c.getAggregateFunction());
-                        retval.append("(");
+                    if (StringUtils.isNotEmpty(c.getCustomSql())) {
+                        retval.append(c.getCustomSql());
                     } else {
-                        nonAggColumn = true;
+                        if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
+                            aggColumn = true;
+                            retval.append(c.getAggregateFunction());
+                            retval.append("(");
+                        } else {
+                            nonAggColumn = true;
+                        }
+                        retval.append(withQuotes(dbType, c.getTableAlias()));
+                        retval.append(".");
+                        retval.append(withQuotes(dbType, c.getColumnName()));
+                        if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
+                            retval.append(")");
+                        }
                     }
-                    retval.append(withQuotes(dbType, c.getTableAlias()));
-                    retval.append(".");
-                    retval.append(withQuotes(dbType, c.getColumnName()));
-                    if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
-                        retval.append(")");
+
+                    comma = ", ";
+
+                    if (StringUtils.isNotEmpty(c.getDisplayName())) {
+                        retval.append(" as ");
+                        retval.append(withQuotes(dbType, c.getDisplayName()));
                     }
-                }
 
-                comma = ", ";
-                
-                if (StringUtils.isNotEmpty(c.getDisplayName())) {
-                    retval.append(" as ");
-                    retval.append(withQuotes(dbType, c.getDisplayName()));
-                }
-
-                if (c.getSortPosition() > 0) {
-                    orderBy.add(c);
+                    if (c.getSortPosition() > 0) {
+                        orderBy.add(c);
+                    }
                 }
             }
 
@@ -283,7 +285,6 @@ public class DBHelper {
                 }
             }
         }
-
 
         LOG.debug("generated sql: " + retval.toString());
 

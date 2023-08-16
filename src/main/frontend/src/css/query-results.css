@@ -15,7 +15,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 
 .query-results-table {
-    border: var(--query-results-table-border)
+    border-right: var(--query-results-table-border);
+    border-bottom: var(--query-results-table-border);
 }
 
 .query-results-table-body {
@@ -24,13 +25,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 .query-results-table-hdr {
     display: grid;
+    top: 0;
+    position: sticky;    
     grid-template-columns: 0;
     text-align: center;
     color: var(--query-results-table-hdr-forecolor);
     font-size: var(--query-results-table-hdr-fontsize);
     font-weight: var(--query-results-table-hdr-fontweight);
+    border-top: var(--query-results-table-border);
     border-bottom: var(--query-results-table-border);
     text-align: center;
+    z-index: 10;
 }
 
 .query-results-table-hdr > div {
@@ -39,6 +44,16 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     position: sticky;
     top: 0;
     border-right: var(--query-results-table-border);
+}
+
+.query-results-table-hdr > div:nth-child(1) {
+    left: 0;
+    top: 0;
+    position: sticky;
+    border-left: var(--query-results-table-border);
+    border-right: var(--query-results-table-border);
+    background-color: var(--query-results-table-detail-rownum-bkcolor);
+    z-index: 20;
 }
 
 .query-results-table-det {
@@ -58,6 +73,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .query-results-table-det > div:nth-child(1) {
     left: 0;
     position: sticky;
+    border-left: var(--query-results-table-border);
     border-right: var(--query-results-table-border);
     background-color: var(--query-results-table-detail-rownum-bkcolor);
 }

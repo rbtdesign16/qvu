@@ -141,7 +141,7 @@ const QueryResultsTable = () => {
 
     const getHeaderStyle = () => {
         return {
-            gridTemplateColumns: getGridWidths(),
+            gridTemplateColumns: getGridWidths()
         };
     };
 

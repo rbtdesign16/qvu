@@ -104,6 +104,7 @@ const ResultsFilterSelectModal = (props) => {
                 ck[i].checked = false;
             }
         }
+        config.hide();
     };
 
     return (

@@ -9,27 +9,22 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 @import "qvu-theme.css";
 
 .query-results-cont {
-    overflow-y: hidden;
-    overflow-x: auto;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
 }
 
 .query-results-table {
-    position: relative;
-    height: 100%;
     border: var(--query-results-table-border)
 }
 
 .query-results-table-body {
     height: calc(100% - 30px);
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
 .query-results-table-hdr {
     display: grid;
     grid-template-columns: 0;
-    position: sticky;
     text-align: center;
     color: var(--query-results-table-hdr-forecolor);
     font-size: var(--query-results-table-hdr-fontsize);
@@ -41,13 +36,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .query-results-table-hdr > div {
     background-color: var(--query-results-table-hdr-data-bkcolor);
     padding: 2px;
+    position: sticky;
+    top: 0;
     border-right: var(--query-results-table-border);
 }
 
 .query-results-table-det {
     display: grid;
     grid-template-columns: 0;
-    position: sticky;
     color: var(--query-results-table-detail-forecolor);
     font-size: var(--query-results-table-detail-fontsize);
     font-weight: var(--query-results-table-detail-fontweight);
@@ -60,6 +56,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 
 .query-results-table-det > div:nth-child(1) {
+    left: 0;
+    position: sticky;
     border-right: var(--query-results-table-border);
     background-color: var(--query-results-table-detail-rownum-bkcolor);
 }

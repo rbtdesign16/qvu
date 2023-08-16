@@ -963,7 +963,7 @@ public class MainServiceImpl implements MainService {
         ResultSetMetaData rmd = res.getMetaData();
 
         // rowcount 
-        retval.getHeader().add("#");
+        retval.getHeader().add("");
         int[] cwidths = new int[rmd.getColumnCount()];
         retval.getColumnTypes().add(java.sql.Types.INTEGER);
         for (int i = 0; i < cwidths.length; ++i) {

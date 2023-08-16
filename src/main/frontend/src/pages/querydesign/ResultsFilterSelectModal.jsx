@@ -17,7 +17,9 @@ const ResultsFilterSelectModal = (props) => {
     const {getText} = useLang();
     const {queryResults, currentFilters, setCurrentFilters, isRowHidden} = useQueryDesign();
     const {data, columnTypes, header} = queryResults;
-    
+
+    const EMPTY_FILTER_VALUE = getText("empty-filter-value");
+
     const getTitle = () => {
         if (config && header && config.columnIndex) {
             return getText("Filter for", " " + header[config.columnIndex]);
@@ -25,25 +27,25 @@ const ResultsFilterSelectModal = (props) => {
             return "";
         }
     };
-    
+
     const onHide = () => {
         config.hide();
     };
-    
+
     const onShow = () => {
         if (currentFilters[config.columnIndex]) {
             let ck = getCheckboxes();
-             for (let i = 0; i < ck.length; ++i) {
-                 ck[i].checked = currentFilters[config.columnIndex].includes(ck[i].name);
-             }
-         }
+            for (let i = 0; i < ck.length; ++i) {
+                ck[i].checked = currentFilters[config.columnIndex].includes(ck[i].name);
+            }
+        }
     };
-    
+
     const getEntries = () => {
         let values = [];
         let haveEmpty = false;
         let s = new Set();
-        
+
         if (data) {
             data.map(r => {
                 if (!isRowHidden(r)) {
@@ -60,22 +62,26 @@ const ResultsFilterSelectModal = (props) => {
             });
 
             values.sort((a, b) => doSortCompare(columnTypes[config.columnIndex], a, b));
+
+            if (haveEmpty) {
+                values.splice(0, 0, getText("empty-filter-value"));
+            }
         }
-        
+
         if (values.length > 0) {
             return values.map((v, indx) => {
                 let id = "cb-" + indx;
                 return <div><input id={id} name={v} type="checkbox"/><label className="ck-label" htmlFor={id}>{v}</label></div>;
-            }); 
+            });
         } else {
             return "";
         }
     };
-    
+
     const getCheckboxes = () => {
         return document.getElementById("fvals").querySelectorAll("input[type=checkbox]");
     };
-    
+
     const onApply = () => {
         let selected = [];
         let ck = getCheckboxes();
@@ -85,12 +91,13 @@ const ResultsFilterSelectModal = (props) => {
                     selected.push(ck[i].name);
                 }
             }
-            
+
             let cf = {...currentFilters};
             cf[config.columnIndex] = selected;
+
             setCurrentFilters(cf);
         }
-        
+
         config.hide();
     };
 

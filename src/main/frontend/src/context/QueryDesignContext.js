@@ -1,14 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import {
-UNARY_COMPARISON_OPERATORS,
-        isDataTypeString,
-        isDataTypeNumeric,
-        isDataTypeDateTime,
-        isEmpty,
-        updateAndOr,
-        DEFAULT_NEW_DOCUMENT_NAME,
-        DEFAULT_DOCUMENT_GROUP,
-        doSortCompare
+    UNARY_COMPARISON_OPERATORS,
+    isDataTypeString,
+    isDataTypeNumeric,
+    isDataTypeDateTime,
+    isEmpty,
+    updateAndOr,
+    DEFAULT_NEW_DOCUMENT_NAME,
+    DEFAULT_DOCUMENT_GROUP,
+    doSortCompare
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -33,6 +33,9 @@ export const QueryDesignProvider = ({ children }) => {
         name: getText(DEFAULT_NEW_DOCUMENT_NAME),
         group: DEFAULT_DOCUMENT_GROUP
     });
+    
+    const EMPTY_FILTER_VALUE = getText("empty-filter-value");
+    
     const getColumnNameForDisplay = (s) => {
         let retval = "";
 
@@ -52,7 +55,11 @@ export const QueryDesignProvider = ({ children }) => {
     const isRowHidden = (rowdata) => {
         for (let i = 1; i < rowdata.length; ++i) {
             if (currentFilters[i] && (currentFilters[i].length > 0)) {
-                if (!currentFilters[i].includes(String(rowdata[i]))) {
+                if (isEmpty(rowdata[i])) {
+                    if (!currentFilters[i].includes(EMPTY_FILTER_VALUE)) {
+                        return true;
+                    }
+                } else if (!currentFilters[i].includes(String(rowdata[i]))) {
                     return true;
                 }
             }

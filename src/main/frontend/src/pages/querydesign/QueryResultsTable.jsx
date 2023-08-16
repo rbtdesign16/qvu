@@ -184,7 +184,7 @@ const QueryResultsTable = () => {
     };
 
     const getTableWidth = () => {
-        let retval = 20;
+        let retval = 0;
         for (let i = 0; i < initialColumnWidths.length; ++i) {
             retval += (DEFAULT_PIXELS_PER_CHARACTER * initialColumnWidths[i]);
         }

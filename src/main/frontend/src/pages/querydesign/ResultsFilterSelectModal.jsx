@@ -95,23 +95,21 @@ const ResultsFilterSelectModal = (props) => {
             let cf = {...currentFilters};
             cf[config.columnIndex] = selected;
 
-            setCurrentFilters(cf);
+            config.setFilters(cf);
         }
-
-        config.hide();
     };
 
     const onReset = () => {
         let cf = {...currentFilters};
         cf[config.columnIndex] = "";
-        setCurrentFilters(cf);
         let ck = getCheckboxes();
         if (ck) {
             for (let i = 0; i < ck.length; ++i) {
                 ck[i].checked = false;
             }
         }
-        config.hide();
+        
+        config.setFilters(cf);
     };
 
     return (

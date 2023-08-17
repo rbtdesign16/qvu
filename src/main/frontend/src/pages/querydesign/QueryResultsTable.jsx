@@ -46,7 +46,7 @@ const QueryResultsTable = () => {
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
-    const [totalPages, setTotalPages] = useState(Math.max(0, Math.ceil(data.length / DEFAULT_PAGE_SIZE)));
+    const [totalPages, setTotalPages] = useState(Math.max(1, Math.ceil(data.length / DEFAULT_PAGE_SIZE)));
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -63,9 +63,24 @@ const QueryResultsTable = () => {
     };
 
     const filter = (colnum) => {
-        setShowFilterModal({show: true, columnIndex: colnum, hide: hideFilterModal});
+        setShowFilterModal({show: true, columnIndex: colnum, hide: hideFilterModal, setFilters: setFilters});
     };
 
+    const setFilters = (filters) => {
+        hideFilterModal();
+        setCurrentPage(1);
+        setCurrentFilters(filters);
+    };
+    
+    
+    const haveFilters = () => {
+        for (let i = 1; i < header.length; ++i) {
+            if (currentFilters[i] && (currentFilters[i].length > 0)) {
+                return true;
+            }
+        }
+    }
+    
     const getSortColor = (indx, type) => {
         if (isCurrentSort(indx, type)) {
             return COLOR_CRIMSON;
@@ -126,26 +141,46 @@ const QueryResultsTable = () => {
         return pageSize * (currentPage - 1);
     };
 
+    const getVisibleRecords = () => {
+        let retval = [];
+        
+        if (!haveFilters()) {
+            retval = data;
+        } else {
+            data.map(r => {
+                if (!isRowHidden(r)) {
+                    retval.push(r);
+                }
+            });
+        }
+        
+        return retval;
+    };
 
     const loadDisplayRecords = () => {
         let retval = [];
 
+        let vrecs = getVisibleRecords();
         let index = getStartRow();
         if (index > -1) {
             for (let i = 0; i < pageSize; ++i) {
-                if (index < data.length) {
-                    if (!isRowHidden(data[index])) {
-                        retval.push(data[index]);
-                        index++;
-                    }
+                if (index < vrecs.length) {
+                    retval.push(vrecs[index]);
+                    index++;
                 } else {
                     break;
                 }
             }
         }
+        
+        let tpg = Math.max(1, Math.ceil(vrecs.length / pageSize));
 
+        if (tpg !== totalPages) {
+            setTotalPages(tpg);
+        }
+        
         return retval;
-    }
+    };
 
     const getDetail = (detailStyle, columnStyles) => {
         let recs = loadDisplayRecords();

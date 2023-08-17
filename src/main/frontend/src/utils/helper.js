@@ -108,6 +108,12 @@ export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 export const RESULT_SET_PAGE_SIZES = [100, 200, 300, 400, 500, 600, 800, 1000];
 export const DEFAULT_PAGE_SIZE  = 200;
 
+export const ARROW_UP_KEY = "arrowup";
+export const ARROW_DOWN_KEY = "arrowdown";
+export const HOME_KEY = "arrowleft";
+export const END_KEY = "arrowright";
+
+
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
 };

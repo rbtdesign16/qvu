@@ -97,9 +97,23 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     border: none;
 }
 
-.page-size-select {
+.page-input {
     float: left;
+    display: inline-block;
     margin-left: 10px;
+    padding-top: 3px;
+}
+
+.page-input select {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.page-input input {
+    margin-left: 10px;
+    margin-right: 5px;
+    height: 30px;
+    text-align: center;
 }
 
 

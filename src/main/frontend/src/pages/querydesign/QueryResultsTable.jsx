@@ -2,14 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
-import ResponsivePagination from 'react-responsive-pagination';
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import ResultsFilterSelectModal from "./ResultsFilterSelectModal";
 import {AiFillCaretUp, AiFillCaretDown, AiFillFilter} from "react-icons/ai";
-import 'react-responsive-pagination/themes/minimal.css';
 import "../../css/query-results.css";
 
 import {
@@ -29,7 +27,11 @@ isDataTypeNumeric,
         COLOR_CRIMSON,
         COLOR_BLACK,
         RESULT_SET_PAGE_SIZES,
-        DEFAULT_PAGE_SIZE
+        DEFAULT_PAGE_SIZE,
+        ARROW_UP_KEY,
+        ARROW_DOWN_KEY,
+        HOME_KEY,
+        END_KEY
         } from "../../utils/helper";
 
 const QueryResultsTable = () => {
@@ -123,8 +125,8 @@ const QueryResultsTable = () => {
     const getStartRow = () => {
         return pageSize * (currentPage - 1);
     };
-    
-    
+
+
     const loadDisplayRecords = () => {
         let retval = [];
 
@@ -214,6 +216,7 @@ const QueryResultsTable = () => {
     };
 
     const onPageSize = (e) => {
+        e.preventDefault();
         let sz = Number(e.target.options[e.target.selectedIndex].value);
         let pages = Math.max(0, Math.ceil(data.length / sz));
         setTotalPages(pages);
@@ -230,6 +233,14 @@ const QueryResultsTable = () => {
         });
     };
 
+    const onPage = (e) => {
+       let pg = e.target.value;
+       
+       if ((pg > 0) && (pg <= totalPages)) {
+           setCurrentPage(pg);
+       }
+    };
+
     if (initialColumnWidths) {
         return <div className="query-results-panel">
             <div className="query-results-cont">
@@ -242,16 +253,14 @@ const QueryResultsTable = () => {
                 </div>
             </div>
             <div className="query-results-footer">
-                <span className="page-size-select">
+                <div className="page-input">
                     {getText("Page Size:")}
-                    <select style={{marginLeft: "10px"}} onChange={e => onPageSize(e)}>{getPageSizes()}</select>
-                </span>
-                <ResponsivePagination
-                    current={currentPage}
-                    total={totalPages}
-                    maxWidth={400}
-                    onPageChange={setCurrentPage}/>
-            </div>
+                    <select onChange={e => onPageSize(e)}>{getPageSizes()}</select>
+                    {getText("Page:")}
+                    <input type="number" min={1} max={totalPages} value={currentPage} disabled={totalPages < 2} onChange={e => onPage(e)}/>
+                    of {totalPages}
+                </div>
+             </div>
         </div>;
     } else {
         return <div className="info-txt">{getText("no query results")}</div>;

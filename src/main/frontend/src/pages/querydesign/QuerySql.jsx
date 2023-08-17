@@ -22,7 +22,7 @@ const QuerySql = () => {
         <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="sql-display-cont">
             <SqlDisplay/>
         </SplitterPanel>
-        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%"}} className="query-results-cont">
+        <SplitterPanel style={{width: Math.floor(splitter1Sizes[1]) + "%", overflow: "hidden"}} >
             <QueryResultsTable/>
         </SplitterPanel>
     </Splitter>);

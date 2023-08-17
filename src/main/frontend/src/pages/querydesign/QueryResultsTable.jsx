@@ -4,10 +4,12 @@
  */
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
+import ResponsivePagination from 'react-responsive-pagination';
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import ResultsFilterSelectModal from "./ResultsFilterSelectModal";
 import {AiFillCaretUp, AiFillCaretDown, AiFillFilter} from "react-icons/ai";
+import 'react-responsive-pagination/themes/minimal.css';
 import "../../css/query-results.css";
 
 import {
@@ -25,21 +27,26 @@ isDataTypeNumeric,
         JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE,
         DEFAULT_PIXELS_PER_CHARACTER,
         COLOR_CRIMSON,
-        COLOR_BLACK
+        COLOR_BLACK,
+        RESULT_SET_PAGE_SIZES,
+        DEFAULT_PAGE_SIZE
         } from "../../utils/helper";
 
 const QueryResultsTable = () => {
-    const {queryResults, 
-        currentResultsSort, 
-        setCurrentResultsSort, 
-        doSort, 
-        isCurrentSort, 
-        currentFilters, 
+    const {queryResults,
+        currentResultsSort,
+        setCurrentResultsSort,
+        doSort,
+        isCurrentSort,
+        currentFilters,
         setCurrentFilters,
         isRowHidden} = useQueryDesign();
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
+    const [totalPages, setTotalPages] = useState(100);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
     const sortFilterStyle = {
         display: "inline-grid",
@@ -151,8 +158,6 @@ const QueryResultsTable = () => {
         };
     };
 
-    const getFooterStyle = () => {
-    };
 
     const getTextAlign = (type) => {
         if (isDataTypeDateTime(type)) {
@@ -192,14 +197,41 @@ const QueryResultsTable = () => {
         return retval;
     };
 
+    const onPageSize = (e) => {
+    };
+    
+    const getPageSizes = () => {
+        return RESULT_SET_PAGE_SIZES.map(s => {
+            if (s === pageSize) {
+                return <option value={s} selected>{s}</option>;
+            } else {
+                return <option value={s}>{s}</option>;
+            }
+        });
+    };
+    
     if (initialColumnWidths) {
-        return <div style={{width: getTableWidth() + "px"}} className="query-results-table">
-            <ResultsFilterSelectModal config={showFilterModal}/>
-            <div className="query-results-table-hdr" style={getHeaderStyle()}>{getHeaderColumns()}</div>
-            <div className="query-results-table-body">
-                {getDetail(getDetailStyle(), getDetailColumnStyles())}
+        return <div className="query-results-panel">
+            <div className="query-results-cont">
+                <div style={{width: getTableWidth() + "px"}} className="query-results-table">
+                    <ResultsFilterSelectModal config={showFilterModal}/>
+                    <div className="query-results-table-hdr" style={getHeaderStyle()}>{getHeaderColumns()}</div>
+                    <div className="query-results-table-body">
+                        {getDetail(getDetailStyle(), getDetailColumnStyles())}
+                    </div>
+                </div>
             </div>
-            <div style={getFooterStyle()}>{getFooter()}</div>
+            <div className="query-results-footer">
+                <span className="page-size-select">
+                    {getText("Page Size:")}
+                    <select style={{paddingLeft: "10px"}} onChange={e => onPageSize(e)}>{getPageSizes()}</select>
+                </span>
+                <ResponsivePagination
+                    current={currentPage}
+                    total={totalPages}
+                    maxWidth={400}
+                    onPageChange={setCurrentPage}/>
+            </div>
         </div>;
     } else {
         return <div className="info-txt">{getText("no query results")}</div>;

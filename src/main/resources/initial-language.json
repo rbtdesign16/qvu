@@ -211,6 +211,7 @@
         "Cancel": "Cancel",
         "Loading available documents": "Loading available documents",
         "Loading document": "Loading document",
-        "empty-filter-value": "(empty)"
+        "empty-filter-value": "(empty)",
+        "Page Size:": "Page Size:"
     }
 }

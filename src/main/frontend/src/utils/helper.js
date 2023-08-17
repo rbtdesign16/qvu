@@ -105,6 +105,9 @@ export const ALLOWED_NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8"
 export const NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "minus"];
 export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
+export const RESULT_SET_PAGE_SIZES = [100, 200, 300, 400, 500, 600, 800, 1000];
+export const DEFAULT_PAGE_SIZE  = 200;
+
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
 };

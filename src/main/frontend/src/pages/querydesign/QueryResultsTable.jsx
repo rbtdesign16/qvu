@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
  */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import ResponsivePagination from 'react-responsive-pagination';
 import useQueryDesign from "../../context/QueryDesignContext";
@@ -44,7 +44,7 @@ const QueryResultsTable = () => {
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
-    const [totalPages, setTotalPages] = useState(100);
+    const [totalPages, setTotalPages] = useState(Math.max(0, Math.ceil(data.length / DEFAULT_PAGE_SIZE)));
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
@@ -120,19 +120,35 @@ const QueryResultsTable = () => {
         return row.map((coldata, indx) => <div style={columnStyles[indx]}>{getDisplayData(coldata, rownum, indx)}</div>);
     };
 
-    const getDetail = (detailStyle, columnStyles) => {
-        let rownum = 1;
-        return data.map(r => {
-            if (isRowHidden(r)) {
-                return "";
-            } else {
-                return <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, rownum++, columnStyles)}</div>;
-            }
-        });
+    const getStartRow = () => {
+        return pageSize * (currentPage - 1);
     };
+    
+    
+    const loadDisplayRecords = () => {
+        let retval = [];
 
-    const getFooter = () => {
-        return "";
+        let index = getStartRow();
+        if (index > -1) {
+            for (let i = 0; i < pageSize; ++i) {
+                if (index < data.length) {
+                    if (!isRowHidden(data[index])) {
+                        retval.push(data[index]);
+                        index++;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return retval;
+    }
+
+    const getDetail = (detailStyle, columnStyles) => {
+        let recs = loadDisplayRecords();
+        let rownum = 1;
+        return recs.map(r => <div className="query-results-table-det" style={detailStyle}>{getColumnDetail(r, rownum++, columnStyles)}</div>);
     };
 
     const getGridWidths = () => {
@@ -198,8 +214,12 @@ const QueryResultsTable = () => {
     };
 
     const onPageSize = (e) => {
+        let sz = Number(e.target.options[e.target.selectedIndex].value);
+        let pages = Math.max(0, Math.ceil(data.length / sz));
+        setTotalPages(pages);
+        setPageSize(sz);
     };
-    
+
     const getPageSizes = () => {
         return RESULT_SET_PAGE_SIZES.map(s => {
             if (s === pageSize) {
@@ -209,7 +229,7 @@ const QueryResultsTable = () => {
             }
         });
     };
-    
+
     if (initialColumnWidths) {
         return <div className="query-results-panel">
             <div className="query-results-cont">
@@ -224,7 +244,7 @@ const QueryResultsTable = () => {
             <div className="query-results-footer">
                 <span className="page-size-select">
                     {getText("Page Size:")}
-                    <select style={{paddingLeft: "10px"}} onChange={e => onPageSize(e)}>{getPageSizes()}</select>
+                    <select style={{marginLeft: "10px"}} onChange={e => onPageSize(e)}>{getPageSizes()}</select>
                 </span>
                 <ResponsivePagination
                     current={currentPage}

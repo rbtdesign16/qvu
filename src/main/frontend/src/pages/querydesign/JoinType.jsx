@@ -43,7 +43,7 @@ const JoinType = (props) => {
                    keyboard={true}>
                 <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}>
-                        <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>
+                        <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>
                         {getText("Join Type")}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

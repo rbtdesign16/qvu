@@ -210,21 +210,13 @@ img {
     height: calc(100% - 30px);
 }
 
-.icon-s {
-    cursor: pointer;
-    margin-top: -5px;
-    margin-right: 3px;
-    
-}
-
 .icon {
     cursor: pointer;
 }
 
-.icon-s-dis {
+.icon-dis {
     cursor: default;
     filter: grayscale();
-    margin-top: -5px;
 }
 
 .ck-label {

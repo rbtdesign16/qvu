@@ -49,9 +49,9 @@ const DocumentSelectModal = (props) => {
     
     const getNode = (element, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><TreeArrowIcon isOpen={isExpanded}/><span className="name"><FcFolder className="icon-s" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span></span>;
+            return <span><TreeArrowIcon isOpen={isExpanded}/><span className="name"><FcFolder className="icon" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span></span>;
         } else {
-            return <span style={{cursor: "pointer"}} className="name" onClick={(e) => onClick(element)}><FcDocument className="icon-s" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span>;
+            return <span style={{cursor: "pointer"}} className="name" onClick={(e) => onClick(element)}><FcDocument className="icon" size={SMALL_ICON_SIZE}/>&nbsp;{element.name}</span>;
         }
     };
 

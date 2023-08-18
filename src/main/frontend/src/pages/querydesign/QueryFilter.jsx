@@ -80,8 +80,8 @@ const QueryFilter = () => {
     return <div className="query-filter-panel">
         <div className="filter-header">
             <span title={getText("Add filter column")}>
-                {!selectColumn  ? <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} disabled={true} className="icon-m-dis"/>
-                    : <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} className="icon-m cloverGreen-f" onClick={e => addFilterColumn()}/>}
+                {!selectColumn  ? <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} disabled={true} className="icon-dis"/>
+                    : <MdOutlineAddBox size={BIG_ICON_SIZE} style={{marginBottom: "5px"}} className="icon cloverGreen-f" onClick={e => addFilterColumn()}/>}
             </span>
             <select onChange={e => setSelectedColumn(e)}><option value=""></option>{loadSelectColumns()}</select>
         </div>

@@ -174,7 +174,7 @@ const CustomForeignKeys = (props) => {
                             <label className="ck-label" htmlFor={"imp-" + indx}>{getText("Imported Keys")}</label>
                         </div>
                         <div className="label"></div><div>
-                            <div title={getText("Remove entry")} style={{float: "right"}} ><AiFillDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove(indx)} /></div>
+                            <div title={getText("Remove entry")} style={{float: "right"}} ><AiFillDelete  className="icon crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove(indx)} /></div>
                         </div>
                     </div>
                     <div><span className="red-f">*</span>{getText("indicates required field")}</div>
@@ -252,7 +252,7 @@ const CustomForeignKeys = (props) => {
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header closeButton>
-                        <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
+                        <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                             &nbsp;&nbsp;{getText("Custom Foreign Keys", " - ") + datasourceName }</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>

@@ -152,7 +152,7 @@ const ColumnSettings = (props) => {
                    backdrop={true} 
                    keyboard={true}>
                 <Modal.Header closeButton>
-                    <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
+                    <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Column Settings", " - ") + getTableName() }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

@@ -174,7 +174,7 @@ const FilterEntry = (props) => {
 
     const getDetail = () => {
         return <tr style={{paddingLeft: "10px"}}>
-            <td title={getText("Remove entry")}><AiOutlineDelete  className="icon-s crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
+            <td title={getText("Remove entry")}><AiOutlineDelete  className="icon crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
             <td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={!filterColumns[index].andOr}>{loadAndOr()}</select></td>
             <td><select name="openParenthesis" onChange={e => onChange(e)}>{loadOpenParenthesis()}</select></td>
             <td><span className="fc-name">{getColumnNameForDisplay(filterColumns[index])}</span></td>
@@ -187,7 +187,7 @@ const FilterEntry = (props) => {
     return <div key={"fe-" + index}>
         <div className="filter-title" id={"fil-" + index}>
             <span>
-                <MdHelpOutline style={{marginBottom: "5px"}} className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
+                <MdHelpOutline style={{marginBottom: "5px"}} className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
                 <span title={getHeaderTitle()} >{getColumnNameForDisplay(filterColumns[index])}</span>
             </span>
         </div>

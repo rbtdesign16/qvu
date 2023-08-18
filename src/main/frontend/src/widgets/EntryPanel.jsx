@@ -131,14 +131,14 @@ const EntryPanel = (props) => {
     const getLabel = (c) => {
         if (c.type === "checkbox") {
             if (c.showHelp) {
-                return <div style={{textAlign: "right", verticalAlign: "middle"}}><MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/></div>;
+                return <div style={{textAlign: "right", verticalAlign: "middle"}}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/></div>;
             } else {
                 return <div/>;
             }
         } else {
             if (c.showHelp) {
                 return  <div className="label">
-                    <MdHelpOutline className="icon-s" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/>&nbsp;&nbsp;
+                    <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => c.showHelp(c.helpText)}/>&nbsp;&nbsp;
                     {c.required && <span className="red-f">*</span>}{c.label}</div>;
             } else {
                 return <div className="label">{c.required && <span className="red-f">*</span>}{c.label}</div>;

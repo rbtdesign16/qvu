@@ -79,8 +79,8 @@ const EditableDataList = (props) => {
     
     const getButtons = (indx) => {
         return <div className="btn-bar tb-border">
-            {isEditDisabled(indx) ? <span title={getEditTitle(indx)}><CiEdit className="icon-s-dis" size={SMALL_ICON_SIZE} /></span> : <span title={getEditTitle(indx)}><CiEdit className="icon-s cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => listConfig.onEdit(indx)} /></span>}
-            {isDeleteDisabled(indx) ? <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon-s-dis" size={SMALL_ICON_SIZE}  /> </span>: <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon-s crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => listConfig.onDelete(indx)} /></span>}
+            {isEditDisabled(indx) ? <span title={getEditTitle(indx)}><CiEdit className="icon-dis" size={SMALL_ICON_SIZE} /></span> : <span title={getEditTitle(indx)}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => listConfig.onEdit(indx)} /></span>}
+            {isDeleteDisabled(indx) ? <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon-dis" size={SMALL_ICON_SIZE}  /> </span>: <span  title={getDelTitle(indx)}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => listConfig.onDelete(indx)} /></span>}
         </div>;
      };
 
@@ -102,7 +102,7 @@ const EditableDataList = (props) => {
                 <div className="title">
                     <span>{listConfig.title}</span>
                     {listConfig.onAdd &&
-                            <span  title={listConfig.addTitle} style={{float: "right"}}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon-m cloverGreen-f" onClick={listConfig.onAdd}/></span>
+                            <span  title={listConfig.addTitle} style={{float: "right"}}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" onClick={listConfig.onAdd}/></span>
                     }
                 </div>
                 <div className="data-container">

@@ -428,14 +428,14 @@ const SqlDisplay = (props) => {
         <ParameterEntryModal config={showParameterEntry}/>
         <span style={{float: "right", marginRight: "30px", top: "5px", position: "sticky"}}>
             <span  title={getText("Copy sql to clipboard")} style={{marginRight: "10px"}}>
-                <AiOutlineCopy className="icon-s cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
+                <AiOutlineCopy className="icon cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => copySqlToClipboard()} />
             </span>
             <span  title={getText("Export to excel")} style={{marginRight: "10px"}}>
-                {haveQueryResults() ? <AiOutlineFileExcel className="icon-s cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => excelExport()} />
-                                : <AiOutlineFileExcel className="icon-s-dis" size={MEDIUM_ICON_SIZE + 2} />}
+                {haveQueryResults() ? <AiOutlineFileExcel className="icon cloverGreen-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => excelExport()} />
+                                : <AiOutlineFileExcel className="icon-dis" size={MEDIUM_ICON_SIZE + 2} />}
             </span>
             <span  title={getText("Run query")} >
-                <BiRun className="icon-s crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runLocalQuery()} />
+                <BiRun className="icon crimson-f" size={MEDIUM_ICON_SIZE + 2} onClick={(e) => runLocalQuery()} />
             </span>
         </span>
         <div className="sql-clause-name">SELECT</div>

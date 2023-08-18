@@ -59,7 +59,7 @@ const DataSelectTree = (props) => {
         if (element.metadata && element.metadata.type) {
             switch (String(element.metadata.type)) {
                 case NODE_TYPE_ROOT:
-                    return <FcDatabase className="icon-s" size={SMALL_ICON_SIZE}/>;
+                    return <FcDatabase className="icon" size={SMALL_ICON_SIZE}/>;
                 case NODE_TYPE_TABLE:
                     if (selectedTableIds.includes(element.id)) {
                         return <img src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
@@ -68,9 +68,9 @@ const DataSelectTree = (props) => {
                     }
                 case NODE_TYPE_COLUMN:
                     if (element.metadata.pkindex > -1) {
-                        return <FcKey className="icon-s" size={SMALL_ICON_SIZE}/>;
+                        return <FcKey className="icon" size={SMALL_ICON_SIZE}/>;
                     } else {
-                        return <FcTimeline className="icon-s" size={SMALL_ICON_SIZE}/>;
+                        return <FcTimeline className="icon" size={SMALL_ICON_SIZE}/>;
                     }
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
                     return <img src={getFkIcon(element, "imp")} width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;

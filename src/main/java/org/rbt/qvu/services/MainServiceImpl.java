@@ -3,6 +3,8 @@ package org.rbt.qvu.services;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -20,6 +22,7 @@ import java.util.LinkedHashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -345,9 +348,11 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult doInitialSetup(InitialSetup initialSetup) {
         OperationResult retval = new OperationResult();
+        FileOutputStream fos = null;
         try {
-            File f = new File(initialSetup.getRepository() + File.separator + "config");
-
+            File f = new File(initialSetup.getRepository() + File.separator + "documents");
+            f.mkdirs();
+            f = new File(initialSetup.getRepository() + File.separator + "config" + File.separator + "certs");
             f.mkdirs();
 
             config.setRepositoryFolder(initialSetup.getRepository());
@@ -365,10 +370,29 @@ public class MainServiceImpl implements MainService {
 
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             fileHandler.saveSecurityConfig(securityConfig);
-
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-self-signed.p12"), new File(config.getDefaultsCertFileName()));
+
+            Properties p = new Properties();
+            p.load(getClass().getResourceAsStream("/initial-application.properties"));
+            
+            p.setProperty("server.ssl.key-store", "file:" + initialSetup.getRepository() + "/config/certs/qvu-self-signed.p12");
+            
+            fos = new FileOutputStream(initialSetup.getRepository() + "/config/application.properties");
+            p.store(fos, "initial setup");
+            
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (Exception ex) {
+                    if (retval.isSuccess()) {
+                        Helper.populateResultError(retval, ex);
+                    }
+                };
+            }
         }
 
         return retval;
@@ -427,11 +451,11 @@ public class MainServiceImpl implements MainService {
 
             Set<String> userRoles = new HashSet<>(user.getRoles());
 
+            
+            DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
             QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper,
-                    config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName),
+                    ds,
                     userRoles,
-                    config.getDatasourcesConfig().getMaxImportedKeyDepth(),
-                    config.getDatasourcesConfig().getMaxExportedKeyDepth(),
                     tableInfo);
 
             retval.setResult(node);

@@ -123,9 +123,27 @@ const Admin = () => {
                 required: true
             },
             {
+                label: getText("Max Imported Key Depth:"),
+                name: "maxImportedKeyDepth",
+                default: 2,
+                type: "number",
+                required: true,
+                showHelp: showHelpMessage,
+                helpText: getText("datasourceMaxImportedKey-help")
+            },
+             {
+                label: getText("Max Exported Key Depth:"),
+                name: "maxExportedKeyDepth",
+                default: 4,
+                type: "number",
+                required: true,
+                showHelp: showHelpMessage,
+                helpText: getText("datasourceMaxExportedKey-help")
+            },
+            {
                 label: getText("Connection Timeout:"),
                 name: "connectionTimeout",
-                type: "number"
+                type: "number",
             },
             {
                 label: getText("Idle Timeout:"),
@@ -478,7 +496,8 @@ const Admin = () => {
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
-            gridClass: "entrygrid-175-425",
+            gridClass: "entrygrid-225-425",
+            dlgsize: "ds-admin",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,
             buttons: [

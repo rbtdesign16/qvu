@@ -24,7 +24,7 @@ import org.rbt.qvu.dto.TableSettings;
  * @author rbtuc
  */
 public class QuerySelectTreeBuilder {
-    public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, int maxImportedKeyDepth, int maxExportedKeyDepth, List<Table> tableInfo) {
+    public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
 
@@ -59,8 +59,8 @@ public class QuerySelectTreeBuilder {
                     retval.getChildren().add(n);
                     loadColumns(n, ta, t, t.getName(), userRoles);
                     Map<String, Integer> fkMap = new HashMap<>();
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, maxImportedKeyDepth, curDepth, t.getName(), fkMap);
-                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, maxExportedKeyDepth, curDepth, t.getName(), fkMap);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getImportedKeys(), true, datasource.getMaxImportedKeyDepth(), curDepth, t.getName(), fkMap);
+                    loadForeignKeys(n, dsHelper, datasourceName, tMap, userRoles, t, t.getExportedKeys(), false, datasource.getMaxExportedKeyDepth(), curDepth, t.getName(), fkMap);
                 }
             }
         }

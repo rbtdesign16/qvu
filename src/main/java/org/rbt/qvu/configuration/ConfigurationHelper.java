@@ -201,12 +201,8 @@ public class ConfigurationHelper {
         return retval;
     }
 
-    public String getQueryDocumentsFolder() {
-        return repositoryFolder + File.separator + "query-documents";
-    }
-
-    public String getReportDocumentsFolder() {
-        return repositoryFolder + File.separator + "report-documents";
+    public String getDefaultsCertFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + "certs" + Constants.LANGUAGE_FILE_NAME;
     }
 
     public String getLanguageFileName() {

@@ -528,3 +528,8 @@ textarea {
 .filter-values > div:nth-child(even) {
     background-color: var(--query-results-table-detail-row-bkcolor2);
 }
+
+
+.modal-ds-admin {
+    min-width: 600px;
+}

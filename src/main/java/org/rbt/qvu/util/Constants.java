@@ -44,6 +44,9 @@ public class Constants {
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";
     public static final String NONE = "none";
+    
+    public static final int DEFAULT_MAX_EXPORTED_KEY_DEPTH = 4;
+    public static final int DEFAULT_MAX_IMPORTED_KEY_DEPTH = 2;
 
     public static final String ROLE_PREFIX = "role_";
     public static final String SAML_FIRST_NAME_ATTRIBUTE_KEY = "urn:oid:2.5.4.42";
@@ -54,6 +57,7 @@ public class Constants {
     public static final String DATASOURCES_CONFIG_FILE_NAME = "qvu-datasources.json";
     public static final String DOCUMENT_GROUPS_CONFIG_FILE_NAME = "qvu-document-groups.json";
     public static final String LANGUAGE_FILE_NAME = "qvu-language.json";
+    public static final String DEFAULT_CERT_FILE_NAME = "qvu-self-signed.p12";
     public static final String DEFAULT_LANGUAGE_KEY = "en-US";
 
     public static final String[] DEFAULT_ROLE_NAMES = {

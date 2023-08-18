@@ -59,23 +59,23 @@ const EntryPanel = (props) => {
             }
             switch (c.type) {
                 case "input":
-                    return <input name={c.name} id={id} type="text" size={c.size ? c.size : 30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name]}/>;
+                    return <input name={c.name} id={id} type="text" size={c.size ? c.size : 30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue}/>;
                 case "password":
                     return <input name={c.name} id={id}  type="password" size={c.size ? c.size : 20} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name]}/>;
                 case "select":
                     return <select name={c.name}  id={id} onChange={e => onChange(e)} style={c.style} disabled={c.disabled} >{loadOptions(dataObject[c.name], c.options)}</select>;
                 case "number":
-                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
+                    return <input name={c.name}  id={id} type="number" onChange={e => onChange(e)} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue} disabled={c.disabled} style={c.style}  />;
                 case "date":
-                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                    return <input name={c.name} id={id}  type="date" onChange={e => onChange(e)} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue} disabled={c.disabled} style={c.style} />;
                 case "email":
-                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} style={c.style} disabled={c.disabled}/>;
+                    return <input name={c.name} id={id}  type="email" size={20} onChange={e => onChange(e)} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue} style={c.style} disabled={c.disabled}/>;
                 case "checkbox":
                     return <input name={c.name}  id={id} type="checkbox" onChange={e => onChange(e)} defaultChecked={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
                 case "textarea":
-                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style}  />;
+                    return <textarea name={c.name}  id={id} cols={30} rows={2} onChange={e => onChange(e)} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue} disabled={c.disabled} style={c.style}  />;
                 case "file":
-                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} defaultValue={dataObject[c.name]} disabled={c.disabled} style={c.style} />;
+                    return <input name={c.name} id={id} type="file" size={40} onChange={e => onChange(e)} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue} disabled={c.disabled} style={c.style} />;
                 case "label":
                     return <span className="read-only-data" style={c.style} >{getLabelText(c.text)}</span>;
                 case "button":

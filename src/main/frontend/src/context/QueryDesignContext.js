@@ -29,6 +29,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [currentFilters, setCurrentFilters] = useState({});
     const [splitter1Sizes, setSplitter1Sizes] = useState([25, 75]);
     const [queryResults, setQueryResults] = useState({header: [], data: []});
+    const [treeViewExpandedIds, setTreeViewExpandedIds] = useState([]);
     const [currentDocument, setCurrentDocument] = useState({
         name: getText(DEFAULT_NEW_DOCUMENT_NAME),
         group: DEFAULT_DOCUMENT_GROUP
@@ -495,7 +496,9 @@ export const QueryDesignProvider = ({ children }) => {
                                 setCurrentFilters,
                                 isRowHidden,
                                 clearData,
-                                setCurrentDocument
+                                setCurrentDocument,
+                                treeViewExpandedIds,
+                                setTreeViewExpandedIds
                             }}>
                 {children}
             </QueryDesignContext.Provider>

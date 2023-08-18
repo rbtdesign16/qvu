@@ -27,9 +27,9 @@ const DataSelectTree = (props) => {
         setSelectedColumnIds,
         setSelectedTableIds,
         setBaseTable,
+        treeViewExpandedIds,
         updateSelectColumns} = useQueryDesign();
     const [showJoinType, setShowJoinType] = useState({show: false});
-    
     
     const getColumnLinks = (md) => {
         if (md.fromdiscols && md.todiscols) {
@@ -151,7 +151,7 @@ const DataSelectTree = (props) => {
         hideJoinType();
         updateSelectColumns();
     };
-
+    
     const handleContextMenu = (e, element) => {
         if (element && element.metadata) {
             switch (String(element.metadata.type)) {
@@ -206,6 +206,7 @@ const DataSelectTree = (props) => {
                 data={treeViewData}
                 propagateCollapse={true}
                 multiSelect={true}
+                expandedIds={treeViewExpandedIds}
                 selectedIds={selectedColumnIds}
                 nodeRenderer={nodeRenderer}
                 />

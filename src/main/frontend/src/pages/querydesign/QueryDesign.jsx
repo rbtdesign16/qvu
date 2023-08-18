@@ -20,20 +20,20 @@ import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import {
-    SUCCESS,
-    INFO,
-    WARN,
-    ERROR,
-    DEFAULT_ERROR_TITLE,
-    DEFAULT_DOCUMENT_GROUP,
-    QUERY_DOCUMENT_TYPE,
-    replaceTokens,
-    SPLITTER_GUTTER_SIZE,
-    NODE_TYPE_TABLE,
-    NODE_TYPE_COLUMN,
-    NODE_TYPE_IMPORTED_FOREIGNKEY,
-    NODE_TYPE_EXPORTED_FOREIGNKEY
-} from "../../utils/helper";
+SUCCESS,
+        INFO,
+        WARN,
+        ERROR,
+        DEFAULT_ERROR_TITLE,
+        DEFAULT_DOCUMENT_GROUP,
+        QUERY_DOCUMENT_TYPE,
+        replaceTokens,
+        SPLITTER_GUTTER_SIZE,
+        NODE_TYPE_TABLE,
+        NODE_TYPE_COLUMN,
+        NODE_TYPE_IMPORTED_FOREIGNKEY,
+        NODE_TYPE_EXPORTED_FOREIGNKEY
+        } from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
@@ -65,7 +65,8 @@ import { getDatasourceTreeViewData,
         setFilterColumns,
         setFromClause,
         setCurrentDocument,
-        updateSelectColumns} = useQueryDesign();
+        updateSelectColumns,
+        setTreeViewExpandedIds} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources} = useDataHandler();
@@ -144,7 +145,7 @@ import { getDatasourceTreeViewData,
 
     };
 
-    
+
     const onDatasourceChange = async (e) => {
         let ds = e.target.options[e.target.selectedIndex].value;
         if (ds) {
@@ -179,7 +180,7 @@ import { getDatasourceTreeViewData,
     const findNodeId = (parent, path) => {
         let retval;
         let parts = path.split("|");
-        
+
         for (let i = 0; !retval && (i < parent.children.length); ++i) {
             switch (String(parent.children[i].metadata.type)) {
                 case NODE_TYPE_TABLE:
@@ -194,7 +195,7 @@ import { getDatasourceTreeViewData,
                     break;
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
-                { 
+                {
                     let pos = parts[0].indexOf("{");
                     let nm = parts[0].substring(0, pos);
                     if (nm === parent.children[i].metadata.dbname) {
@@ -203,10 +204,10 @@ import { getDatasourceTreeViewData,
                 }
             }
         }
-        
+
         return retval;
-     };
-    
+    };
+
     const loadDocument = async (group, name) => {
         hideDocumentSelect();
         showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
@@ -222,10 +223,10 @@ import { getDatasourceTreeViewData,
             } else {
                 let treeData = res.result;
                 let selIds = [];
- 
+
                 for (let i = 0; i < doc.selectColumns.length; ++i) {
                     let nid = findNodeId(treeData, doc.selectColumns[i].path);
-                    
+
                     if (nid) {
                         if (!selIds.includes(nid)) {
                             selIds.push(nid);
@@ -235,14 +236,18 @@ import { getDatasourceTreeViewData,
 
                 treeData = flattenTree(treeData);
                 let tids = new Set();
+                let expandedIds = [];
                 for (let i = 0; i < selIds.length; ++i) {
-                   let pid = treeData[selIds[i]].parent;
+                    let pid = treeData[selIds[i]].parent;
 
-                   while (pid) {
-                       tids.add(pid);
-                       pid = treeData[pid].parent;
-                   }
-               }
+                    while (pid) {
+                        if (!tids.has(pid)) {
+                            expandedIds.push(pid);
+                        }
+                        tids.add(pid);
+                        pid = treeData[pid].parent;
+                    }
+                }
 
                 setDatasource(doc.datasource);
                 setTreeViewData(treeData);
@@ -252,49 +257,50 @@ import { getDatasourceTreeViewData,
                 setFromClause(doc.fromClause);
                 setSelectedColumnIds(selIds);
                 setSelectedTableIds([...tids]);
-                
+                setTreeViewExpandedIds(expandedIds);
+
                 setCurrentDocument({
                     name: doc.name,
                     group: doc.documentGroupName
                 });
 
                 hideMessage();
-                
+
             }
         }
-     };
-    
+    };
+
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});
     };
-    
+
     const onShowDocumentSelect = async () => {
         showMessage(INFO, getText("Loading available documents", "..."), null, true);
-        
+
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 
         hideMessage();
-        
+
         if (isApiSuccess(res)) {
             setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
         } else {
             showMessage(ERROR, res.message);
         }
     };
-    
+
     const onNewDocument = () => {
         setNewDocument();
     };
-    
+
     const getDocumentInfo = () => {
-        return "    " 
-                + getText("Group", ":  ") 
-                + currentDocument.group 
-                + ",    " 
+        return "    "
+                + getText("Group", ":  ")
+                + currentDocument.group
+                + ",    "
                 + getText("Document", ":  ")
                 + currentDocument.name;
     };
-    
+
     useEffect(() => {
         setTreeViewData(null);
         setDatasource(null);

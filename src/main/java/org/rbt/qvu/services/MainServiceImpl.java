@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
@@ -1306,4 +1307,28 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-}
+    @Override
+    public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
+        
+        OperationResult<QueryResult> res = runQuery(runWrapper);
+
+        if (res.isSuccess()) {
+            QueryResult result = res.getResult();
+            retval.setResult(new ArrayList<LinkedHashMap<String, Object>>());
+            for (List<Object> rowdata: result.getData()) {
+                LinkedHashMap row = new LinkedHashMap();
+                for (int i = 1; i < result.getHeader().size(); ++i) {
+                    row.put(result.getHeader().get(i), rowdata.get(i));
+                }
+                
+                retval.getResult().add(row);
+            }
+        } else {
+            retval.setErrorCode(res.getErrorCode());
+            retval.setMessage(res.getMessage());
+        }
+        
+        return retval;
+    }
+ }

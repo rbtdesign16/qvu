@@ -1,5 +1,6 @@
 package org.rbt.qvu.controllers;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import org.rbt.qvu.services.MainService;
@@ -214,6 +215,13 @@ public class MainController {
         LOG.debug("in runQuery()");
         return service.runQuery(runWrapper);
     }
+    
+    @PostMapping("api/v1/query/data/run")
+    public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(@RequestBody QueryRunWrapper runWrapper) {
+        LOG.debug("in runDataQuery()");
+        return service.runDataQuery(runWrapper);
+    }
+
 
     @PostMapping("api/v1/query/excel/export")
     public HttpEntity<byte[]> exportToExcel(@RequestBody ExcelExportWrapper wrapper) {

@@ -57,6 +57,8 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
+import org.rbt.qvu.configuration.security.BasicConfiguration;
+import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
@@ -82,6 +84,7 @@ import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.QuerySelectTreeBuilder;
 import org.rbt.qvu.util.RoleComparator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -103,6 +106,13 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
+    
+    @Value("${default.security.type}")
+    private String securityType;
+    
+    @Value("${security.types}")
+    private String availableSecurityType;
+
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -132,7 +142,9 @@ public class MainServiceImpl implements MainService {
 
             SecurityConfiguration scfg = config.getSecurityConfig();
             retval.setInitialSetupRequired(config.isInitialSetupRequired());
-            SecurityService authService = config.getSecurityConfig().getAuthenticatorService();
+
+            BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+            SecurityService authService = basicConfig.getSecurityService();
 
             // users and roles are defined via json
             if (authService != null) { // if we have a service defined we will try to loaf from there
@@ -212,10 +224,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult saveRole(Role role) {
         OperationResult retval = new OperationResult();
-        if (config.getSecurityConfig().isAllowServiceSave()) {
+        BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+
+        if (basicConfig.getSecurityService() != null) {
             try {
                 role.setNewRecord(false);
-                retval = config.getSecurityConfig().getAuthenticatorService().saveRole(role);
+                retval = basicConfig.getSecurityService().saveRole(role);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);
             }
@@ -229,9 +243,11 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult deleteRole(String roleName) {
         OperationResult retval = new OperationResult();
-        if (config.getSecurityConfig().isAllowServiceSave()) {
+        BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+
+        if (basicConfig.getSecurityService() != null) {
             try {
-                retval = config.getSecurityConfig().getAuthenticatorService().deleteRole(roleName);
+                retval = basicConfig.getSecurityService().deleteRole(roleName);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);
             }
@@ -269,10 +285,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult saveUser(User user) {
         OperationResult retval = new OperationResult();
-        if (config.getSecurityConfig().isAllowServiceSave()) {
+        BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+
+        if (basicConfig.getSecurityService() != null) {
             try {
                 user.setNewRecord(false);
-                retval = config.getSecurityConfig().getAuthenticatorService().saveUser(user);
+                retval = basicConfig.getSecurityService().saveUser(user);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);
             }
@@ -286,9 +304,11 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult deleteUser(String userId) {
         OperationResult retval = new OperationResult();
-        if (config.getSecurityConfig().isAllowServiceSave()) {
+        BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+
+        if (basicConfig.getSecurityService() != null) {
             try {
-                retval = config.getSecurityConfig().getAuthenticatorService().deleteUser(userId);
+                retval = basicConfig.getSecurityService().deleteUser(userId);
             } catch (Exception ex) {
                 Helper.populateResultError(retval, ex);
             }
@@ -328,8 +348,8 @@ public class MainServiceImpl implements MainService {
 
             config.setRepositoryFolder(repositoryFolder);
             config.setSecurityType(Constants.BASIC_SECURITY_TYPE);
-     
-            File propsFile = new File(repositoryFolder + File.separator + "application.properties");
+
+            File propsFile = new File(repositoryFolder + File.separator + "config" + File.separator + "application.properties");
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
@@ -338,7 +358,7 @@ public class MainServiceImpl implements MainService {
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
             s = s.replace("${log.folder}", repositoryFolder + File.separator + "logs");
             FileUtils.write(propsFile, s, "UTF-8");
-            
+
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
         } finally {
@@ -409,7 +429,6 @@ public class MainServiceImpl implements MainService {
 
             Set<String> userRoles = new HashSet<>(user.getRoles());
 
-            
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
             QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper,
                     ds,
@@ -962,7 +981,7 @@ public class MainServiceImpl implements MainService {
         retval.getInitialColumnWidths().add(Constants.DEFAULT_ROW_NUMBER_WIDTH);
         while (res.next()) {
             List<Object> row = new ArrayList<>();
-            
+
             row.add(rowcnt + 1);
 
             rowcnt++;
@@ -981,7 +1000,7 @@ public class MainServiceImpl implements MainService {
         retval.setRowCount(rowcnt);
         if (rowcnt > 0) {
             for (Integer i = 0; i < cwidths.length; ++i) {
-                Integer hdrlen = (retval.getHeader().get(i+1).length() + 4);
+                Integer hdrlen = (retval.getHeader().get(i + 1).length() + 4);
 
                 int type = retval.getColumnTypes().get(i + 1);
                 if (dbHelper.isDataTypeDateTime(type)) {
@@ -1005,7 +1024,7 @@ public class MainServiceImpl implements MainService {
             }
         } else {
             for (Integer i = 0; i < cwidths.length; ++i) {
-                retval.getInitialColumnWidths().add(retval.getHeader().get(i+1).length() + 4);
+                retval.getInitialColumnWidths().add(retval.getHeader().get(i + 1).length() + 4);
             }
         }
 
@@ -1093,7 +1112,7 @@ public class MainServiceImpl implements MainService {
             headerStyle.setBorderTop(BorderStyle.THIN);
             headerStyle.setBorderRight(BorderStyle.THIN);
             headerStyle.setBorderBottom(BorderStyle.THIN);
-            
+
             headerStyle.setAlignment(HorizontalAlignment.CENTER);
             headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
@@ -1105,34 +1124,33 @@ public class MainServiceImpl implements MainService {
 
             headerFont.setFontHeightInPoints((short) wrapper.getHeaderFontSize());
             rgbB = Hex.decodeHex(wrapper.getHeaderFontColor());
-            headerFont.setColor( new XSSFColor(rgbB, null).getIndex());
+            headerFont.setColor(new XSSFColor(rgbB, null).getIndex());
             headerStyle.setFont(headerFont);
-            
+
             XSSFCellStyle detailStyle1 = wb.createCellStyle();
             Font detailFont = wb.createFont();
             detailStyle1.setBorderLeft(BorderStyle.THIN);
             detailStyle1.setBorderTop(BorderStyle.THIN);
             detailStyle1.setBorderRight(BorderStyle.THIN);
             detailStyle1.setBorderBottom(BorderStyle.THIN);
-            
+
             rgbB = Hex.decodeHex(wrapper.getDetailBackgroundColor1());
             color = new XSSFColor(rgbB, null);
             detailStyle1.setFillForegroundColor(color);
             detailStyle1.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             detailFont.setFontHeightInPoints((short) wrapper.getDetailFontSize());
             rgbB = Hex.decodeHex(wrapper.getDetailFontColor());
-            detailFont.setColor( new XSSFColor(rgbB, null).getIndex());
+            detailFont.setColor(new XSSFColor(rgbB, null).getIndex());
             detailFont.setFontHeightInPoints((short) wrapper.getDetailFontSize());
 
             detailStyle1.setFont(detailFont);
-
 
             XSSFCellStyle detailStyle2 = wb.createCellStyle();
             detailStyle2.setBorderLeft(BorderStyle.THIN);
             detailStyle2.setBorderTop(BorderStyle.THIN);
             detailStyle2.setBorderRight(BorderStyle.THIN);
             detailStyle2.setBorderBottom(BorderStyle.THIN);
-            
+
             rgbB = Hex.decodeHex(wrapper.getDetailBackgroundColor2());
             color = new XSSFColor(rgbB, null);
             detailStyle2.setFillForegroundColor(color);
@@ -1146,10 +1164,10 @@ public class MainServiceImpl implements MainService {
             List<String> header = wrapper.getQueryResults().getHeader();
             for (int i = 1; i < header.size(); ++i) {
                 // Create cell - skip first data entry - this results is row num
-                cell = row.createCell(i-1);
+                cell = row.createCell(i - 1);
                 cell.setCellValue(header.get(i));
                 cell.setCellStyle(headerStyle);
-                sheet.setColumnWidth(i-1, 25 * Constants.DEFAULT_PIXELS_PER_CHARACTER * wrapper.getQueryResults().getInitialColumnWidths().get(i));
+                sheet.setColumnWidth(i - 1, 25 * Constants.DEFAULT_PIXELS_PER_CHARACTER * wrapper.getQueryResults().getInitialColumnWidths().get(i));
             }
 
             List<Integer> columnTypes = wrapper.getQueryResults().getColumnTypes();
@@ -1159,7 +1177,7 @@ public class MainServiceImpl implements MainService {
                 List<Object> rowdata = data.get(i);
                 for (int j = 1; j < rowdata.size(); j++) {
                     // Create cell - skip first data entry - this results is row num
-                    cell = row.createCell(j-1);
+                    cell = row.createCell(j - 1);
                     if ((i % 2) == 0) {
                         cell.setCellStyle(detailStyle1);
                     } else {
@@ -1224,18 +1242,17 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    
     @Override
     public OperationResult<DocumentNode> getAvailableDocuments(String documentType) {
         OperationResult<DocumentNode> retval = new OperationResult<>();
 
         long start = System.currentTimeMillis();
-        
+
         User u = getCurrentUser();
-        
-        Set <String> hs = new HashSet(u.getRoles());
-        List <DocumentGroup> groups = config.getDocumentGroupsConfig().getDocumentGroups();
-        List <DocumentGroup> userDocGroups = new ArrayList();
+
+        Set<String> hs = new HashSet(u.getRoles());
+        List<DocumentGroup> groups = config.getDocumentGroupsConfig().getDocumentGroups();
+        List<DocumentGroup> userDocGroups = new ArrayList();
         for (DocumentGroup g : groups) {
             if ((g.getRoles() == null) || g.getRoles().isEmpty()) {
                 userDocGroups.add(g);
@@ -1248,22 +1265,21 @@ public class MainServiceImpl implements MainService {
                 }
             }
         }
-         
-        
+
         Collections.sort(userDocGroups, new DocumentGroupComparator());
-        
+
         int id = 0;
         DocumentNode rootNode = new DocumentNode(id++);
         DocumentNode currentNode = null;
-        
+
         for (DocumentGroup g : userDocGroups) {
-           if ((currentNode == null) || !g.getName().equals(currentNode.getMetadata().get("group"))) {
-               currentNode = new DocumentNode(id++);
-               currentNode.setName(g.getName());
-               rootNode.getChildren().add(currentNode);
+            if ((currentNode == null) || !g.getName().equals(currentNode.getMetadata().get("group"))) {
+                currentNode = new DocumentNode(id++);
+                currentNode.setName(g.getName());
+                rootNode.getChildren().add(currentNode);
             }
-            List <String> fileNames =  fileHandler.getGroupDocumentNames(documentType, g.getName());
-        
+            List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName());
+
             for (String fname : fileNames) {
                 DocumentNode n = new DocumentNode(id++);
                 n.getMetadata().put("group", g.getName());
@@ -1272,19 +1288,19 @@ public class MainServiceImpl implements MainService {
                 currentNode.getChildren().add(n);
             }
         }
-        
+
         // remove any empty folders
-        Iterator <DocumentNode> it = rootNode.getChildren().iterator();
+        Iterator<DocumentNode> it = rootNode.getChildren().iterator();
         while (it.hasNext()) {
             DocumentNode f = it.next();
-            
+
             if ((f.getChildren() == null) || f.getChildren().isEmpty()) {
                 it.remove();
             }
         }
-    
+
         retval.setResult(rootNode);
-        
+
         LOG.debug("getAvailableDocuments() - elapsed time: " + ((System.currentTimeMillis() - start) / 1000) + "sec");
         return retval;
     }
@@ -1292,25 +1308,44 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper) {
         OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
-        
+
         OperationResult<QueryResult> res = runQuery(runWrapper);
 
         if (res.isSuccess()) {
             QueryResult result = res.getResult();
             retval.setResult(new ArrayList<LinkedHashMap<String, Object>>());
-            for (List<Object> rowdata: result.getData()) {
+            for (List<Object> rowdata : result.getData()) {
                 LinkedHashMap row = new LinkedHashMap();
                 for (int i = 1; i < result.getHeader().size(); ++i) {
                     row.put(result.getHeader().get(i), rowdata.get(i));
                 }
-                
+
                 retval.getResult().add(row);
             }
         } else {
             retval.setErrorCode(res.getErrorCode());
             retval.setMessage(res.getMessage());
         }
-        
+
         return retval;
     }
- }
+
+    @Override
+    public OperationResult<AuthConfig> getAuthConfig() {
+        OperationResult<AuthConfig> retval = new OperationResult<>();
+        
+        SecurityConfiguration scfg = config.getSecurityConfig();
+        AuthConfig result = new AuthConfig();
+        
+        result.setBasicConfiguration(scfg.getBasicConfiguration());
+        result.setSamlConfiguration(scfg.getSamlConfiguration());
+        result.setOidcConfiguratio(scfg.getOidcConfiguration());
+        result.setDefaultSecurityType(config.getSecurityType());
+        
+        
+        
+
+        return retval;
+    }
+
+}

@@ -378,3 +378,16 @@ export const getDocument = async (documentType, documentGroup, documentName) => 
        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
+
+export const getSecurityConfig = async() => {
+    try {
+        let res = await axios.get(getApiURL() + "/auth/config/load");
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+
+    }
+};

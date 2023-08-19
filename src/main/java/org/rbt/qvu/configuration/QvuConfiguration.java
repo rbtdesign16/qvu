@@ -66,7 +66,7 @@ public class QvuConfiguration {
     private BasicAuthSecurityProvider basicAuthProvider;
 
     @Bean
-    @ConditionalOnExpression("'${security.type}'.contains('basic')")
+    @ConditionalOnExpression("'${security.types}'.contains('basic')")
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
         LOG.debug("in basicAuthManager()");
         AuthenticationManagerBuilder authenticationManagerBuilder
@@ -76,7 +76,7 @@ public class QvuConfiguration {
     }
 
     @Bean
-    @ConditionalOnExpression("'${security.type}'.contains('saml')")
+    @ConditionalOnExpression("'${security.types}'.contains('saml')")
     RelyingPartyRegistrationRepository samlRepository() throws Exception {
         LOG.debug("in samlRepository()");
         RelyingPartyRegistration relyingPartyRegistration = null;
@@ -109,7 +109,7 @@ public class QvuConfiguration {
     }
 
     @Bean
-    @ConditionalOnExpression("'${security.type}'.contains('oidc')")
+    @ConditionalOnExpression("'${security.types}'.contains('oidc')")
     ClientRegistrationRepository oidcRepository() throws Exception {
         LOG.debug("in oidcRepository()");
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();

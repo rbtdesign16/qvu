@@ -32,7 +32,7 @@ public class ConfigurationHelper {
     @Value("#{systemProperties['repository.folder'] ?: ''}")
     private String repositoryFolder;
 
-    @Value("${security.type:basic}")
+    @Value("${default.security.type:basic}")
     private String securityType;
 
     private SecurityConfiguration securityConfig;

@@ -9,9 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.RoleComparator;
 import org.rbt.qvu.util.UserComparator;
@@ -24,15 +22,21 @@ import org.slf4j.LoggerFactory;
  */
 public class SecurityConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
-    private String authenticatorServiceClassName;
-    private boolean allowServiceSave = false;
+    private BasicConfiguration basicConfiguration;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
-    private Map<String, String> roleAliases = new HashMap<>();
     private List<Role> roles = new ArrayList<>();
     private List<User> users = new ArrayList<>();
 
     private long lastUpdated;
+
+    public BasicConfiguration getBasicConfiguration() {
+        return basicConfiguration;
+    }
+
+    public void setBasicConfiguration(BasicConfiguration basicConfiguration) {
+        this.basicConfiguration = basicConfiguration;
+    }
 
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
@@ -50,51 +54,12 @@ public class SecurityConfiguration {
         this.oidcConfiguration = oidcConfiguration;
     }
 
-    public String getAuthenticatorServiceClassName() {
-        return authenticatorServiceClassName;
-    }
-
-    public void setAuthenticatorServiceClassName(String authenticatorServiceClassName) {
-        this.authenticatorServiceClassName = authenticatorServiceClassName;
-    }
-    
-    public SecurityService getAuthenticatorService() throws Exception {
-        SecurityService retval = null;
-        if (StringUtils.isNotEmpty(authenticatorServiceClassName)) {
-            Class c = Class.forName(authenticatorServiceClassName);
-            if (SecurityService.class.isAssignableFrom(c)) {
-                retval = (SecurityService)c.getDeclaredConstructor().newInstance();
-            }
-        }
-        return retval;
-    }
-    
-    public boolean isAllowServiceSave() {
-        return StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;
-    }
-
-    public void setAllowServiceSave(boolean allowServiceSave) {
-        this.allowServiceSave = allowServiceSave;
-    }
-
     public void postConstruct() {
         LOG.debug("in SecurityConfiguration.postConstruct()");
         Collections.sort(this.roles, new RoleComparator());
         Collections.sort(this.users, new UserComparator());
     }
    
-    public String getRoleAlias(String role) {
-        return roleAliases.get(role);
-    }
-
-    public Map<String, String> getRoleAliases() {
-        return roleAliases;
-    }
-
-    public void setRoleAliases(Map<String, String> roleAliases) {
-        this.roleAliases = roleAliases;
-    }
-
     public long getLastUpdated() {
         return lastUpdated;
     }

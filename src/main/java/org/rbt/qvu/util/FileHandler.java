@@ -381,16 +381,6 @@ public class FileHandler {
         }
     }
 
-    private void removeRoleFromAliases(SecurityConfiguration securityConfig, String roleName) {
-        Iterator<Entry<String, String>> it = securityConfig.getRoleAliases().entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String, String> e = it.next();
-            if (e.getValue().equalsIgnoreCase(roleName)) {
-                it.remove();
-            }
-        }
-    }
-
     private void removeRoleFromDocumentGroups(DocumentGroupsConfiguration docgroups, String roleName) {
         Iterator<DocumentGroup> it = docgroups.getDocumentGroups().iterator();
 
@@ -421,7 +411,6 @@ public class FileHandler {
                         Role r = it.next();
                         if (r.getName().equalsIgnoreCase(roleName)) {
                             removeRoleFromUsers(securityConfig, roleName);
-                            removeRoleFromAliases(securityConfig, roleName);
                             DocumentGroupsConfiguration docgroups = config.getDocumentGroupsConfig();
                             removeRoleFromDocumentGroups(docgroups, roleName);
                             retval = saveDocumentGroups(docgroups);

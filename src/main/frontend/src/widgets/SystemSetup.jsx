@@ -1,21 +1,17 @@
 import React, {useContext, useState} from "react";
+import { Tabs, Tab } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import EntryPanel from "../../widgets/EntryPanel";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import EditObjectModal from "../../widgets/EditObjectModal";
-import Splash from "../../widgets/Splash";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import {
-    INFO,
-    ERROR,
-    checkEntryFields,
-    setErrorMessage,
-    ERROR_TEXT_COLOR,
-    SUCCESS_TEXT_COLOR,
-    DEFAULT_ERROR_TITLE,
-    replaceTokens
+INFO,
+        SUCCESS,
+        ERROR,
+        replaceTokens
 } from "../../utils/helper";
 
 import {
@@ -25,13 +21,14 @@ import {
 } from "../../utils/authHelper";
 
 import {
-    verifyInitialRepositoryFolder,
-    doInitialSetup,
     isApiError,
-    isApiSuccess} from "../../utils/apiHelper";
+    isApiSuccess,
+    getSecurityConfig} from "../../utils/apiHelper";
 
-const AuthenticationSetup = () => {
+const AuthenticationSetup = (props) => {
     const {authData} = useAuth();
+    const {config} = props;
+    const {samlConfiguration, basicConfiguration, oauthConfiguration, useOauth, useSaml, useBasic} = config;
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
@@ -47,51 +44,15 @@ const AuthenticationSetup = () => {
         showHelp(getText(txt));
     };
 
-    const hideEdit = () => {
-        setEditModal({show: false});
-    };
-
-    const saveSamlConfiguration = (config) => {
-        let ok = checkEntryFields(config);
-
-        if (ok) {
-            setData({...data, oidcConfiguration: null, samlConfiguration: config.dataObject});
-            hideEdit();
-        } else {
-            setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
-        }
-    };
-
-    const onSamlDataChange = (e, cfg, dobj) => {
-        if (e.target.name === "signAssertions") {
-            cfg[3].required = cfg[4].required = e.target.checked;
-            cfg[3].disabled = cfg[4].disabled = !e.target.checked;
-            if (!e.target.checked) {
-                dobj.signingCertFileName = "";
-                dobj.signingKeyFileName = "";
-            }
-            return true;
-        }
+    const onHide = () => {
+        config.hide();
     };
 
 
-    const getSamlSecurityConfig = () => {
+    const getSamlConfig = () => {
         return {
-            idPrefix: "smlc-",
-            show: true,
-            title: getText("SAML Configuration"),
+            dataObject: samlConfiguration,
             gridClass: "entrygrid-200-425",
-            cancel: hideEdit,
-            save: saveSamlConfiguration,
-            dlgsize: "lg",
-            afterChange: onSamlDataChange,
-            dataObject: data.samlConfiguration ? data.samlConfiguration : {
-                idpUrl: "",
-                signAssertions: false,
-                spEntityId: "",
-                signingCertFileName: "",
-                signingKeyFileName: ""
-            },
             entryConfig: [{
                     label: getText("IDP URL"),
                     name: "idpUrl",
@@ -136,30 +97,10 @@ const AuthenticationSetup = () => {
         };
     };
 
-    const saveOidcConfiguration = (config) => {
-        let ok = checkEntryFields(config);
-        if (ok) {
-            setData({...data, oidcConfiguration: config.dataObject, samlConfiguration: null});
-            hideEdit();
-        } else {
-            setErrorMessage(config.idPrefix, getText("Please complete all required entries"));
-        }
-    };
-
-    const getOidcSecurityConfig = () => {
+    const getOauthConfig = () => {
         return {
-            idPrefix: "oic-",
-            show: true,
-            dlgsize: "lg",
-            title: getText("OIDC Configuration"),
             gridClass: "entrygrid-200-425",
-            cancel: hideEdit,
-            save: saveOidcConfiguration,
-            dataObject: data.oidcConfiguration ? data.oidcConfiguration : {
-                issuerLocationUrl: "",
-                clientId: "",
-                clientSecret: ""
-            },
+            dataObject: oauthConfiguration,
             entryConfig: [{
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
@@ -190,70 +131,21 @@ const AuthenticationSetup = () => {
         };
     };
 
-    const isConfigureDisabled = () => {
-        return data.securityType === SECURITY_TYPE_BASIC;
-    };
-    
-    const getEntryConfig = () => {
-        return [{
-                label: getText("Repository Folder:"),
-                name: "repository",
-                style: {width: "100%"},
-                type: "input",
-                showHelp: showHelpMessage,
-                helpText: getText("repository-help"),
-                required: true
-            },
-            {
-                label: getText("Authentication Type:"),
-                name: "securityType",
-                type: "select",
-                options: ["basic", "saml", "oidc"],
-                entryConfig: [{
-                        label: getText("Configure Security"),
-                        name: "stb1",
-                        type: "button",
-                        isDisabled: isConfigureDisabled,
-                        onClick: (c) => {
-                            showSecurityConfig(data.securityType);
-                        }
-                    },
-                    {
-                        type: "label",
-                        name: "stl1",
-                        style: getSecurityConfigLabelStyle(),
-                        text: getSecurityConfigLabelText()
-                    }]
-
-            }];
-    };
-
-    const showSecurityConfig = (type) => {
-        if (type === SECURITY_TYPE_SAML) {
-            setEditModal(getSamlSecurityConfig());
-        } else if (type === SECURITY_TYPE_OIDC) {
-            setEditModal(getOidcSecurityConfig());
-        }
-    };
-
-    const onCancel = () => {
-        setData({
-            repository: "",
-            securityType: SECURITY_TYPE_BASIC
-        });
-    };
-
-
-    const getConfig = () => {
-        console.log("------------>xx");
+    const getBasicConfig = () => {
         return {
-            entryConfig: getEntryConfig(),
-            dataObject: data,
-            idPrefix: "init-",
-            gridClass: "entrygrid-200-425"
+            gridClass: "entrygrid-200-425",
+            dataObject: basicConfiguration,
+            entryConfig: [{
+                    label: getText("Custom Security Service"),
+                    name: "securityServiceClass",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("securityServiceClass-help")
+                }]
         };
     };
-
 
     const saveSetup = async () => {
         let cfg = getConfig();
@@ -277,12 +169,12 @@ const AuthenticationSetup = () => {
 
     const checkSamlData = () => {
         let retval = false;
-        if (data.samlConfiguration) {
+        if (useSaml) {
             let ok = true;
 
-            let entryConfig = getSamlSecurityConfig().entryConfig;
+            let entryConfig = getSamlConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !data.samlConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !samlConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -294,15 +186,15 @@ const AuthenticationSetup = () => {
         return retval;
     };
 
-    const checkOidcData = () => {
+    const checkOAuthData = () => {
         let retval = false;
 
-        if (data.oidcConfiguration) {
+        if (useOauth) {
             let ok = true;
 
-            let entryConfig = getOidcSecurityConfig().entryConfig;
+            let entryConfig = getOauthConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !data.oidcConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !oauthConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -312,79 +204,48 @@ const AuthenticationSetup = () => {
         }
 
         return retval;
-    };
-
-    const getSecurityConfigLabelStyle = () => {
-        switch (data.securityType) {
-            case SECURITY_TYPE_SAML:
-                if (checkSamlData()) {
-                    return {color: SUCCESS_TEXT_COLOR};
-                } else {
-                    return {color: ERROR_TEXT_COLOR};
-                }
-            case SECURITY_TYPE_OIDC:
-                if (checkOidcData()) {
-                    return {color: SUCCESS_TEXT_COLOR};
-                } else {
-                    return {color: ERROR_TEXT_COLOR};
-                }
-            case SECURITY_TYPE_BASIC:
-                return "";
-        }
-    };
-
-    const getSecurityConfigLabelText = () => {
-        switch (data.securityType) {
-            case SECURITY_TYPE_SAML:
-                if (checkSamlData()) {
-                    return getText("configuration complete");
-                } else {
-                    return getText("configuration incomplete");
-                }
-            case SECURITY_TYPE_OIDC:
-                if (checkOidcData()) {
-                    return getText("configuration complete");
-                } else {
-                    return getText("configuration incomplete");
-                }
-            case SECURITY_TYPE_BASIC:
-                return "";
-        }
     };
 
     const canSave = () => {
         let retval = false;
-        if (data.repository && data.securityType) {
-            switch (data.securityType) {
-                case SECURITY_TYPE_SAML:
-                    retval = checkSamlData();
-                    break;
-                case SECURITY_TYPE_OIDC:
-                    retval = checkOidcData();
-                    break;
-                case SECURITY_TYPE_BASIC:
-                    retval = true;
-                    break;
-            }
-        }
 
         return retval;
     };
 
-    if (initComplete) {
-        return <Splash title={getText("Initialization Complete")} premessage={replaceTokens(getText("repositoryInitializationSucces-msg"), [data.repository, data.securityType])}/>;
-    } else {
-        return (
-                <div className="initial-setup">
-                    <EditObjectModal config={editModal}/>
-                    <div className="title">{getText("Qvu Initial Setup")}</div>
-                    <div><EntryPanel config={getConfig()}/></div>
-                    <div id="init-error-msg"></div>
-                    <div className="btn-bar bord-t">
-                        <Button size="sm"  variant="primary" disabled={!canSave()} onClick={() => saveSetup()}>Save Setup</Button>
-                    </div>
-                </div>);
-        }
+    const getDefaultActiveTabKey = () => {
+    }
+    return (
+            <div>
+                <Modal animation={false} 
+                       size={config.dlgsize ? config.dlgsize : ""}
+                       show={config.show} 
+                       onHide={onHide}
+                       backdrop={true} 
+                       keyboard={true}>
+                    <Modal.Header closeButton>
+                        <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+                            <Tab bsPrefix="ssbasic" eventKey="adm" title="Basic">
+                                <div><EntryPanel config={getBasicConfig()}/></div>
+                            </Tab>
+                            <Tab eventKey="sssaml" title="SAML">
+                                <div><EntryPanel config={getSamlConfig()}/></div>
+                            </Tab>
+                            <Tab eventKey="ssouth" title="OAuth">
+                                <div><EntryPanel config={getOauthConfig()}/></div>
+                            </Tab>
+                        </Tabs>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config)}>{getText("Save")}</Button>
+                    </Modal.Footer>
+                </Modal>
+            </div>
+            );
+
 };
 
 export default AuthenticationSetup;

@@ -38,9 +38,6 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
 
     @Autowired
     private ConfigurationHelper config;
-
-    private String authenticatorClass;
-
     private List<Role> roles = new ArrayList<>();
     private List<User> users = new ArrayList<>();
 
@@ -49,13 +46,12 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
         LOG.info("in BasicAuthSecurityProvider.init()");
         try {
             SecurityConfiguration securityConfig = config.getSecurityConfig();
-            authenticatorClass = securityConfig.getAuthenticatorServiceClassName();
-            LOG.info("authenticatorClass=" + authenticatorClass);
-
+            BasicConfiguration basicConfig = securityConfig.getBasicConfiguration();
+            
             // if no authenticator service then load from config file
-            if (securityConfig.getAuthenticatorService() != null) {
-                users = securityConfig.getAuthenticatorService().getAllUsers();
-                roles = securityConfig.getAuthenticatorService().getAllRoles();
+            if (basicConfig.getSecurityService() != null) {
+                users = basicConfig.getSecurityService().getAllUsers();
+                roles = basicConfig.getSecurityService().getAllRoles();
             } else {
                 roles = securityConfig.getRoles();
                 users = securityConfig.getUsers();
@@ -81,9 +77,9 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
                 throw new Exception("usename and password required");
             }
 
-            SecurityService service = config.getSecurityConfig().getAuthenticatorService();
-            if (service != null) {
-                retval = authenticateWithClass(service, name, password);
+            BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
+            if (basicConfig.getSecurityService() != null) {
+                retval = authenticateWithClass(basicConfig.getSecurityService(), name, password);
             } else {
                 retval = authenticateFromProperties(name, password);
             }

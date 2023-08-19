@@ -22,9 +22,6 @@ public class Constants {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    // environment variables for ecternal config 
-    public static final String SECURITY_TYPE_PROPERTY = "security.type";
-
     // security authentication types supported
     public static final String BASIC_SECURITY_TYPE = "basic";
     public static final String OIDC_SECURITY_TYPE = "oidc";

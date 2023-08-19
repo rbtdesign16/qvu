@@ -14,13 +14,13 @@ import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
+import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
-import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryResult;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.QueryRunWrapper;
@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * The type Main controller.
@@ -246,5 +245,12 @@ public class MainController {
         return service.getDocument(type, group, name);
     }
     
+    
+    @GetMapping("api/v1/db/dauth/config/load")
+    public OperationResult<AuthConfig> getAuthConfig() {
+        LOG.debug("in getAuthConfig()");
+        return service.getAuthConfig();
+    }
+
 
 }

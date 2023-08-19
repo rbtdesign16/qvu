@@ -6,13 +6,13 @@ import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
+import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.AuthData;
 import org.rbt.qvu.dto.ColumnSettings;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
-import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryResult;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.QueryRunWrapper;
@@ -78,5 +78,7 @@ public interface MainService {
     public OperationResult<DocumentNode> getAvailableDocuments(String documentType);
 
     public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper);
+
+    public OperationResult<AuthConfig> getAuthConfig();
 
 }

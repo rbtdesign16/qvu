@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.RoleComparator;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 public class SecurityConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
     private String authenticatorServiceClassName;
-    private String securityType;
     private boolean allowServiceSave = false;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
@@ -36,7 +34,6 @@ public class SecurityConfiguration {
 
     private long lastUpdated;
 
-    
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
     }
@@ -72,22 +69,6 @@ public class SecurityConfiguration {
         return retval;
     }
     
-    public boolean canAddUsersAndRoles() {
-        return (isBasic() || isAllowServiceSave());
-    }
-
-    public String getSecurityType() {
-        return securityType;
-    }
-
-    public void setSecurityType(String securityType) {
-        this.securityType = securityType;
-    }
-    
-    public boolean isBasic() {
-        return Constants.BASIC_SECURITY_TYPE.equals(this.securityType);
-    }
-
     public boolean isAllowServiceSave() {
         return StringUtils.isNotEmpty(this.authenticatorServiceClassName) && allowServiceSave;
     }
@@ -122,10 +103,6 @@ public class SecurityConfiguration {
         this.lastUpdated = lastUpdated;
     }
     
-    public boolean isBasicConfig() {
-        return Constants.BASIC_SECURITY_TYPE.equals(securityType);
-    }
-
     public List<Role> getRoles() {
         return roles;
     }

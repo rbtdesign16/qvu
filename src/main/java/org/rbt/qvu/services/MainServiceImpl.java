@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -65,7 +64,6 @@ import org.rbt.qvu.dto.DocumentNode;
 import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.ForeignKey;
-import org.rbt.qvu.dto.InitialSetup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.QueryParameter;
 import org.rbt.qvu.dto.QueryResult;
@@ -325,22 +323,21 @@ public class MainServiceImpl implements MainService {
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "config" + File.separator + "certs");
             f.mkdirs();
+            f = new File(repositoryFolder + File.separator + "logs");
+            f.mkdirs();
 
             config.setRepositoryFolder(repositoryFolder);
             config.setSecurityType(Constants.BASIC_SECURITY_TYPE);
      
+            File propsFile = new File(repositoryFolder + File.separator + "application.properties");
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
-            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-self-signed.p12"), new File(config.getDefaultsCertFileName()));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
 
-            Properties p = new Properties();
-            p.load(getClass().getResourceAsStream("/initial-application.properties"));
-            
-            p.setProperty("server.ssl.key-store", "file:" + repositoryFolder + "/config/certs/qvu-self-signed.p12");
-            
-            fos = new FileOutputStream(repositoryFolder + "/config/application.properties");
-            p.store(fos, "initial setup");
+            String s = FileUtils.readFileToString(propsFile, "UTF-8");
+            s = s.replace("${log.folder}", repositoryFolder + File.separator + "logs");
+            FileUtils.write(propsFile, s, "UTF-8");
             
         } catch (Exception ex) {
             Helper.populateResultError(retval, ex);

@@ -16,7 +16,7 @@
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.folder}/qvu.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${QVU_LOG_FOLDER}/qvu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${log.folder}/qvu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>5MB</maxFileSize>
             <maxHistory>5</maxHistory>
             <totalSizeCap>10MB</totalSizeCap>

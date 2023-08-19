@@ -29,10 +29,10 @@ public class ConfigurationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
     private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default document group\", \"defaultGroup\": true, \"roles\":[]}]}";
     
-    @Value("#{systemProperties['repository.folder'] ?: '-'}")
+    @Value("#{systemProperties['repository.folder'] ?: ''}")
     private String repositoryFolder;
 
-    @Value("#{systemProperties['security.type'] ?: 'basic'}")
+    @Value("${security.type:basic}")
     private String securityType;
 
     private SecurityConfiguration securityConfig;
@@ -45,26 +45,23 @@ public class ConfigurationHelper {
     private void init() {
         LOG.info(" in Config.init()");
         try {
-            initialSetupRequired = "-".equals(repositoryFolder);
-
             // indicates initial setup required
-            if (initialSetupRequired) {
+            if (StringUtils.isEmpty(repositoryFolder)) {
+                initialSetupRequired = true;
+                LOG.info("inital setup is required");
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
             } else {
                 loadConfiguration();
+                LOG.info("repository.folder=" + repositoryFolder);
+                LOG.info("security.type=" + securityType);
             }
             
             if (securityConfig == null) {
                 throw new Exception("failed to load security configuration");
-            } else {
-                securityConfig.setSecurityType(securityType);
-            }
+            } 
 
-            LOG.info("repository.folder=" + repositoryFolder);
-            LOG.info("security.type=" + securityType);
-            LOG.info("inital setup required: " + initialSetupRequired);
             
             securityConfig.postConstruct();
             datasourcesConfig.postConstruct();
@@ -139,7 +136,7 @@ public class ConfigurationHelper {
     }
 
     public String getSecurityType() {
-        return securityConfig.getSecurityType();
+        return securityType;
     }
 
     public Map<String, Map<String, String>> getLangResources() {

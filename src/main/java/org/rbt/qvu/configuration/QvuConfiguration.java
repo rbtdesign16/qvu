@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import javax.annotation.PostConstruct;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbt.qvu.configuration.security.OidcConfiguration;
 import org.rbt.qvu.configuration.security.SamlConfiguration;
@@ -22,6 +23,7 @@ import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,7 +58,10 @@ public class QvuConfiguration {
     private void init() {
         LOG.info("in QvuConfiguration.init()");
     }
-
+    
+    @Value("${server.ssl.key-store:}")
+    private String sslKeyStore;
+            
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
 
@@ -120,13 +125,13 @@ public class QvuConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
         
-        // if initial setup do not require https
-        if (config.isInitialSetupRequired()) {
+        // if no ssl key store then allow http
+        if (StringUtils.isEmpty(sslKeyStore)) {
             http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable());
-        } else {
+        } else { // force https
             http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())

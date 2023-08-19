@@ -1,0 +1,44 @@
+
+2023-08-19 10:13:46.163  INFO org.rbt.qvu.QvuApplication: Starting QvuApplication using Java 20.0.1 with PID 5420 (C:\dev\projects\qvu\target\classes started by rbtuc in C:\dev\projects\qvu)
+
+2023-08-19 10:13:46.163  INFO org.rbt.qvu.QvuApplication: Starting QvuApplication using Java 20.0.1 with PID 5420 (C:\dev\projects\qvu\target\classes started by rbtuc in C:\dev\projects\qvu)
+
+2023-08-19 10:13:46.166  INFO org.rbt.qvu.QvuApplication: No active profile set, falling back to 1 default profile: "default"
+
+2023-08-19 10:13:46.166  INFO org.rbt.qvu.QvuApplication: No active profile set, falling back to 1 default profile: "default"
+
+2023-08-19 10:13:47.302  INFO org.rbt.qvu.configuration.QvuConfiguration:  in Config.init()
+
+2023-08-19 10:13:47.302  INFO org.rbt.qvu.configuration.QvuConfiguration:  in Config.init()
+
+2023-08-19 10:13:47.363  INFO org.rbt.qvu.configuration.QvuConfiguration: repository.folder=c:/dev/qvu
+
+2023-08-19 10:13:47.363  INFO org.rbt.qvu.configuration.QvuConfiguration: repository.folder=c:/dev/qvu
+
+2023-08-19 10:13:47.363  INFO org.rbt.qvu.configuration.QvuConfiguration: security.type=basic
+
+2023-08-19 10:13:47.363  INFO org.rbt.qvu.configuration.QvuConfiguration: security.type=basic
+
+2023-08-19 10:13:47.367  INFO org.rbt.qvu.configuration.database.DataSources: in QvuDataSource.init()
+
+2023-08-19 10:13:47.367  INFO org.rbt.qvu.configuration.database.DataSources: in QvuDataSource.init()
+
+2023-08-19 10:13:47.374  INFO org.rbt.qvu.configuration.security.BasicAuthSecurityProvider: in BasicAuthSecurityProvider.init()
+
+2023-08-19 10:13:47.374  INFO org.rbt.qvu.configuration.security.BasicAuthSecurityProvider: in BasicAuthSecurityProvider.init()
+
+2023-08-19 10:13:47.376  INFO org.rbt.qvu.configuration.QvuConfiguration: in QvuConfiguration.init()
+
+2023-08-19 10:13:47.376  INFO org.rbt.qvu.configuration.QvuConfiguration: in QvuConfiguration.init()
+
+2023-08-19 10:13:47.568  INFO org.rbt.qvu.services.MainServiceImpl: in MainServiceImpl.init()
+
+2023-08-19 10:13:47.568  INFO org.rbt.qvu.services.MainServiceImpl: in MainServiceImpl.init()
+
+2023-08-19 10:13:47.572  INFO org.rbt.qvu.controllers.MainController: in MainController.init()
+
+2023-08-19 10:13:47.572  INFO org.rbt.qvu.controllers.MainController: in MainController.init()
+
+2023-08-19 10:13:47.955  INFO org.rbt.qvu.QvuApplication: Started QvuApplication in 2.285 seconds (process running for 2.678)
+
+2023-08-19 10:13:47.955  INFO org.rbt.qvu.QvuApplication: Started QvuApplication in 2.285 seconds (process running for 2.678)

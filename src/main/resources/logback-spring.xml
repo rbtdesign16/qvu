@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-
-    
     <property name="LOG_PATTERN"
               value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} %logger: %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
 
@@ -14,9 +12,9 @@
 
 
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.folder}/qvu.log</file>
+        <file>${repository.folder}/logs/qvu.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.folder}/qvu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${repository.folder}/logs/archive/qvu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>5MB</maxFileSize>
             <maxHistory>5</maxHistory>
             <totalSizeCap>10MB</totalSizeCap>

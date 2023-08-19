@@ -18,6 +18,8 @@ import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,6 +37,9 @@ public class ConfigurationHelper {
     @Value("${default.security.type:basic}")
     private String securityType;
 
+    @Value("${log.folder}")
+    private String logFolder;
+
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
     private DocumentGroupsConfiguration documentGroupsConfig;
@@ -43,7 +48,10 @@ public class ConfigurationHelper {
 
     @PostConstruct
     private void init() {
-        LOG.info(" in Config.init()");
+        LOG.info("in Config.init()");
+         
+        System.setProperty("log.folder", repositoryFolder + "/logs");
+        
         try {
             // indicates initial setup required
             if (StringUtils.isEmpty(repositoryFolder)) {

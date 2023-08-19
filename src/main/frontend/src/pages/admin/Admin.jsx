@@ -46,7 +46,8 @@ import {
         isApiSuccess,
         isApiError,
         loadTableSettings,
-        loadDatasourceTableNames} from "../../utils/apiHelper";
+        loadDatasourceTableNames,
+        getSecurityConfig} from "../../utils/apiHelper";
 import {
     isAdministrator, 
     isQueryDesigner, 
@@ -146,7 +147,7 @@ const Admin = () => {
             {
                 label: getText("Connection Timeout:"),
                 name: "connectionTimeout",
-                type: "number",
+                type: "number"
             },
             {
                 label: getText("Idle Timeout:"),
@@ -885,8 +886,24 @@ const Admin = () => {
         }
     };
 
-    const onSystemSettings = () => {
-        showSystemSetting({show: true});
+    const hideSystemSettings = () => {
+        setShowSystemSettings({show: false});
+    };
+    
+    const saveSystemSettings = (settings) => {
+    };
+    
+    const onSystemSettings = async () => {
+        showMessage(INFO, getText("Loading system settings", "..."), null, true);
+        
+        let res = await getSecurityConfig();
+        
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            setShowSystemSettings({show: true, config: res.results, hide: hideSystemSettings, save: saveSystemSettings, hideMessage: hideMessage});
+        }
+        
     };
     
     return (

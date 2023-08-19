@@ -213,12 +213,27 @@ const AuthenticationSetup = (props) => {
     };
 
     const getDefaultActiveTabKey = () => {
+        switch (config.defaultSecurityType) {
+            case  SECURITY_TYPE_BASIC:
+                return "key" + SECURITY_TYPE_BASIC;
+            case SECURITY_TYPE_SAML:
+                return  "key" + SECURITY_TYPE_BASIC;
+            case SECURITY_TYPE_OIDC:
+                return "key" + SECURITY_TYPE_BASIC;
+        }
     }
+    
+    
+    const onShow = () => {
+        config.hideMessage();
+    }
+    
     return (
             <div>
                 <Modal animation={false} 
                        size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
+                       onShow={onShow}
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
@@ -227,13 +242,13 @@ const AuthenticationSetup = (props) => {
                     </Modal.Header>
                     <Modal.Body>
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                            <Tab bsPrefix="ssbasic" eventKey="adm" title="Basic">
+                            <Tab bsPrefix="ssbasic" eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
                                 <div><EntryPanel config={getBasicConfig()}/></div>
                             </Tab>
-                            <Tab eventKey="sssaml" title="SAML">
+                            <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
                                 <div><EntryPanel config={getSamlConfig()}/></div>
                             </Tab>
-                            <Tab eventKey="ssouth" title="OAuth">
+                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="OAuth">
                                 <div><EntryPanel config={getOauthConfig()}/></div>
                             </Tab>
                         </Tabs>

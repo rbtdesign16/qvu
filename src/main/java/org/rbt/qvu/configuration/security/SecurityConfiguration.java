@@ -6,9 +6,7 @@ package org.rbt.qvu.configuration.security;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
 import org.rbt.qvu.util.RoleComparator;

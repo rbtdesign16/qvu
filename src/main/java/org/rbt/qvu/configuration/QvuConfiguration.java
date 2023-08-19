@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,22 +47,40 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 
 @Configuration
 @EnableWebSecurity
-// load properties from external repository location 
-@PropertySource(ignoreResourceNotFound=true, value="file:${repository.folder}/config/application.properties")
+@PropertySources({
+    @PropertySource(value = "classpath:application.properties"),
+    @PropertySource(value = "file:${repository.folder}/config/application.properties", ignoreResourceNotFound = true)
+})
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 
     @Autowired
     private ConfigurationHelper config;
 
+    @Value("${server.ssl.key-store:}")
+    private String sslKeyStore;
+
+    @Value("${server.port}")
+    private Integer serverPort;
+
+    @Value("${server.servlet.context-path}")
+    private String servletContextPath;
+
+    @Value("${default.security.type}")
+    private String defaultSecurityType;
+
+    @Value("${security.types}")
+    private String securityTypes;
+
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
+        LOG.info("server.port=" + serverPort);
+        LOG.info("server.servlet.context-path=" + servletContextPath);
+        LOG.info("default.security.type=" + defaultSecurityType);
+        LOG.info("security.types=" + securityTypes);
     }
-    
-    @Value("${server.ssl.key-store:}")
-    private String sslKeyStore;
-            
+
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
 
@@ -124,22 +143,22 @@ public class QvuConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
-        
+
         // if no ssl key store then allow http
         if (StringUtils.isEmpty(sslKeyStore)) {
             http
-                .authorizeHttpRequests((authorize) -> authorize
-                .anyRequest().authenticated())
-                .csrf(csrf -> csrf.disable());
+                    .authorizeHttpRequests((authorize) -> authorize
+                    .anyRequest().authenticated())
+                    .csrf(csrf -> csrf.disable());
         } else { // force https
             http
-                .authorizeHttpRequests((authorize) -> authorize
-                .anyRequest().authenticated())
-                .requiresChannel(channel -> 
-                    channel.anyRequest().requiresSecure())
-                .csrf(csrf -> csrf.disable());
+                    .authorizeHttpRequests((authorize) -> authorize
+                    .anyRequest().authenticated())
+                    .requiresChannel(channel
+                            -> channel.anyRequest().requiresSecure())
+                    .csrf(csrf -> csrf.disable());
         }
-        
+
         if (config.getSecurityType().contains(Constants.OIDC_SECURITY_TYPE)) {
             LOG.debug("adding oauth2 login support");
             http.oauth2Login(withDefaults());

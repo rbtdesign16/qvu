@@ -17,12 +17,12 @@ const EditableDataList = (props) => {
         return listConfig.delTitle + " " + listConfig.data[indx][listConfig.displayConfig[0].field];
     };
     
-    const getFieldValue = (rec, field) => {
+    const getFieldValue = (rec, field, useLang) => {
         if (field) {
             if (typeof field === "function") {
                 return field(rec);
             } else {
-                return rec[field];
+                return useLang ? getText(rec[field]) : rec[field];
             }
         } else {
             return "";
@@ -46,7 +46,7 @@ const EditableDataList = (props) => {
 
                     return <div className={listConfig.className}>
                         <div  className="label" style={labelStyle} >{c.label ? c.label : ""}</div>
-                        <div className="display-field"  style={fieldStyle} >{getFieldValue(rec, c.field)}</div>
+                        <div className="display-field"  style={fieldStyle} >{getFieldValue(rec, c.field, c.useLang) }</div>
                     </div>;
                 } else {
                     return "";

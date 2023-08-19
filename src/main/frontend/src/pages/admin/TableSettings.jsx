@@ -75,7 +75,7 @@ const TableSettings = (props) => {
         let retval = [];
 
         if (authData.allRoles) {
-            authData.allRoles.map(r => retval.push({label: r.name, value: r.name}));
+            authData.allRoles.map(r => retval.push({label: getText(r.name), value: r.name}));
         }
 
         return retval;

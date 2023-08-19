@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author rbtuc
  */
 public class SecurityConfiguration {
-    private static Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
     private String authenticatorServiceClassName;
     private String securityType;
     private boolean allowServiceSave = false;

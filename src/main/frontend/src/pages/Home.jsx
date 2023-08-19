@@ -12,14 +12,13 @@ import useLang from "../context/LangContext";
 import useAuth from "../context/AuthContext";
 import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
-import InitialSetup from "./init/InitialSetup";
+import RepositorySetup from "../widgets/RepositorySetup";
 import {QueryDesignProvider} from "../context/QueryDesignContext";
 
 import PropTypes from "prop-types";
 import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/authHelper"
 
-
-        const Home = (props) => {
+const Home = (props) => {
     const {copyright, version} = props;
     const {authData, initializeAuth} = useAuth();
     const {datasources, initializeDataHandler} = useDataHandler();
@@ -51,7 +50,7 @@ import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils
     const getBody = () => {
         if (authData) {
             if (authData.initialSetupRequired) {
-                return <InitialSetup/>;
+                return <RepositorySetup/>;
             } else if (hasTabAccess()) {
                 return (<div>
                          <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">

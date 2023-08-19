@@ -289,13 +289,14 @@ img {
     text-align: center;
 }
 
-.initial-setup {
-    border: 1px solid var(--default-border-color);
+.repository-setup {
+border: 1px solid var(--default-border-color);
     border-radius: 3px;
-    margin-left: 10%;
-    margin-top: 5%;
+    left: 100px;
+    top: 100px;
     padding: 5px;
-    width: 700px;
+    width: 500px;
+    position: absolute;
 }
 
 .read-only-data {

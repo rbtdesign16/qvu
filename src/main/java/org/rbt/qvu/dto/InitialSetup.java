@@ -13,12 +13,7 @@ import org.rbt.qvu.configuration.security.SamlConfiguration;
  */
 public class InitialSetup {
     private String repository;
-    private String adminPassword;
     private String securityType;
-    private String langKey;
-    private String securityServiceClass;
-    private boolean fileBasedSecurity;
-    private boolean allowServiceSave;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
 
@@ -38,29 +33,6 @@ public class InitialSetup {
         this.securityType = securityType;
     }
 
-    public String getSecurityServiceClass() {
-        return securityServiceClass;
-    }
-
-    public void setSecurityServiceClass(String securityServiceClass) {
-        this.securityServiceClass = securityServiceClass;
-    }
-
-    public boolean isFileBasedSecurity() {
-        return fileBasedSecurity;
-    }
-
-    public void setFileBasedSecurity(boolean fileBasedSecurity) {
-        this.fileBasedSecurity = fileBasedSecurity;
-    }
-
-    public boolean isAllowServiceSave() {
-        return allowServiceSave;
-    }
-
-    public void setAllowServiceSave(boolean allowServiceSave) {
-        this.allowServiceSave = allowServiceSave;
-    }
 
     public SamlConfiguration getSamlConfiguration() {
         return samlConfiguration;
@@ -77,21 +49,4 @@ public class InitialSetup {
     public void setOidcConfiguration(OidcConfiguration oidcConfiguration) {
         this.oidcConfiguration = oidcConfiguration;
     }
-
-    public String getLangKey() {
-        return langKey;
-    }
-
-    public void setLangKey(String langKey) {
-        this.langKey = langKey;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
-
 }

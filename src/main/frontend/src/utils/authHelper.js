@@ -15,15 +15,15 @@ export const userHasRole = (authData, role) => {
 };
 
 export const isAdministrator = (authData) => {
-   return  userHasRole(authData, authData.administratorRole);
+   return  userHasRole(authData, DEFAULT_ADMINISTRATOR_ROLE);
 };
 
 export const isQueryDesigner = (authData) => {
-    return userHasRole(authData, authData.queryDesignerRole);
+    return userHasRole(authData, DEFAULT_QUERY_DESIGNER_ROLE);
 };
 
 export const isReportDesigner = (authData) => {
-    return userHasRole(authData, authData.reportDesignerRole);
+    return userHasRole(authData, DEFAULT_REPORT_DESIGNER_ROLE);
 };
 
 export const isUser = (authData) => {

@@ -2,13 +2,6 @@
     "authenticatorServiceClassName": "",
     "securityType": "basic",
     "roleAttributeName": "role",
-    "roleAliases": {
-        "administrator": "administrator role",
-        "query designer": "query designer alias",
-        "report designer": "report designer alias",
-        "user": "user alias"
-    },
-
     "allowServiceSave": false,
     "samlConfiguration": {
         "idpUrl": "",
@@ -30,16 +23,6 @@
             "roles": [
                 "user",
                 "administrator",
-                "report designer",
-                "query designer"
-            ]
-        },
-        {
-            "userId": "user",
-            "password": "5CC32E366C87C4CB49E4309B75F57D64",
-            "attributes": [],
-            "roles": [
-                "user",
                 "report designer",
                 "query designer"
             ]

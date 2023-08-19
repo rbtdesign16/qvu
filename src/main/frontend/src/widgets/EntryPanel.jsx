@@ -11,13 +11,17 @@ const EntryPanel = (props) => {
     const [toggle, setToggle] = useState(false);
     const {getText} = useLang();
     const loadOptions = (curval, options) => {
-        return options.map((o) => {
-            if (curval === o) {
-                return <option value={o} selected>{o}</option>;
-            } else {
-                return <option value={o}>{o}</option>;
-            }
-        });
+        if (options) {
+            return options.map((o) => {
+                if (curval === o) {
+                    return <option value={o} selected>{o}</option>;
+                } else {
+                    return <option value={o}>{o}</option>;
+                }
+            });
+        } else {
+            return "";
+        }
     };
 
     const onChange = (e, c) => {
@@ -79,7 +83,7 @@ const EntryPanel = (props) => {
                 case "label":
                     return <span className="read-only-data" style={c.style} >{getLabelText(c.text)}</span>;
                 case "button":
-                    return <Button size="sm" onClick={(e) => c.onClick(c)}>{c.label}</Button>;
+                    return <Button size="sm" disabled={c.isDisabled ? c.isDisabled() : false} onClick={(e) => c.onClick(c)}>{c.label}</Button>;
                 case "multiselect":
                     return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} hasSelectAll={c.hasSelectAll} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
             }

@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -147,34 +146,6 @@ public class MainServiceImpl implements MainService {
             }
 
             Collections.sort(retval.getAllRoles(), new RoleComparator());
-
-            String alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_ADMINISTRATOR_ROLE);
-            if (StringUtils.isNotEmpty(alias)) {
-                retval.setAdministratorRole(alias);
-            } else {
-                retval.setAdministratorRole(Constants.DEFAULT_ADMINISTRATOR_ROLE);
-            }
-
-            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
-            if (StringUtils.isNotEmpty(alias)) {
-                retval.setQueryDesignerRole(alias);
-            } else {
-                retval.setQueryDesignerRole(Constants.DEFAULT_QUERY_DESIGNER_ROLE);
-            }
-
-            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
-            if (StringUtils.isNotEmpty(alias)) {
-                retval.setReportDesignerRole(alias);
-            } else {
-                retval.setReportDesignerRole(Constants.DEFAULT_REPORT_DESIGNER_ROLE);
-            }
-
-            alias = config.getSecurityConfig().getRoleAlias(Constants.DEFAULT_USER_ROLE);
-            if (StringUtils.isNotEmpty(alias)) {
-                retval.setUserRole(alias);
-            } else {
-                retval.setUserRole(Constants.DEFAULT_USER_ROLE);
-            }
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
@@ -346,39 +317,29 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult doInitialSetup(InitialSetup initialSetup) {
+    public OperationResult initializeRepository(String repositoryFolder) {
         OperationResult retval = new OperationResult();
         FileOutputStream fos = null;
         try {
-            File f = new File(initialSetup.getRepository() + File.separator + "documents");
+            File f = new File(repositoryFolder + File.separator + "documents");
             f.mkdirs();
-            f = new File(initialSetup.getRepository() + File.separator + "config" + File.separator + "certs");
+            f = new File(repositoryFolder + File.separator + "config" + File.separator + "certs");
             f.mkdirs();
 
-            config.setRepositoryFolder(initialSetup.getRepository());
-            config.setSecurityType(initialSetup.getSecurityType());
-            SecurityConfiguration securityConfig = new SecurityConfiguration();
-            securityConfig.setSecurityType(initialSetup.getSecurityType());
-            securityConfig.setAllowServiceSave(initialSetup.isAllowServiceSave());
-            securityConfig.setAuthenticatorServiceClassName(initialSetup.getSecurityServiceClass());
-            switch (initialSetup.getSecurityType()) {
-                case Constants.SAML_SECURITY_TYPE ->
-                    securityConfig.setSamlConfiguration(initialSetup.getSamlConfiguration());
-                case Constants.OIDC_SECURITY_TYPE ->
-                    securityConfig.setOidcConfiguration(initialSetup.getOidcConfiguration());
-            }
-
+            config.setRepositoryFolder(repositoryFolder);
+            config.setSecurityType(Constants.BASIC_SECURITY_TYPE);
+     
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
-            fileHandler.saveSecurityConfig(securityConfig);
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-self-signed.p12"), new File(config.getDefaultsCertFileName()));
 
             Properties p = new Properties();
             p.load(getClass().getResourceAsStream("/initial-application.properties"));
             
-            p.setProperty("server.ssl.key-store", "file:" + initialSetup.getRepository() + "/config/certs/qvu-self-signed.p12");
+            p.setProperty("server.ssl.key-store", "file:" + repositoryFolder + "/config/certs/qvu-self-signed.p12");
             
-            fos = new FileOutputStream(initialSetup.getRepository() + "/config/application.properties");
+            fos = new FileOutputStream(repositoryFolder + "/config/application.properties");
             p.store(fos, "initial setup");
             
         } catch (Exception ex) {

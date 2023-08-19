@@ -202,7 +202,7 @@ public class ConfigurationHelper {
     }
 
     public String getDefaultsCertFileName() {
-        return repositoryFolder + File.separator + "config" + File.separator + "certs" + Constants.LANGUAGE_FILE_NAME;
+        return repositoryFolder + File.separator + "config" + File.separator + "certs" + File.separator + Constants.DEFAULT_CERT_FILE_NAME;
     }
 
     public String getLanguageFileName() {

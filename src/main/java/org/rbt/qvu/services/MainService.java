@@ -49,7 +49,7 @@ public interface MainService {
 
     public String loadLang(String langkey);
 
-    public OperationResult doInitialSetup(InitialSetup initialSetup);
+    public OperationResult initializeRepository(String repositoryFolder);
 
     public OperationResult verifyInitialRepositoryFolder(String folder);
 

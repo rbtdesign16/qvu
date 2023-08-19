@@ -13,6 +13,12 @@ const hconfig = {
     }
 };
 
+const hconfig2 = {
+    headers: {
+        "Content-Type": "text/plain"
+    }
+};
+
 const getServer = () => {
     return window.location.hostname;
 };
@@ -206,9 +212,9 @@ export const deleteUser = async (uid) => {
     }
 };
 
-export const verifyInitialRepositoryFolder = async (f) => {
+export const verifyInitialRepositoryFolder = async (repositoryFolder) => {
     try {
-        let res = await axios.get(getApiURL() + "/repo/init/verify?folder=" + f);
+        let res = await axios.post(getApiURL() + "/repo/verify", repositoryFolder, hconfig2);
         if (res) {
             return res.data;
         }
@@ -217,9 +223,9 @@ export const verifyInitialRepositoryFolder = async (f) => {
     }
 };
 
-export const doInitialSetup = async (cfg) => {
+export const initializeRepository = async (repositoryFolder) => {
     try {
-        let res = await axios.post(getApiURL() + "/repo/initialize", cfg, hconfig);
+        let res = await axios.post(getApiURL() + "/repo/initialize", repositoryFolder, hconfig2);
 
         if (res) {
             return res.data;

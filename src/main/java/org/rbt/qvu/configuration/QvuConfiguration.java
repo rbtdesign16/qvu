@@ -45,7 +45,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 @Configuration
 @EnableWebSecurity
 // load properties from external repository location 
-@PropertySource("file:${repository.folder}/config/application.properties")
+@PropertySource(ignoreResourceNotFound=true, value="file:${repository.folder}/config/application.properties")
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 
@@ -119,13 +119,22 @@ public class QvuConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
-        http
+        
+        // if initial setup do not require https
+        if (config.isInitialSetupRequired()) {
+            http
+                .authorizeHttpRequests((authorize) -> authorize
+                .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable());
+        } else {
+            http
                 .authorizeHttpRequests((authorize) -> authorize
                 .anyRequest().authenticated())
                 .requiresChannel(channel -> 
                     channel.anyRequest().requiresSecure())
                 .csrf(csrf -> csrf.disable());
-
+        }
+        
         if (config.getSecurityType().contains(Constants.OIDC_SECURITY_TYPE)) {
             LOG.debug("adding oauth2 login support");
             http.oauth2Login(withDefaults());

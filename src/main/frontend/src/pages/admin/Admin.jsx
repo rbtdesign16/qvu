@@ -363,7 +363,7 @@ const Admin = () => {
         let retval = [];
 
         if (authData.allRoles) {
-            authData.allRoles.map(r => retval.push({label: r.name, value: r.name}));
+            authData.allRoles.map(r => retval.push({label: getText(r.name), value: r.name}));
         }
 
         return retval;
@@ -726,11 +726,13 @@ const Admin = () => {
         displayConfig: [
             {
                 label: getText("Name:"),
-                field: "name"
+                field: "name",
+                useLang: true
             },
             {
                 label: getText("Description:"),
-                field: "description"
+                field: "description",
+                useLang: true
             },
             {
                 field: getAliasMessageIfRequired,
@@ -755,11 +757,13 @@ const Admin = () => {
         displayConfig: [
             {
                 label: getText("Name:"),
-                field: "name"
+                field: "name",
+                useLang: true
             },
             {
                 label: getText("Description:"),
-                field: "description"
+                field: "description",
+                useLang: true
             }
         ],
         data: documentGroups

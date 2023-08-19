@@ -144,16 +144,16 @@ public class MainController {
         return service.loadLang(langkey);
     }
 
-    @GetMapping("api/v1/repo/init/verify")
-    public OperationResult verifyRepositoryFolder(@RequestParam String folder) {
-        LOG.debug("in verifyRepositoryFolder(" + folder + ")");
-        return service.verifyInitialRepositoryFolder(folder);
+    @PostMapping("api/v1/repo/verify")
+    public OperationResult verifyRepositoryFolder(@RequestBody String repositoryFolder) {
+        LOG.debug("in verifyRepositoryFolder(" + repositoryFolder + ")");
+        return service.verifyInitialRepositoryFolder(repositoryFolder);
     }
 
     @PostMapping("api/v1/repo/initialize")
-    public OperationResult doInitialSetup(@RequestBody InitialSetup initialSetup) {
-        LOG.debug("in doInitialSetup()");
-        return service.doInitialSetup(initialSetup);
+    public OperationResult initializeRepository(@RequestBody String repositoryFolder) {
+        LOG.debug("in initializeRepository(" + repositoryFolder + ")");
+        return service.initializeRepository(repositoryFolder);
     }
 
     @GetMapping("api/v1/db/datasource/{datasourceName}/tables")

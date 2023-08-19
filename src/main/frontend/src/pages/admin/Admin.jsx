@@ -4,6 +4,7 @@ import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
+import {FcServices} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
@@ -25,7 +26,8 @@ import {
         updateJsonArray,
         findInArray,
         replaceTokens,
-        BASE_ROLES} from "../../utils/helper";
+        BASE_ROLES,
+        SMALL_ICON_SIZE} from "../../utils/helper";
 
 import {
         saveDatasource,
@@ -63,7 +65,8 @@ const Admin = () => {
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
-
+    const [showSystemSettings, setShowSystemSettings] = useState({show: false});
+    
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
             okFunc();
@@ -882,11 +885,16 @@ const Admin = () => {
         }
     };
 
+    const onSystemSettings = () => {
+        showSystemSetting({show: true});
+    };
+    
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
                 <CustomForeignKeys config={customForeignKeys}/>
+                <div style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;&nbsp;{getText("System Settings")}</div>
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>

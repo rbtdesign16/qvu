@@ -167,11 +167,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!--
                     <systemPropertyVariables>
                         <repository.folder>c:/dev/qvu</repository.folder>
                     </systemPropertyVariables>
-                                        -->
                 </configuration>
             </plugin>
             <plugin>

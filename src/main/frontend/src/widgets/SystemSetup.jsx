@@ -200,14 +200,20 @@ const SystemSetup = (props) => {
     };
 
     const getDefaultActiveTabKey = () => {
+        let retval = SECURITY_TYPE_BASIC;
         switch (securityConfig.defaultSecurityType) {
             case  SECURITY_TYPE_BASIC:
-                return "key" + SECURITY_TYPE_BASIC;
+                retval = "key-" + SECURITY_TYPE_BASIC;
+                break;
             case SECURITY_TYPE_SAML:
-                return  "key" + SECURITY_TYPE_BASIC;
+                retval =  "key-" + SECURITY_TYPE_SAML;
+                return retval;
             case SECURITY_TYPE_OIDC:
-                return "key" + SECURITY_TYPE_BASIC;
+                retval = "key-" + SECURITY_TYPE_OIDC;
+                break;
         }
+
+        return retval;
     };
     
     
@@ -234,7 +240,7 @@ const SystemSetup = (props) => {
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body><div style={{width: "500px"}}>
                     {securityConfig && 
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             <Tab bsPrefix="ssbasic" eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
@@ -246,7 +252,7 @@ const SystemSetup = (props) => {
                             <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
                                 <div><EntryPanel config={getOidcConfig()}/></div>
                             </Tab>
-                        </Tabs>}
+                            </Tabs>}</div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>

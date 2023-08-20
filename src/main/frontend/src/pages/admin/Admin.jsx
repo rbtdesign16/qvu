@@ -8,6 +8,7 @@ import {FcServices} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
+import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
         INFO,
@@ -891,25 +892,17 @@ const Admin = () => {
     };
     
     const saveSystemSettings = (settings) => {
+        console.log("-------->save=" + JSON.stringify(settings));
     };
     
     const onSystemSettings = async () => {
-        showMessage(INFO, getText("Loading system settings", "..."), null, true);
-        
-        let res = await getSecurityConfig();
-        
-        if (isApiError(res)) {
-            showMessage(ERROR, res.message);
-        } else {
-            setShowSystemSettings({show: true, config: res.results, hide: hideSystemSettings, save: saveSystemSettings, hideMessage: hideMessage});
-        }
-        
+        setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings});
     };
-    
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
+                <SystemSetup config={showSystemSettings}/>
                 <CustomForeignKeys config={customForeignKeys}/>
                 <div style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;&nbsp;{getText("System Settings")}</div>
                 <EditableDataList listConfig={datasourcesConfig}/>

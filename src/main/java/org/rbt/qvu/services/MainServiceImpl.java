@@ -1339,11 +1339,13 @@ public class MainServiceImpl implements MainService {
         
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setSamlConfiguration(scfg.getSamlConfiguration());
-        result.setOidcConfiguratio(scfg.getOidcConfiguration());
+        result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setDefaultSecurityType(config.getSecurityType());
         
-        
-        
+        retval.setResult(result);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("AuthConfig: " + fileHandler.getGson(true).toJson(result));
+        }
 
         return retval;
     }

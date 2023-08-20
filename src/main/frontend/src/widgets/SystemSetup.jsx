@@ -1,44 +1,39 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import { Tabs, Tab } from "react-bootstrap";
+import PropTypes from "prop-types";
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import EntryPanel from "../../widgets/EntryPanel";
-import useAuth from "../../context/AuthContext";
-import useLang from "../../context/LangContext";
-import EditObjectModal from "../../widgets/EditObjectModal";
-import useMessage from "../../context/MessageContext";
-import useHelp from "../../context/HelpContext";
+import EntryPanel from "./EntryPanel";
+import useAuth from "../context/AuthContext";
+import useLang from "../context/LangContext";
+import useMessage from "../context/MessageContext";
+import useHelp from "../context/HelpContext";
 import {
-INFO,
+    INFO,
         SUCCESS,
         ERROR,
-        replaceTokens
-} from "../../utils/helper";
+        replaceTokens,
+        MODAL_TITLE_SIZE
+} from "../utils/helper";
 
 import {
     SECURITY_TYPE_BASIC,
     SECURITY_TYPE_SAML,
     SECURITY_TYPE_OIDC,
-} from "../../utils/authHelper";
+} from "../utils/authHelper";
 
 import {
     isApiError,
     isApiSuccess,
-    getSecurityConfig} from "../../utils/apiHelper";
+    getSecurityConfig} from "../utils/apiHelper";
 
-const AuthenticationSetup = (props) => {
+const SystemSetup = (props) => {
     const {authData} = useAuth();
     const {config} = props;
-    const {samlConfiguration, basicConfiguration, oauthConfiguration, useOauth, useSaml, useBasic} = config;
+    const [securityConfig, setSecurityConfig] = useState(null);
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
-    const [editModal, setEditModal] = useState({show: false});
-    const [initComplete, setInitComplete] = useState(false);
-    const [toggle, setToggle] = useState(false);
-    const [data, setData] = useState({
-        repository: "",
-        securityType: SECURITY_TYPE_BASIC
-    });
 
     const showHelpMessage = (txt) => {
         showHelp(getText(txt));
@@ -51,7 +46,7 @@ const AuthenticationSetup = (props) => {
 
     const getSamlConfig = () => {
         return {
-            dataObject: samlConfiguration,
+            dataObject: securityConfig.samlConfiguration,
             gridClass: "entrygrid-200-425",
             entryConfig: [{
                     label: getText("IDP URL"),
@@ -97,10 +92,10 @@ const AuthenticationSetup = (props) => {
         };
     };
 
-    const getOauthConfig = () => {
+    const getOidcConfig = () => {
         return {
             gridClass: "entrygrid-200-425",
-            dataObject: oauthConfiguration,
+            dataObject: securityConfig.oidcConfiguration,
             entryConfig: [{
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
@@ -134,7 +129,7 @@ const AuthenticationSetup = (props) => {
     const getBasicConfig = () => {
         return {
             gridClass: "entrygrid-200-425",
-            dataObject: basicConfiguration,
+            dataObject: securityConfig.basicConfiguration,
             entryConfig: [{
                     label: getText("Custom Security Service"),
                     name: "securityServiceClass",
@@ -147,34 +142,26 @@ const AuthenticationSetup = (props) => {
         };
     };
 
+    const checkData = () => {
+        return (checkSamlData() && checkOAuthData());
+    };
+    
     const saveSetup = async () => {
-        let cfg = getConfig();
-        if (checkEntryFields(cfg)) {
-            let res = await verifyInitialRepositoryFolder(data.repository);
-            if (isApiSuccess(res)) {
-                let res = await doInitialSetup(data);
-
-                if (isApiError(res)) {
-                    showMessage(ERROR, getText(res.message));
-                } else {
-                    setInitComplete(true);
-                }
-            } else {
-                showMessage(ERROR, getText(res.message));
-            }
+        if (checkData()) {
+            config.save(securityConfig);
         } else {
-            setErrorMessage(cfg.idPrefix, getText("please complete all required entries"));
+            setMessage(ERROR, "please complete all required entries");
         }
     };
 
     const checkSamlData = () => {
-        let retval = false;
-        if (useSaml) {
+        let retval = true;
+        if (securityConfig.useSaml) {
             let ok = true;
 
             let entryConfig = getSamlConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !samlConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !securityConfig.samlConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -186,15 +173,15 @@ const AuthenticationSetup = (props) => {
         return retval;
     };
 
-    const checkOAuthData = () => {
-        let retval = false;
+    const checkOidcData = () => {
+        let retval = true;
 
-        if (useOauth) {
+        if (securityConfig.useOidc) {
             let ok = true;
 
-            let entryConfig = getOauthConfig().entryConfig;
+            let entryConfig = getOidcConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !oauthConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !securityConfig.oidcConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -213,7 +200,7 @@ const AuthenticationSetup = (props) => {
     };
 
     const getDefaultActiveTabKey = () => {
-        switch (config.defaultSecurityType) {
+        switch (securityConfig.defaultSecurityType) {
             case  SECURITY_TYPE_BASIC:
                 return "key" + SECURITY_TYPE_BASIC;
             case SECURITY_TYPE_SAML:
@@ -221,16 +208,23 @@ const AuthenticationSetup = (props) => {
             case SECURITY_TYPE_OIDC:
                 return "key" + SECURITY_TYPE_BASIC;
         }
-    }
+    };
     
     
-    const onShow = () => {
-        config.hideMessage();
-    }
+    const onShow = async () => {
+        showMessage(INFO, getText("Loading system settings", "..."), null, true);
+        
+        let res = await getSecurityConfig();
+        
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            hideMessage();
+            setSecurityConfig(res.result);
+        }
+    };
     
-    return (
-            <div>
-                <Modal animation={false} 
+    return  (<Modal animation={false} 
                        size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
                        onShow={onShow}
@@ -241,6 +235,7 @@ const AuthenticationSetup = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                    {securityConfig && 
                         <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             <Tab bsPrefix="ssbasic" eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
                                 <div><EntryPanel config={getBasicConfig()}/></div>
@@ -248,19 +243,22 @@ const AuthenticationSetup = (props) => {
                             <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
                                 <div><EntryPanel config={getSamlConfig()}/></div>
                             </Tab>
-                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="OAuth">
-                                <div><EntryPanel config={getOauthConfig()}/></div>
+                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
+                                <div><EntryPanel config={getOidcConfig()}/></div>
                             </Tab>
-                        </Tabs>
+                        </Tabs>}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config)}>{getText("Save")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={() => saveSetup()}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
-            </div>
             );
-
 };
 
-export default AuthenticationSetup;
+SystemSetup.propTypes = {
+    config: PropTypes.object.isRequired
+};
+
+
+export default SystemSetup;

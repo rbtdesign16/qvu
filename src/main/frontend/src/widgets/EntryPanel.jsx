@@ -61,6 +61,7 @@ const EntryPanel = (props) => {
             if (!c.style) {
                 c.style = {};
             }
+            
             switch (c.type) {
                 case "input":
                     return <input name={c.name} id={id} type="text" size={c.size ? c.size : 30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue}/>;

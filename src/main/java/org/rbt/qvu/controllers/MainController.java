@@ -246,11 +246,9 @@ public class MainController {
     }
     
     
-    @GetMapping("api/v1/db/dauth/config/load")
+    @GetMapping("api/v1/auth/config/load")
     public OperationResult<AuthConfig> getAuthConfig() {
         LOG.debug("in getAuthConfig()");
         return service.getAuthConfig();
     }
-
-
 }

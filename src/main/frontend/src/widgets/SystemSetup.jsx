@@ -49,7 +49,13 @@ const SystemSetup = (props) => {
             dataObject: securityConfig.samlConfiguration,
             gridClass: "entrygrid-200-425",
             idPrefix: "saml-",
-            entryConfig: [{
+            entryConfig: [
+                {
+                    label: getText("Enable"),
+                    name: "useOidc",
+                    type: "checkbox"
+                },
+                {
                     label: getText("IDP URL"),
                     name: "idpUrl",
                     type: "input",
@@ -98,7 +104,13 @@ const SystemSetup = (props) => {
             gridClass: "entrygrid-200-425",
             dataObject: securityConfig.oidcConfiguration,
             idPrefix: "oidc-",
-            entryConfig: [{
+            entryConfig: [
+                {
+                    label: getText("Enable"),
+                    name: "useOidc",
+                    type: "checkbox",
+                },
+                {
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
                     type: "input",
@@ -133,12 +145,17 @@ const SystemSetup = (props) => {
             gridClass: "entrygrid-200-425",
             idPrefix: "bas-",
             dataObject: securityConfig.basicConfiguration,
-            entryConfig: [{
+            entryConfig: [
+                {
+                    label: getText("Enable"),
+                    name: "useBasic",
+                    type: "checkbox"
+                },
+                {
                     label: getText("Custom Security Service"),
                     name: "securityServiceClass",
                     type: "input",
                     size: 50,
-                    required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("securityServiceClass-help")
                 }]

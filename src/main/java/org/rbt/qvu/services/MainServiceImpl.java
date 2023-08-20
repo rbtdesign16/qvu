@@ -1338,8 +1338,14 @@ public class MainServiceImpl implements MainService {
         AuthConfig result = new AuthConfig();
         
         result.setBasicConfiguration(scfg.getBasicConfiguration());
+        result.setUseBasic(Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType()));
+        
         result.setSamlConfiguration(scfg.getSamlConfiguration());
+        result.setUseSaml(Constants.SAML_SECURITY_TYPE.equals(config.getSecurityType()));
+        
         result.setOidcConfiguration(scfg.getOidcConfiguration());
+        result.setUseOidc(Constants.OIDC_SECURITY_TYPE.equals(config.getSecurityType()));
+        
         result.setDefaultSecurityType(config.getSecurityType());
         
         retval.setResult(result);

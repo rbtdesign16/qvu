@@ -48,6 +48,7 @@ const SystemSetup = (props) => {
         return {
             dataObject: securityConfig.samlConfiguration,
             gridClass: "entrygrid-200-425",
+            idPrefix: "saml-",
             entryConfig: [{
                     label: getText("IDP URL"),
                     name: "idpUrl",
@@ -96,6 +97,7 @@ const SystemSetup = (props) => {
         return {
             gridClass: "entrygrid-200-425",
             dataObject: securityConfig.oidcConfiguration,
+            idPrefix: "oidc-",
             entryConfig: [{
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
@@ -129,12 +131,13 @@ const SystemSetup = (props) => {
     const getBasicConfig = () => {
         return {
             gridClass: "entrygrid-200-425",
+            idPrefix: "bas-",
             dataObject: securityConfig.basicConfiguration,
             entryConfig: [{
                     label: getText("Custom Security Service"),
                     name: "securityServiceClass",
                     type: "input",
-                    size: 60,
+                    size: 50,
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("securityServiceClass-help")
@@ -230,6 +233,24 @@ const SystemSetup = (props) => {
         }
     };
     
+    const getTabPanel = () => {
+        if (securityConfig) {
+            return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+                            <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
+                                <EntryPanel config={getBasicConfig()}/>
+                            </Tab>
+                            <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
+                                <EntryPanel config={getSamlConfig()}/>
+                            </Tab>
+                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
+                                <EntryPanel config={getOidcConfig()}/>
+                            </Tab>
+                            </Tabs>);
+                } else {
+                    return "";
+                }
+            };
+    
     return  (<Modal animation={false} 
                        size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
@@ -240,20 +261,7 @@ const SystemSetup = (props) => {
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body><div style={{width: "500px"}}>
-                    {securityConfig && 
-                        <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                            <Tab bsPrefix="ssbasic" eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
-                                <div><EntryPanel config={getBasicConfig()}/></div>
-                            </Tab>
-                            <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
-                                <div><EntryPanel config={getSamlConfig()}/></div>
-                            </Tab>
-                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
-                                <div><EntryPanel config={getOidcConfig()}/></div>
-                            </Tab>
-                            </Tabs>}</div>
-                    </Modal.Body>
+                    <Modal.Body>{ getTabPanel() }</Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
                         <Button size="sm" variant="primary" type="submit" onClick={() => saveSetup()}>{getText("Save")}</Button>

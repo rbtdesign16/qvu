@@ -896,7 +896,7 @@ const Admin = () => {
     };
     
     const onSystemSettings = async () => {
-        setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings});
+        setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
     };
     return (
             <div className="admin-tab">

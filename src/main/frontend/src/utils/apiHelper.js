@@ -391,3 +391,15 @@ export const getSecurityConfig = async() => {
 
     }
 };
+
+export const saveSecurityConfig = async (config) => {
+    try {
+        let res = await axios.post(getApiURL() + "/auth/config/save", config, hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};

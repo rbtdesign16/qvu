@@ -27,6 +27,7 @@ public class Constants {
     public static final String OIDC_SECURITY_TYPE = "oidc";
     public static final String SAML_SECURITY_TYPE = "saml";
     
+    public static final String[] SECURITY_TYPES = {BASIC_SECURITY_TYPE, SAML_SECURITY_TYPE, OIDC_SECURITY_TYPE}; 
     public static final int DEFAULT_PIXELS_PER_CHARACTER = 12;
     public static final int DEFAULT_ROW_NUMBER_WIDTH = 4;
     
@@ -37,6 +38,9 @@ public class Constants {
     
     public static final String DEFAULT_ADMIN_USER = "admin";
     public static final String DEFAULT_SAML_ROLE_ATTRIBUTE_NAME = "Role";
+    public static final String DEFAULT_SECURITY_TYPE_PROPERTY = "default.security.type";
+    public static final String SECURITY_TYPES_PROPERTY = "security.types";
+    
     
     public static final String OFFLINE = "offline";
     public static final String ONLINE = "online";

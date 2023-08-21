@@ -80,5 +80,7 @@ public interface MainService {
     public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper);
 
     public OperationResult<AuthConfig> getAuthConfig();
+    
+    public OperationResult saveAuthConfig(AuthConfig authConfig);
 
 }

@@ -251,4 +251,11 @@ public class MainController {
         LOG.debug("in getAuthConfig()");
         return service.getAuthConfig();
     }
+    
+    
+    @PostMapping("api/v1/auth/config/save")
+    public OperationResult saveAuthConfig(@RequestBody AuthConfig authConfig) {
+        LOG.debug("in saveAuthConfig()");
+        return service.saveAuthConfig(authConfig);
+    }
 }

@@ -9,6 +9,9 @@ import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.sql.Timestamp;
@@ -17,7 +20,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.client.utils.OperationResult;
@@ -30,6 +32,7 @@ import org.rbt.qvu.configuration.database.DataSources;
 import org.rbt.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbt.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbt.qvu.configuration.security.SecurityConfiguration;
+import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.DocumentGroup;
 import org.rbt.qvu.dto.QueryDocument;
 import org.rbt.qvu.dto.ReportDocument;
@@ -545,7 +548,7 @@ public class FileHandler {
 
         return retval;
     }
-
+    
     public OperationResult getDocument(String type, String group, String name) {
         OperationResult retval = new OperationResult();
 
@@ -747,5 +750,80 @@ public class FileHandler {
         Collections.sort(retval);
         return retval;
     }
+    
+    public OperationResult updateApplicationProperties(AuthConfig authConfig) {
+        OperationResult retval = new OperationResult();
+        
+        LineNumberReader lnr = null;
+        PrintWriter pw = null;
+        List <String> lines = new ArrayList<>();
+        
+        String securityTypes = authConfig.getDefaultSecurityType();
+        
+        for (String type : Constants.SECURITY_TYPES) {
+            if (!type.equals(authConfig.getDefaultSecurityType())) {
+                switch(type) {
+                    case Constants.BASIC_SECURITY_TYPE:
+                        if (authConfig.getBasicConfiguration().isEnabled()) {
+                            securityTypes += ("," + type);
+                        }
+                        break;
+                   case Constants.SAML_SECURITY_TYPE:
+                        if (authConfig.getSamlConfiguration().isEnabled()) {
+                            securityTypes += ("," + type);
+                        }
+                        break;
+                   case Constants.OIDC_SECURITY_TYPE:
+                        if (authConfig.getOidcConfiguration().isEnabled()) {
+                            securityTypes += ("," + type);
+                        }
+                        break;
+                }        
+            }
+        }
+        
+        try {
+            lnr = new LineNumberReader(new FileReader(config.getApplicationPropertiesFileName()));
+            String line;
+            while((line = lnr.readLine()) != null) {
+                if (line.contains(Constants.DEFAULT_SECURITY_TYPE_PROPERTY)) {
+                    lines.add(Constants.DEFAULT_SECURITY_TYPE_PROPERTY + "=" + authConfig.getDefaultSecurityType());
+                } else if (line.contains(Constants.SECURITY_TYPES_PROPERTY)) {
+                    lines.add(Constants.SECURITY_TYPES_PROPERTY + "=" + securityTypes);
+                } else {  
+                    lines.add(line);
+                }
+            }
+            
+            lnr.close();
+            lnr = null;
+            
+            pw = new PrintWriter(config.getApplicationPropertiesFileName());
+            
+            for (String s : lines) {
+                pw.println(s);
+            }
+        }
+        
+        catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+        
+        finally {
+            if (lnr != null) {
+                try {
+                    lnr.close();
+                } catch (Exception ex) {};
+            }
+            
+            if (pw != null) {
+                try {
+                    pw.close();
+                } catch (Exception ex) {};
+            }
+        }
+ 
+        return retval;
+   }
 
 }

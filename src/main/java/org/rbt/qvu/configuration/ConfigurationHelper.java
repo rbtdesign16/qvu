@@ -107,6 +107,10 @@ public class ConfigurationHelper {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.DOCUMENT_GROUPS_CONFIG_FILE_NAME;
     }
 
+    public String getApplicationPropertiesFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + "application.properties";
+    }
+
     public File getDocumentsFolder() {
         File retval = new File(repositoryFolder + File.separator + "documents");
         if (!retval.exists()) {

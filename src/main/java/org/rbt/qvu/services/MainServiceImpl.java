@@ -3,6 +3,7 @@ package org.rbt.qvu.services;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -21,6 +22,7 @@ import java.util.LinkedHashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -106,13 +108,12 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
-    
+
     @Value("${default.security.type}")
     private String securityType;
-    
+
     @Value("${security.types}")
     private String availableSecurityType;
-
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -1329,26 +1330,21 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
-    private boolean isSecurityTypeEnabled(String type) {
-        return ((config.getSecurityType() != null) && config.getSecurityType().contains(type));
-    }
 
     @Override
     public OperationResult<AuthConfig> getAuthConfig() {
         OperationResult<AuthConfig> retval = new OperationResult<>();
-        
+
         SecurityConfiguration scfg = config.getSecurityConfig();
         AuthConfig result = new AuthConfig();
-        
+
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setSamlConfiguration(scfg.getSamlConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setDefaultSecurityType(config.getSecurityType());
-        
-        
+
         // make sure security type is enabled
-        switch(config.getSecurityType()) {
+        switch (config.getSecurityType()) {
             case Constants.BASIC_SECURITY_TYPE:
                 result.getBasicConfiguration().setEnabled(true);
                 break;
@@ -1359,11 +1355,49 @@ public class MainServiceImpl implements MainService {
                 result.getOidcConfiguration().setEnabled(true);
                 break;
         }
-        
+
         retval.setResult(result);
         if (LOG.isDebugEnabled()) {
             LOG.debug("AuthConfig: " + fileHandler.getGson(true).toJson(result));
         }
+
+        return retval;
+    }
+
+    @Override
+    public OperationResult saveAuthConfig(AuthConfig authConfig) {
+        OperationResult<AuthConfig> retval = new OperationResult<>();
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        try {
+            SecurityConfiguration scfg = config.getSecurityConfig();
+
+            scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
+            scfg.setSamlConfiguration(authConfig.getSamlConfiguration());
+            scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
+            config.setSecurityType(authConfig.getDefaultSecurityType());
+
+            fileHandler.saveSecurityConfig(scfg);
+            fileHandler.updateApplicationProperties(authConfig);
+
+         } catch (Exception ex) {
+            Helper.populateResultError(retval, ex);
+        }
+        
+        finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (Exception ex) {};
+            }
+            
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (Exception ex) {};
+            }
+        }
+               
 
         return retval;
     }

@@ -48,7 +48,8 @@ import {
         isApiError,
         loadTableSettings,
         loadDatasourceTableNames,
-        getSecurityConfig} from "../../utils/apiHelper";
+        getSecurityConfig,
+        saveSecurityConfig} from "../../utils/apiHelper";
 import {
     isAdministrator, 
     isQueryDesigner, 
@@ -891,8 +892,17 @@ const Admin = () => {
         setShowSystemSettings({show: false});
     };
     
-    const saveSystemSettings = (settings) => {
-        console.log("-------->save=" + JSON.stringify(settings));
+    const saveSystemSettings = async (settings) => {
+        hideSystemSettings();
+        showMessage(INFO, getText("Saving security settings", "..."), null, true);
+        let res = await saveSecurityConfig(settings);
+        
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            hideMessage();
+        }
+        
     };
     
     const onSystemSettings = async () => {

@@ -3,7 +3,8 @@
     "roleAttributeName": "role",
     "allowServiceSave": false,
     "basicConfiguration": {
-        "securityClassName": ""
+        "securityClassName": "",
+        "enabled": true
     },
     "samlConfiguration": {
         "idpUrl": "",
@@ -11,12 +12,13 @@
         "spEntityId": "",
         "signingCertFileName": "",
         "signingKeyFileName": "",
-        "roleAttributeName": "Role"
+        "enabled": false
     },
     "oidcConfiguration": {
         "issuerLocationUrl": "",
         "clientId": "",
-        "clientSecret": ""
+        "clientSecret": "",
+        "enabled": false
     },
     "users": [{
             "userId": "admin",

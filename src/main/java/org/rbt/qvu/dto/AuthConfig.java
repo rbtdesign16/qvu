@@ -13,30 +13,10 @@ import org.rbt.qvu.configuration.security.SamlConfiguration;
  * @author rbtuc
  */
 public class AuthConfig {
-    private boolean useBasic;
-    private boolean useSaml;
-    private boolean useOidc;
-    
     private String defaultSecurityType;
     private BasicConfiguration basicConfiguration;
     private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
-
-    public boolean isUseBasic() {
-        return useBasic;
-    }
-
-    public void setUseBasic(boolean useBasic) {
-        this.useBasic = useBasic;
-    }
-
-    public boolean isUseSaml() {
-        return useSaml;
-    }
-
-    public void setUseSaml(boolean useSaml) {
-        this.useSaml = useSaml;
-    }
 
     public String getDefaultSecurityType() {
         return defaultSecurityType;
@@ -60,14 +40,6 @@ public class AuthConfig {
 
     public void setSamlConfiguration(SamlConfiguration samlConfiguration) {
         this.samlConfiguration = samlConfiguration;
-    }
-
-    public boolean isUseOidc() {
-        return useOidc;
-    }
-
-    public void setUseOidc(boolean useOidc) {
-        this.useOidc = useOidc;
     }
 
     public OidcConfiguration getOidcConfiguration() {

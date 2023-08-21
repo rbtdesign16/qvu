@@ -12,6 +12,7 @@ public class OidcConfiguration {
     private String issuerLocationUrl;
     private String clientId;
     private String clientSecret;
+    private boolean enabled;
 
     public String getIssuerLocationUrl() {
         return issuerLocationUrl;
@@ -36,4 +37,14 @@ public class OidcConfiguration {
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
     }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+    
+    
 }

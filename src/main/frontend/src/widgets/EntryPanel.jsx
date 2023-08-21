@@ -53,6 +53,7 @@ const EntryPanel = (props) => {
         }
     };
     
+    
     const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
             return dataObject[c.name];

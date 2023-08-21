@@ -14,6 +14,7 @@ public class SamlConfiguration {
     private String spEntityId;
     private String signingCertFileName;
     private String signingKeyFileName;
+    private boolean enabled;
 
     public String getIdpUrl() {
         return idpUrl;
@@ -53,6 +54,14 @@ public class SamlConfiguration {
 
     public void setSigningKeyFileName(String signingKeyFileName) {
         this.signingKeyFileName = signingKeyFileName;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

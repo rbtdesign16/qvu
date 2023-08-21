@@ -14,14 +14,14 @@ INFO,
         ERROR,
         replaceTokens,
         MODAL_TITLE_SIZE
-        } from "../utils/helper";
+} from "../utils/helper";
 
 import {
 SECURITY_TYPE_BASIC,
         SECURITY_TYPE_SAML,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
-        } from "../utils/authHelper";
+} from "../utils/authHelper";
 
 import {
 isApiError,
@@ -94,7 +94,7 @@ const SystemSetup = (props) => {
                 },
                 {
                     label: getText("Enable"),
-                    name: "useSaml",
+                    name: "enabled",
                     type: "checkbox"
                 }]
         };
@@ -135,7 +135,7 @@ const SystemSetup = (props) => {
                 },
                 {
                     label: getText("Enable"),
-                    name: "useOidc",
+                    name: "enabled",
                     type: "checkbox"
                 }]
         };
@@ -157,7 +157,7 @@ const SystemSetup = (props) => {
                 },
                 {
                     label: getText("Enable"),
-                    name: "useBasic",
+                    name: "enabled",
                     type: "checkbox"
                 }]
         };
@@ -171,13 +171,13 @@ const SystemSetup = (props) => {
         if (checkData()) {
             config.save(securityConfig);
         } else {
-            setMessage(ERROR, "please complete all required entries");
+            setMessage(ERROR, getText("please complete all required entries"));
         }
     };
 
     const checkSamlData = () => {
         let retval = true;
-        if (securityConfig.useSaml) {
+        if (securityConfig.samlConfiguration && securityConfig.samlConfiguration.enabled) {
             let ok = true;
 
             let entryConfig = getSamlConfig().entryConfig;
@@ -197,7 +197,7 @@ const SystemSetup = (props) => {
     const checkOidcData = () => {
         let retval = true;
 
-        if (securityConfig.useOidc) {
+        if (securityConfig.oidcConfiguration && securityConfig.oidcConfiguration.enabled) {
             let ok = true;
 
             let entryConfig = getOidcConfig().entryConfig;
@@ -234,6 +234,8 @@ const SystemSetup = (props) => {
                 break;
         }
 
+
+
         return retval;
     };
 
@@ -246,6 +248,7 @@ const SystemSetup = (props) => {
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
+            res.newRecord = false;
             hideMessage();
             setSecurityConfig(res.result);
         }
@@ -253,7 +256,6 @@ const SystemSetup = (props) => {
 
     const loadSecurityTypes = () => {
         if (securityConfig && securityConfig.defaultSecurityType) {
-            console.log("------------>" + securityConfig.defaultSecurityType);
             return SECURITY_TYPES.map(t => {
                 if (t === securityConfig.defaultSecurityType) {
                     return <option value={t} selected>{t}</option>;
@@ -296,7 +298,7 @@ const SystemSetup = (props) => {
             <div>   
                 <div style={{textAlign: "center"}} className="entrygrid-225-225">
                     <label className="label">{getText("Default Security Type")}</label>
-                    <select onChange={e => setDefaultSecurityTyoe(e.target.value)}> 
+                    <select onChange={e => setDefaultSecurityType(e.target.value)}> 
                         {loadSecurityTypes()}
                     </select>   
                 </div>

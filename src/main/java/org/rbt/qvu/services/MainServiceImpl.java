@@ -1329,6 +1329,10 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    private boolean isSecurityTypeEnabled(String type) {
+        return ((config.getSecurityType() != null) && config.getSecurityType().contains(type));
+    }
 
     @Override
     public OperationResult<AuthConfig> getAuthConfig() {
@@ -1338,15 +1342,23 @@ public class MainServiceImpl implements MainService {
         AuthConfig result = new AuthConfig();
         
         result.setBasicConfiguration(scfg.getBasicConfiguration());
-        result.setUseBasic(Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType()));
-        
         result.setSamlConfiguration(scfg.getSamlConfiguration());
-        result.setUseSaml(Constants.SAML_SECURITY_TYPE.equals(config.getSecurityType()));
-        
         result.setOidcConfiguration(scfg.getOidcConfiguration());
-        result.setUseOidc(Constants.OIDC_SECURITY_TYPE.equals(config.getSecurityType()));
-        
         result.setDefaultSecurityType(config.getSecurityType());
+        
+        
+        // make sure security type is enabled
+        switch(config.getSecurityType()) {
+            case Constants.BASIC_SECURITY_TYPE:
+                result.getBasicConfiguration().setEnabled(true);
+                break;
+            case Constants.SAML_SECURITY_TYPE:
+                result.getSamlConfiguration().setEnabled(true);
+                break;
+            case Constants.OIDC_SECURITY_TYPE:
+                result.getOidcConfiguration().setEnabled(true);
+                break;
+        }
         
         retval.setResult(result);
         if (LOG.isDebugEnabled()) {

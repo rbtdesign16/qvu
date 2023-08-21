@@ -18,8 +18,6 @@ import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,7 +81,6 @@ public class ConfigurationHelper {
     public void loadConfiguration() throws Exception {
         langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
         securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
-        
         datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
         
         String dgfile = getDocumentGroupsConfigurationFileName();

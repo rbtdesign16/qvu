@@ -164,14 +164,14 @@ const SystemSetup = (props) => {
     };
 
     const checkData = () => {
-        return (checkSamlData() && checkOAuthData());
+        return (checkSamlData() && checkOidcData());
     };
 
     const saveSetup = async () => {
         if (checkData()) {
             config.save(securityConfig);
         } else {
-            setMessage(ERROR, getText("please complete all required entries"));
+            showMessage(ERROR, getText("please complete all required entries"));
         }
     };
 
@@ -265,6 +265,55 @@ const SystemSetup = (props) => {
             });
         }
     };
+    
+    const onSecurityTypeChange = (e) => {
+        let sc = {...securityConfig};
+        let type = e.target.value;
+        let newid;
+        let oldid;
+        switch (type) {
+         case  SECURITY_TYPE_BASIC:
+             sc.basicConfiguration.enabled = true;
+             newid = "bas-enabled";
+             break;
+         case SECURITY_TYPE_SAML:
+             sc.samlConfiguration.enabled = true;
+             newid = "saml-enabled";
+             break;
+         case SECURITY_TYPE_OIDC:
+             sc.oidcConfiguration.enabled = true;
+             newid = "oidc-enabled";
+             break;
+        }
+        
+       switch (securityConfig.defaultSecurityType) {
+         case  SECURITY_TYPE_BASIC:
+             sc.basicConfiguration.enabled = false;
+             oldid = "bas-enabled";
+             break;
+         case SECURITY_TYPE_SAML:
+             sc.samlConfiguration.enabled = false;
+             oldid = "saml-enabled";
+             break;
+         case SECURITY_TYPE_OIDC:
+             oldid = "oidc-enabled";
+             sc.oidcConfiguration.enabled = false;
+             break;
+        }
+        
+        
+        let el = document.getElementById(newid);
+        if (el) {
+            el.checked = true;
+        }
+        
+        el = document.getElementById(oldid);
+        if (el) {
+            el.checked = false;
+        }
+        sc.defaultSecurityType = type;
+        setSecurityConfig(sc);
+    };
 
     const getTabPanel = () => {
         if (securityConfig) {
@@ -298,7 +347,7 @@ const SystemSetup = (props) => {
             <div>   
                 <div style={{textAlign: "center"}} className="entrygrid-225-225">
                     <label className="label">{getText("Default Security Type")}</label>
-                    <select onChange={e => setDefaultSecurityType(e.target.value)}> 
+                    <select onChange={e => onSecurityTypeChange(e)}> 
                         {loadSecurityTypes()}
                     </select>   
                 </div>

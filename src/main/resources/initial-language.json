@@ -54,6 +54,7 @@
         "datasourceRoles-help": "Select desired roles to limit datasource access by role. If no roles are selected the datasource is accessible to all users",
         "Datasources": "Datasources",
         "Default admin user not found": "Default admin user not found",
+        "Default Security Type": "Default Security Type",
         "default document name": "new-query-doc",
         "delete datasource": "delete datasource",
         "Delete datasource": "Delete datasource",

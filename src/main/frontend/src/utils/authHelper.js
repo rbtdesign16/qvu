@@ -8,6 +8,8 @@ export const SECURITY_TYPE_BASIC = "basic";
 export const SECURITY_TYPE_SAML = "saml";
 export const SECURITY_TYPE_OIDC = "oidc";
 
+export const SECURITY_TYPES = [SECURITY_TYPE_BASIC, SECURITY_TYPE_SAML,SECURITY_TYPE_OIDC];
+
 export const userHasRole = (authData, role) => {
     if (authData.currentUser && authData.currentUser.roles) {
         return authData.currentUser.roles.includes(role);

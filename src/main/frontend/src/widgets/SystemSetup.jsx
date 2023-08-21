@@ -9,23 +9,24 @@ import useLang from "../context/LangContext";
 import useMessage from "../context/MessageContext";
 import useHelp from "../context/HelpContext";
 import {
-    INFO,
+INFO,
         SUCCESS,
         ERROR,
         replaceTokens,
         MODAL_TITLE_SIZE
-} from "../utils/helper";
+        } from "../utils/helper";
 
 import {
-    SECURITY_TYPE_BASIC,
-    SECURITY_TYPE_SAML,
-    SECURITY_TYPE_OIDC,
-} from "../utils/authHelper";
+SECURITY_TYPE_BASIC,
+        SECURITY_TYPE_SAML,
+        SECURITY_TYPE_OIDC,
+        SECURITY_TYPES
+        } from "../utils/authHelper";
 
 import {
-    isApiError,
-    isApiSuccess,
-    getSecurityConfig} from "../utils/apiHelper";
+isApiError,
+        isApiSuccess,
+        getSecurityConfig} from "../utils/apiHelper";
 
 const SystemSetup = (props) => {
     const {authData} = useAuth();
@@ -47,14 +48,9 @@ const SystemSetup = (props) => {
     const getSamlConfig = () => {
         return {
             dataObject: securityConfig.samlConfiguration,
-            gridClass: "entrygrid-200-425",
+            gridClass: "entrygrid-225-350",
             idPrefix: "saml-",
             entryConfig: [
-                {
-                    label: getText("Enable"),
-                    name: "useOidc",
-                    type: "checkbox"
-                },
                 {
                     label: getText("IDP URL"),
                     name: "idpUrl",
@@ -95,21 +91,21 @@ const SystemSetup = (props) => {
                     disabled: true,
                     showHelp: showHelpMessage,
                     helpText: getText("signingKeyFileName-help")
+                },
+                {
+                    label: getText("Enable"),
+                    name: "useSaml",
+                    type: "checkbox"
                 }]
         };
     };
 
     const getOidcConfig = () => {
         return {
-            gridClass: "entrygrid-200-425",
+            gridClass: "entrygrid-225-350",
             dataObject: securityConfig.oidcConfiguration,
             idPrefix: "oidc-",
             entryConfig: [
-                {
-                    label: getText("Enable"),
-                    name: "useOidc",
-                    type: "checkbox",
-                },
                 {
                     label: getText("Issuer Location URL"),
                     name: "issuerLocationUrl",
@@ -136,21 +132,21 @@ const SystemSetup = (props) => {
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("clientSecret-help")
+                },
+                {
+                    label: getText("Enable"),
+                    name: "useOidc",
+                    type: "checkbox"
                 }]
         };
     };
 
     const getBasicConfig = () => {
         return {
-            gridClass: "entrygrid-200-425",
+            gridClass: "entrygrid-225-350",
             idPrefix: "bas-",
             dataObject: securityConfig.basicConfiguration,
             entryConfig: [
-                {
-                    label: getText("Enable"),
-                    name: "useBasic",
-                    type: "checkbox"
-                },
                 {
                     label: getText("Custom Security Service"),
                     name: "securityServiceClass",
@@ -158,6 +154,11 @@ const SystemSetup = (props) => {
                     size: 50,
                     showHelp: showHelpMessage,
                     helpText: getText("securityServiceClass-help")
+                },
+                {
+                    label: getText("Enable"),
+                    name: "useBasic",
+                    type: "checkbox"
                 }]
         };
     };
@@ -165,7 +166,7 @@ const SystemSetup = (props) => {
     const checkData = () => {
         return (checkSamlData() && checkOAuthData());
     };
-    
+
     const saveSetup = async () => {
         if (checkData()) {
             config.save(securityConfig);
@@ -226,7 +227,7 @@ const SystemSetup = (props) => {
                 retval = "key-" + SECURITY_TYPE_BASIC;
                 break;
             case SECURITY_TYPE_SAML:
-                retval =  "key-" + SECURITY_TYPE_SAML;
+                retval = "key-" + SECURITY_TYPE_SAML;
                 return retval;
             case SECURITY_TYPE_OIDC:
                 retval = "key-" + SECURITY_TYPE_OIDC;
@@ -235,13 +236,13 @@ const SystemSetup = (props) => {
 
         return retval;
     };
-    
-    
+
+
     const onShow = async () => {
         showMessage(INFO, getText("Loading system settings", "..."), null, true);
-        
+
         let res = await getSecurityConfig();
-        
+
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
@@ -249,41 +250,64 @@ const SystemSetup = (props) => {
             setSecurityConfig(res.result);
         }
     };
-    
+
+    const loadSecurityTypes = () => {
+        if (securityConfig && securityConfig.defaultSecurityType) {
+            console.log("------------>" + securityConfig.defaultSecurityType);
+            return SECURITY_TYPES.map(t => {
+                if (t === securityConfig.defaultSecurityType) {
+                    return <option value={t} selected>{t}</option>;
+                } else {
+                    return <option value={t}>{t}</option>;
+                }
+            });
+        }
+    };
+
     const getTabPanel = () => {
         if (securityConfig) {
             return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
-                            <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
-                                <EntryPanel config={getBasicConfig()}/>
-                            </Tab>
-                            <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
-                                <EntryPanel config={getSamlConfig()}/>
-                            </Tab>
-                            <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
-                                <EntryPanel config={getOidcConfig()}/>
-                            </Tab>
-                            </Tabs>);
-                } else {
-                    return "";
-                }
-            };
-    
+                <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
+                    <EntryPanel config={getBasicConfig()}/>
+                </Tab>
+                <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
+                    <EntryPanel config={getSamlConfig()}/>
+                </Tab>
+                <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
+                    <EntryPanel config={getOidcConfig()}/>
+                </Tab>
+            </Tabs>);
+        } else {
+            return "";
+        }
+    };
+
     return  (<Modal animation={false} 
-                       size={config.dlgsize ? config.dlgsize : ""}
-                       show={config.show} 
-                       onShow={onShow}
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
-                    <Modal.Header closeButton>
-                        <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>{ getTabPanel() }</Modal.Body>
-                    <Modal.Footer>
-                        <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={() => saveSetup()}>{getText("Save")}</Button>
-                    </Modal.Footer>
-                </Modal>
+           size={config.dlgsize ? config.dlgsize : ""}
+           show={config.show} 
+           onShow={onShow}
+           onHide={onHide}
+           backdrop={true} 
+           keyboard={true}>
+        <Modal.Header closeButton>
+            <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <div>   
+                <div style={{textAlign: "center"}} className="entrygrid-225-225">
+                    <label className="label">{getText("Default Security Type")}</label>
+                    <select onChange={e => setDefaultSecurityTyoe(e.target.value)}> 
+                        {loadSecurityTypes()}
+                    </select>   
+                </div>
+                { getTabPanel() }
+            </div>
+        </Modal.Body>
+        <Modal.Footer>
+            <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
+            <Button size="sm" variant="primary" type="submit" onClick={() => saveSetup()}>{getText("Save")}</Button>
+        </Modal.Footer>
+    </Modal>
             );
 };
 

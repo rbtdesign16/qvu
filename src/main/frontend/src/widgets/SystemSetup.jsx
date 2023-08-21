@@ -47,9 +47,10 @@ const SystemSetup = (props) => {
 
     const getSamlConfig = () => {
         return {
-            dataObject: securityConfig.samlConfiguration,
+            dataObject: {...securityConfig.samlConfiguration},
             gridClass: "entrygrid-225-350",
             idPrefix: "saml-",
+            afterChange: onSamlChange,
             entryConfig: [
                 {
                     label: getText("IDP URL"),
@@ -103,8 +104,9 @@ const SystemSetup = (props) => {
     const getOidcConfig = () => {
         return {
             gridClass: "entrygrid-225-350",
-            dataObject: securityConfig.oidcConfiguration,
+            dataObject: {...securityConfig.oidcConfiguration},
             idPrefix: "oidc-",
+            afterChange: onOidcChange,
             entryConfig: [
                 {
                     label: getText("Issuer Location URL"),
@@ -145,7 +147,8 @@ const SystemSetup = (props) => {
         return {
             gridClass: "entrygrid-225-350",
             idPrefix: "bas-",
-            dataObject: securityConfig.basicConfiguration,
+            dataObject: {...securityConfig.basicConfiguration},
+            afterChange: onBasicChange,
             entryConfig: [
                 {
                     label: getText("Custom Security Service"),
@@ -163,6 +166,25 @@ const SystemSetup = (props) => {
         };
     };
 
+
+    const onBasicChange = (e, entryConfig, dataObject) => {
+        let sc = {...securityConfig};
+        sc.basicConfiguration = dataObject;
+        setSecurityConfig(sc);
+    };
+
+    const onSamlChange = (e, entryConfig, dataObject) => {
+        let sc = {...securityConfig};
+        sc.samlConfiguration = dataObject;
+        setSecurityConfig(sc);
+    };
+
+    const onOidcChange = (e, entryConfig, dataObject) => {
+        let sc = {...securityConfig};
+        sc.oidcConfiguration = dataObject;
+        setSecurityConfig(sc);
+    };
+    
     const checkData = () => {
         return (checkSamlData() && checkOidcData());
     };

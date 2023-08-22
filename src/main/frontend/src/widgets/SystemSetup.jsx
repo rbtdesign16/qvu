@@ -175,6 +175,23 @@ const SystemSetup = (props) => {
 
     const onSamlChange = (e, entryConfig, dataObject) => {
         let sc = {...securityConfig};
+        
+        let el = document.getElementById("saml-signingCertFileName");
+        if (el) {
+            el.disabled = !dataObject.signAssertions;
+            if (el.disabled) {
+                el.value = "";
+            }
+        }
+        
+        el = document.getElementById("saml-signingKeyFileName");
+        if (el) {
+            el.disabled = !dataObject.signAssertions;
+            if (el.disabled) {
+                el.value = "";
+            }
+        }
+        
         sc.samlConfiguration = dataObject;
         setSecurityConfig(sc);
     };

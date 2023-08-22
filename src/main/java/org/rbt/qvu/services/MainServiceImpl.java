@@ -22,12 +22,12 @@ import java.util.LinkedHashMap;
 import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -158,6 +158,15 @@ public class MainServiceImpl implements MainService {
 
             Collections.sort(retval.getAllRoles(), new RoleComparator());
 
+            // clone it so we can send a modified copy back
+            retval = SerializationUtils.clone(retval);
+            
+            
+            // remove the passwords
+            for (User u : retval.getAllUsers()) {
+                u.setPassword(null);
+            }
+            
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
             }

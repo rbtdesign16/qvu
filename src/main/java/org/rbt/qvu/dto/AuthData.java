@@ -4,6 +4,7 @@
  */
 package org.rbt.qvu.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.rbt.qvu.client.utils.Role;
@@ -13,7 +14,7 @@ import org.rbt.qvu.client.utils.User;
  *
  * @author rbtuc
  */
-public class AuthData {
+public class AuthData implements Serializable {
     private List<Role> allRoles = new ArrayList<>();
     private List<User> allUsers = new ArrayList<>();
     private User currentUser;

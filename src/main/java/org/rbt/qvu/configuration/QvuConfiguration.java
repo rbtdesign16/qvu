@@ -48,7 +48,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 @Configuration
 @EnableWebSecurity
 @PropertySources({
-    @PropertySource(value = "classpath:application.properties"),
+    @PropertySource(value = "classpath:default-application.properties"),
     @PropertySource(value = "file:${repository.folder}/config/application.properties", ignoreResourceNotFound = true)
 })
 public class QvuConfiguration {

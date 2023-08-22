@@ -1,6 +1,4 @@
-import React, { createContext, useState, useContext }
-from "react";
-
+import React, { createContext, useState, useContext } from "react";
 export const LangContext = createContext();
 
 export const LangProvider = ({ children }
@@ -9,9 +7,10 @@ export const LangProvider = ({ children }
 
     const getText = (textKey, addText = "") => {
         try {
+            
             if (lang && lang[textKey]) {
                 return lang[textKey] + addText;
-            } else {
+            } else if (lang && lang[DEFAULT_LANG_CODE]) {
                 return textKey + addText;
             }
         } catch (e) {

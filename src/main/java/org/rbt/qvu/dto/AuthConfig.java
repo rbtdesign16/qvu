@@ -49,6 +49,4 @@ public class AuthConfig {
     public void setOidcConfiguration(OidcConfiguration oidcConfiguration) {
         this.oidcConfiguration = oidcConfiguration;
     }
-    
-    
 }

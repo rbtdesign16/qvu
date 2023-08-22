@@ -83,6 +83,7 @@
         "Edit user": "Edit user",
         "Email:": "Email:",
         "empty-filter-value": "(empty)",
+        "Enabled": "Enabled",
         "Error": "Error",
         "errorCode-1" : "Folder is not empty - please choose an empty folder",
         "errorCode-2": "Folder not found - please choose an existing folder",

@@ -94,7 +94,7 @@ const SystemSetup = (props) => {
                     helpText: getText("signingKeyFileName-help")
                 },
                 {
-                    label: getText("Enable"),
+                    label: getText("Enabled"),
                     name: "enabled",
                     type: "checkbox"
                 }]
@@ -136,7 +136,7 @@ const SystemSetup = (props) => {
                     helpText: getText("clientSecret-help")
                 },
                 {
-                    label: getText("Enable"),
+                    label: getText("Enabled"),
                     name: "enabled",
                     type: "checkbox"
                 }]
@@ -159,7 +159,7 @@ const SystemSetup = (props) => {
                     helpText: getText("securityServiceClass-help")
                 },
                 {
-                    label: getText("Enable"),
+                    label: getText("Enabled"),
                     name: "enabled",
                     type: "checkbox"
                 }]

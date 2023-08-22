@@ -35,7 +35,7 @@ public class ConfigurationHelper {
     @Value("${default.security.type:basic}")
     private String securityType;
 
-    @Value("${log.folder}")
+    @Value("${log.folder:#{systemProperties['java.io.tmpdir']}")
     private String logFolder;
 
     private SecurityConfiguration securityConfig;

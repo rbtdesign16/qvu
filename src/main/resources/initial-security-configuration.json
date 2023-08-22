@@ -8,7 +8,7 @@
     },
     "samlConfiguration": {
         "idpUrl": "",
-        "signAssertions": true,
+        "signAssertions": false,
         "spEntityId": "",
         "signingCertFileName": "",
         "signingKeyFileName": "",

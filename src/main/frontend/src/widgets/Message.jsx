@@ -10,19 +10,15 @@ import {
     INFO,
     SUCCESS,
     WARN,
-    ERROR,
-    SUCCESS_MESSAGE_TIMEOUT
+    ERROR
     
 } from "../utils/helper";
 
 
 const Message = () => {
     const {messageInfo, showMessage, hideMessage} = useMessage();
-
-    let myTimeout;
     
     const onHide = () => {
-        myTimeout = null;
         hideMessage();
     };
 
@@ -48,20 +44,12 @@ const Message = () => {
         }
     };
     
-    const onEntered = () => {
-        if (messageInfo.type === SUCCESS) {
-            myTimeout = setTimeout(onHide, SUCCESS_MESSAGE_TIMEOUT);
-        } else if (myTimeout) {
-            clearTimeout(myTimeout);
-        }
-    };
-    
+   
     return (
             <Modal
                 show={messageInfo.show}
                 size="sm"
                 onHide={onHide}
-                onEntered={onEntered}
                 contentClassName={getClassName()}
                 backdrop={messageInfo.backdrop}
                 id="message-popup"

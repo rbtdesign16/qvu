@@ -12,7 +12,7 @@ const EntryPanel = (props) => {
     const {getText} = useLang();
     const loadOptions = (curval, options) => {
         if (options) {
-            return options.map((o) => {
+            return options.map((o, indx) => {
                 if (curval === o) {
                     return <option value={o} selected>{o}</option>;
                 } else {
@@ -52,8 +52,8 @@ const EntryPanel = (props) => {
             return "";
         }
     };
-    
-    
+
+
     const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
             return dataObject[c.name];
@@ -62,7 +62,15 @@ const EntryPanel = (props) => {
             if (!c.style) {
                 c.style = {};
             }
-            
+
+            if (!dataObject[c.name]) {
+                if (c.defaultValue) {
+                    dataObject[c.name] = c.defaultValue;
+                } else if (c.type === "select") {
+                    dataObject[c.name] = c.options[0];
+                }
+            }
+
             switch (c.type) {
                 case "input":
                     return <input name={c.name} id={id} type="text" size={c.size ? c.size : 30} style={c.style} onChange={e => onChange(e)} disabled={c.disabled} defaultValue={dataObject[c.name] ? dataObject[c.name] : c.defaultValue}/>;
@@ -91,7 +99,7 @@ const EntryPanel = (props) => {
             }
         }
     };
-    
+
     const multiSelectValueRenderer = (c, dataOBject, selected, options) => {
         if (c.valueRenderer) {
             return c.valueRenderer(c, dataOBject, selected, options);
@@ -100,13 +108,13 @@ const EntryPanel = (props) => {
                 return getText("Item(s) selected");
             } else {
                 getText("Select", "...");
-            }    
-        } 
+            }
+        }
     };
-    
+
     const onMultiSelectChange = (selections, c, dataObject) => {
-        c.setSelected(dataObject, selections); 
-        setToggle(!toggle); 
+        c.setSelected(dataObject, selections);
+        setToggle(!toggle);
     };
 
     const isButtonDisabled = (b) => {
@@ -118,7 +126,7 @@ const EntryPanel = (props) => {
             }
         }
     };
-    
+
     const loadButtons = () => {
         return buttons.map(b => {
             return  <Button  size="sm"  disabled={isButtonDisabled(b)} style={{marginLeft: "10px"}} onClick={() => b.onClick(dataObject)}  id={b.id} >{b.text}</Button>;
@@ -161,43 +169,43 @@ const EntryPanel = (props) => {
     const getEntry = (c) => {
         if (c.type === "checkbox") {
             return <div className="display-field">{getInputField(c)}<label htmlFor={idPrefix + c.name} style={{paddingLeft: "3px", cursor: "pointer"}}>{c.label}</label></div>;
-        } else {
-            return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
-        }
-    };
+                    } else {
+                        return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
+                    }
+                };
 
-    const loadEntryFields = () => {
-        return entryConfig.map(c => {
-            if (!c.hide || !c.hide()) {
-                return <div className={getGridClass()}>
-                    { getLabel(c) }
-                    { getEntry(c) }
+                const loadEntryFields = () => {
+                    return entryConfig.map(c => {
+                        if (!c.hide || !c.hide()) {
+                            return <div className={getGridClass()}>
+                                { getLabel(c) }
+                                { getEntry(c) }
+                            
+                            </div>;
+                        } else {
+                            return "";
+                        }
+                    });
+                };
 
-                </div>;
-            } else {
-                return "";
-            }
-        });
-    };
+                const haveRequiredFields = () => {
+                    for (let i = 0; i < entryConfig.length; ++i) {
+                        if (entryConfig[i].required) {
+                            return true;
+                        }
+                    }
+                };
 
-    const haveRequiredFields = () => {
-        for (let i = 0; i < entryConfig.length; ++i) {
-            if (entryConfig[i].required) {
-                return true;
-            }
-        }
-    };
+                return (
+                        <div>
+                            { loadEntryFields() }
+                            {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
+                            {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
+                        </div>);
+            };
 
-    return (
-            <div>
-                { loadEntryFields() }
-                {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
-                {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
-            </div>);
-};
+            EntryPanel.propTypes = {
+                config: PropTypes.object.isRequired
+            };
 
-EntryPanel.propTypes = {
-    config: PropTypes.object.isRequired
-};
-
-export default EntryPanel;
+            export default EntryPanel;

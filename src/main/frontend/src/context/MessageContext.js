@@ -6,7 +6,8 @@ import {
     ERROR,
     DEFAULT_SUCCESS_TITLE,
     DEFAULT_WARN_TITLE,
-    DEFAULT_ERROR_TITLE } from "../utils/helper";
+    DEFAULT_ERROR_TITLE,
+    SUCCESS_MESSAGE_TIMEOUT} from "../utils/helper";
  
 export const MessageContext = createContext();
 
@@ -14,8 +15,12 @@ export const MessageProvider = ({ children }) => {
     const {getText} = useLang();
     const [messageInfo, setMessageInfo] = useState({show: false});
     const hideMessage = () => {
+        clearTimeout(timeout);
+        timeout = null;
         setMessageInfo({show: false});
     };
+    
+    let timeout = null;
     
     const showMessage = (type, message, title = null, showSpinner = false, withBackdrop = false) => {
         if (!title) {
@@ -30,6 +35,10 @@ export const MessageProvider = ({ children }) => {
                     title = getText(DEFAULT_ERROR_TITLE);
                     break;
             }
+        }
+        
+        if (type === SUCCESS) {
+            timeout = setTimeout(hideMessage, SUCCESS_MESSAGE_TIMEOUT);
         }
         
         setMessageInfo({show: true, type: type, message: message, title: title, showSpinner: showSpinner, backdrop: withBackdrop});

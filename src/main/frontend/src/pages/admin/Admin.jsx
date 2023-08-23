@@ -28,7 +28,10 @@ import {
         findInArray,
         replaceTokens,
         BASE_ROLES,
-        SMALL_ICON_SIZE} from "../../utils/helper";
+        SMALL_ICON_SIZE,
+        DEFAULT_EXPORTED_KEY_DEPTH,
+        DEFAULT_IMPORTED_KEY_DEPTH
+} from "../../utils/helper";
 
 import {
         saveDatasource,
@@ -131,7 +134,7 @@ const Admin = () => {
             {
                 label: getText("Max Imported Key Depth:"),
                 name: "maxImportedKeyDepth",
-                default: 2,
+                defaultValue: DEFAULT_IMPORTED_KEY_DEPTH,
                 type: "number",
                 required: true,
                 showHelp: showHelpMessage,
@@ -140,7 +143,7 @@ const Admin = () => {
              {
                 label: getText("Max Exported Key Depth:"),
                 name: "maxExportedKeyDepth",
-                default: 4,
+                defaultValue: DEFAULT_EXPORTED_KEY_DEPTH,
                 type: "number",
                 required: true,
                 showHelp: showHelpMessage,
@@ -530,7 +533,7 @@ const Admin = () => {
                         showMessage(INFO, getText("Attempting to connect", "..."), null, true);
                         let res = await testDatasource(dataObject);
                         if (isApiSuccess(res)) {
-                            showMessage(SUCCESS, getText("Successfully connected to datasoure", "  ") + dataObject.datasourceName);
+                            showMessage(SUCCESS, replceTokens(getText("Successfully connected to datasoure"), [dataObject.datasourceName]));
                         } else {
                             showMessage(ERROR, res.message);
                         }
@@ -583,24 +586,24 @@ const Admin = () => {
     };
 
     const editDatasource = (indx) => {
-        setEditModal(getDatasourceConfig(getText("Update datasource", " ") + datasources[indx].datasourceName, {...datasources[indx]}));
+        setEditModal(getDatasourceConfig(replaceTokens(getText("Update datasource"), [datasources[indx].datasourceName]), {...datasources[indx]}));
     };
 
     const deleteSelectedDatasource = (indx) => {
         const ds = datasources[indx];
 
         const okFunc = async () => {
-            showMessage(INFO, getText("Deleting datasource") + ds.datasourceName + "...", getText("Deleting"), true);
+            showMessage(INFO, replaceTokens(getText("Deleting datasource"), [ds.datasourceName + "..."]), getText("Deleting"), true);
             let res = await deleteDatasource(ds.datasourceName);
             if (isApiSuccess(res)) {
                 setDatasources(await loadDatasources());
-                showMessage(SUCCESS, getText("Datasource", " ") + ds.datasourceName + " " + getText("deleted"));
+                showMessage(SUCCESS, replaceTokens(getText("Datasource deleted"),  [ds.datasourceName]));
             } else {
-                showMessage(ERROR, getText("Failed to delete datasource", " ") + ds.datasourceName + " " + getText(res.message));
+                showMessage(ERROR, replaceTokens(getText("Failed to delete datasource", [ds.datasourceName, getText(res.message)])) );
             }
         };
 
-        handleOnClick(getText("delete datasource", " ") + ds.datasourceName + "?", okFunc);
+        handleOnClick(replaceTokens(getText("delete datasource prompt"), [ds.datasourceName]), okFunc);
     };
 
     const addRole = () => {
@@ -615,18 +618,18 @@ const Admin = () => {
     const deleteSelectedRole = async (indx) => {
         const r = authData.allRoles[indx];
         const okFunc = async () => {
-            showMessage(INFO, getText("Deleting role", " ") + r.name + "...", null, true);
+            showMessage(INFO, replaceTokens(getText("Deleting role"), [r.name + "..."]), null, true);
             let res = await deleteRole(r.name);
 
             if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted role", " ") + r.name);
+                showMessage(SUCCESS, replaceTokens(getText("Deleted role"), [r.name]));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete role", " ") + r.name));
+                showMessage(ERROR, formatErrorResponse(res, replaceTokens(getText("Failed to delete role"), [r.name, res.message])));
             }
         };
 
-        handleOnClick(getText("delete role", " ") + r.name + getText("?"), okFunc);
+        handleOnClick(replaceTokens(getText("delete role prompt"), [r.name]), okFunc);
     };
 
    const addDocumentGroup = () => {
@@ -641,18 +644,18 @@ const Admin = () => {
     const deleteSelectedDocumentGroup = async (indx) => {
         const g = documentGroups[indx];
         const okFunc = async () => {
-            showMessage(INFO, getText("Deleting group", " ") + g.name + "...", null, true);
+            showMessage(INFO, replaceTokens(getText("Deleting group"), [g.name + "..."]), null, true);
             let res = await deleteDocumentGroup(g.name);
 
             if (isApiSuccess(res)) {
                 setDocumentGroups(await loadDocumentGroups());
-                showMessage(SUCCESS, getText("Deleted group", " ") + g.name);
+                showMessage(SUCCESS, replaceTokens(getText("Deleted group"), [g.name]));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, replaceTokens(getText("Failed to delete group"), [g.name])));
+                showMessage(ERROR, formatErrorResponse(res, replaceTokens(getText("Failed to delete group"), [g.name, res.message])));
             }
         };
 
-        handleOnClick(getText("Delete group", " ") + g.name + getText("?"), okFunc);
+        handleOnClick(replaceTokens(getText("delete group prompt", " "), [g.name]), okFunc);
     };
 
     
@@ -669,18 +672,18 @@ const Admin = () => {
     const deleteSelectedUser = async (indx) => {
         const u = authData.allUsers[indx];
         const okFunc = async () => {
-            showMessage(INFO, getText("Deleting user", " ") + u.userId + "...", null, true);
+            showMessage(INFO, replaceTokens(getText("Deleting user"), [u.userId + "..."]), null, true);
             let res = await deleteUser(u.userId);
 
             if (isApiSuccess(res)) {
                 setAuthData(await loadAuth());
-                showMessage(SUCCESS, getText("Deleted user", " ") + u.userId);
+                showMessage(SUCCESS, replaceTokens(getText("Deleted user"), [u.userId]));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user", " ") + u.userId));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user"), [userId, res.message]));
             }
         };
 
-        handleOnClick(getText("delete user", " ") + u.name + getText("?"), okFunc);
+        handleOnClick(replaceTokens(getText("delete user prompt"), [u.name + getText("?")]), okFunc);
     };
     
     const isDocumentGroupDeleteable = (indx) => {
@@ -812,7 +815,7 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, getText("Saving datasource", " ") + config.dataObject.datasourceName + "...", getText("Saving"), true);
+            showMessage(INFO, replaceTokens(getText("Saving datasource"), [config.dataObject.datasourceName]), getText("Saving"), true);
             let res = await saveDatasource(config.dataObject);
             
             if (isApiSuccess(res)) {
@@ -822,7 +825,7 @@ const Admin = () => {
                 showMessage(SUCCESS, replaceTokens(getText("Datasource saved"), [config.dataObject.datasourceName]));
 
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save datasource:", " ") + config.dataObject.datasourceName));
+                showMessage(ERROR, formatErrorResponse(res, replaceTokens(getText("Failed to save datasource"), [config.dataObject.datasourceName, res.message])));
             }
 
         } else {
@@ -834,7 +837,7 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, replaceTokens(getText("Saving role", "..."),  [config.dataObject.name]), null, true);
+            showMessage(INFO, replaceTokens(getText("Saving role"),  [config.dataObject.name]), null, true);
             let res = await saveRole(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
@@ -853,7 +856,7 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, replaceTokens(getText("Saving document group", "..."), [config.dataObject.name]), null, true);
+            showMessage(INFO, replaceTokens(getText("Saving document group"), [config.dataObject.name]), null, true);
             let res = await saveDocumentGroup(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
@@ -873,7 +876,7 @@ const Admin = () => {
 
         if (ok) {
             setErrorMessage(config.idPrefix, "");
-            showMessage(INFO, replaceTokens(getText("Saving user", "..."), [config.dataObject.userId]), null, true);
+            showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
             let res = await saveUser(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");

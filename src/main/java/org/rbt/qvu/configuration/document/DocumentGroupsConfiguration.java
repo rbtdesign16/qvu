@@ -5,12 +5,8 @@
 package org.rbt.qvu.configuration.document;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.dto.DocumentGroup;
-import org.rbt.qvu.util.DocumentGroupComparator;
 
 /**
  *

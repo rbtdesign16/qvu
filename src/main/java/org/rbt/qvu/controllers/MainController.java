@@ -30,6 +30,7 @@ import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
 import org.rbt.qvu.util.DBHelper;
+import org.rbt.qvu.util.FileHandler;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -48,6 +49,9 @@ public class MainController {
 
     @Autowired
     MainService service;
+
+    @Autowired
+    private FileHandler fileHandler;
 
     @PostConstruct
     private void init() {
@@ -124,7 +128,6 @@ public class MainController {
         return service.deleteDatasource(datasourceName);
     }
 
-    
     @PostMapping("api/v1/document/group/save")
     public OperationResult saveDocumentGroup(@RequestBody DocumentGroup group) {
         LOG.debug("in saveDocumentGroup()");
@@ -196,7 +199,7 @@ public class MainController {
         LOG.debug("in saveDocument()");
         return service.saveDocument(doc);
     }
-    
+
     @DeleteMapping("api/v1/document/delete/{type}/{group}/{name}")
     public OperationResult deleteDocument(@PathVariable String type, @PathVariable String group, @PathVariable String name) {
         LOG.debug("in deleteDocument(" + type + ", " + group + ", " + name + ")");
@@ -208,19 +211,18 @@ public class MainController {
         LOG.debug("in runQuery()");
         return service.runQuery(runWrapper);
     }
-    
+
     @PostMapping("api/v1/query/document/run")
     public OperationResult<QueryResult> runQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runQuery()");
         return service.runQuery(runWrapper);
     }
-    
+
     @PostMapping("api/v1/query/data/run")
     public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runDataQuery()");
         return service.runDataQuery(runWrapper);
     }
-
 
     @PostMapping("api/v1/query/excel/export")
     public HttpEntity<byte[]> exportToExcel(@RequestBody ExcelExportWrapper wrapper) {
@@ -231,8 +233,8 @@ public class MainController {
         header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=my_file.xls");
         header.setContentLength(excelContent.length);
         return new HttpEntity<>(excelContent, header);
-   }
-    
+    }
+
     @GetMapping("api/v1/documents/currentuser/{documentType}")
     public OperationResult<DocumentNode> getAvailableDocuments(@PathVariable String documentType) {
         LOG.debug("in getAvailableDocuments(" + documentType + ")");
@@ -244,18 +246,35 @@ public class MainController {
         LOG.debug("in getDocument(" + type + ", " + group + ", " + name + ")");
         return service.getDocument(type, group, name);
     }
-    
-    
+
     @GetMapping("api/v1/auth/config/load")
     public OperationResult<AuthConfig> getAuthConfig() {
         LOG.debug("in getAuthConfig()");
         return service.getAuthConfig();
     }
-    
-    
+
     @PostMapping("api/v1/auth/config/save")
     public OperationResult saveAuthConfig(@RequestBody AuthConfig authConfig) {
         LOG.debug("in saveAuthConfig()");
         return service.saveAuthConfig(authConfig);
     }
+
+    @GetMapping("api/v1/help/{lang}")
+    public HttpEntity<byte[]> getHelpDocument(@PathVariable String lang) {
+        LOG.debug("in getHelpDocument()");
+        HttpEntity<byte[]> retval = null;
+        try {
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-help.pdf");
+            byte[] data = fileHandler.getHelpDocument(lang);
+            header.setContentLength(data.length);
+            retval = new HttpEntity<>(data, header);
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+
+        return retval;
+    }
+
 }

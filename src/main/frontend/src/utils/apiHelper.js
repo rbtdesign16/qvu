@@ -403,3 +403,12 @@ export const saveSecurityConfig = async (config) => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
+
+export const loadHelpDocument = async () => {
+    try {
+         let res = await axios.get(getApiURL() + "/help/" + navigator.language, {responseType: "arraybuffer"});
+         return res.data;
+     } catch (e) {
+        console.log("error: loadHelpDocument - " + e); 
+    }
+};

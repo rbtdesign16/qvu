@@ -223,5 +223,7 @@ public class ConfigurationHelper {
         this.securityType = securityType;
     }
 
-    
+    public File getHelpFolder() {
+        return new File(repositoryFolder + File.separator + "help");
+    }
 }

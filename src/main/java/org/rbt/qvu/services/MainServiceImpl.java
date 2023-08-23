@@ -364,6 +364,7 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
 
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
             s = s.replace("${log.folder}", repositoryFolder + File.separator + "logs");

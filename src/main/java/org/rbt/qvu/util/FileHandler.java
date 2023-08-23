@@ -825,5 +825,28 @@ public class FileHandler {
  
         return retval;
    }
+    
+    public byte[] getHelpDocument(String lang) {
+        byte[] retval = null;
+
+        try {
+            File folder = config.getHelpFolder();
+ 
+            if (folder.exists()) {
+                File helpDoc = new File(folder.getPath() + File.separator + "qvu-help-" + lang + ".pdf");
+                
+                if (!helpDoc.exists()) {
+                    helpDoc = new File(folder.getPath() + File.separator + "qvu-help-en-US.pdf");
+                }
+                
+                return FileUtils.readFileToByteArray(helpDoc);
+            }
+        } catch (Exception ex) {
+           LOG.error(ex.toString(), ex);;
+        } 
+
+        return retval;
+    }
+
 
 }

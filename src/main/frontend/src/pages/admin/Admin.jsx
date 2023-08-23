@@ -612,7 +612,7 @@ const Admin = () => {
 
     const editRole = (indx) => {
         let r = authData.allRoles[indx];
-        setEditModal(getRoleConfig(getText("Update role", " ") + r.name, {...r}));
+        setEditModal(getRoleConfig(replaceTokens(getText("Update role"),  [r.name]), {...r}));
     };
 
     const deleteSelectedRole = async (indx) => {
@@ -638,7 +638,7 @@ const Admin = () => {
 
     const editDocumentGroup = (indx) => {
         let g = documentGroups[indx];
-        setEditModal(getDocumentGroupConfig(getText("Update group", " ") + g.name, {...g}));
+        setEditModal(getDocumentGroupConfig(replaceTokens(getText("Update group"), [g.name]), {...g}));
     };
 
     const deleteSelectedDocumentGroup = async (indx) => {
@@ -666,7 +666,7 @@ const Admin = () => {
 
     const editUser = (indx) => {
         let u = authData.allUsers[indx];
-        setEditModal(getUserConfig(getText("Update user", " ") + u.userId, {...u}));
+        setEditModal(getUserConfig(replaceTokens(getText("Update user"), [u.userId]), {...u}));
     };
 
     const deleteSelectedUser = async (indx) => {
@@ -679,11 +679,11 @@ const Admin = () => {
                 setAuthData(await loadAuth());
                 showMessage(SUCCESS, replaceTokens(getText("Deleted user"), [u.userId]));
             } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user"), [userId, res.message]));
+                showMessage(ERROR, formatErrorResponse(res, getText("Failed to delete user"), [u.userId, res.message]));
             }
         };
 
-        handleOnClick(replaceTokens(getText("delete user prompt"), [u.name + getText("?")]), okFunc);
+        handleOnClick(replaceTokens(getText("delete user prompt"), [u.name]), okFunc);
     };
     
     const isDocumentGroupDeleteable = (indx) => {

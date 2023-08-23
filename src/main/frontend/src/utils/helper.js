@@ -140,6 +140,17 @@ export const loadDocumentFromBlob = async (fileName, blob) => {
     }
 };
 
+export const showDocumentFromBlob = async (blob) => {
+    if (blob) {
+        let downloadLink = document.createElement("a");
+        downloadLink.target = "_blank";
+        downloadLink.href = window.URL.createObjectURL(blob);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+    }
+};
+
 export const setFieldError = (pre, fname) => {
     let el = document.getElementById(pre + fname);
     if (el) {

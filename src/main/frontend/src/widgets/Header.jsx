@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { MdHelpOutline } from 'react-icons/md';
 import useLang from "../context/LangContext";
-import {SMALL_ICON_SIZE, loadDocumentFromBlob} from "../utils/helper"
+import {SMALL_ICON_SIZE, showDocumentFromBlob} from "../utils/helper"
 import {loadHelpDocument} from "../utils/apiHelper";
 
 const Header = (props) => {
@@ -12,12 +12,11 @@ const Header = (props) => {
     const showHelpDocument = async () => {
         let res = await loadHelpDocument();
         
-        console.log("------->" + JSON.stringify(res));
-        let blob = new Blob([res], {
+         let blob = new Blob([res], {
             type: "application/pdf"
         });
 
-        loadDocumentFromBlob("qvu-help.pdf", blob);
+        showDocumentFromBlob(blob);
    };
 
     return (

@@ -412,3 +412,12 @@ export const loadHelpDocument = async () => {
         console.log("error: loadHelpDocument - " + e); 
     }
 };
+
+export const loadGettingStartedDocument = async () => {
+    try {
+         let res = await axios.get(getApiURL() + "/gettingstarted/" + navigator.language, {responseType: "arraybuffer"});
+         return res.data;
+     } catch (e) {
+        console.log("error: loadGettingStartedDocument - " + e); 
+    }
+};

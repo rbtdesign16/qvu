@@ -277,4 +277,22 @@ public class MainController {
         return retval;
     }
 
+        @GetMapping("api/v1/gettingstarted/{lang}")
+    public HttpEntity<byte[]> getGettingStartedDocument(@PathVariable String lang) {
+        LOG.debug("in getGettingStartedDocument()");
+        HttpEntity<byte[]> retval = null;
+        try {
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
+            byte[] data = fileHandler.getGettingStartedDocument(lang);
+            header.setContentLength(data.length);
+            retval = new HttpEntity<>(data, header);
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+
+        return retval;
+    }
+
 }

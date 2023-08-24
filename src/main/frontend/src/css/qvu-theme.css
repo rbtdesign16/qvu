@@ -60,4 +60,6 @@
    --query-results-table-detail-fontsize: 11pt;
    --query-results-table-detail-fontweight: 400;
    --query-results-table-detail-rownum-bkcolor: #F5F5F5;
+   
+   --popup-hover-background: #DCDCDC;
 }

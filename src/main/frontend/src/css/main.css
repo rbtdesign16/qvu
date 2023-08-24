@@ -29,6 +29,7 @@ body {
     width: 100%;
     border-bottom: solid 1px var(--default-border-color);
     background: var(--header-background);
+    z-index: 100;
 
 }
 
@@ -537,6 +538,7 @@ textarea {
 
 .help-control {
     float: right;
+    width: 200px;
     margin-right: 20px;
     cursor: pointer;
 }
@@ -545,3 +547,19 @@ textarea {
     color: var(--default-background-color) !important;
     font-weight: var(--default-font-weight) !important;
 }
+
+.popup-menu {
+    border: var(--query-results-table-border);
+    font-weight: var(--default-font-weight);
+    font-size: var(--default-font-size);
+    color: var(--default-font-color);
+    list-style-type: none;
+    background: var(--default-background-color);
+    cursor: pointer;
+    padding: 3px;
+}
+
+.popup-menu div:hover {
+    background: var(--popup-hover-background);
+}
+

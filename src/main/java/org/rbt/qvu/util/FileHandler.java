@@ -548,7 +548,7 @@ public class FileHandler {
 
         return retval;
     }
-    
+
     public OperationResult getDocument(String type, String group, String name) {
         OperationResult retval = new OperationResult();
 
@@ -625,9 +625,7 @@ public class FileHandler {
             doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
 
             if (docFile.exists()) {
-                try (FileOutputStream fos = new FileOutputStream(docFile); 
-                        FileChannel channel = fos.getChannel(); 
-                        FileLock lock = channel.lock()) {
+                try (FileOutputStream fos = new FileOutputStream(docFile); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                     fos.write(getGson(true).toJson(doc).getBytes());
                     // if originalFile is not null then we need to delete it
                     // because we are storing document in new location
@@ -726,14 +724,14 @@ public class FileHandler {
 
         return retval;
     }
-    
+
     public List<String> getGroupDocumentNames(String type, String group) {
-        List <String> retval = new ArrayList();
+        List<String> retval = new ArrayList();
 
         File f = config.getDocumentGroupsFolder(group);
 
         if (f.exists() && f.isDirectory()) {
-            f =  new File(f.getPath() + File.separator + type);
+            f = new File(f.getPath() + File.separator + type);
             if (f.exists() && f.isDirectory()) {
                 File[] docs = f.listFiles();
 
@@ -750,103 +748,122 @@ public class FileHandler {
         Collections.sort(retval);
         return retval;
     }
-    
+
     public OperationResult updateApplicationProperties(AuthConfig authConfig) {
         OperationResult retval = new OperationResult();
-        
+
         LineNumberReader lnr = null;
         PrintWriter pw = null;
-        List <String> lines = new ArrayList<>();
-        
+        List<String> lines = new ArrayList<>();
+
         String securityTypes = authConfig.getDefaultSecurityType();
-        
+
         for (String type : Constants.SECURITY_TYPES) {
             if (!type.equals(authConfig.getDefaultSecurityType())) {
-                switch(type) {
+                switch (type) {
                     case Constants.BASIC_SECURITY_TYPE:
                         if (authConfig.getBasicConfiguration().isEnabled()) {
                             securityTypes += ("," + type);
                         }
                         break;
-                   case Constants.SAML_SECURITY_TYPE:
+                    case Constants.SAML_SECURITY_TYPE:
                         if (authConfig.getSamlConfiguration().isEnabled()) {
                             securityTypes += ("," + type);
                         }
                         break;
-                   case Constants.OIDC_SECURITY_TYPE:
+                    case Constants.OIDC_SECURITY_TYPE:
                         if (authConfig.getOidcConfiguration().isEnabled()) {
                             securityTypes += ("," + type);
                         }
                         break;
-                }        
+                }
             }
         }
-        
+
         try {
             lnr = new LineNumberReader(new FileReader(config.getApplicationPropertiesFileName()));
             String line;
-            while((line = lnr.readLine()) != null) {
+            while ((line = lnr.readLine()) != null) {
                 if (line.contains(Constants.DEFAULT_SECURITY_TYPE_PROPERTY)) {
                     lines.add(Constants.DEFAULT_SECURITY_TYPE_PROPERTY + "=" + authConfig.getDefaultSecurityType());
                 } else if (line.contains(Constants.SECURITY_TYPES_PROPERTY)) {
                     lines.add(Constants.SECURITY_TYPES_PROPERTY + "=" + securityTypes);
-                } else {  
+                } else {
                     lines.add(line);
                 }
             }
-            
+
             lnr.close();
             lnr = null;
-            
+
             pw = new PrintWriter(config.getApplicationPropertiesFileName());
-            
+
             for (String s : lines) {
                 pw.println(s);
             }
-        }
-        
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
-        }
-        
-        finally {
+        } finally {
             if (lnr != null) {
                 try {
                     lnr.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
-            
+
             if (pw != null) {
                 try {
                     pw.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
         }
- 
+
         return retval;
-   }
-    
+    }
+
     public byte[] getHelpDocument(String lang) {
         byte[] retval = null;
 
         try {
             File folder = config.getHelpFolder();
- 
+
             if (folder.exists()) {
                 File helpDoc = new File(folder.getPath() + File.separator + "qvu-help-" + lang + ".pdf");
-                
+
                 if (!helpDoc.exists()) {
                     helpDoc = new File(folder.getPath() + File.separator + "qvu-help-en-US.pdf");
                 }
-                
+
                 return FileUtils.readFileToByteArray(helpDoc);
             }
         } catch (Exception ex) {
-           LOG.error(ex.toString(), ex);;
-        } 
+            LOG.error(ex.toString(), ex);;
+        }
 
         return retval;
     }
 
+    public byte[] getGettingStartedDocument(String lang) {
+        byte[] retval = null;
+
+        try {
+            File folder = config.getHelpFolder();
+
+            if (folder.exists()) {
+                File helpDoc = new File(folder.getPath() + File.separator + "qvu-gettingstarted-" + lang + ".pdf");
+
+                if (!helpDoc.exists()) {
+                    helpDoc = new File(folder.getPath() + File.separator + "qvu-gettingstarted-en-US.pdf");
+                }
+
+                return FileUtils.readFileToByteArray(helpDoc);
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);;
+        }
+
+        return retval;
+    }
 
 }

@@ -277,7 +277,7 @@ public class MainController {
         return retval;
     }
 
-        @GetMapping("api/v1/gettingstarted/{lang}")
+    @GetMapping("api/v1/gettingstarted/{lang}")
     public HttpEntity<byte[]> getGettingStartedDocument(@PathVariable String lang) {
         LOG.debug("in getGettingStartedDocument()");
         HttpEntity<byte[]> retval = null;

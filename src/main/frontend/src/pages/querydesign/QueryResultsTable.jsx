@@ -50,6 +50,7 @@ const QueryResultsTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
 
+    let recordCount = 0;
     const sortFilterStyle = {
         display: "inline-grid",
         gridTemplateRows: "10px 10px",
@@ -79,7 +80,7 @@ const QueryResultsTable = () => {
                 return true;
             }
         }
-    }
+    };
     
     const getSortColor = (indx, type) => {
         if (isCurrentSort(indx, type)) {
@@ -110,7 +111,7 @@ const QueryResultsTable = () => {
     };
 
     const getHeaderColumns = () => {
-        return queryResults.header.map((h, indx) => <div id={"h" + indx}>{h}{getSortFilter(indx)}</div>);
+        return header.map((h, indx) => <div id={"h" + indx}>{h}{getSortFilter(indx)}</div>);
     };
 
     const getDisplayData = (coldata, rownum, indx) => {
@@ -154,6 +155,7 @@ const QueryResultsTable = () => {
             });
         }
         
+        
         return retval;
     };
 
@@ -172,12 +174,15 @@ const QueryResultsTable = () => {
                 }
             }
         }
-        
+ 
+        recordCount = retval.length;
+ 
         let tpg = Math.max(1, Math.ceil(vrecs.length / pageSize));
 
         if (tpg !== totalPages) {
             setTotalPages(tpg);
         }
+        
         
         return retval;
     };
@@ -293,7 +298,7 @@ const QueryResultsTable = () => {
                     <select onChange={e => onPageSize(e)}>{getPageSizes()}</select>
                     {getText("Page:")}
                     <input type="number" min={1} max={totalPages} value={currentPage} disabled={totalPages < 2} onChange={e => onPage(e)}/>
-                    {" " + getText("of") + " " + totalPages}
+                    {" " + getText("of") + " " + totalPages + " - " + getText("Record Count") + " " + recordCount}
                 </div>
              </div>
         </div>;

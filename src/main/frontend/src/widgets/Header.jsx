@@ -26,7 +26,7 @@ const Header = (props) => {
                     <span>{"Qvu " + version}</span>
                     <span className="help-control" onClick={(e) => showHelpDocument()}>
                         <MdHelpOutline className="icon yellow-f" size={SMALL_ICON_SIZE}/>
-                        <span style={{color: "white"}} >{getText("Help")}</span>
+                        <span>{getText("Help")}</span>
                     </span>
                 </div>
             </div>

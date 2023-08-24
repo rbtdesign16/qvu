@@ -541,3 +541,7 @@ textarea {
     cursor: pointer;
 }
 
+.help-control span {
+    color: var(--default-background-color) !important;
+    font-weight: var(--default-font-weight) !important;
+}

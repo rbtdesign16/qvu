@@ -4,7 +4,7 @@ import useAuth from "../context/AuthContext";
 import { MdHelpOutline } from 'react-icons/md';
 import useLang from "../context/LangContext";
 import {SMALL_ICON_SIZE, showDocumentFromBlob} from "../utils/helper"
-import {loadHelpDocument} from "../utils/apiHelper";
+import {loadHelpDocument, loadGettingStartedDocument} from "../utils/apiHelper";
 import logo from "../images/logo.png";
 
 const Header = (props) => {
@@ -21,7 +21,7 @@ const Header = (props) => {
         }
     };
     
-    const showGetting = async () => {
+    const showGettingStarted = async () => {
         setShowMenu(false);
          let res = await loadGettingStartedDocument();
          

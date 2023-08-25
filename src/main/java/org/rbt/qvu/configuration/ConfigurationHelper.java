@@ -227,4 +227,8 @@ public class ConfigurationHelper {
     public File getHelpFolder() {
         return new File(repositoryFolder + File.separator + "help");
     }
+
+    public File getCssFolder() {
+        return new File(repositoryFolder + File.separator + "css");
+    }
 }

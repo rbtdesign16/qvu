@@ -382,7 +382,7 @@ public class MainServiceImpl implements MainService {
             fileHandler.saveSecurityConfig(securityConfig);
             
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
-            s = s.replace("${log.folder}", repositoryFolder + File.separator + "logs");
+            s = s.replace("${repository}", repositoryFolder);
             FileUtils.write(propsFile, s, "UTF-8");
 
         } catch (Exception ex) {

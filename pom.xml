@@ -182,12 +182,10 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <layout>ZIP</layout>
-                    <!--
                     <systemPropertyVariables>
                         <repository.folder>c:/dev/qvu</repository.folder>
                         <log.level>DEBUG</log.level>
                     </systemPropertyVariables>
-                                        -->
                 </configuration>
             </plugin>
             <plugin>

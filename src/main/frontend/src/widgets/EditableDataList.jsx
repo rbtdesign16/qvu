@@ -66,7 +66,7 @@ const EditableDataList = (props) => {
     };
     
    const isEditDisabled = (indx) => {
-        return !listConfig.onEdit || isReadOnly(indx);;
+        return !listConfig.onEdit || isReadOnly(indx);
     };
 
     const isDeleteDisabled = (indx) => {

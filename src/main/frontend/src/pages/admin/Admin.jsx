@@ -11,55 +11,57 @@ import TableSettings from "./TableSettings";
 import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
-        INFO,
-        WARN,
-        ERROR,
-        SUCCESS,
-        DEFAULT_SUCCESS_TITLE,
-        DEFAULT_ERROR_TITLE,
-        ERROR_TEXT_COLOR,
-        INFO_TEXT_COLOR,
-        confirm,
-        isEmpty,
-        setFieldError,
-        setErrorMessage,
-        checkEntryFields,
-        updateJsonArray,
-        findInArray,
-        replaceTokens,
-        BASE_ROLES,
-        SMALL_ICON_SIZE,
-        DEFAULT_EXPORTED_KEY_DEPTH,
-        DEFAULT_IMPORTED_KEY_DEPTH
-} from "../../utils/helper";
+    INFO,
+    WARN,
+    ERROR,
+    SUCCESS,
+    DEFAULT_SUCCESS_TITLE,
+    DEFAULT_ERROR_TITLE,
+    ERROR_TEXT_COLOR,
+    INFO_TEXT_COLOR,
+    confirm,
+    isEmpty,
+    setFieldError,
+    setErrorMessage,
+    checkEntryFields,
+    updateJsonArray,
+    findInArray,
+    replaceTokens,
+    SMALL_ICON_SIZE,
+    DEFAULT_EXPORTED_KEY_DEPTH,
+    DEFAULT_IMPORTED_KEY_DEPTH
+    } from "../../utils/helper";
 
 import {
-        saveDatasource,
-        saveDocumentGroup,
-        deleteDocumentGroup,
-        saveUser,
-        saveRole,
-        deleteDatasource,
-        deleteRole,
-        deleteUser,
-        loadDatasources,
-        loadDocumentGroups,
-        loadAuth,
-        formatErrorResponse,
-        testDatasource,
-        isApiSuccess,
-        isApiError,
-        loadTableSettings,
-        loadDatasourceTableNames,
-        getSecurityConfig,
-        saveSecurityConfig} from "../../utils/apiHelper";
+    saveDatasource,
+    saveDocumentGroup,
+    deleteDocumentGroup,
+    saveUser,
+    saveRole,
+    deleteDatasource,
+    deleteRole,
+    deleteUser,
+    loadDatasources,
+    loadDocumentGroups,
+    loadAuth,
+    formatErrorResponse,
+    testDatasource,
+    isApiSuccess,
+    isApiError,
+    loadTableSettings,
+    loadDatasourceTableNames,
+    getSecurityConfig,
+    saveSecurityConfig} from "../../utils/apiHelper";
 import {
-    isAdministrator, 
-    isQueryDesigner, 
+    isAdministrator,
+    isQueryDesigner,
     isReportDesigner,
     DEFAULT_ADMINISTRATOR_ROLE,
     DEFAULT_QUERY_DESIGNER_ROLE,
-    DEFAULT_REPORT_DESIGNER_ROLE} from "../../utils/authHelper";
+    DEFAULT_REPORT_DESIGNER_ROLE,
+    BASE_ROLES,
+    ADMIN_USER_ID
+        } from "../../utils/authHelper";
 
 
 const Admin = () => {
@@ -67,18 +69,24 @@ const Admin = () => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {datasources, setDatasources, databaseTypes, datasourceTableNames, setDatasourceTableNames, documentGroups, setDocumentGroups} = useDataHandler();
+    const {datasources, 
+        setDatasources, 
+        databaseTypes, 
+        datasourceTableNames, 
+        setDatasourceTableNames, 
+        documentGroups, 
+        setDocumentGroups} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
     const [showSystemSettings, setShowSystemSettings] = useState({show: false});
-    
+
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
             okFunc();
         }
-    };    
-    
+    };
+
     const getDatasourceEntryConfig = () => {
         return [
             {
@@ -140,7 +148,7 @@ const Admin = () => {
                 showHelp: showHelpMessage,
                 helpText: getText("datasourceMaxImportedKey-help")
             },
-             {
+            {
                 label: getText("Max Exported Key Depth:"),
                 name: "maxExportedKeyDepth",
                 defaultValue: DEFAULT_EXPORTED_KEY_DEPTH,
@@ -195,7 +203,7 @@ const Admin = () => {
                 label: getText("Description:"),
                 name: "description",
                 type: "input"
-            },{
+            }, {
                 label: getText("Roles:"),
                 name: "roles",
                 type: "multiselect",
@@ -206,7 +214,7 @@ const Admin = () => {
             }];
     };
 
-    
+
     const getRoleEntryConfig = () => {
         return [
             {
@@ -225,19 +233,19 @@ const Admin = () => {
 
     const getAliasMessageIfRequired = (rec) => {
         let retval = "";
-        
+
         if (isAdministrator(authData) && (rec.name === authData.administratorRole) && (rec.name !== DEFAULT_ADMINISTRATOR_ROLE)) {
             retval += ("*" + getText("role alias", " ") + getText(DEFAULT_ADMINISTRATOR_ROLE));
-        } else if (isQueryDesigner(authData) && (rec.name === authData.queryDesignerRole)  && (rec.name !== DEFAULT_QUERY_DESIGNER_ROLE)) {
-           retval += ("*" + getText("role alias", " ") + getText(DEFAULT_QUERY_DESIGNER_ROLE));
-        } else if (isQueryDesigner(authData) && (rec.name === authData.reportDesignerRole)  && (rec.name !== DEFAULT_REPORT_DESIGNER_ROLE)) {
-           retval += ("*" + getText("role alias", " ") + getText(DEFAULT_REPORT_DESIGNER_ROLE));
+        } else if (isQueryDesigner(authData) && (rec.name === authData.queryDesignerRole) && (rec.name !== DEFAULT_QUERY_DESIGNER_ROLE)) {
+            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_QUERY_DESIGNER_ROLE));
+        } else if (isQueryDesigner(authData) && (rec.name === authData.reportDesignerRole) && (rec.name !== DEFAULT_REPORT_DESIGNER_ROLE)) {
+            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_REPORT_DESIGNER_ROLE));
         }
-        
+
         return retval;
-            
+
     };
-    
+
     const getUserEntryConfig = (isnew) => {
         let retval = [
             {
@@ -346,7 +354,7 @@ const Admin = () => {
 
         return retval;
     };
-    
+
     const setDocumentGroupRoles = (dataObject, selections) => {
         if (selections) {
             if (!dataObject.roles) {
@@ -386,14 +394,14 @@ const Admin = () => {
             el.disabled = !canTestDatasource(listConfig, dataObject);
         }
 
-        
+
         if (el2) {
-           if (!el || el.disabled) {
-               el2.disabled = true;
-           } else {
+            if (!el || el.disabled) {
+                el2.disabled = true;
+            } else {
                 el2.disabled = isDatasourceInaccessible(dataObject);
-           }
-       }
+            }
+        }
 
     };
 
@@ -405,18 +413,18 @@ const Admin = () => {
         } else {
             return true;
         }
-                
+
     };
-    
+
     const saveTableSettings = (dataObject, datasource) => {
         let utables = [];
 
         datasource.datasourceTables.map(t => {
             // only save rec with settings
-            if (t.displayName 
-                || t.hide 
-                || (t.toles && t.roles.length > 0) 
-                || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
+            if (t.displayName
+                    || t.hide
+                    || (t.toles && t.roles.length > 0)
+                    || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
                 utables.push(t);
             }
         });
@@ -424,7 +432,7 @@ const Admin = () => {
         dataObject.datasourceTableSettings = utables;
         hideTableSettings();
     };
-    
+
     const hideTableSettings = () => {
         setTableSettings({show: false});
     };
@@ -432,9 +440,9 @@ const Admin = () => {
     const showTableSettings = async (dataObject) => {
         showMessage(INFO, getText("Loading table settings", "..."), null, true);
         let res = await loadTableSettings(dataObject);
-       
+
         if (isApiSuccess(res)) {
-             let tsMap = new Map();
+            let tsMap = new Map();
 
             dataObject.datasourceTableSettings.map(t => {
                 tsMap.set(t.tableName, t);
@@ -451,26 +459,26 @@ const Admin = () => {
                 }
             });
 
-             hideMessage();
+            hideMessage();
 
             let ds = {...dataObject};
             ds.datasourceTables = t;
-            setTableSettings({show: true, 
+            setTableSettings({show: true,
                 dataObject: dataObject,
                 datasource: ds,
                 saveTableSettings: saveTableSettings,
                 hideTableSettings: hideTableSettings, tables: t});
-        }  else {
+        } else {
             showMessage(ERROR, res.message);
         }
     };
-    
-   
+
+
     const saveCustomForeignKeys = (dataObject, fks) => {
         dataObject.customForeignKeys = fks;
         hideCustomForeignKeys();
     };
-    
+
     const hideCustomForeignKeys = () => {
         setCustomForeignKeys({show: false});
     };
@@ -488,12 +496,12 @@ const Admin = () => {
                 setDatasourceTableNames(dsnames);
             }
         }
-        
-        setCustomForeignKeys({show: true, 
-           dataObject: dataObject,
-           datasource: {...dataObject},
-           saveCustomForeignKeys: saveCustomForeignKeys,
-           hideCustomForeignKeys: hideCustomForeignKeys});
+
+        setCustomForeignKeys({show: true,
+            dataObject: dataObject,
+            datasource: {...dataObject},
+            saveCustomForeignKeys: saveCustomForeignKeys,
+            hideCustomForeignKeys: hideCustomForeignKeys});
     };
 
     const getDatasourceConfig = (title, dataObject) => {
@@ -597,9 +605,9 @@ const Admin = () => {
             let res = await deleteDatasource(ds.datasourceName);
             if (isApiSuccess(res)) {
                 setDatasources(await loadDatasources());
-                showMessage(SUCCESS, replaceTokens(getText("Datasource deleted"),  [ds.datasourceName]));
+                showMessage(SUCCESS, replaceTokens(getText("Datasource deleted"), [ds.datasourceName]));
             } else {
-                showMessage(ERROR, replaceTokens(getText("Failed to delete datasource", [ds.datasourceName, getText(res.message)])) );
+                showMessage(ERROR, replaceTokens(getText("Failed to delete datasource", [ds.datasourceName, getText(res.message)])));
             }
         };
 
@@ -612,7 +620,7 @@ const Admin = () => {
 
     const editRole = (indx) => {
         let r = authData.allRoles[indx];
-        setEditModal(getRoleConfig(replaceTokens(getText("Update role"),  [r.name]), {...r}));
+        setEditModal(getRoleConfig(replaceTokens(getText("Update role"), [r.name]), {...r}));
     };
 
     const deleteSelectedRole = async (indx) => {
@@ -632,7 +640,7 @@ const Admin = () => {
         handleOnClick(replaceTokens(getText("delete role prompt"), [r.name]), okFunc);
     };
 
-   const addDocumentGroup = () => {
+    const addDocumentGroup = () => {
         setEditModal(getDocumentGroupConfig(getText("Create new group"), {newRecord: true}));
     };
 
@@ -658,8 +666,8 @@ const Admin = () => {
         handleOnClick(replaceTokens(getText("delete group prompt", " "), [g.name]), okFunc);
     };
 
-    
-    
+
+
     const addUser = () => {
         setEditModal(getUserConfig(getText("Create new user"), {newRecord: true}));
     };
@@ -685,9 +693,9 @@ const Admin = () => {
 
         handleOnClick(replaceTokens(getText("delete user prompt"), [u.name]), okFunc);
     };
-    
+
     const isDocumentGroupDeleteable = (indx) => {
-         return !documentGroups[indx].defaultGroup;
+        return !documentGroups[indx].defaultGroup;
     };
 
 
@@ -718,7 +726,7 @@ const Admin = () => {
     const isRoleReadOnly = (indx) => {
         return BASE_ROLES.includes(authData.allRoles[indx].name);
     };
-    
+
 
     const rolesConfig = {
         title: getText("Roles"),
@@ -778,6 +786,10 @@ const Admin = () => {
         data: documentGroups
     };
 
+    const isUserReadOnly = (indx) => {
+        return (authData.allUsers[indx].userId === ADMIN_USER_ID);
+    }
+
 
     const usersConfig = {
         title: getText("Users"),
@@ -787,6 +799,7 @@ const Admin = () => {
         editTitle: getText("Edit user"),
         delTitle: getText("Delete user"),
         className: "entrygrid-100-175",
+        isReadOnly: isUserReadOnly,
         onAdd: authData.allowUserAdd ? addUser : null,
         onEdit: editUser,
         onDelete: authData.allowUserDelete ? deleteSelectedUser : null,
@@ -817,7 +830,7 @@ const Admin = () => {
         if (ok) {
             showMessage(INFO, replaceTokens(getText("Saving datasource"), [config.dataObject.datasourceName]), getText("Saving"), true);
             let res = await saveDatasource(config.dataObject);
-            
+
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setDatasources(res.result);
@@ -837,13 +850,13 @@ const Admin = () => {
         let ok = checkEntryFields(config);
 
         if (ok) {
-            showMessage(INFO, replaceTokens(getText("Saving role"),  [config.dataObject.name]), null, true);
+            showMessage(INFO, replaceTokens(getText("Saving role"), [config.dataObject.name]), null, true);
             let res = await saveRole(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
                 setAuthData(await loadAuth());
                 setEditModal({show: false});
-                showMessage(SUCCESS, replaceTokens(getText("Role saved"), [config.dataObject.name ]));
+                showMessage(SUCCESS, replaceTokens(getText("Role saved"), [config.dataObject.name]));
             } else {
                 showMessage(ERROR, formatErrorResponse(res, getText("Failed to save role:", " ") + config.dataObject.name));
             }
@@ -851,8 +864,8 @@ const Admin = () => {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
-    
-     const saveModifiedDocumentGroup = async (config) => {
+
+    const saveModifiedDocumentGroup = async (config) => {
         let ok = checkEntryFields(config);
 
         if (ok) {
@@ -870,7 +883,7 @@ const Admin = () => {
             setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
-    
+
     const saveModifiedUser = async (config) => {
         let ok = checkEntryFields(config);
 
@@ -894,20 +907,20 @@ const Admin = () => {
     const hideSystemSettings = () => {
         setShowSystemSettings({show: false});
     };
-    
+
     const saveSystemSettings = async (settings) => {
         hideSystemSettings();
         showMessage(INFO, getText("Saving security settings", "..."), null, true);
         let res = await saveSecurityConfig(settings);
-        
+
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             hideMessage();
         }
-        
+
     };
-    
+
     const onSystemSettings = async () => {
         setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
     };

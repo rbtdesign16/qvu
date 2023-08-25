@@ -4,6 +4,11 @@ export const DEFAULT_ADMINISTRATOR_ROLE = "administrator";
 export const DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
 export const DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
 
+export const BASE_ROLES = [DEFAULT_ADMINISTRATOR_ROLE, DEFAULT_QUERY_DESIGNER_ROLE, DEFAULT_REPORT_DESIGNER_ROLE];
+
+
+export const ADMIN_USER_ID = "admin";
+
 export const SECURITY_TYPE_BASIC = "basic";
 export const SECURITY_TYPE_SAML = "saml";
 export const SECURITY_TYPE_OIDC = "oidc";

@@ -1,0 +1,11 @@
+{
+  "documentGroups": [
+    {
+      "name": "general",
+      "description": "default document group",
+      "newRecord": false,
+      "defaultGroup": true,
+      "roles": []
+    }
+  ]
+}

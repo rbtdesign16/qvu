@@ -49,7 +49,7 @@ const Home = (props) => {
 
     const getBody = () => {
         if (authData) {
-            if (authData.initialSetupRequired) {
+            if (authData.initializingApplication) {
                 return <RepositorySetup/>;
             } else if (hasTabAccess()) {
                 return (<div>

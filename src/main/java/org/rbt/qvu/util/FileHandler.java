@@ -87,6 +87,7 @@ public class FileHandler {
             LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
         }
         return retval;
+            
     }
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {

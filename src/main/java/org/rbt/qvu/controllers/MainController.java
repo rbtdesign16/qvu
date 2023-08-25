@@ -153,9 +153,9 @@ public class MainController {
     }
 
     @PostMapping("api/v1/repo/initialize")
-    public OperationResult initializeRepository(@RequestBody String repositoryFolder) {
-        LOG.debug("in initializeRepository(" + repositoryFolder + ")");
-        return service.initializeRepository(repositoryFolder);
+    public OperationResult initializeRepository(@RequestBody String initialInfo) {
+        LOG.debug("in initializeRepository()");
+        return service.initializeRepository(initialInfo);
     }
 
     @GetMapping("api/v1/db/datasource/{datasourceName}/tables")

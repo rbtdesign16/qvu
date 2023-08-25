@@ -20,7 +20,7 @@ public class AuthData implements Serializable {
     private User currentUser;
     private boolean allowUserAdd;
     private boolean allowUserDelete;
-    private boolean initialSetupRequired;
+    private boolean initializingApplication;
 
     public List<Role> getAllRoles() {
         return allRoles;
@@ -46,14 +46,6 @@ public class AuthData implements Serializable {
         this.currentUser = currentUser;
     }
 
-    public boolean isInitialSetupRequired() {
-        return initialSetupRequired;
-    }
-
-    public void setInitialSetupRequired(boolean initialSetupRequired) {
-        this.initialSetupRequired = initialSetupRequired;
-    }
-
     public boolean isAllowUserAdd() {
         return allowUserAdd;
     }
@@ -69,4 +61,14 @@ public class AuthData implements Serializable {
     public void setAllowUserDelete(boolean allowUserDelete) {
         this.allowUserDelete = allowUserDelete;
     }
+
+    public boolean isInitializingApplication() {
+        return initializingApplication;
+    }
+
+    public void setInitializingApplication(boolean initializingApplication) {
+        this.initializingApplication = initializingApplication;
+    }
+    
+    
 }

@@ -42,7 +42,7 @@ public class ConfigurationHelper {
     private DataSourcesConfiguration datasourcesConfig;
     private DocumentGroupsConfiguration documentGroupsConfig;
     private Map<String, Map<String, String>> langResources = new HashMap<>();
-    private boolean initialSetupRequired;
+    private boolean initializingApplication;
 
     @PostConstruct
     private void init() {
@@ -53,11 +53,12 @@ public class ConfigurationHelper {
         try {
             // indicates initial setup required
             if (StringUtils.isEmpty(repositoryFolder)) {
-                initialSetupRequired = true;
+                initializingApplication = true;
                 LOG.info("inital setup is required");
                 securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
                 datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
                 langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
+                documentGroupsConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-document-groups.json"), DocumentGroupsConfiguration.class);
             } else {
                 loadConfiguration();
                 LOG.info("repository.folder=" + repositoryFolder);
@@ -156,8 +157,8 @@ public class ConfigurationHelper {
         return repositoryFolder;
     }
 
-    public boolean isInitialSetupRequired() {
-        return initialSetupRequired;
+    public boolean isInitializingApplication() {
+        return initializingApplication;
     }
 
     public void setDatasourcesConfig(DataSourcesConfiguration datasourcesConfig) {

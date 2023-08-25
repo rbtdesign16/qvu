@@ -79,6 +79,7 @@ import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.CacheHelper;
+import org.rbt.qvu.util.ConfigBuilder;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.DatasourceSettingsHelper;
 import org.rbt.qvu.util.DocumentGroupComparator;
@@ -142,7 +143,7 @@ public class MainServiceImpl implements MainService {
             retval.setAllowUserDelete(localUser);
 
             SecurityConfiguration scfg = config.getSecurityConfig();
-            retval.setInitialSetupRequired(config.isInitialSetupRequired());
+            retval.setInitializingApplication(config.isInitializingApplication());
 
             BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
             SecurityService authService = basicConfig.getSecurityService();
@@ -345,15 +346,22 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult initializeRepository(String repositoryFolder) {
+    public OperationResult initializeRepository(String initialInfo) {
         OperationResult retval = new OperationResult();
         FileOutputStream fos = null;
         try {
+            int pos = initialInfo.indexOf("|");
+            
+            String repositoryFolder = initialInfo.substring(0, pos);
+            String adminPassword = initialInfo.substring(pos + 1);
+
             File f = new File(repositoryFolder + File.separator + "documents");
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "config" + File.separator + "certs");
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "logs");
+            f.mkdirs();
+            f = new File(repositoryFolder + File.separator + "help");
             f.mkdirs();
 
             config.setRepositoryFolder(repositoryFolder);
@@ -365,12 +373,20 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
 
+            // update admin password
+            SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);
+            User u = securityConfig.findUser("admin");
+            u.setPassword(Helper.toMd5Hash(adminPassword));
+            fileHandler.saveSecurityConfig(securityConfig);
+            
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
             s = s.replace("${log.folder}", repositoryFolder + File.separator + "logs");
             FileUtils.write(propsFile, s, "UTF-8");
 
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
         } finally {
             if (fos != null) {

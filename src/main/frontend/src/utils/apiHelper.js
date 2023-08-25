@@ -223,9 +223,9 @@ export const verifyInitialRepositoryFolder = async (repositoryFolder) => {
     }
 };
 
-export const initializeRepository = async (repositoryFolder) => {
+export const initializeRepository = async (repositoryFolder, adminPassword) => {
     try {
-        let res = await axios.post(getApiURL() + "/repo/initialize", repositoryFolder, hconfig2);
+        let res = await axios.post(getApiURL() + "/repo/initialize", repositoryFolder + "|" + adminPassword, hconfig2);
 
         if (res) {
             return res.data;

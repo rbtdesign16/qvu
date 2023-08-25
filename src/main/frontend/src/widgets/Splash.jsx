@@ -1,5 +1,6 @@
 import React  from "react";
 import useLang from "../context/LangContext";
+import logo from "../images/logo.png";
 import PropTypes from "prop-types";
 
 const Splash = (props) => {
@@ -7,7 +8,7 @@ const Splash = (props) => {
     return (
             <div className="splash">
                 {title && <h2>{title}</h2>}
-                <div><img width={100} src={"logo.png"}/>
+                <div><img width={100} src={logo}/>
                 {message && <span className="splash-message">{message}</span>}</div>
                 {premessage && <pre style={{paddingTop: "20px"}}>{premessage}</pre>}
             </div>

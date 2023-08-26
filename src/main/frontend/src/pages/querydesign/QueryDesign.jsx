@@ -20,7 +20,7 @@ import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import {
-SUCCESS,
+        SUCCESS,
         INFO,
         WARN,
         ERROR,
@@ -66,10 +66,11 @@ import { getDatasourceTreeViewData,
         setFromClause,
         setCurrentDocument,
         updateSelectColumns,
-        setTreeViewExpandedIds} = useQueryDesign();
+        setTreeViewExpandedIds,
+        schema} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
-    const {datasources, setDatasources} = useDataHandler();
+    const {datasources, setDatasources, getDatasourceSchema} = useDataHandler();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
 
@@ -126,6 +127,7 @@ import { getDatasourceTreeViewData,
                 createDate: actionTimestamp,
                 lastUpdated: actionTimestamp,
                 datasource: datasource,
+                schema: schema,
                 baseTable: baseTable,
                 documentGroupName: group,
                 newRecord: true,

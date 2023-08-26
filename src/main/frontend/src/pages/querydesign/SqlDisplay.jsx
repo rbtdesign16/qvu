@@ -47,7 +47,7 @@ const SqlDisplay = (props) => {
         setQueryResults,
         isRowHidden} = useQueryDesign();
     const {getText} = useLang();
-    const {getDatabaseType} = useDataHandler();
+    const {getDatabaseType, isSchemaRequired, getDatasourceSchema} = useDataHandler();
     const [showParameterEntry, setShowParameterEntry] = useState({show: false});
     const {showMessage, hideMessage} = useMessage();
 
@@ -151,9 +151,21 @@ const SqlDisplay = (props) => {
             }
         });
     };
+    
+    const getFromTableName = (schema, tname) => {
+        let retval = "";
+        if (isSchemaRequired(datasource)) {
+            retval = withQuotes(schema) + "." + withQuotes(tname);
+        } else {
+            retval = withQuotes(tname);
+        }
+        
+        return retval;
+    }
 
     const getFromColumns = () => {
         if (fromClause && Array.isArray(fromClause)) {
+            let schema = getDatasourceSchema(datasource);
             return fromClause.map((f, indx) => {
                 let joinType = " join ";
 
@@ -162,11 +174,11 @@ const SqlDisplay = (props) => {
                 }
 
                 if (indx === 0) {
-                    return <div className="sql-clause-column">    <span className="crimson-f">{withQuotes(f.table)}</span> {" " + withQuotes(f.alias)}</div>;
+                    return <div className="sql-clause-column">    <span className="crimson-f">{getFromTableName(schema, f.table)}</span> {" " + withQuotes(f.alias)}</div>;
                 } else {
                     return <div className="sql-clause-column">
                         {"    " + joinType}
-                        <span className="crimson-f">{withQuotes(f.table)}</span>
+                        <span className="crimson-f">{getFromTableName(schema, f.table)}</span>
                         {" " + withQuotes(f.alias) + " "}
                         <span className="sql-clause-name">{"ON "}</span>{getJoinColumns(f)}</div>;
                 }

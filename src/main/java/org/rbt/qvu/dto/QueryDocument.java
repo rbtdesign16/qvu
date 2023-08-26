@@ -20,6 +20,7 @@ public class QueryDocument {
     private Timestamp createDate;
     private Timestamp lastUpdated;
     private String datasource;
+    private String schema;
     private String databaseType;
     private String baseTable;
     private String savedDocumentGroupName;
@@ -147,6 +148,14 @@ public class QueryDocument {
 
     public void setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
     
     

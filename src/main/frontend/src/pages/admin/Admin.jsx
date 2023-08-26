@@ -788,7 +788,7 @@ const Admin = () => {
 
     const isUserReadOnly = (indx) => {
         return (authData.allUsers[indx].userId === ADMIN_USER_ID);
-    }
+    };
 
 
     const usersConfig = {

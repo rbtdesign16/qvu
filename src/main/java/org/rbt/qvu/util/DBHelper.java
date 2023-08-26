@@ -128,6 +128,14 @@ public class DBHelper {
         return retval.toString();
     }
 
+    private String getFromTableName(String dbType, String schema, String tableName) {
+        if (isSchemaRequired(dbType)) {
+            return withQuotes(dbType, schema) + "." + withQuotes(dbType, tableName);
+        } else {
+            return withQuotes(dbType, tableName);
+        }
+    }
+    
     public String getSelect(QueryDocumentRunWrapper runWrapper) {
         StringBuilder retval = new StringBuilder();
 
@@ -179,6 +187,7 @@ public class DBHelper {
 
             retval.append(" from ");
 
+            String schema = dsconfig.getSchema();
             for (SqlFrom c : runWrapper.getDocument().getFromClause()) {
                 if (StringUtils.isNotEmpty(c.getJoinType())) {
                     if (Constants.OUTER_JOIN.equals(c.getJoinType())) {
@@ -188,7 +197,7 @@ public class DBHelper {
                     }
                 }
 
-                retval.append(withQuotes(dbType, c.getTable()));
+                retval.append(getFromTableName(dbType, schema, c.getTable()));
                 retval.append(" ");
                 retval.append(withQuotes(dbType, c.getAlias()));
 
@@ -334,6 +343,21 @@ public class DBHelper {
         }
 
         return retval.toString();
+    }
+
+    public boolean isSchemaRequired(String dbType) {
+        boolean retval = false;
+        switch (dbType) {
+            case DB_TYPE_ORACLE:
+            case DB_TYPE_MYSQL:
+            case DB_TYPE_POSTGRES:
+                retval = false;
+            case DB_TYPE_SQLSERVER:
+                retval = true;
+                break;
+        }
+
+        return retval;
     }
 
     public String getDatabasePlaceholder(String dbType, int indx) {

@@ -56,14 +56,18 @@ const SqlDisplay = (props) => {
     const getColumnName = (s) => {
         let retval = "";
 
-        if (s.aggregateFunction) {
-            retval += (s.aggregateFunction + "(");
-        }
+        if (s.customSql) {
+            retval = s.customSql;
+        } else {
+            if (s.aggregateFunction) {
+                retval += (s.aggregateFunction + "(");
+            }
 
-        retval += (withQuotes(s.tableAlias) + "." + withQuotes(s.columnName));
+            retval += (withQuotes(s.tableAlias) + "." + withQuotes(s.columnName));
 
-        if (s.aggregateFunction) {
-            retval += ")";
+            if (s.aggregateFunction) {
+                retval += ")";
+            }
         }
 
         return retval;
@@ -315,12 +319,12 @@ const SqlDisplay = (props) => {
                 return <div className="sql-clause-column">
                     <span className="sql-clause-name">{"    " + getAndOr(f)}</span>
                     {getOpenParenthesis(f)
-                                                + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
-                                                + " "
-                                                + f.comparisonOperator
-                                                + " "
-                                                + getComparisonValue(f)
-                                                + getCloseParenthesis(f)}
+                        + withQuotes(f.tableAlias) + "." + withQuotes(f.columnName)
+                        + " "
+                        + f.comparisonOperator
+                        + " "
+                        + getComparisonValue(f)
+                        + getCloseParenthesis(f)}
                 </div>;
             } else {
                 return "";

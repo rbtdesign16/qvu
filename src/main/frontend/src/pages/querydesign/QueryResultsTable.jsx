@@ -298,7 +298,7 @@ const QueryResultsTable = () => {
                     <select onChange={e => onPageSize(e)}>{getPageSizes()}</select>
                     {getText("Page:")}
                     <input type="number" min={1} max={totalPages} value={currentPage} disabled={totalPages < 2} onChange={e => onPage(e)}/>
-                    {" " + getText("of") + " " + totalPages + " - " + getText("Record Count") + " " + recordCount}
+                    {" " + getText("of") + " " + totalPages + " - " + getText("Record Count") + " " + data.length}
                 </div>
              </div>
         </div>;

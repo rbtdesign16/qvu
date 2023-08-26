@@ -215,7 +215,7 @@ public class MainServiceImpl implements MainService {
             conn = dbHelper.getConnection(datasource);
             DatabaseMetaData dmd = conn.getMetaData();
             res = dmd.getSchemas();
-        } catch (Exception ex) {
+         } catch (Exception ex) {
             retval.setErrorCode(Errors.DB_CONNECTION_FAILED);
             retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(),
                     Errors.getMessage(Errors.DB_CONNECTION_FAILED),
@@ -224,6 +224,7 @@ public class MainServiceImpl implements MainService {
             dbHelper.closeConnection(conn, null, res);
         }
 
+        
         return retval;
     }
 

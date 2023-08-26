@@ -541,7 +541,7 @@ const Admin = () => {
                         showMessage(INFO, getText("Attempting to connect", "..."), null, true);
                         let res = await testDatasource(dataObject);
                         if (isApiSuccess(res)) {
-                            showMessage(SUCCESS, replceTokens(getText("Successfully connected to datasoure"), [dataObject.datasourceName]));
+                            showMessage(SUCCESS, replaceTokens(getText("Successfully connected to datasoure"), [dataObject.datasourceName]));
                         } else {
                             showMessage(ERROR, res.message);
                         }

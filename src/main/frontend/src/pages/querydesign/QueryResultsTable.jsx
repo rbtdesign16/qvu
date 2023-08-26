@@ -7,11 +7,12 @@ import Button from "react-bootstrap/Button";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import ResultsFilterSelectModal from "./ResultsFilterSelectModal";
+import PageControl from "../../widgets/PageControl";
 import {AiFillCaretUp, AiFillCaretDown, AiFillFilter} from "react-icons/ai";
 import "../../css/query-results.css";
 
 import {
-isDataTypeNumeric,
+        isDataTypeNumeric,
         isDataTypeString,
         isDataTypeDateTime,
         getDisplayDate,
@@ -26,13 +27,10 @@ isDataTypeNumeric,
         DEFAULT_PIXELS_PER_CHARACTER,
         COLOR_CRIMSON,
         COLOR_BLACK,
-        RESULT_SET_PAGE_SIZES,
-        DEFAULT_PAGE_SIZE,
         ARROW_UP_KEY,
         ARROW_DOWN_KEY,
-        HOME_KEY,
-        END_KEY
-        } from "../../utils/helper";
+        DEFAULT_PAGE_SIZE
+    } from "../../utils/helper";
 
 const QueryResultsTable = () => {
     const {queryResults,
@@ -46,11 +44,8 @@ const QueryResultsTable = () => {
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
-    const [totalPages, setTotalPages] = useState(Math.max(1, Math.ceil(data.length / DEFAULT_PAGE_SIZE)));
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+    const [pagingInfo, setPagingInfo] = useState({currentPage: 1, pageSize: DEFAULT_PAGE_SIZE, pageCount: Math.max(1, Math.ceil(data.length / DEFAULT_PAGE_SIZE))});
 
-    let recordCount = 0;
     const sortFilterStyle = {
         display: "inline-grid",
         gridTemplateRows: "10px 10px",
@@ -69,7 +64,7 @@ const QueryResultsTable = () => {
 
     const setFilters = (filters) => {
         hideFilterModal();
-        setCurrentPage(1);
+        setPagingInfo({...pagingInfo, currentPage: 1});
         setCurrentFilters(filters);
     };
     
@@ -115,10 +110,10 @@ const QueryResultsTable = () => {
     };
 
     const getDisplayData = (coldata, rownum, indx) => {
-        if (indx === 0) {
+      /*  if (indx === 0) {
             return rownum;
         } else {
-
+*/
             switch (columnTypes[indx]) {
                 case JDBC_TYPE_DATE:
                     return getDisplayDate(coldata);
@@ -131,7 +126,7 @@ const QueryResultsTable = () => {
                 default:
                     return coldata;
             }
-        }
+     //   }
     };
 
     const getColumnDetail = (row, rownum, columnStyles) => {
@@ -139,7 +134,7 @@ const QueryResultsTable = () => {
     };
 
     const getStartRow = () => {
-        return pageSize * (currentPage - 1);
+        return pagingInfo.pageSize * (pagingInfo.currentPage - 1);
     };
 
     const getVisibleRecords = () => {
@@ -165,7 +160,7 @@ const QueryResultsTable = () => {
         let vrecs = getVisibleRecords();
         let index = getStartRow();
         if (index > -1) {
-            for (let i = 0; i < pageSize; ++i) {
+            for (let i = 0; i < pagingInfo.pageSize; ++i) {
                 if (index < vrecs.length) {
                     retval.push(vrecs[index]);
                     index++;
@@ -175,12 +170,10 @@ const QueryResultsTable = () => {
             }
         }
  
-        recordCount = retval.length;
- 
-        let tpg = Math.max(1, Math.ceil(vrecs.length / pageSize));
+        let tpg = Math.max(1, Math.ceil(vrecs.length / pagingInfo.pageSize));
 
-        if (tpg !== totalPages) {
-            setTotalPages(tpg);
+        if (tpg !== pagingInfo.pageCount) {
+            setPagingInfo({...pagingInfo, pageCount: tpg});;
         }
         
         
@@ -265,7 +258,7 @@ const QueryResultsTable = () => {
 
     const getPageSizes = () => {
         return RESULT_SET_PAGE_SIZES.map(s => {
-            if (s === pageSize) {
+            if (s === pagingInfo.pageSize) {
                 return <option value={s} selected>{s}</option>;
             } else {
                 return <option value={s}>{s}</option>;
@@ -276,7 +269,7 @@ const QueryResultsTable = () => {
     const onPage = (e) => {
        let pg = e.target.value;
        
-       if ((pg > 0) && (pg <= totalPages)) {
+       if ((pg > 0) && (pg <= pagingInfo.pageCount)) {
            setCurrentPage(pg);
        }
     };
@@ -293,13 +286,7 @@ const QueryResultsTable = () => {
                 </div>
             </div>
             <div className="query-results-footer">
-                <div className="page-input">
-                    {getText("Page Size:")}
-                    <select onChange={e => onPageSize(e)}>{getPageSizes()}</select>
-                    {getText("Page:")}
-                    <input type="number" min={1} max={totalPages} value={currentPage} disabled={totalPages < 2} onChange={e => onPage(e)}/>
-                    {" " + getText("of") + " " + totalPages + " - " + getText("Record Count") + " " + data.length}
-                </div>
+                <PageControl pagingInfo={pagingInfo} setPagingInfo={setPagingInfo} dataSet={data}/>
              </div>
         </div>;
     } else {

@@ -96,7 +96,7 @@ export const DB_TYPE_SQLSERVER = "Microsoft SQL Server";
 export const DB_TYPE_ORACLE = "Oracle";
 export const DB_TYPE_POSTGRES = "PostgreSQL";
 
-export const ALLOWED_NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "enter", "minus", "period", "arrowleft", "arrowright", "arrowup", "arrowdown", "backspace", "tab", "delete", "insert"];
+export const ALLOWED_NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "enter", "minus", "period", "arrowleft", "arrowright", "arrowup", "arrowdown", "backspace", "home", "end", "tab", "delete", "insert"];
 export const NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", ".", "minus"];
 export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 

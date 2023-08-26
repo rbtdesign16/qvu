@@ -3,13 +3,30 @@ import PropTypes from "prop-types";
 import {isAllowedNumericKey, isNumericEntry, isDigit} from "../utils/helper";
 
 const NumberEntry = (props) => {
-    const {name, onChange, defaultValue, min, max, id} = props;
+    const {name, onChange, defaultValue, min, max, id, handleArrowUp, handleArrowDown} = props;
 
     const onKey = (e) => {
         let ok = isAllowedNumericKey(e);
-
         if (!ok) {
             e.preventDefault();
+        } else if (e.code.toLowerCase() === "arrowup") {
+            let val = Number(e.target.value);
+            if (!max || (max && (val < max))) {
+                e.target.value = val + 1;
+                e.preventDefault();
+                if (handleArrowUp) {
+                    handleArrowUp(e);
+                }
+            }
+        } else if (e.code.toLowerCase() === "arrowdown") {
+            let val = Number(e.target.value);
+            if (!min || (min && (val > min))) {
+                e.target.value = val - 1;
+                e.preventDefault();
+                if (handleArrowDown) {
+                    handleArrowDown(e);
+                }
+            }
         } else if (isNumericEntry(e)) {
             let pos = e.target.selectionStart;
             let code = "";

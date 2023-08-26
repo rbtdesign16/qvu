@@ -102,6 +102,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     display: inline-block;
     margin-left: 10px;
     padding-top: 3px;
+    user-select: none
 }
 
 .page-input select {

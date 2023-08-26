@@ -9,24 +9,24 @@ const NumberEntry = (props) => {
         let ok = isAllowedNumericKey(e);
         if (!ok) {
             e.preventDefault();
-        } else if (e.code.toLowerCase() === "arrowup") {
+        } else if (e.code.toLowerCase() === "arrowdown") {
             let val = Number(e.target.value);
             if (!max || (max && (val < max))) {
                 e.target.value = val + 1;
-                e.preventDefault();
-                if (handleArrowUp) {
-                    handleArrowUp(e);
-                }
-            }
-        } else if (e.code.toLowerCase() === "arrowdown") {
-            let val = Number(e.target.value);
-            if (!min || (min && (val > min))) {
-                e.target.value = val - 1;
-                e.preventDefault();
                 if (handleArrowDown) {
                     handleArrowDown(e);
                 }
             }
+            e.preventDefault();
+        } else if (e.code.toLowerCase() === "arrowup") {
+            let val = Number(e.target.value);
+            if (!min || (min && (val > min))) {
+                e.target.value = val - 1;
+                if (handleArrowUp) {
+                    handleArrowUp(e);
+                }
+            }
+            e.preventDefault();
         } else if (isNumericEntry(e)) {
             let pos = e.target.selectionStart;
             let code = "";

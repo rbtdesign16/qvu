@@ -26,7 +26,7 @@ const PageControl = (props) => {
         e.preventDefault();
         let sz = Number(e.target.options[e.target.selectedIndex].value);
         let pages = Math.max(0, Math.ceil(dataSet.length / sz));
-        setPagingInfo({...pagingInfo, pageSize: pages, pageCount: pages});
+        setPagingInfo({...pagingInfo, pageSize: sz, pageCount: pages, currentPage: 1});
     };
 
     const getPageSizes = () => {

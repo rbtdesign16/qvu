@@ -27,7 +27,6 @@
             "roles": [
                 "user",
                 "administrator",
-                "report designer",
                 "query designer"
             ]
         }
@@ -40,10 +39,6 @@
         {
             "name": "query designer",
             "description": "query designer role"
-        },
-        {
-            "name": "report designer",
-            "description": "report designer role"
         }
     ]
 }

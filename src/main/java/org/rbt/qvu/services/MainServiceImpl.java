@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1018,8 +1021,15 @@ public class MainServiceImpl implements MainService {
 
                 if (o != null) {
                     cwidths[i] = cwidths[i] + o.toString().length();
+                    // format timestamp
+                    if (rmd.getColumnType(i + 1) == java.sql.Types.TIMESTAMP) {
+                        if (o instanceof LocalDateTime) {
+                            o = Timestamp.valueOf((LocalDateTime)o);
+                        }
+                     }
                 }
 
+                    
                 row.add(o);
             }
             retval.getData().add(row);

@@ -112,12 +112,6 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private DBHelper dbHelper;
 
-    @Value("${default.security.type}")
-    private String securityType;
-
-    @Value("${security.types}")
-    private String availableSecurityType;
-
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
     private final CacheHelper cacheHelper = new CacheHelper();

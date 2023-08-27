@@ -504,6 +504,16 @@ const Admin = () => {
             hideCustomForeignKeys: hideCustomForeignKeys});
     };
 
+    const testConnection = async(ds) => {
+        showMessage(INFO, getText("Attempting to connect", "..."), null, true);
+         let res = await testDatasource(ds);
+         if (isApiSuccess(res)) {
+             showMessage(SUCCESS, replaceTokens(getText("Successfully connected to datasoure"), [ds.datasourceName]));
+         } else {
+             showMessage(ERROR, res.message);
+         }
+    };
+    
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -536,16 +546,8 @@ const Admin = () => {
                     id: "testds",
                     text: getText("Test Connection"),
                     className: "btn btn-primary",
-                    disabled: dataObject.newRecord,
-                    onClick: async () => {
-                        showMessage(INFO, getText("Attempting to connect", "..."), null, true);
-                        let res = await testDatasource(dataObject);
-                        if (isApiSuccess(res)) {
-                            showMessage(SUCCESS, replaceTokens(getText("Successfully connected to datasoure"), [dataObject.datasourceName]));
-                        } else {
-                            showMessage(ERROR, res.message);
-                        }
-                    }}]
+                    onClick: testConnection
+                }]
         };
     };
 

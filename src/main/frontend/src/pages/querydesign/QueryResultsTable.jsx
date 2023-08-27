@@ -44,7 +44,10 @@ const QueryResultsTable = () => {
     const {getText} = useLang();
     const {data, initialColumnWidths, columnTypes, header} = queryResults;
     const [showFilterModal, setShowFilterModal] = useState({show: false});
-    const [pagingInfo, setPagingInfo] = useState({currentPage: 1, pageSize: DEFAULT_PAGE_SIZE, pageCount: Math.max(1, Math.ceil(data.length / DEFAULT_PAGE_SIZE))});
+    const [pagingInfo, setPagingInfo] = useState({currentPage: 1, 
+        pageSize: DEFAULT_PAGE_SIZE, 
+        pageCount: Math.max(1, Math.ceil(data.length / DEFAULT_PAGE_SIZE)),
+        visibleRecordCount: data.length});
 
     const sortFilterStyle = {
         display: "inline-grid",
@@ -110,10 +113,9 @@ const QueryResultsTable = () => {
     };
 
     const getDisplayData = (coldata, rownum, indx) => {
-      /*  if (indx === 0) {
+      if (indx === 0) {
             return rownum;
         } else {
-*/
             switch (columnTypes[indx]) {
                 case JDBC_TYPE_DATE:
                     return getDisplayDate(coldata);
@@ -126,7 +128,7 @@ const QueryResultsTable = () => {
                 default:
                     return coldata;
             }
-     //   }
+        }
     };
 
     const getColumnDetail = (row, rownum, columnStyles) => {
@@ -173,7 +175,7 @@ const QueryResultsTable = () => {
         let tpg = Math.max(1, Math.ceil(vrecs.length / pagingInfo.pageSize));
 
         if (tpg !== pagingInfo.pageCount) {
-            setPagingInfo({...pagingInfo, pageCount: tpg});;
+            setPagingInfo({...pagingInfo, pageCount: tpg, visibleRecordCount: vrecs.length});
         }
         
         

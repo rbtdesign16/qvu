@@ -107,7 +107,12 @@ const PageControl = (props) => {
             onChange={e => onPage(e)} />
         <AiFillCaretRight className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={e => onPageDown()}/>
         <AiOutlineStepForward className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={e => onEnd()}/>
-        {" " + getText("of") + " " + pagingInfo.pageCount + " - " + getText("Record Count") + " " + dataSet.length}
+        {" " + getText("of")  + " " + pagingInfo.pageCount}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        {getText("Total Records:")
+            + " " + dataSet.length 
+            + ", " + getText("Visible Records:")
+            + " " + pagingInfo.visibleRecordCount}
     </div>);
 };
 

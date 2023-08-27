@@ -224,6 +224,7 @@
         "Target Columns:": "Target Columns:",
         "Target Table:": "Target Table:",
         "Test Connection": "Test Connection",
+        "Total Records:": "Total Records:",
         "Update datasource": "Update datasource $1",
         "Update group": "Update group $1",
         "Update role": "Update role $1",
@@ -233,6 +234,7 @@
         "User Name:": "User Name:",
         "User saved": "User $1 saved",
         "Users": "Users",
+        "Visible Records:": "Visible Records:",
         "Warning": "Warning"
     }
 }

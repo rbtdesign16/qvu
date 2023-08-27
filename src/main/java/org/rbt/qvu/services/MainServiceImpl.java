@@ -503,8 +503,12 @@ public class MainServiceImpl implements MainService {
                 conn = qvuds.getConnection(datasourceName);
                 DatabaseMetaData dmd = conn.getMetaData();
 
-                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-
+                if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
+                    res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                } else {
+                    res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                }
+                
                 while (res.next()) {
                     String schema = res.getString(2);
                     String tname = res.getString(3);

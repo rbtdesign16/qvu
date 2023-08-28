@@ -1106,6 +1106,7 @@ public class MainServiceImpl implements MainService {
                             || dbHelper.isDataTypeDateTime(p.getDataType())) {
                         ps.setString(i + 1, p.getValue());
                     } else if (dbHelper.isDataTypeNumeric(p.getDataType())) {
+                        ps.setObject(i + 1, p.getValue(), p.getDataType());
                     }
                 }
                 res = ps.executeQuery();

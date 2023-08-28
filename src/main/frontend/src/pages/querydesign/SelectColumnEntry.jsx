@@ -38,6 +38,7 @@ const SelectColumnEntry = (props) => {
                 <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
                 <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
                 <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+                <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
                 <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
             </div>;
         } else {
@@ -46,6 +47,7 @@ const SelectColumnEntry = (props) => {
                 <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
                 <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
                 <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+                <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
                 <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
             </div>;
         }

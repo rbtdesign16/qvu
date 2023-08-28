@@ -376,6 +376,7 @@ const SqlDisplay = (props) => {
     };
 
     const runQueryWithParameters = async (params) => {
+        hideParameterEntry();
         showMessage(INFO, getText("Running query", "...", ), null, true);
         let res = await runQuery(buildRunDocument(), params);
 

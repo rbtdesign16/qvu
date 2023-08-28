@@ -14,6 +14,7 @@ import TextEntry from "./TextEntry";
 import PropTypes from "prop-types";
 import {
     replaceTokens, 
+    DEFAULT_NEW_DOCUMENT_NAME, 
     DEFAULT_DOCUMENT_GROUP, 
     MODAL_TITLE_SIZE,
     isValidFilenameKey,
@@ -23,11 +24,19 @@ import {
 const SaveDocumentModal = (props) => {
     const {config} = props;
     const {authData} = useAuth();
-    const {setTreeViewData, treeViewData, setDatasource, datasource, selectColumns, filterColumns, baseTable, fromClause} = useQueryDesign();
+    const {setTreeViewData, 
+        treeViewData, 
+        setDatasource, 
+        datasource, 
+        selectColumns, 
+        filterColumns, 
+        baseTable, 
+        fromClause,
+        currentDocument} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, documentGroups} = useDataHandler();
-    const [documentName, setDocumentName] = useState(null);
+    const [documentName, setDocumentName] = useState(getText(DEFAULT_NEW_DOCUMENT_NAME));
     const [groupName, setGroupName] = useState(DEFAULT_DOCUMENT_GROUP);
     
     const getTitle = () => {
@@ -48,10 +57,6 @@ const SaveDocumentModal = (props) => {
         });
     };
     
-    const setName = (e) => {
-        setDocumentName(e.targe.value);
-    };
-    
     const isValidNameKey = (e) => {
       if (!isValidFilenameKey(e)) {
           e.preventDefault(e);
@@ -61,11 +66,27 @@ const SaveDocumentModal = (props) => {
     const canSave = () => {
         return isNotEmpty(documentName) && isNotEmpty(groupName);
     };
+    
+    const onShow = () => {
+        let el = document.getElementById("docname");
+        if (el) {
+            el.value = currentDocument.name;
+        }
+        
+        if (currentDocument.name) {
+            setDocumentName(currentDocument.name);
+        }
+        
+        if (currentDocument.group) {
+            setGroupName(currentDocument.group);
+        }
+    };
 
     return (
             <div className="static-modal">
                 <Modal animation={false} 
                        show={config.show} 
+                       onShow={onShow}
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
@@ -74,7 +95,7 @@ const SaveDocumentModal = (props) => {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="entrygrid-100-150">
-                            <div className="label">{getText("Name:")}</div><div><TextEntry checkKey={isValidNameKey} onChange={e => setDocumentName(e.target.value)}/></div>
+                            <div className="label">{getText("Name:")}</div><div><TextEntry id="docname" checkKey={isValidNameKey} defaultValue={documentName} onChange={e => setDocumentName(e.target.value)}/></div>
                             <div className="label">{getText("Group:")}</div><div><select onChange={e => setGroupName(e.target.value)}>{ loadDocumentGroups()}</select></div>
                         </div>
                     </Modal.Body>

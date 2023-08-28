@@ -434,7 +434,7 @@ export const isSqlWhereRequired = (filterColumns) => {
 export const isValidFilenameKey = (e) => {
     if (isEmpty(e.target.value)) {
         return isAlpha(e);
-    } else if (!isAlphanumeric(e) && (e.code.toLowerCase() !== "minus")) {
+    } else if (!isAlphanumeric(e) && (e.code.toLowerCase() !== "minus") && (e.code.toLowerCase() !== "period")) {
         return false;
     } else {
         return true;

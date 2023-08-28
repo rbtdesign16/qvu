@@ -1,12 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 const TextEntry = (props) => {
-  const {name, onChange, defaultValue, checkKey} = props;
-  
+  const {id, name, onChange, defaultValue, checkKey} = props;
   
   return (
     <span>
-      <input type="text" name={name} onKeyPress={e => checkKey(e)} size={25} onBlur={e => onChange(e)} defaultValue={defaultValue}/>
+      <input id={id} type="text" name={name} onKeyPress={e => checkKey(e)} size={25} onBlur={e => onChange(e)} defaultValue={defaultValue}/>
     </span>
   );
 };

@@ -32,7 +32,8 @@ export const QueryDesignProvider = ({ children }) => {
     const [treeViewExpandedIds, setTreeViewExpandedIds] = useState([]);
     const [currentDocument, setCurrentDocument] = useState({
         name: getText(DEFAULT_NEW_DOCUMENT_NAME),
-        group: DEFAULT_DOCUMENT_GROUP
+        group: DEFAULT_DOCUMENT_GROUP,
+        newdoc: true
     });
     
     const EMPTY_FILTER_VALUE = getText("empty-filter-value");
@@ -408,7 +409,7 @@ export const QueryDesignProvider = ({ children }) => {
 
     const setNewDocument = () => {
         setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME),
-            group: DEFAULT_DOCUMENT_GROUP});
+            group: DEFAULT_DOCUMENT_GROUP, newdoc: true});
         clearData();
     };
 

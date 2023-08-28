@@ -122,6 +122,7 @@ import { getDatasourceTreeViewData,
             actionTimestamp: actionTimestamp,
             queryDocument: {
                 name: name,
+                newRecord: currentDocument.newdoc,
                 createdBy: userId,
                 updatedBy: userId,
                 createDate: actionTimestamp,
@@ -130,7 +131,6 @@ import { getDatasourceTreeViewData,
                 schema: schema,
                 baseTable: baseTable,
                 documentGroupName: group,
-                newRecord: true,
                 selectColumns: selectColumns,
                 filterColumns: filterColumns,
                 fromClause: fromClause
@@ -263,7 +263,8 @@ import { getDatasourceTreeViewData,
 
                 setCurrentDocument({
                     name: doc.name,
-                    group: doc.documentGroupName
+                    group: doc.documentGroupName,
+                    newdoc: false
                 });
 
                 hideMessage();

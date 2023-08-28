@@ -90,6 +90,16 @@ const PageControl = (props) => {
         }
     };
     
+    const getPageDisplay = () => {
+        let retval = getText("Total Records:") + " " + dataSet.length;
+    
+        if (dataSet.length !== pagingInfo.visibleRecordCount) {
+            retval = retval + ", " + getText("Filtered Records:") + " " + pagingInfo.visibleRecordCount;
+        }
+        
+        return retval;
+    };
+    
     return (<div className="page-input">
         {getText("Page Size:")}
         <select onChange={e => onPageSize(e)}>{getPageSizes()}</select>
@@ -109,10 +119,7 @@ const PageControl = (props) => {
         <AiOutlineStepForward className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={e => onEnd()}/>
         {" " + getText("of")  + " " + pagingInfo.pageCount}
         &nbsp;&nbsp;&nbsp;&nbsp;
-        {getText("Total Records:")
-            + " " + dataSet.length 
-            + ", " + getText("Visible Records:")
-            + " " + pagingInfo.visibleRecordCount}
+        {getPageDisplay()}
     </div>);
 };
 

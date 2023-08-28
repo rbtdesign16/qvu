@@ -109,6 +109,7 @@
         "fileBasedSecurity-help": "If check, security information such as users and roles will be stored on locally as JSON files",
         "Filter for": "Filter for",
         "Filter": "Filter",
+        "Filtered Records:": "Filtered Records:",
         "First Name:": "First Name:",
         "general": "general",
         "Getting started": "Getting started",
@@ -235,7 +236,6 @@
         "User Name:": "User Name:",
         "User saved": "User $1 saved",
         "Users": "Users",
-        "Visible Records:": "Visible Records:",
         "Warning": "Warning"
     }
 }

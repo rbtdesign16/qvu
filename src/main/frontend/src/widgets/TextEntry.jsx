@@ -5,7 +5,14 @@ const TextEntry = (props) => {
   
   return (
     <span>
-      <input id={id} type="text" name={name} onKeyPress={e => checkKey(e)} size={25} onBlur={e => onChange(e)} defaultValue={defaultValue}/>
+      <input 
+        id={id} 
+        type="text" 
+        name={name} 
+        onKeyPress={e => checkKey(e)} 
+        size={25} 
+        onBlur={e => onChange(e)} 
+        defaultValue={defaultValue}/>
     </span>
   );
 };

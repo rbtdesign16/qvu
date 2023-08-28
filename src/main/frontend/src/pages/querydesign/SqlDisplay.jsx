@@ -432,12 +432,15 @@ const SqlDisplay = (props) => {
             detailFontSize: style.getPropertyValue('--query-results-table-detail-fontsize').replace("pt", "")
         };
 
+        showMessage(INFO, getText("Exporting to excel"), null, true);
         let res = await exportToExcel(wrapper);
         let blob = new Blob([res.data], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         });
 
-        loadDocumentFromBlob("excel-export.xlsx", blob);
+        await loadDocumentFromBlob("excel-export.xlsx", blob);
+        
+        hideMessage();
     };
 
     return <div id="sql-display">

@@ -98,6 +98,7 @@
         "errorCode3": "$1 not found",
         "errorCode4": "An unexpected error has occured = $1",
         "Export to excel": "Export to excel",
+        "Exporting to excel": "Exporting to excel...",
         "Failed to delete group": "Failed to delete group $1 - $2",
         "Failed to delete role": "Failed to delete role $1 - $2",
         "Failed to delete user": "Failed to delete user $1 - $2",

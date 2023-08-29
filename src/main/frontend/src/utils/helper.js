@@ -35,11 +35,6 @@ export const COLOR_CRIMSON = "crimson";
 export const COLOR_COBALT_BLUE = "#0020C2";
 export const COLOR_BLACK = "black";
 
-export const TYPE_PASSWORD = "password";
-export const TYPE_DATE = "date";
-export const TYPE_NUMBER = "number";
-export const TYPE_EMAIL = "email";
-
 export const MODAL_TITLE_SIZE = "h5";
 export const SPLITTER_GUTTER_SIZE = 8;
 export const SMALL_ICON_SIZE = 18;
@@ -80,6 +75,17 @@ export const JDBC_TYPE_LONGNVARCHAR = -16;
 export const JDBC_TYPE_NCLOB = 2011;
 export const JDBC_TYPE_TIME_WITH_TIMEZONE = 2013;
 export const JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE = 2014;
+
+export const TYPE_PASSWORD = "password";
+export const TYPE_NUMBER = "number";
+export const TYPE_EMAIL = "email";
+export const TYPE_STRING = "string";
+export const TYPE_DATE = "date";
+export const TYPE_TIMESTAMP = "timestamp";
+export const TYPE_TIME = "time";
+export const TYPE_INTEGER = "integer";
+export const TYPE_FLOAT = "float";
+export const TYPE_BOOLEAN = "boolean";
 
 export const OPEN_PARENTHESIS = ["", "(", "((", "((("];
 export const CLOSE_PARENTHESIS = ["", ")", "))", ")))"];
@@ -567,3 +573,48 @@ export const doSortCompare = (dataType, val1, val2) => {
     }
 };
 
+
+export const getParameterTypeFromId = (id) => {
+    let retval;
+    switch(id) {
+        case JDBC_TYPE_CHAR:
+        case JDBC_TYPE_VARCHAR:
+        case JDBC_TYPE_LONGVARCHAR:
+        case JDBC_TYPE_NCHAR:
+       case JDBC_TYPE_NVARCHAR:
+        case JDBC_TYPE_LONGNVARCHAR:
+            retval = TYPE_STRING;
+            break;
+        case JDBC_TYPE_TINYINT:
+        case JDBC_TYPE_SMALLINT:
+        case JDBC_TYPE_INTEGER:
+        case JDBC_TYPE_BIGINT:
+            retval = TYPE_INTEGER;
+            break;
+        case JDBC_TYPE_REAL:
+        case JDBC_TYPE_DOUBLE:
+        case JDBC_TYPE_NUMERIC:
+        case JDBC_TYPE_DECIMAL:
+            retval = TYPE_FLOAT;
+            break;
+        case JDBC_TYPE_DATE:
+            retval = TYPE_DATE;
+            break;
+        case JDBC_TYPE_TIME:
+        case JDBC_TYPE_TIME_WITH_TIMEZONE:
+            retval = TYPE_TIME;
+            break;
+        case JDBC_TYPE_TIMESTAMP:
+        case JDBC_TYPE_TIMESTAMP_WITH_TIMEZONE:
+            retval = TYPE_TIMESTAMP;
+            break;
+        case JDBC_TYPE_BOOLEAN:
+            retval = TYPE_BOOLEAN;
+            break
+        default:
+            retval = TYPE_STRING;
+            break;
+    }
+    
+    return retval;
+};

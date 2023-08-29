@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.QueryDocumentRunWrapper;
+import org.rbt.qvu.dto.QueryParameter;
 import org.rbt.qvu.dto.SqlFilterColumn;
 import org.rbt.qvu.dto.SqlFrom;
 import org.rbt.qvu.dto.SqlSelectColumn;
@@ -392,4 +393,32 @@ public class DBHelper {
         }
     }
 
+    public static int getJdbcTypeFromName(String name) {
+        int retval;
+        switch(name) {
+            case QueryParameter.DATE_TYPE:
+                retval = java.sql.Types.DATE;
+                break;
+            case QueryParameter.FLOAT_TYPE:
+                retval = java.sql.Types.DOUBLE;
+               break;
+            case QueryParameter.INTEGER_TYPE:
+                retval = java.sql.Types.INTEGER;
+                break;
+           case QueryParameter.TIME_TYPE:
+                retval = java.sql.Types.TIME;
+                break;
+            case QueryParameter.BOOLEAN_TYPE:
+                retval = java.sql.Types.BOOLEAN;
+                break;
+             case QueryParameter.TIMESTAMP_TYPE:
+                retval = java.sql.Types.TIMESTAMP;
+                break;
+            default:
+                retval = java.sql.Types.VARCHAR;
+                break;
+        }
+        
+        return retval;
+    }
 };

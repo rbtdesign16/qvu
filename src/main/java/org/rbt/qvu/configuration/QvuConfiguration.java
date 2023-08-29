@@ -170,7 +170,7 @@ public class QvuConfiguration {
         }
 
         if (config.getSecurityType().contains(Constants.BASIC_SECURITY_TYPE)) {
-            LOG.debug("adding basic auth login suppor");
+            LOG.debug("adding basic auth login support");
             http.httpBasic(withDefaults());
         }
 

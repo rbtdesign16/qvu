@@ -18,7 +18,8 @@ import {
     MODAL_TITLE_SIZE,
     isValidFilenameKey,
     isEmpty,
-    UNARY_COMPARISON_OPERATORS} from "../utils/helper";
+    UNARY_COMPARISON_OPERATORS,
+    getParameterTypeFromId} from "../utils/helper";
 
 
 const ParameterEntryModal = (props) => {
@@ -90,7 +91,7 @@ const ParameterEntryModal = (props) => {
         for (let i = 0; i < parameters.length; ++i) {
             params.push({
                 value: parameters[i],
-                dataType: entryFields[i].dataType
+                dataTypeName: getParameterTypeFromId(entryFields[i].dataType)
             });
         }
         

@@ -1102,12 +1102,8 @@ public class MainServiceImpl implements MainService {
                 stmt = ps;
                 for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
                     QueryParameter p = runWrapper.getParameters().get(i);
-                    if (dbHelper.isDataTypeString(p.getDataType())
-                            || dbHelper.isDataTypeDateTime(p.getDataType())) {
-                        ps.setString(i + 1, p.getValue());
-                    } else if (dbHelper.isDataTypeNumeric(p.getDataType())) {
-                        ps.setObject(i + 1, p.getValue(), p.getDataType());
-                    }
+                    
+                    ps.setObject(i + 1, dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
                 }
                 res = ps.executeQuery();
             } else {

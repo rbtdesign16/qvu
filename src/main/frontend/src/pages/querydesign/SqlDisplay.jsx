@@ -77,7 +77,7 @@ const SqlDisplay = (props) => {
     const getDisplayName = (s) => {
         let retval = "";
 
-        if (s.displayName) {
+        if (s.displayName && (s.displayName !== s.columnName)) {
             retval += (" AS " + withQuotes(s.displayName));
         }
 

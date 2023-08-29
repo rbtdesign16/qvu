@@ -175,7 +175,8 @@ public class DBHelper {
 
                     comma = ", ";
 
-                    if (StringUtils.isNotEmpty(c.getDisplayName())) {
+                    if (StringUtils.isNotEmpty(c.getDisplayName()) 
+                            && !c.getDisplayName().equals(c.getColumnName())) {
                         retval.append(" as ");
                         retval.append(withQuotes(dbType, c.getDisplayName()));
                     }

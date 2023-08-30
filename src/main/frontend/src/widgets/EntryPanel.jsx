@@ -53,6 +53,10 @@ const EntryPanel = (props) => {
         }
     };
 
+    const onMultiSelectChange = (c, dataObject, selections) => {
+        c.setSelected(dataObject, selections);
+        setToggle(!toggle);
+    }
 
     const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
@@ -95,7 +99,7 @@ const EntryPanel = (props) => {
                 case "button":
                     return <Button size="sm" disabled={c.isDisabled ? c.isDisabled() : false} onClick={(e) => c.onClick(c)}>{c.label}</Button>;
                 case "multiselect":
-                    return <MultiSelect options={c.options()}  value={c.getSelected(dataObject)} hasSelectAll={c.hasSelectAll} onChange={(selectedItems) => onMultiSelectChange(selectedItems, c, dataObject)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
+                    return <MultiSelect id={id} options={c.options()}  value={c.getSelected(dataObject)} hasSelectAll={c.hasSelectAll} onChange={selections => onMultiSelectChange(c, dataObject, selections)} valueRenderer={(selected, options) => multiSelectValueRenderer(c, dataObject, selected, options)} />;
             }
         }
     };
@@ -110,11 +114,6 @@ const EntryPanel = (props) => {
                 getText("Select", "...");
             }
         }
-    };
-
-    const onMultiSelectChange = (selections, c, dataObject) => {
-        c.setSelected(dataObject, selections);
-        setToggle(!toggle);
     };
 
     const isButtonDisabled = (b) => {

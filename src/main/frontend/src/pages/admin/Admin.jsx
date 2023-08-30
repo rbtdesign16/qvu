@@ -314,7 +314,7 @@ const Admin = () => {
     };
 
     const setDatasourceRoles = (dataObject, selections) => {
-        if (selections) {
+         if (selections) {
             if (!dataObject.roles) {
                 dataObject.roles = [];
             } else {
@@ -420,16 +420,17 @@ const Admin = () => {
         let utables = [];
 
         datasource.datasourceTables.map(t => {
-            // only save rec with settings
+             // only save rec with settings
             if (t.displayName
                     || t.hide
-                    || (t.toles && t.roles.length > 0)
+                    || (t.roles && t.roles.length > 0)
                     || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
-                utables.push(t);
+               utables.push(t);
             }
         });
 
         dataObject.datasourceTableSettings = utables;
+        
         hideTableSettings();
     };
 

@@ -481,7 +481,6 @@ public class MainServiceImpl implements MainService {
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
 
             if (ds != null) {
-
                 // load up custom foreign keys to apply tp table definitions
                 Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
                 for (ForeignKey fk : ds.getCustomForeignKeys()) {
@@ -513,6 +512,7 @@ public class MainServiceImpl implements MainService {
                         t = new Table();
                         t.setSchema(schema);
                         t.setName(tname);
+
                         t.setDatasource(datasourceName);
                         t.setType(res.getString(4));
                         t.setColumns(getTableColumns(datasourceName, dmd, t));
@@ -784,7 +784,11 @@ public class MainServiceImpl implements MainService {
 
                 DatabaseMetaData dmd = conn.getMetaData();
 
-                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
+                    res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                } else {
+                    res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+                }
 
                 while (res.next()) {
                     TableColumnNames t = new TableColumnNames();
@@ -828,11 +832,15 @@ public class MainServiceImpl implements MainService {
 
             DatabaseMetaData dmd = conn.getMetaData();
 
-            res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+            if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
+                res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+            } else {
+                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
+            }
 
             while (res.next()) {
                 String tname = res.getString(3);
-
+ 
                 TableSettings curta = tamap.get(tname);
 
                 if (curta == null) {

@@ -5,7 +5,6 @@
 package org.rbt.qvu.dto;
 
 import org.rbt.qvu.configuration.security.OidcConfiguration;
-import org.rbt.qvu.configuration.security.SamlConfiguration;
 
 /**
  *
@@ -14,7 +13,6 @@ import org.rbt.qvu.configuration.security.SamlConfiguration;
 public class InitialSetup {
     private String repository;
     private String securityType;
-    private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
 
     public String getRepository() {
@@ -33,14 +31,6 @@ public class InitialSetup {
         this.securityType = securityType;
     }
 
-
-    public SamlConfiguration getSamlConfiguration() {
-        return samlConfiguration;
-    }
-
-    public void setSamlConfiguration(SamlConfiguration samlConfiguration) {
-        this.samlConfiguration = samlConfiguration;
-    }
 
     public OidcConfiguration getOidcConfiguration() {
         return oidcConfiguration;

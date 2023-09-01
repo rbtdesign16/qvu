@@ -264,7 +264,8 @@ const Admin = () => {
                 label: getText("Last Name:"),
                 name: "lastName",
                 type: "input"
-            }, {
+            }, 
+            {
                 label: getText("Email:"),
                 name: "email",
                 type: "email",

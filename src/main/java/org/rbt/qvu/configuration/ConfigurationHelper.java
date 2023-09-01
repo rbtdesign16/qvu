@@ -32,7 +32,7 @@ public class ConfigurationHelper {
     @Value("#{systemProperties['repository.folder'] ?: ''}")
     private String repositoryFolder;
 
-    @Value("${default.security.type:basic}")
+    @Value("${security.type:basic}")
     private String securityType;
 
     @Value("${log.folder:#{systemProperties['java.io.tmpdir']}")

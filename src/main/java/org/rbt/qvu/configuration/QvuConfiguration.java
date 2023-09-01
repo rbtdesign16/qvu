@@ -4,21 +4,13 @@
  */
 package org.rbt.qvu.configuration;
 
-import java.io.File;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.PostConstruct;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbt.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbt.qvu.configuration.security.OidcConfiguration;
-import org.rbt.qvu.configuration.security.SamlConfiguration;
 import org.rbt.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +21,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
-import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrationRepository;
-import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistrations;
 import org.springframework.security.authentication.AuthenticationManager;
+import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 
 @Configuration
 @EnableWebSecurity
@@ -66,26 +60,22 @@ public class QvuConfiguration {
     @Value("${server.servlet.context-path}")
     private String servletContextPath;
 
-    @Value("${default.security.type}")
-    private String defaultSecurityType;
-
-    @Value("${security.types}")
-    private String securityTypes;
+    @Value("${security.type}")
+    private String securityType;
 
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
         LOG.info("server.port=" + serverPort);
         LOG.info("server.servlet.context-path=" + servletContextPath);
-        LOG.info("default.security.type=" + defaultSecurityType);
-        LOG.info("security.types=" + securityTypes);
+        LOG.info("security.type=" + securityType);
     }
 
     @Autowired
     private BasicAuthSecurityProvider basicAuthProvider;
 
     @Bean
-    @ConditionalOnExpression("'${security.types}'.contains('basic')")
+    @ConditionalOnExpression("'${security.type}'=='basic'")
     AuthenticationManager basicAuthManager(HttpSecurity http) throws Exception {
         LOG.debug("in basicAuthManager()");
         AuthenticationManagerBuilder authenticationManagerBuilder
@@ -95,103 +85,82 @@ public class QvuConfiguration {
     }
 
     @Bean
-    @ConditionalOnExpression("'${security.types}'.contains('saml')")
-    RelyingPartyRegistrationRepository samlRepository() throws Exception {
-        LOG.debug("in samlRepository()");
-        RelyingPartyRegistration relyingPartyRegistration = null;
-        SamlConfiguration samlConfig = config.getSecurityConfig().getSamlConfiguration();
-        if (samlConfig != null) {
-            if (samlConfig.isSignAssertions()) {
-                String keyFileName = samlConfig.getSigningKeyFileName();
-                final Saml2X509Credential credentials
-                        = Saml2X509Credential.signing(getPrivateKey(keyFileName),
-                                getCertificate(samlConfig.getSigningCertFileName()));
-                relyingPartyRegistration = RelyingPartyRegistrations
-                        .fromMetadataLocation(samlConfig.getIdpUrl())
-                        .registrationId("qvusaml")
-                        .signingX509Credentials((c) -> c.add(credentials))
-                        .build();
-            } else {
-                relyingPartyRegistration
-                        = RelyingPartyRegistrations
-                                .fromMetadataLocation(samlConfig.getIdpUrl())
-                                .registrationId("qvusaml")
-                                .build();
-
-            }
-
-            return new InMemoryRelyingPartyRegistrationRepository(relyingPartyRegistration);
-        } else {
-            return null;
-        }
-
-    }
-
-    @Bean
-    @ConditionalOnExpression("'${security.types}'.contains('oidc')")
+    @ConditionalOnExpression("'${security.type}'=='oidc'")
     ClientRegistrationRepository oidcRepository() throws Exception {
         LOG.debug("in oidcRepository()");
+        Set<String> scopes = new HashSet<>();
+        scopes.add(OidcScopes.OPENID);
+        scopes.add(OidcScopes.PROFILE);
+        
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
                 .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
+                .scope(scopes)
+                .registrationId("qvuoidc")
                 .clientId(oidcConfig.getClientId())
+                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .clientSecret(oidcConfig.getClientSecret()).build();
 
         return new InMemoryClientRegistrationRepository(clientRegistration);
     }
 
+    public GrantedAuthoritiesMapper userAuthoritiesMapper() {
+               System.out.println("------->a");
+        return (authorities) -> {
+            Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
+
+                System.out.println("------->0");
+            authorities.forEach(authority -> {
+                System.out.println("------->1");
+                if (OidcUserAuthority.class.isInstance(authority)) {
+                    OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
+
+                    OidcIdToken idToken = oidcUserAuthority.getIdToken();
+                    OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
+
+                    // Map the claims found in idToken and/or userInfo
+                    // to one or more GrantedAuthority's and add it to mappedAuthorities
+                } else if (OAuth2UserAuthority.class.isInstance(authority)) {
+                    OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority) authority;
+
+                    Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
+
+                    // Map the attributes found in userAttributes
+                    // to one or more GrantedAuthority's and add it to mappedAuthorities
+                }
+            });
+
+            return mappedAuthorities;
+        };
+    }
+
+    private void oidcFilterChainConfig(HttpSecurity http) throws Exception {
+        LOG.debug("adding oidc login support");
+         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
+            .authenticated())
+            .oauth2Login(oauth2 -> oauth2
+			    .userInfoEndpoint(userInfo -> userInfo.userAuthoritiesMapper(userAuthoritiesMapper())));
+    }
+
+    private void basicFilterChainConfig(HttpSecurity http) throws Exception {
+        LOG.debug("adding basiv login support");
+
+        http.httpBasic(withDefaults());
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
-
-        // if no ssl key store then allow http
-        if (StringUtils.isEmpty(sslKeyStore)) {
-            http
-                    .authorizeHttpRequests((authorize) -> authorize
-                    .anyRequest().authenticated())
-                    .csrf(csrf -> csrf.disable());
-        } else { // force https
-            http
-                    .authorizeHttpRequests((authorize) -> authorize
-                    .anyRequest().authenticated())
-                    .requiresChannel(channel
-                            -> channel.anyRequest().requiresSecure())
-                    .csrf(csrf -> csrf.disable());
+        if (Constants.OIDC_SECURITY_TYPE.equals(config.getSecurityType())) {
+            oidcFilterChainConfig(http);
+        } else if (Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType())) {
+            basicFilterChainConfig(http);
         }
 
-        if (config.getSecurityType().contains(Constants.OIDC_SECURITY_TYPE)) {
-            LOG.debug("adding oauth2 login support");
-            http.oauth2Login(withDefaults());
+        if (StringUtils.isNotEmpty(sslKeyStore)) {
+            http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         }
-
-        if (config.getSecurityType().contains(Constants.SAML_SECURITY_TYPE)) {
-            LOG.debug("adding saml login support");
-            http.saml2Login(withDefaults());
-        }
-
-        if (config.getSecurityType().contains(Constants.BASIC_SECURITY_TYPE)) {
-            LOG.debug("adding basic auth login support");
-            http.httpBasic(withDefaults());
-        }
-
         return http.build();
-    }
-
-    private PrivateKey getPrivateKey(String keyFile) throws Exception {
-        byte[] key = Files.readAllBytes(Paths.get(keyFile));
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(key);
-        return keyFactory.generatePrivate(keySpec);
-    }
-
-    private X509Certificate getCertificate(String certFile) throws Exception {
-        X509Certificate retval = null;
-        CertificateFactory fac = CertificateFactory.getInstance("X509");
-        try (InputStream is = FileUtils.openInputStream(new File(certFile))) {
-            retval = (X509Certificate) fac.generateCertificate(is);
-        }
-
-        return retval;
     }
 
 }

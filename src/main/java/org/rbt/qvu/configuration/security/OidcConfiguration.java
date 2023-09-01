@@ -12,7 +12,7 @@ public class OidcConfiguration {
     private String issuerLocationUrl;
     private String clientId;
     private String clientSecret;
-    private boolean enabled;
+    private String incomingAdminRoles;
 
     public String getIssuerLocationUrl() {
         return issuerLocationUrl;
@@ -38,13 +38,11 @@ public class OidcConfiguration {
         this.clientSecret = clientSecret;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getIncomingAdminRoles() {
+        return incomingAdminRoles;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setIncomingAdminRoles(String incomingAdminRoles) {
+        this.incomingAdminRoles = incomingAdminRoles;
     }
-    
-    
-}
+ }

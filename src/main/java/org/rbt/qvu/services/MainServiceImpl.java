@@ -89,8 +89,6 @@ import org.rbt.qvu.util.Errors;
 import org.rbt.qvu.util.Helper;
 import org.rbt.qvu.util.QuerySelectTreeBuilder;
 import org.rbt.qvu.util.RoleComparator;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.saml2.provider.service.authentication.DefaultSaml2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -727,8 +725,6 @@ public class MainServiceImpl implements MainService {
             if (o != null) {
                 if (o instanceof User) {
                     retval = (User) o;
-                } else if (o instanceof DefaultSaml2AuthenticatedPrincipal) {
-                    retval = toUser((DefaultSaml2AuthenticatedPrincipal) o);
                 } else if (o instanceof DefaultOAuth2User) {
                     retval = toUser((DefaultOAuth2User) o);
                 }
@@ -742,24 +738,15 @@ public class MainServiceImpl implements MainService {
         return config.getSecurityConfig();
     }
 
-    private User toUser(DefaultSaml2AuthenticatedPrincipal u) {
-        User retval = getSecurityConfig().findUser(u.getName());
-
-        if (retval == null) {
-            retval = new User();
-            retval.setUserId(u.getName());
-            fileHandler.saveUser(retval);
-        }
-
-        return retval;
-    }
-
     private User toUser(DefaultOAuth2User u) {
         User retval = getSecurityConfig().findUser(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
 
         if (retval == null) {
             retval = new User();
             retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
+            retval.setEmail(u.getAttribute(StandardClaimNames.EMAIL));
+            retval.setFirstName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
+            retval.setLastName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
             fileHandler.saveUser(retval);
         }
 
@@ -1378,22 +1365,9 @@ public class MainServiceImpl implements MainService {
         AuthConfig result = new AuthConfig();
 
         result.setBasicConfiguration(scfg.getBasicConfiguration());
-        result.setSamlConfiguration(scfg.getSamlConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setDefaultSecurityType(config.getSecurityType());
 
-        // make sure security type is enabled
-        switch (config.getSecurityType()) {
-            case Constants.BASIC_SECURITY_TYPE:
-                result.getBasicConfiguration().setEnabled(true);
-                break;
-            case Constants.SAML_SECURITY_TYPE:
-                result.getSamlConfiguration().setEnabled(true);
-                break;
-            case Constants.OIDC_SECURITY_TYPE:
-                result.getOidcConfiguration().setEnabled(true);
-                break;
-        }
 
         retval.setResult(result);
         if (LOG.isDebugEnabled()) {
@@ -1412,7 +1386,6 @@ public class MainServiceImpl implements MainService {
             SecurityConfiguration scfg = config.getSecurityConfig();
 
             scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
-            scfg.setSamlConfiguration(authConfig.getSamlConfiguration());
             scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
             config.setSecurityType(authConfig.getDefaultSecurityType());
 

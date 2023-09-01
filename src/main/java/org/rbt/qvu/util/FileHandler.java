@@ -461,7 +461,9 @@ public class FileHandler {
                             BeanUtils.copyProperties(user, curuser, "password");
                         }
                     } else {
-                        user.setPassword(Helper.toMd5Hash(user.getPassword()));
+                        if (StringUtils.isNotEmpty(user.getPassword())) {
+                            user.setPassword(Helper.toMd5Hash(user.getPassword()));
+                        }
                         securityConfig.getUsers().add(user);
                     }
 
@@ -757,38 +759,12 @@ public class FileHandler {
         PrintWriter pw = null;
         List<String> lines = new ArrayList<>();
 
-        String securityTypes = authConfig.getDefaultSecurityType();
-
-        for (String type : Constants.SECURITY_TYPES) {
-            if (!type.equals(authConfig.getDefaultSecurityType())) {
-                switch (type) {
-                    case Constants.BASIC_SECURITY_TYPE:
-                        if (authConfig.getBasicConfiguration().isEnabled()) {
-                            securityTypes += ("," + type);
-                        }
-                        break;
-                    case Constants.SAML_SECURITY_TYPE:
-                        if (authConfig.getSamlConfiguration().isEnabled()) {
-                            securityTypes += ("," + type);
-                        }
-                        break;
-                    case Constants.OIDC_SECURITY_TYPE:
-                        if (authConfig.getOidcConfiguration().isEnabled()) {
-                            securityTypes += ("," + type);
-                        }
-                        break;
-                }
-            }
-        }
-
         try {
             lnr = new LineNumberReader(new FileReader(config.getApplicationPropertiesFileName()));
             String line;
             while ((line = lnr.readLine()) != null) {
-                if (line.contains(Constants.DEFAULT_SECURITY_TYPE_PROPERTY)) {
-                    lines.add(Constants.DEFAULT_SECURITY_TYPE_PROPERTY + "=" + authConfig.getDefaultSecurityType());
-                } else if (line.contains(Constants.SECURITY_TYPES_PROPERTY)) {
-                    lines.add(Constants.SECURITY_TYPES_PROPERTY + "=" + securityTypes);
+                if (line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
+                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + authConfig.getDefaultSecurityType());
                 } else {
                     lines.add(line);
                 }

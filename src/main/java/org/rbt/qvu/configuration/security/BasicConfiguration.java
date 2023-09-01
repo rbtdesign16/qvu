@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class BasicConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BasicConfiguration.class);
     private String securityServiceClass;
-    private boolean enabled;
+    private String incomingAdminRoles;
     
     @JsonIgnore
     private SecurityService securityService;
@@ -46,13 +46,12 @@ public class BasicConfiguration {
         return retval;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getIncomingAdminRoles() {
+        return incomingAdminRoles;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setIncomingAdminRoles(String incomingAdminRoles) {
+        this.incomingAdminRoles = incomingAdminRoles;
     }
-    
-    
+
 }

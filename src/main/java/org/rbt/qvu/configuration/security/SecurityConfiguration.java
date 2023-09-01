@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 public class SecurityConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
     private BasicConfiguration basicConfiguration;
-    private SamlConfiguration samlConfiguration;
     private OidcConfiguration oidcConfiguration;
     private List<Role> roles = new ArrayList<>();
     private List<User> users = new ArrayList<>();
@@ -36,13 +35,6 @@ public class SecurityConfiguration {
         this.basicConfiguration = basicConfiguration;
     }
 
-    public SamlConfiguration getSamlConfiguration() {
-        return samlConfiguration;
-    }
-
-    public void setSamlConfiguration(SamlConfiguration samlConfiguration) {
-        this.samlConfiguration = samlConfiguration;
-    }
 
     public OidcConfiguration getOidcConfiguration() {
         return oidcConfiguration;

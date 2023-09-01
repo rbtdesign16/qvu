@@ -18,7 +18,6 @@ INFO,
 
 import {
 SECURITY_TYPE_BASIC,
-        SECURITY_TYPE_SAML,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
 } from "../utils/authHelper";
@@ -42,63 +41,6 @@ const SystemSetup = (props) => {
 
     const onHide = () => {
         config.hide();
-    };
-
-
-    const getSamlConfig = () => {
-        return {
-            dataObject: {...securityConfig.samlConfiguration},
-            gridClass: "entrygrid-225-350",
-            idPrefix: "saml-",
-            afterChange: onSamlChange,
-            entryConfig: [
-                {
-                    label: getText("IDP URL"),
-                    name: "idpUrl",
-                    type: "input",
-                    size: 60,
-                    required: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("idpUrl-help")
-                },
-                {
-                    label: getText("SP Entity ID"),
-                    name: "spEntityId",
-                    type: "input",
-                    size: 40,
-                    required: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("spEntityId-help")
-                },
-                {
-                    label: getText("Sign Assertions"),
-                    name: "signAssertions",
-                    type: "checkbox"
-                },
-                {
-                    label: getText("Signing Cert File"),
-                    name: "signingCertFileName",
-                    disabled: true,
-                    type: "input",
-                    size: 60,
-                    showHelp: showHelpMessage,
-                    helpText: getText("signingCertFileName-help")
-                },
-                {
-                    label: getText("Signing Key File"),
-                    name: "signingKeyFileName",
-                    type: "input",
-                    size: 60,
-                    disabled: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("signingKeyFileName-help")
-                },
-                {
-                    label: getText("Enabled"),
-                    name: "enabled",
-                    type: "checkbox"
-                }]
-        };
     };
 
     const getOidcConfig = () => {
@@ -173,29 +115,6 @@ const SystemSetup = (props) => {
         setSecurityConfig(sc);
     };
 
-    const onSamlChange = (e, entryConfig, dataObject) => {
-        let sc = {...securityConfig};
-        
-        let el = document.getElementById("saml-signingCertFileName");
-        if (el) {
-            el.disabled = !dataObject.signAssertions;
-            if (el.disabled) {
-                el.value = "";
-            }
-        }
-        
-        el = document.getElementById("saml-signingKeyFileName");
-        if (el) {
-            el.disabled = !dataObject.signAssertions;
-            if (el.disabled) {
-                el.value = "";
-            }
-        }
-        
-        sc.samlConfiguration = dataObject;
-        setSecurityConfig(sc);
-    };
-
     const onOidcChange = (e, entryConfig, dataObject) => {
         let sc = {...securityConfig};
         sc.oidcConfiguration = dataObject;
@@ -212,25 +131,6 @@ const SystemSetup = (props) => {
         } else {
             showMessage(ERROR, getText("please complete all required entries"));
         }
-    };
-
-    const checkSamlData = () => {
-        let retval = true;
-        if (securityConfig.samlConfiguration && securityConfig.samlConfiguration.enabled) {
-            let ok = true;
-
-            let entryConfig = getSamlConfig().entryConfig;
-            for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !securityConfig.samlConfiguration[entryConfig[i].name]) {
-                    ok = false;
-                    break;
-                }
-            }
-
-            retval = ok;
-        }
-
-        return retval;
     };
 
     const checkOidcData = () => {
@@ -265,9 +165,6 @@ const SystemSetup = (props) => {
             case  SECURITY_TYPE_BASIC:
                 retval = "key-" + SECURITY_TYPE_BASIC;
                 break;
-            case SECURITY_TYPE_SAML:
-                retval = "key-" + SECURITY_TYPE_SAML;
-                return retval;
             case SECURITY_TYPE_OIDC:
                 retval = "key-" + SECURITY_TYPE_OIDC;
                 break;
@@ -315,10 +212,6 @@ const SystemSetup = (props) => {
              sc.basicConfiguration.enabled = true;
              newid = "bas-enabled";
              break;
-         case SECURITY_TYPE_SAML:
-             sc.samlConfiguration.enabled = true;
-             newid = "saml-enabled";
-             break;
          case SECURITY_TYPE_OIDC:
              sc.oidcConfiguration.enabled = true;
              newid = "oidc-enabled";
@@ -329,10 +222,6 @@ const SystemSetup = (props) => {
          case  SECURITY_TYPE_BASIC:
              sc.basicConfiguration.enabled = false;
              oldid = "bas-enabled";
-             break;
-         case SECURITY_TYPE_SAML:
-             sc.samlConfiguration.enabled = false;
-             oldid = "saml-enabled";
              break;
          case SECURITY_TYPE_OIDC:
              oldid = "oidc-enabled";
@@ -359,9 +248,6 @@ const SystemSetup = (props) => {
             return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                 <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
                     <EntryPanel config={getBasicConfig()}/>
-                </Tab>
-                <Tab eventKey={"key-" + SECURITY_TYPE_SAML} title="SAML">
-                    <EntryPanel config={getSamlConfig()}/>
                 </Tab>
                 <Tab eventKey={"key-" + SECURITY_TYPE_OIDC} title="Oidc">
                     <EntryPanel config={getOidcConfig()}/>

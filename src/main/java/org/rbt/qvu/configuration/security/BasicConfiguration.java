@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 public class BasicConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BasicConfiguration.class);
     private String securityServiceClass;
-    private String incomingAdminRoles;
     
     @JsonIgnore
     private SecurityService securityService;
@@ -45,13 +44,4 @@ public class BasicConfiguration {
         
         return retval;
     }
-
-    public String getIncomingAdminRoles() {
-        return incomingAdminRoles;
-    }
-
-    public void setIncomingAdminRoles(String incomingAdminRoles) {
-        this.incomingAdminRoles = incomingAdminRoles;
-    }
-
 }

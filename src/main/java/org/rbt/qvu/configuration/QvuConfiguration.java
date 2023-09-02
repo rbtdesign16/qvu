@@ -96,7 +96,7 @@ public class QvuConfiguration {
         ClientRegistration clientRegistration = ClientRegistrations
                 .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
                 .scope(scopes)
-                .registrationId("qvuoidc")
+                .registrationId(Constants.OIDC_REGISTRATION_ID)
                 .clientId(oidcConfig.getClientId())
                 .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
                 .clientSecret(oidcConfig.getClientSecret()).build();
@@ -138,8 +138,10 @@ public class QvuConfiguration {
         LOG.debug("adding oidc login support");
          http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
             .authenticated())
-            .oauth2Login(oauth2 -> oauth2
-			    .userInfoEndpoint(userInfo -> userInfo.userAuthoritiesMapper(userAuthoritiesMapper())));
+            .oauth2Login(withDefaults());
+ 
+      //      .oauth2Login(oauth2 -> oauth2
+		//	    .userInfoEndpoint(userInfo -> userInfo.userAuthoritiesMapper(userAuthoritiesMapper())));
     }
 
     private void basicFilterChainConfig(HttpSecurity http) throws Exception {

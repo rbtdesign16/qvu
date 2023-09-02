@@ -13,6 +13,7 @@ public class OidcConfiguration {
     private String clientId;
     private String clientSecret;
     private String incomingAdminRoles;
+    private String roleClaimPropertyName;
 
     public String getIssuerLocationUrl() {
         return issuerLocationUrl;
@@ -45,4 +46,14 @@ public class OidcConfiguration {
     public void setIncomingAdminRoles(String incomingAdminRoles) {
         this.incomingAdminRoles = incomingAdminRoles;
     }
+
+    public String getRoleClaimPropertyName() {
+        return roleClaimPropertyName;
+    }
+
+    public void setRoleClaimPropertyName(String roleClaimPropertyName) {
+        this.roleClaimPropertyName = roleClaimPropertyName;
+    }
+    
+    
  }

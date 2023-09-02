@@ -25,6 +25,7 @@ import org.rbt.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.binary.Hex;
@@ -62,6 +63,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.rbt.qvu.client.utils.SecurityService;
 import org.rbt.qvu.configuration.security.BasicConfiguration;
+import org.rbt.qvu.configuration.security.OidcConfiguration;
 import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.Column;
 import org.rbt.qvu.dto.ColumnSettings;
@@ -71,9 +73,9 @@ import org.rbt.qvu.dto.DocumentWrapper;
 import org.rbt.qvu.dto.ExcelExportWrapper;
 import org.rbt.qvu.dto.ForeignKey;
 import org.rbt.qvu.dto.QueryDocument;
+import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.QueryParameter;
 import org.rbt.qvu.dto.QueryResult;
-import org.rbt.qvu.dto.QueryDocumentRunWrapper;
 import org.rbt.qvu.dto.QueryRunWrapper;
 import org.rbt.qvu.dto.QuerySelectNode;
 import org.rbt.qvu.dto.ReportDocument;
@@ -155,13 +157,12 @@ public class MainServiceImpl implements MainService {
 
             // clone it so we can send a modified copy back
             retval = SerializationUtils.clone(retval);
-            
-            
+
             // remove the passwords
             for (User u : retval.getAllUsers()) {
                 u.setPassword(null);
             }
-            
+
             if (LOG.isDebugEnabled()) {
                 LOG.debug("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
             }
@@ -209,7 +210,7 @@ public class MainServiceImpl implements MainService {
             conn = dbHelper.getConnection(datasource);
             DatabaseMetaData dmd = conn.getMetaData();
             res = dmd.getSchemas();
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             retval.setErrorCode(Errors.DB_CONNECTION_FAILED);
             retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(),
                     Errors.getMessage(Errors.DB_CONNECTION_FAILED),
@@ -218,7 +219,6 @@ public class MainServiceImpl implements MainService {
             dbHelper.closeConnection(conn, null, res);
         }
 
-        
         return retval;
     }
 
@@ -346,7 +346,7 @@ public class MainServiceImpl implements MainService {
         FileOutputStream fos = null;
         try {
             int pos = initialInfo.indexOf("|");
-            
+
             String repositoryFolder = initialInfo.substring(0, pos);
             String adminPassword = initialInfo.substring(pos + 1);
 
@@ -375,7 +375,7 @@ public class MainServiceImpl implements MainService {
             User u = securityConfig.findUser("admin");
             u.setPassword(Helper.toMd5Hash(adminPassword));
             fileHandler.saveSecurityConfig(securityConfig);
-            
+
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
             s = s.replace("${repository}", repositoryFolder);
             FileUtils.write(propsFile, s, "UTF-8");
@@ -498,7 +498,7 @@ public class MainServiceImpl implements MainService {
                 } else {
                     res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
                 }
-                
+
                 while (res.next()) {
                     String schema = res.getString(2);
                     String tname = res.getString(3);
@@ -738,17 +738,53 @@ public class MainServiceImpl implements MainService {
         return config.getSecurityConfig();
     }
 
+    private boolean hasAdminRoleMapping(DefaultOAuth2User u, OidcConfiguration oidcConfig) {
+        boolean retval = false;
+
+        if (StringUtils.isNotEmpty(oidcConfig.getRoleClaimPropertyName())
+                && StringUtils.isNotEmpty(oidcConfig.getIncomingAdminRoles())) {
+                List <String> roles = (List<String>)u.getAttribute(oidcConfig.getRoleClaimPropertyName());
+
+             if ((roles != null) && !roles.isEmpty()) {
+                Set<String> inRoles = new HashSet<>();
+
+                StringTokenizer st = new StringTokenizer(oidcConfig.getIncomingAdminRoles(), ",");
+
+                while (st.hasMoreTokens()) {
+                    inRoles.add(st.nextToken());
+                }
+
+                 for (String r : roles) {
+ 
+                    if (inRoles.contains(r)) {
+                        retval = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return retval;
+    }
+
     private User toUser(DefaultOAuth2User u) {
         User retval = getSecurityConfig().findUser(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
 
+        // add authenticated user to local user list
         if (retval == null) {
             retval = new User();
             retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
             retval.setEmail(u.getAttribute(StandardClaimNames.EMAIL));
             retval.setFirstName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
-            retval.setLastName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
-            fileHandler.saveUser(retval);
+            retval.setLastName(u.getAttribute(StandardClaimNames.FAMILY_NAME));
+
+            if (hasAdminRoleMapping(u, getSecurityConfig().getOidcConfiguration()))   {
+                retval.getRoles().add(Constants.DEFAULT_ADMINISTRATOR_ROLE);
+            }
+
         }
+
+        fileHandler.saveUser(retval);
 
         return retval;
     }
@@ -827,7 +863,7 @@ public class MainServiceImpl implements MainService {
 
             while (res.next()) {
                 String tname = res.getString(3);
- 
+
                 TableSettings curta = tamap.get(tname);
 
                 if (curta == null) {
@@ -1016,12 +1052,11 @@ public class MainServiceImpl implements MainService {
                     // format timestamp
                     if (rmd.getColumnType(i + 1) == java.sql.Types.TIMESTAMP) {
                         if (o instanceof LocalDateTime) {
-                            o = Timestamp.valueOf((LocalDateTime)o);
+                            o = Timestamp.valueOf((LocalDateTime) o);
                         }
-                     }
+                    }
                 }
 
-                    
                 row.add(o);
             }
             retval.getData().add(row);
@@ -1097,7 +1132,7 @@ public class MainServiceImpl implements MainService {
                 stmt = ps;
                 for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
                     QueryParameter p = runWrapper.getParameters().get(i);
-                    
+
                     ps.setObject(i + 1, dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
                 }
                 res = ps.executeQuery();
@@ -1368,7 +1403,6 @@ public class MainServiceImpl implements MainService {
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setDefaultSecurityType(config.getSecurityType());
 
-
         retval.setResult(result);
         if (LOG.isDebugEnabled()) {
             LOG.debug("AuthConfig: " + fileHandler.getGson(true).toJson(result));
@@ -1392,24 +1426,23 @@ public class MainServiceImpl implements MainService {
             fileHandler.saveSecurityConfig(scfg);
             fileHandler.updateApplicationProperties(authConfig);
 
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             Helper.populateResultError(retval, ex);
-        }
-        
-        finally {
+        } finally {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
-            
+
             if (fos != null) {
                 try {
                     fos.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
         }
-               
 
         return retval;
     }

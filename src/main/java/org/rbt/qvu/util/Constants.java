@@ -6,12 +6,10 @@ package org.rbt.qvu.util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.rbt.qvu.client.utils.Role;
-import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 
 /**
  *
@@ -42,6 +40,7 @@ public class Constants {
     public static final String ONLINE = "online";
     public static final String NONE = "none";
     
+    public static final String OIDC_REGISTRATION_ID = "qvuoidc";
     public static final int DEFAULT_MAX_EXPORTED_KEY_DEPTH = 4;
     public static final int DEFAULT_MAX_IMPORTED_KEY_DEPTH = 2;
 

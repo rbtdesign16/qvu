@@ -3,14 +3,15 @@
     "roleAttributeName": "role",
     "allowServiceSave": false,
     "basicConfiguration": {
-        "securityClassName": "",
-        "enabled": true
-    },
+        "securityClassName": ""
+     },
     "oidcConfiguration": {
         "issuerLocationUrl": "",
         "clientId": "",
         "clientSecret": "",
-        "enabled": false
+        "enabled": false,
+        "roleClaimPropertyName": "",
+        "incomingAdminRoles": ""
     },
     "users": [{
             "userId": "admin",

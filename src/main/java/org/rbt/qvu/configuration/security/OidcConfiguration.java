@@ -14,6 +14,7 @@ public class OidcConfiguration {
     private String clientSecret;
     private String incomingAdminRoles;
     private String roleClaimPropertyName;
+    private boolean useEmailForUserId;
 
     public String getIssuerLocationUrl() {
         return issuerLocationUrl;
@@ -53,6 +54,14 @@ public class OidcConfiguration {
 
     public void setRoleClaimPropertyName(String roleClaimPropertyName) {
         this.roleClaimPropertyName = roleClaimPropertyName;
+    }
+
+    public boolean isUseEmailForUserId() {
+        return useEmailForUserId;
+    }
+
+    public void setUseEmailForUserId(boolean useEmailForUserId) {
+        this.useEmailForUserId = useEmailForUserId;
     }
     
     

@@ -769,7 +769,15 @@ public class MainServiceImpl implements MainService {
 
     private User toUser(DefaultOAuth2User u) {
         User retval = null;
-        String nm = u.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
+        String nm = null;
+        
+        OidcConfiguration oidcConfig = getSecurityConfig().getOidcConfiguration();
+        
+        if (oidcConfig.isUseEmailForUserId()) {
+            nm = u.getAttribute(StandardClaimNames.EMAIL);
+        } else {
+            nm = u.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
+        }
         
         if (StringUtils.isEmpty(nm)) {
             nm = u.getName();

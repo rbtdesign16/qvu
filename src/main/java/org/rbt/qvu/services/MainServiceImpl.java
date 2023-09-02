@@ -743,9 +743,9 @@ public class MainServiceImpl implements MainService {
 
         if (StringUtils.isNotEmpty(oidcConfig.getRoleClaimPropertyName())
                 && StringUtils.isNotEmpty(oidcConfig.getIncomingAdminRoles())) {
-                List <String> roles = (List<String>)u.getAttribute(oidcConfig.getRoleClaimPropertyName());
+            List<String> roles = (List<String>) u.getAttribute(oidcConfig.getRoleClaimPropertyName());
 
-             if ((roles != null) && !roles.isEmpty()) {
+            if ((roles != null) && !roles.isEmpty()) {
                 Set<String> inRoles = new HashSet<>();
 
                 StringTokenizer st = new StringTokenizer(oidcConfig.getIncomingAdminRoles(), ",");
@@ -754,8 +754,8 @@ public class MainServiceImpl implements MainService {
                     inRoles.add(st.nextToken());
                 }
 
-                 for (String r : roles) {
- 
+                for (String r : roles) {
+
                     if (inRoles.contains(r)) {
                         retval = true;
                         break;
@@ -763,29 +763,40 @@ public class MainServiceImpl implements MainService {
                 }
             }
         }
-        
+
         return retval;
     }
 
     private User toUser(DefaultOAuth2User u) {
-        User retval = getSecurityConfig().findUser(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
+        User retval = null;
+        String nm = u.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
+        
+        if (StringUtils.isEmpty(nm)) {
+            nm = u.getName();
+        }
+        
+        
+        if (StringUtils.isNotEmpty(nm)) {
+            retval = getSecurityConfig().findUser(nm);
 
-        // add authenticated user to local user list
-        if (retval == null) {
-            retval = new User();
-            retval.setUserId(u.getAttribute(StandardClaimNames.PREFERRED_USERNAME));
-            retval.setEmail(u.getAttribute(StandardClaimNames.EMAIL));
-            retval.setFirstName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
-            retval.setLastName(u.getAttribute(StandardClaimNames.FAMILY_NAME));
+            // add authenticated user to local user list
+            if (retval == null) {
+                retval = new User();
 
-            if (hasAdminRoleMapping(u, getSecurityConfig().getOidcConfiguration()))   {
-                retval.getRoles().add(Constants.DEFAULT_ADMINISTRATOR_ROLE);
+                retval.setUserId(nm);
+                retval.setEmail(u.getAttribute(StandardClaimNames.EMAIL));
+                retval.setFirstName(u.getAttribute(StandardClaimNames.GIVEN_NAME));
+                retval.setLastName(u.getAttribute(StandardClaimNames.FAMILY_NAME));
+
+                if (hasAdminRoleMapping(u, getSecurityConfig().getOidcConfiguration())) {
+                    retval.getRoles().add(Constants.DEFAULT_ADMINISTRATOR_ROLE);
+                }
+
             }
 
+            fileHandler.saveUser(retval);
         }
-
-        fileHandler.saveUser(retval);
-
+        
         return retval;
     }
 

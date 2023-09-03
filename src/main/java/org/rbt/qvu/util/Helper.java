@@ -120,5 +120,16 @@ public class Helper {
         return retval;
     }
 
+    public static String replaceTokens(String txt, List<String> replacements) {
+        String retval = txt;
+        if (StringUtils.isNotEmpty(retval)) {
+            for (int i = 0; i < replacements.size(); ++i) {
+                String token = "$" + (i+1);
+                retval = retval.replace(token, replacements.get(i));
+            }
+        }
+        
+        return retval;
+    }
     
 }

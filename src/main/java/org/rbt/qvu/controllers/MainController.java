@@ -1,5 +1,6 @@
 package org.rbt.qvu.controllers;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -33,6 +34,7 @@ import org.rbt.qvu.util.AuthHelper;
 import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.FileHandler;
+import org.rbt.qvu.util.Helper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -225,7 +227,10 @@ public class MainController {
         
         // for api call populate text in message
         if (!retval.isSuccess()) {
-            retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()));
+            List <String> replaceList = new ArrayList<>();
+            replaceList.add(runWrapper.getGroupName());
+            replaceList.add(runWrapper.getDocumentName());
+            retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
         }
         
         return retval;
@@ -238,7 +243,10 @@ public class MainController {
         
         // for api call populate text in message
         if (!retval.isSuccess()) {
-            retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()));
+            List <String> replaceList = new ArrayList<>();
+            replaceList.add(runWrapper.getGroupName());
+            replaceList.add(runWrapper.getDocumentName());
+            retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
         }
         
         return retval;

@@ -59,6 +59,10 @@ public class QvuConfiguration {
 
     @Value("${security.type}")
     private String securityType;
+    
+    @Value("${cors.allowed.origins:*}")
+    private String corsAllowedOrigins;
+
 
     @PostConstruct
     private void init() {
@@ -66,6 +70,7 @@ public class QvuConfiguration {
         LOG.info("server.port=" + serverPort);
         LOG.info("server.servlet.context-path=" + servletContextPath);
         LOG.info("security.type=" + securityType);
+        LOG.info("cors.allowed.origins=" + corsAllowedOrigins);
     }
 
     @Autowired
@@ -104,7 +109,7 @@ public class QvuConfiguration {
     private CorsConfigurationSource getCorsConfigurationSource()
 	{
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins));
 		configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -142,4 +147,5 @@ public class QvuConfiguration {
         return http.build();
     }
 
+    
 }

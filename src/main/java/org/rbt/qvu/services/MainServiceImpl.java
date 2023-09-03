@@ -1152,8 +1152,7 @@ public class MainServiceImpl implements MainService {
                 stmt = ps;
                 for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
                     QueryParameter p = runWrapper.getParameters().get(i);
-
-                    ps.setObject(i + 1, dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
+                    ps.setObject(i + 1, p.getValue(), dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
                 }
                 res = ps.executeQuery();
             } else {

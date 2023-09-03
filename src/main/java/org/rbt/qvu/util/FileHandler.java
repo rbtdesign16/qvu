@@ -764,7 +764,7 @@ public class FileHandler {
             String line;
             while ((line = lnr.readLine()) != null) {
                 if (line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
-                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + authConfig.getDefaultSecurityType());
+                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + authConfig.getSecurityType());
                 } else {
                     lines.add(line);
                 }

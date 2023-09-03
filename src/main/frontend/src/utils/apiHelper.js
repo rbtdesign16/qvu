@@ -237,16 +237,16 @@ export const initializeRepository = async (repositoryFolder, adminPassword) => {
 
 
 export const formatErrorResponse = (errorResult, prefix) => {
-    let retval ="";
-    
+    let retval = "";
+
     if (prefix) {
         retval += prefix;
     }
-    
+
     if (errorResult.message) {
         retval += " " + errorResult.message;
     }
-    
+
     return retval;
 };
 
@@ -335,13 +335,14 @@ export const runQuery = async (doc, params) => {
             parameters: params,
             document: doc
         };
-        
+
         let res = await axios.post(getApiURL() + "/query/design/run", runWrapper, hconfig);
 
         if (res) {
             return res.data;
         }
     } catch (e) {
+        console.log("error: runQuery - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -360,10 +361,10 @@ export const getAvailableDocuments = async (documentType) => {
         let res = await axios.get(getApiURL() + "/documents/currentuser/" + documentType, hconfig);
 
         if (res) {
-           return res.data;
+            return res.data;
         }
     } catch (e) {
-       return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
 
@@ -372,10 +373,10 @@ export const getDocument = async (documentType, documentGroup, documentName) => 
         let res = await axios.get(getApiURL() + "/document/" + documentType + "/" + documentGroup + "/" + documentName, hconfig);
 
         if (res) {
-           return res.data;
+            return res.data;
         }
     } catch (e) {
-       return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
 
@@ -406,18 +407,18 @@ export const saveSecurityConfig = async (config) => {
 
 export const loadHelpDocument = async () => {
     try {
-         let res = await axios.get(getApiURL() + "/help/" + navigator.language, {responseType: "arraybuffer"});
-         return res.data;
-     } catch (e) {
-        console.log("error: loadHelpDocument - " + e); 
+        let res = await axios.get(getApiURL() + "/help/" + navigator.language, {responseType: "arraybuffer"});
+        return res.data;
+    } catch (e) {
+        console.log("error: loadHelpDocument - " + e);
     }
 };
 
 export const loadGettingStartedDocument = async () => {
     try {
-         let res = await axios.get(getApiURL() + "/gettingstarted/" + navigator.language, {responseType: "arraybuffer"});
-         return res.data;
-     } catch (e) {
-        console.log("error: loadGettingStartedDocument - " + e); 
+        let res = await axios.get(getApiURL() + "/gettingstarted/" + navigator.language, {responseType: "arraybuffer"});
+        return res.data;
+    } catch (e) {
+        console.log("error: loadGettingStartedDocument - " + e);
     }
 };

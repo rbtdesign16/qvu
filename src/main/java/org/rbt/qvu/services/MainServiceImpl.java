@@ -1075,13 +1075,15 @@ public class MainServiceImpl implements MainService {
                         }
                     }
                 }
-
+                
                 row.add(o);
             }
             retval.getData().add(row);
         }
 
         retval.setRowCount(rowcnt);
+        
+        
         if (rowcnt > 0) {
             for (Integer i = 0; i < cwidths.length; ++i) {
                 Integer hdrlen = (retval.getHeader().get(i + 1).length() + 4);
@@ -1420,7 +1422,7 @@ public class MainServiceImpl implements MainService {
 
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
-        result.setDefaultSecurityType(config.getSecurityType());
+        result.setSecurityType(config.getSecurityType());
 
         retval.setResult(result);
         if (LOG.isDebugEnabled()) {
@@ -1440,7 +1442,7 @@ public class MainServiceImpl implements MainService {
 
             scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
             scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
-            config.setSecurityType(authConfig.getDefaultSecurityType());
+            config.setSecurityType(authConfig.getSecurityType());
 
             fileHandler.saveSecurityConfig(scfg);
             fileHandler.updateApplicationProperties(authConfig);

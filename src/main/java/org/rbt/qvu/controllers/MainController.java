@@ -43,9 +43,9 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The type Main controller.
  */
 @RestController
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins="*")
 public class MainController {
-    private static Logger LOG = LogManager.getLogger(MainController.class);
+    private static final Logger LOG = LogManager.getLogger(MainController.class);
 
     @Autowired
     MainService service;

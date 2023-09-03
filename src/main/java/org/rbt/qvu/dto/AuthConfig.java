@@ -12,16 +12,16 @@ import org.rbt.qvu.configuration.security.OidcConfiguration;
  * @author rbtuc
  */
 public class AuthConfig {
-    private String defaultSecurityType;
+    private String securityType;
     private BasicConfiguration basicConfiguration;
     private OidcConfiguration oidcConfiguration;
 
-    public String getDefaultSecurityType() {
-        return defaultSecurityType;
+    public String getSecurityType() {
+        return securityType;
     }
 
-    public void setDefaultSecurityType(String defaultSecurityType) {
-        this.defaultSecurityType = defaultSecurityType;
+    public void setSecurityType(String securityType) {
+        this.securityType = securityType;
     }
 
     public BasicConfiguration getBasicConfiguration() {

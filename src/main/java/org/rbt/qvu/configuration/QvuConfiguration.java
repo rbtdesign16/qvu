@@ -4,8 +4,8 @@
  */
 package org.rbt.qvu.configuration;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -27,17 +27,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.authentication.AuthenticationManager;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistrations;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -91,7 +88,7 @@ public class QvuConfiguration {
         Set<String> scopes = new HashSet<>();
         scopes.add(OidcScopes.OPENID);
         scopes.add(OidcScopes.PROFILE);
-        
+
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
                 .fromOidcIssuerLocation(oidcConfig.getIssuerLocationUrl())
@@ -103,45 +100,25 @@ public class QvuConfiguration {
 
         return new InMemoryClientRegistrationRepository(clientRegistration);
     }
-
-    public GrantedAuthoritiesMapper userAuthoritiesMapper() {
-               System.out.println("------->a");
-        return (authorities) -> {
-            Set<GrantedAuthority> mappedAuthorities = new HashSet<>();
-
-                System.out.println("------->0");
-            authorities.forEach(authority -> {
-                System.out.println("------->1");
-                if (OidcUserAuthority.class.isInstance(authority)) {
-                    OidcUserAuthority oidcUserAuthority = (OidcUserAuthority) authority;
-
-                    OidcIdToken idToken = oidcUserAuthority.getIdToken();
-                    OidcUserInfo userInfo = oidcUserAuthority.getUserInfo();
-
-                    // Map the claims found in idToken and/or userInfo
-                    // to one or more GrantedAuthority's and add it to mappedAuthorities
-                } else if (OAuth2UserAuthority.class.isInstance(authority)) {
-                    OAuth2UserAuthority oauth2UserAuthority = (OAuth2UserAuthority) authority;
-
-                    Map<String, Object> userAttributes = oauth2UserAuthority.getAttributes();
-
-                    // Map the attributes found in userAttributes
-                    // to one or more GrantedAuthority's and add it to mappedAuthorities
-                }
-            });
-
-            return mappedAuthorities;
-        };
-    }
-
+    
+    private CorsConfigurationSource getCorsConfigurationSource()
+	{
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+    
     private void oidcFilterChainConfig(HttpSecurity http) throws Exception {
         LOG.debug("adding oidc login support");
-         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
-            .authenticated())
-            .oauth2Login(withDefaults());
- 
-      //      .oauth2Login(oauth2 -> oauth2
-		//	    .userInfoEndpoint(userInfo -> userInfo.userAuthoritiesMapper(userAuthoritiesMapper())));
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
+                .authenticated())
+                .cors(c -> c.configurationSource(getCorsConfigurationSource()))
+                .csrf(c -> c.disable())
+                .oauth2Login(withDefaults());
     }
 
     private void basicFilterChainConfig(HttpSecurity http) throws Exception {

@@ -17,7 +17,7 @@ INFO,
 } from "../utils/helper";
 
 import {
-SECURITY_TYPE_BASIC,
+        SECURITY_TYPE_BASIC,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
 } from "../utils/authHelper";
@@ -78,8 +78,17 @@ const SystemSetup = (props) => {
                     helpText: getText("clientSecret-help")
                 },
                 {
-                    label: getText("Enabled"),
-                    name: "enabled",
+                    label: getText("Admin Role Mapping"),
+                    name: "incomingAdminRoles",
+                    type: "input",
+                    size: 50,
+                    showHelp: showHelpMessage,
+                    helpText: getText("adminRoleMapping-help")
+                },
+
+                {
+                    label: getText("Use Email for User Id"),
+                    name: "useEmailForUserId",
                     type: "checkbox"
                 }]
         };
@@ -122,7 +131,7 @@ const SystemSetup = (props) => {
     };
     
     const checkData = () => {
-        return (checkSamlData() && checkOidcData());
+        return checkOidcData();
     };
 
     const saveSetup = async () => {
@@ -161,7 +170,7 @@ const SystemSetup = (props) => {
 
     const getDefaultActiveTabKey = () => {
         let retval = SECURITY_TYPE_BASIC;
-        switch (securityConfig.defaultSecurityType) {
+        switch (securityConfig.securityType) {
             case  SECURITY_TYPE_BASIC:
                 retval = "key-" + SECURITY_TYPE_BASIC;
                 break;
@@ -169,8 +178,6 @@ const SystemSetup = (props) => {
                 retval = "key-" + SECURITY_TYPE_OIDC;
                 break;
         }
-
-
 
         return retval;
     };
@@ -191,9 +198,9 @@ const SystemSetup = (props) => {
     };
 
     const loadSecurityTypes = () => {
-        if (securityConfig && securityConfig.defaultSecurityType) {
+        if (securityConfig && securityConfig.securityType) {
             return SECURITY_TYPES.map(t => {
-                if (t === securityConfig.defaultSecurityType) {
+                if (t === securityConfig.securityType) {
                     return <option value={t} selected>{t}</option>;
                 } else {
                     return <option value={t}>{t}</option>;
@@ -205,41 +212,8 @@ const SystemSetup = (props) => {
     const onSecurityTypeChange = (e) => {
         let sc = {...securityConfig};
         let type = e.target.value;
-        let newid;
-        let oldid;
-        switch (type) {
-         case  SECURITY_TYPE_BASIC:
-             sc.basicConfiguration.enabled = true;
-             newid = "bas-enabled";
-             break;
-         case SECURITY_TYPE_OIDC:
-             sc.oidcConfiguration.enabled = true;
-             newid = "oidc-enabled";
-             break;
-        }
         
-       switch (securityConfig.defaultSecurityType) {
-         case  SECURITY_TYPE_BASIC:
-             sc.basicConfiguration.enabled = false;
-             oldid = "bas-enabled";
-             break;
-         case SECURITY_TYPE_OIDC:
-             oldid = "oidc-enabled";
-             sc.oidcConfiguration.enabled = false;
-             break;
-        }
-        
-        
-        let el = document.getElementById(newid);
-        if (el) {
-            el.checked = true;
-        }
-        
-        el = document.getElementById(oldid);
-        if (el) {
-            el.checked = false;
-        }
-        sc.defaultSecurityType = type;
+        sc.securityType = type;
         setSecurityConfig(sc);
     };
 

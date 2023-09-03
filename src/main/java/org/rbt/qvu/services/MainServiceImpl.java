@@ -1388,7 +1388,7 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper) {
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper) {
         OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
 
         OperationResult<QueryResult> res = runQuery(runWrapper);

@@ -77,7 +77,7 @@ public interface MainService {
 
     public OperationResult<DocumentNode> getAvailableDocuments(String documentType);
 
-    public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(QueryRunWrapper runWrapper);
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper);
 
     public OperationResult<AuthConfig> getAuthConfig();
     

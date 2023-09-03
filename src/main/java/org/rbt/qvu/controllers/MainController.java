@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.rbt.qvu.client.utils.OperationResult;
 import org.rbt.qvu.client.utils.Role;
 import org.rbt.qvu.client.utils.User;
+import org.rbt.qvu.configuration.ConfigurationHelper;
 import org.rbt.qvu.configuration.database.DataSourceConfiguration;
 import org.rbt.qvu.dto.AuthConfig;
 import org.rbt.qvu.dto.AuthData;
@@ -29,6 +30,7 @@ import org.rbt.qvu.dto.Table;
 import org.rbt.qvu.dto.TableColumnNames;
 import org.rbt.qvu.dto.TableSettings;
 import org.rbt.qvu.util.AuthHelper;
+import org.rbt.qvu.util.Constants;
 import org.rbt.qvu.util.DBHelper;
 import org.rbt.qvu.util.FileHandler;
 import org.springframework.http.HttpEntity;
@@ -52,6 +54,10 @@ public class MainController {
 
     @Autowired
     private FileHandler fileHandler;
+    
+    @Autowired
+    private ConfigurationHelper config;
+
 
     @PostConstruct
     private void init() {
@@ -212,16 +218,30 @@ public class MainController {
         return service.runQuery(runWrapper);
     }
 
-    @PostMapping("api/v1/query/document/run")
-    public OperationResult<QueryResult> runQuery(@RequestBody QueryRunWrapper runWrapper) {
+    @PostMapping("api/v1/query/run/tabular")
+    public OperationResult<QueryResult> runTablularQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runQuery()");
-        return service.runQuery(runWrapper);
+        OperationResult<QueryResult> retval =  service.runQuery(runWrapper);
+        
+        // for api call populate text in message
+        if (!retval.isSuccess()) {
+            retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()));
+        }
+        
+        return retval;
     }
 
-    @PostMapping("api/v1/query/data/run")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runDataQuery(@RequestBody QueryRunWrapper runWrapper) {
-        LOG.debug("in runDataQuery()");
-        return service.runDataQuery(runWrapper);
+    @PostMapping("api/v1/query/run/json")
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
+        LOG.debug("in runJsonQuery()");
+        OperationResult<List<LinkedHashMap<String, Object>>> retval =  service.runJsonQuery(runWrapper);
+        
+        // for api call populate text in message
+        if (!retval.isSuccess()) {
+            retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()));
+        }
+        
+        return retval;
     }
 
     @PostMapping("api/v1/query/excel/export")

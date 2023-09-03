@@ -394,7 +394,7 @@ public class DBHelper {
         }
     }
 
-    public static int getJdbcTypeFromName(String name) {
+    public int getJdbcTypeFromName(String name) {
         int retval;
         switch(name) {
             case QueryParameter.DATE_TYPE:

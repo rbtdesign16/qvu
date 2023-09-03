@@ -63,7 +63,6 @@ public class QvuConfiguration {
     @Value("${cors.allowed.origins:*}")
     private String corsAllowedOrigins;
 
-
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
@@ -93,6 +92,7 @@ public class QvuConfiguration {
         Set<String> scopes = new HashSet<>();
         scopes.add(OidcScopes.OPENID);
         scopes.add(OidcScopes.PROFILE);
+        scopes.add(OidcScopes.EMAIL);
 
         OidcConfiguration oidcConfig = config.getSecurityConfig().getOidcConfiguration();
         ClientRegistration clientRegistration = ClientRegistrations
@@ -100,7 +100,7 @@ public class QvuConfiguration {
                 .scope(scopes)
                 .registrationId(Constants.OIDC_REGISTRATION_ID)
                 .clientId(oidcConfig.getClientId())
-                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .redirectUri(Constants.OIDC_REDIRECT_TEMPLATE)
                 .clientSecret(oidcConfig.getClientSecret()).build();
 
         return new InMemoryClientRegistrationRepository(clientRegistration);
@@ -117,29 +117,20 @@ public class QvuConfiguration {
 		return source;
 	}
     
-    private void oidcFilterChainConfig(HttpSecurity http) throws Exception {
-        LOG.debug("adding oidc login support");
-        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest()
-                .authenticated())
-                .cors(c -> c.configurationSource(getCorsConfigurationSource()))
-                .csrf(c -> c.disable())
-                .oauth2Login(withDefaults());
-    }
-
-    private void basicFilterChainConfig(HttpSecurity http) throws Exception {
-        LOG.debug("adding basiv login support");
-
-        http.httpBasic(withDefaults());
-    }
-
-    @Bean
+     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LOG.debug("in filterChain() - securityType=" + config.getSecurityType());
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated());
+
         if (Constants.OIDC_SECURITY_TYPE.equals(config.getSecurityType())) {
-            oidcFilterChainConfig(http);
+            LOG.debug("adding oidc login support");
+            http.oauth2Login(withDefaults());
         } else if (Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType())) {
-            basicFilterChainConfig(http);
+            LOG.debug("adding basiv login support");
+            http.httpBasic(withDefaults());
         }
+        
+        http.cors(c -> c.configurationSource(getCorsConfigurationSource())).csrf(c -> c.disable());
 
         if (StringUtils.isNotEmpty(sslKeyStore)) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());

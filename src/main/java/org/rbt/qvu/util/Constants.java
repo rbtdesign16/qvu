@@ -41,6 +41,7 @@ public class Constants {
     public static final String NONE = "none";
     
     public static final String OIDC_REGISTRATION_ID = "qvuoidc";
+    public static final String OIDC_REDIRECT_TEMPLATE = "{baseUrl}/login/oauth2/code/{registrationId}";
     public static final int DEFAULT_MAX_EXPORTED_KEY_DEPTH = 4;
     public static final int DEFAULT_MAX_IMPORTED_KEY_DEPTH = 2;
 

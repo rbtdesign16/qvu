@@ -16,7 +16,8 @@ import RepositorySetup from "../widgets/RepositorySetup";
 import {QueryDesignProvider} from "../context/QueryDesignContext";
 
 import PropTypes from "prop-types";
-import {INFO, isAdministrator, isQueryDesigner, isReportDesigner} from "../utils/authHelper"
+import {INFO, isAdministrator} from "../utils/authHelper";
+import {loadAuth, loadLang} from  "../utils/apiHelper";
 
 const Home = (props) => {
     const {copyright, version} = props;
@@ -30,41 +31,32 @@ const Home = (props) => {
     }, [authData]);
 
     useEffect(() => {
-        initializeDataHandler();
+         initializeDataHandler();
     }, [datasources]);
 
     const getDefaultActiveTabKey = () => {
         if (isAdministrator(authData)) {
             return "adm";
-        } else if (isQueryDesigner(authData)) {
+        } else {
             return "qdsgn";
-        } else if (isReportDesigner(authData)) {
-            return "rdsgn";
-        }
-    };
-
-    const hasTabAccess = () => {
-        return isAdministrator(authData) || isQueryDesigner(authData) || isReportDesigner(authData);
+        } 
     };
 
     const getBody = () => {
         if (authData) {
             if (authData.initializingApplication) {
                 return <RepositorySetup/>;
-            } else if (hasTabAccess()) {
+            } else {
                 return (<div>
                          <Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
                             { isAdministrator(authData) && <Tab bsPrefix="mytab" eventKey="adm" title={getText("Admin")}>
                                 <Admin/>
                             </Tab> }
-                            { isQueryDesigner(authData) && <Tab eventKey="qdsgn" title={getText("Query Design")}>
+                            <Tab eventKey="qdsgn" title={getText("Query Design")}>
                                 <QueryDesignProvider>
                                     <QueryDesign/>
                                 </QueryDesignProvider>
-                            </Tab>}
-                            { isReportDesigner(authData) && <Tab eventKey="rdsgn" title={getText("Report Design")}>
-                                <ReportDesign/>
-                            </Tab>}
+                            </Tab>
                         </Tabs></div>);
                 return <Splash />;
             }

@@ -1,31 +1,28 @@
 import { intersection } from "./helper";
 
-export const DEFAULT_ADMINISTRATOR_ROLE = "administrator";
-export const DEFAULT_QUERY_DESIGNER_ROLE = "query designer";
-export const DEFAULT_REPORT_DESIGNER_ROLE = "report designer";
+export const ADMINISTRATOR_ROLE = "administrator";
+export const QUERY_DESIGNER_ROLE = "query designer";
+export const REPORT_DESIGNER_ROLE = "report designer";
 
-export const BASE_ROLES = [DEFAULT_ADMINISTRATOR_ROLE, DEFAULT_QUERY_DESIGNER_ROLE, DEFAULT_REPORT_DESIGNER_ROLE];
-
-
+export const BASE_ROLES = [ADMINISTRATOR_ROLE, QUERY_DESIGNER_ROLE, REPORT_DESIGNER_ROLE];
 export const ADMIN_USER_ID = "admin";
-
 export const SECURITY_TYPE_BASIC = "basic";
 export const SECURITY_TYPE_OIDC = "oidc";
 
 export const SECURITY_TYPES = [SECURITY_TYPE_BASIC, SECURITY_TYPE_OIDC];
 
 export const userHasRole = (authData, role) => {
-    if (authData.currentUser && authData.currentUser.roles) {
+    if (authData && authData.currentUser && authData.currentUser.roles) {
         return authData.currentUser.roles.includes(role);
     }
 };
 
 export const isAdministrator = (authData) => {
-   return  userHasRole(authData, DEFAULT_ADMINISTRATOR_ROLE);
+   return  userHasRole(authData, ADMINISTRATOR_ROLE);
 };
 
 export const isQueryDesigner = (authData) => {
-    return userHasRole(authData, DEFAULT_QUERY_DESIGNER_ROLE);
+    return userHasRole(authData, QUERY_DESIGNER_ROLE);
 };
 
 export const isReportDesigner = (authData) => {

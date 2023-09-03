@@ -19,8 +19,9 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
+import { isQueryDesigner } from "../../utils/authHelper";
 import {
-        SUCCESS,
+SUCCESS,
         INFO,
         WARN,
         ERROR,
@@ -33,7 +34,7 @@ import {
         NODE_TYPE_COLUMN,
         NODE_TYPE_IMPORTED_FOREIGNKEY,
         NODE_TYPE_EXPORTED_FOREIGNKEY
-        } from "../../utils/helper";
+} from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
@@ -42,7 +43,7 @@ import { getDatasourceTreeViewData,
         isApiSuccess,
         getDocument} from "../../utils/apiHelper"
 
-        const QueryDesign = () => {
+const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
     const {setTreeViewData,
         treeViewData,
@@ -314,7 +315,7 @@ import { getDatasourceTreeViewData,
                 <SaveDocumentModal config={showSaveDocument}/>
                 <DocumentSelectModal config={showDocumentSelect}/>
                 <Button size="sm"  title={getText("Load Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
-                <Button size="sm"  title={getText("Save Document")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>
+                {isQueryDesigner(authData) && <Button size="sm"  title={getText("Save Document")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
                 <Button size="sm"  title={getText("New Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewDocument()}>{getText("New")}</Button>
                 <span className="cobaltBlue-f">{getDocumentInfo()}</span>
                 <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>

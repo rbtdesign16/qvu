@@ -56,9 +56,9 @@ import {
     isAdministrator,
     isQueryDesigner,
     isReportDesigner,
-    DEFAULT_ADMINISTRATOR_ROLE,
-    DEFAULT_QUERY_DESIGNER_ROLE,
-    DEFAULT_REPORT_DESIGNER_ROLE,
+    ADMINISTRATOR_ROLE,
+    QUERY_DESIGNER_ROLE,
+    REPORT_DESIGNER_ROLE,
     BASE_ROLES,
     ADMIN_USER_ID
         } from "../../utils/authHelper";
@@ -229,21 +229,6 @@ const Admin = () => {
                 name: "description",
                 type: "input"
             }];
-    };
-
-    const getAliasMessageIfRequired = (rec) => {
-        let retval = "";
-
-        if (isAdministrator(authData) && (rec.name === authData.administratorRole) && (rec.name !== DEFAULT_ADMINISTRATOR_ROLE)) {
-            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_ADMINISTRATOR_ROLE));
-        } else if (isQueryDesigner(authData) && (rec.name === authData.queryDesignerRole) && (rec.name !== DEFAULT_QUERY_DESIGNER_ROLE)) {
-            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_QUERY_DESIGNER_ROLE));
-        } else if (isQueryDesigner(authData) && (rec.name === authData.reportDesignerRole) && (rec.name !== DEFAULT_REPORT_DESIGNER_ROLE)) {
-            retval += ("*" + getText("role alias", " ") + getText(DEFAULT_REPORT_DESIGNER_ROLE));
-        }
-
-        return retval;
-
     };
 
     const getUserEntryConfig = (isnew) => {
@@ -754,10 +739,6 @@ const Admin = () => {
                 label: getText("Description:"),
                 field: "description",
                 useLang: true
-            },
-            {
-                field: getAliasMessageIfRequired,
-                fieldStyle: {color: INFO_TEXT_COLOR}
             }
         ],
         data: authData.allRoles

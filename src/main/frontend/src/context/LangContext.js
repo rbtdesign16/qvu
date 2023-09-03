@@ -10,7 +10,7 @@ export const LangProvider = ({ children }
             
             if (lang && lang[textKey]) {
                 return lang[textKey] + addText;
-            } else if (lang && lang[DEFAULT_LANG_CODE]) {
+            } else {
                 return textKey + addText;
             }
         } catch (e) {

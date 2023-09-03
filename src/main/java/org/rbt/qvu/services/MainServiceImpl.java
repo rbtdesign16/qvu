@@ -783,7 +783,6 @@ public class MainServiceImpl implements MainService {
             nm = u.getName();
         }
         
-        
         if (StringUtils.isNotEmpty(nm)) {
             retval = getSecurityConfig().findUser(nm);
 

@@ -901,7 +901,7 @@ const Admin = () => {
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
-            hideMessage();
+            showMessage(SUCCESS, getText("System Settings saved"));
         }
 
     };

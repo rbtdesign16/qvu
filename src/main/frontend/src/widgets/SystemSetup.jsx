@@ -108,11 +108,6 @@ const SystemSetup = (props) => {
                     size: 50,
                     showHelp: showHelpMessage,
                     helpText: getText("securityServiceClass-help")
-                },
-                {
-                    label: getText("Enabled"),
-                    name: "enabled",
-                    type: "checkbox"
                 }]
         };
     };

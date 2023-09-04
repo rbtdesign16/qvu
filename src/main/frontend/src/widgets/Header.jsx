@@ -50,7 +50,7 @@ const Header = (props) => {
         return <div className="popup-menu" >
             <div  onClick={e => onMenuItem("docgs")} >{getText("Getting started")}</div>
             <div  onClick={e => onMenuItem("doch")} style={{borderBottom: "solid 1px darkslategray"}}>{getText("Help documentation")}</div>
-            <a target="_blank" href="mailto:myqvu.issue@gmail.com?subject=Qvu%20issue">{getText("Report an Issue")}</a>
+            <a target="_blank" href="mailto:qvu@rbtdesign.org?subject=Qvu%20issue">{getText("Report an Issue")}</a>
         </div>
     };
 

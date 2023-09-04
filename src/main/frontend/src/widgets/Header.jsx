@@ -13,12 +13,15 @@ const Header = (props) => {
     const [showMenu, setShowMenu] = useState(false);
     const {authData} = useAuth();
 
-    const onMenuItem = (id) => {
-        if (id === "doch") {
-            showHelp();
-        } else {
-            showGettingStarted();
-        }
+    const onMenuItem = (key, data) => {
+        switch(key) {
+            case "doch":
+                showHelp();
+                break;
+            case "docgs":
+                showGettingStarted();
+                break;
+         }
     };
     
     const showGettingStarted = async () => {
@@ -44,9 +47,10 @@ const Header = (props) => {
     };
 
     const popupMenu = () => {
-        return <div className="popup-menu" onClick={e => onMenuItem(e.target.id)} >
-            <div id="docgs">{getText("Getting started")}</div>
-            <div id="doch">{getText("Help documentation")}</div>
+        return <div className="popup-menu" >
+            <div  onClick={e => onMenuItem("docgs")} >{getText("Getting started")}</div>
+            <div  onClick={e => onMenuItem("doch")} style={{borderBottom: "solid 1px darkslategray"}}>{getText("Help documentation")}</div>
+            <a target="_blank" href="mailto:myqvu.data@gmail.com?subject=Qvu%20issue">{getText("Report an Issue")}</a>
         </div>
     };
 

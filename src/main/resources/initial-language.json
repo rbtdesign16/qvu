@@ -179,6 +179,7 @@
         "repositoryInitializationSuccess-msg": "Qvu repository has been created. Please re-start the Qvu application\nand pass the repository location as a system parameters like this:\n\njava -jar -Drepository.folder=$1 /path/to/qvu.jar",
         "repositorySetup-help": "Enter the server side folder that will contain the Qvu repository. The Qvu repository will hold all configuration files and created documents. The entered folder must exist and be empty.",
         "report designer": "report designer",
+        "Report an Issue": "Report an Issue",
         "Reset": "Reset",
         "Role Access:": "Role Access:",
         "role alias": "role alias",

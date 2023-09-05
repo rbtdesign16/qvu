@@ -6,7 +6,7 @@ package org.rbtdesign.qvu.util;
 
 import java.util.Comparator;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.client.utils.User;
+import org.rbtdesign.qvu.client.utils.User;
 
 /**
  *

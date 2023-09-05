@@ -7,8 +7,8 @@ package org.rbtdesign.qvu.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.client.utils.User;
+import org.rbtdesign.qvu.client.utils.Role;
+import org.rbtdesign.qvu.client.utils.User;
 
 /**
  *

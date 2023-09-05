@@ -6,7 +6,7 @@ package org.rbtdesign.qvu.configuration.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
-import org.rbt.qvu.client.utils.SecurityService;
+import org.rbtdesign.qvu.client.utils.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

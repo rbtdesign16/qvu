@@ -35,7 +35,7 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.rbt</groupId>
+            <groupId>org.rbtdesign</groupId>
             <artifactId>qvu-client-utils</artifactId>
             <version>1.0.0</version>
         </dependency>

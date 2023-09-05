@@ -6,7 +6,7 @@ package org.rbtdesign.qvu.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.rbt.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.client.utils.OperationResult;
 
 /**
  *

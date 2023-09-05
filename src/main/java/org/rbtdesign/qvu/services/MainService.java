@@ -2,9 +2,9 @@ package org.rbtdesign.qvu.services;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.rbt.qvu.client.utils.OperationResult;
-import org.rbt.qvu.client.utils.Role;
-import org.rbt.qvu.client.utils.User;
+import org.rbtdesign.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.client.utils.Role;
+import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
 import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.AuthData;

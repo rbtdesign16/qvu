@@ -6,7 +6,7 @@ package org.rbtdesign.qvu.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.rbt.qvu.client.utils.User;
+import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.services.MainServiceImpl;
 import org.slf4j.Logger;

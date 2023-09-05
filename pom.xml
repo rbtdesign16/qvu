@@ -111,7 +111,7 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-       </dependency>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -228,18 +228,4 @@
         </plugins>
         <finalName>qvu</finalName>
     </build>
-    
-    <repositories>
-        <repository>
-            <id>shibboleth_repository</id>
-            <name>Shibboleth Maven Repository</name>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>shibboleth_repository_2</id>
-            <name>Shibboleth Maven Repository (https://mvnrepository.com/artifact/org.opensaml/opensaml-core/4.1.1)</name>
-            <url>https://build.shibboleth.net/maven/releases/</url>
-        </repository>
-    </repositories>
-
 </project>

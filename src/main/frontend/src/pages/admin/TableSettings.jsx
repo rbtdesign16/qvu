@@ -210,7 +210,7 @@ const TableSettings = (props) => {
                    onHide={onHide}
                    backdrop={true} 
                    keyboard={true}>
-                   <Modal.Header >closeButton
+                   <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>
                 </Modal.Header>

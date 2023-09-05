@@ -136,7 +136,6 @@ public class MainServiceImpl implements MainService {
             retval.setCurrentUser(getCurrentUser());
             boolean localUser = isLocalUser();
             retval.setAllowUserAdd(localUser);
-            retval.setAllowUserDelete(localUser);
 
             SecurityConfiguration scfg = config.getSecurityConfig();
             retval.setInitializingApplication(config.isInitializingApplication());
@@ -146,9 +145,11 @@ public class MainServiceImpl implements MainService {
 
             // users and roles are defined via json
             if (authService != null) { // if we have a service defined we will try to loaf from there
+                retval.setAllowUserDelete(false);
                 retval.getAllRoles().addAll(authService.getAllRoles());
                 retval.getAllUsers().addAll(authService.getAllUsers());
             } else {
+                retval.setAllowUserDelete(true);
                 retval.getAllRoles().addAll(scfg.getRoles());
                 retval.setAllUsers(scfg.getUsers());
             }

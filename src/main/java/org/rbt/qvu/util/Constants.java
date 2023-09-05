@@ -73,10 +73,15 @@ public class Constants {
         }
     }
     
+    public static final String DOCUMENT_TYPE_QUERY = "query";
+    public static final String DOCUMENT_TYPE_REPORT = "report";
     public static final String TABLE_CACHE_NAME = "table.cache";
     public static final String TABLE_SETTINGS_CACHE_NAME = "table.settings.cache";
     public static final int TABLE_CACHE_ENTRIES = 200;
     
+    public static final String QUERY_DOCUMENT_CACHE_NAME = "query.document.cache";
+    public static final int QUERY_DOCUMENT_CACHE_ENTRIES = 50;
+
     public static final String INNER_JOIN = "inner";
     public static final String OUTER_JOIN = "outer";
 }

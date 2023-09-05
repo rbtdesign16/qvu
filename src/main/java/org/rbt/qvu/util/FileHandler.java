@@ -49,8 +49,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileHandler {
     private static final Logger LOG = LoggerFactory.getLogger(FileHandler.class);
-    public static final String REPORT_FOLDER = "report";
-    public static final String QUERY_FOLDER = "query";
+    public static final String REPORT_FOLDER = Constants.DOCUMENT_TYPE_REPORT;
+    public static final String QUERY_FOLDER = Constants.DOCUMENT_TYPE_QUERY;
 
     @Autowired
     private ConfigurationHelper config;

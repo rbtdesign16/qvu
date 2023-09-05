@@ -770,19 +770,19 @@ public class MainServiceImpl implements MainService {
     private User toUser(DefaultOAuth2User u) {
         User retval = null;
         String nm = null;
-        
+
         OidcConfiguration oidcConfig = getSecurityConfig().getOidcConfiguration();
-        
+
         if (oidcConfig.isUseEmailForUserId()) {
             nm = u.getAttribute(StandardClaimNames.EMAIL);
         } else {
             nm = u.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
         }
-        
+
         if (StringUtils.isEmpty(nm)) {
             nm = u.getName();
         }
-        
+
         if (StringUtils.isNotEmpty(nm)) {
             retval = getSecurityConfig().findUser(nm);
 
@@ -803,7 +803,7 @@ public class MainServiceImpl implements MainService {
 
             fileHandler.saveUser(retval);
         }
-        
+
         return retval;
     }
 
@@ -986,7 +986,31 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult getDocument(String type, String group, String name) {
-        return fileHandler.getDocument(type, group, name);
+        OperationResult retval = null;
+        String key = group + "." + name;
+        try {
+            if (Constants.DOCUMENT_TYPE_QUERY.equals(type)) {
+                QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
+
+                if (doc != null) {
+                    retval = new OperationResult<QueryDocument>();
+                    retval.setResult(doc);
+                } else {
+                    retval = fileHandler.getDocument(type, group, name);
+                    if (retval.isSuccess()) {
+                        doc = (QueryDocument) retval.getResult();
+                        cacheHelper.getQueryDocumentCache().put(key, doc);
+                    }
+                }
+            } else {
+                retval = new OperationResult();
+                retval.setErrorCode(Errors.NOT_SUPPORTED);
+                retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, Errors.getMessage(Errors.NOT_SUPPORTED)));
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+        return retval;
     }
 
     @Override
@@ -1021,6 +1045,11 @@ public class MainServiceImpl implements MainService {
                 docWrapper.setQueryDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
+
+                if (retval.isSuccess()) {
+                    String key = docWrapper.getGroup() + "." + docWrapper.getQueryDocument().getName();
+                    cacheHelper.getQueryDocumentCache().remove(key);
+                }
             }
 
             retval.setResult(docWrapper);
@@ -1074,15 +1103,14 @@ public class MainServiceImpl implements MainService {
                         }
                     }
                 }
-                
+
                 row.add(o);
             }
             retval.getData().add(row);
         }
 
         retval.setRowCount(rowcnt);
-        
-        
+
         if (rowcnt > 0) {
             for (Integer i = 0; i < cwidths.length; ++i) {
                 Integer hdrlen = (retval.getHeader().get(i + 1).length() + 4);

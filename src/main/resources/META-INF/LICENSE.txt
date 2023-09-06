@@ -1,5 +1,5 @@
 Qvu Data Service
-Copyright (C) rbtdesign, Rob Tucker. All Rights Reserved.
+Copyright (C) rbtdesign. All Rights Reserved.
 
 License last updated: September 5, 2023
 

@@ -368,8 +368,8 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
-            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
-            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
 
             // update admin password
             SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);

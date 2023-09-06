@@ -262,6 +262,9 @@ public class DBHelper {
                     }
                 }
 
+                if (StringUtils.isNotEmpty(c.getCloseParenthesis())) {
+                    retval.append(c.getCloseParenthesis());
+                }
             }
 
             if (aggColumn && nonAggColumn) {

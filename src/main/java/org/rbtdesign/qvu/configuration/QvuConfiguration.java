@@ -126,7 +126,7 @@ public class QvuConfiguration {
             LOG.debug("adding oidc login support");
             http.oauth2Login(withDefaults());
         } else if (Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType())) {
-            LOG.debug("adding basiv login support");
+            LOG.debug("adding basic login support");
             http.httpBasic(withDefaults());
         }
         

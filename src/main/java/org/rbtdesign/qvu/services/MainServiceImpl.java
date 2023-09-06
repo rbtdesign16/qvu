@@ -1050,13 +1050,14 @@ public class MainServiceImpl implements MainService {
                 retval.setMessage(opr.getMessage());
 
                 if (retval.isSuccess()) {
-                    String key = docWrapper.getGroup() + "." + docWrapper.getQueryDocument().getName();
+                    String key = docWrapper.getGroup() + "." + doc.getName();
                     cacheHelper.getQueryDocumentCache().remove(key);
                 }
             }
 
             retval.setResult(docWrapper);
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             Helper.populateResultError(retval, ex);
         }
 

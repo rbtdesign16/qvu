@@ -226,6 +226,10 @@ const SystemSetup = (props) => {
             return "";
         }
     };
+    
+    const getTitle = () => {
+        return getText("System Settings");
+    }
 
     return  (<Modal animation={false} 
            size={config.dlgsize ? config.dlgsize : ""}
@@ -235,7 +239,7 @@ const SystemSetup = (props) => {
            backdrop={true} 
            keyboard={true}>
         <Modal.Header closeButton>
-            <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
+            <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
             <div>   

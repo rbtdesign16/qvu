@@ -18,13 +18,17 @@ import org.rbtdesign.qvu.dto.ForeignKey;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author rbtuc
  */
 public class QuerySelectTreeBuilder {
-    public static QuerySelectNode build(DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, List<Table> tableInfo) {
+    private static final Logger LOG = LoggerFactory.getLogger(QuerySelectTreeBuilder.class);
+    
+    public static QuerySelectNode build(FileHandler fileHandler, DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
 
@@ -67,6 +71,10 @@ public class QuerySelectTreeBuilder {
 
         Integer[] idHolder = {0};
         setIds(retval, idHolder);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("QuerySelectTree: " + fileHandler.getGson().toJson(retval, QuerySelectNode.class));
+        }
 
         return retval;
     }
@@ -217,18 +225,28 @@ public class QuerySelectTreeBuilder {
                                         String tocname = fk.getToColumns().get(i);
                                         ColumnSettings cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + cname);
 
+                                        String nm;
                                         if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                            fromdiscols.add(cs.getDisplayName());
+                                            nm = cs.getDisplayName();
                                         } else {
-                                            fromdiscols.add(cname);
+                                            nm = cname;
                                         }
 
+                                        if (!fromdiscols.contains(nm)) {
+                                            fromdiscols.add(nm);
+                                        }
+                                        
                                         cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
 
                                         if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
-                                            todiscols.add(cs.getDisplayName());
+                                            nm = cs.getDisplayName();
                                         } else {
-                                            todiscols.add(tocname);
+                                            nm = tocname;
+                                        }
+                                        
+                                        // sanity check to prevent duplicate columns
+                                        if (!todiscols.contains(nm)) {
+                                            todiscols.add(nm);
                                         }
                                     }
 

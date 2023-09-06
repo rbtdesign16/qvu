@@ -453,7 +453,9 @@ public class MainServiceImpl implements MainService {
             Set<String> userRoles = new HashSet<>(user.getRoles());
 
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
-            QuerySelectNode node = QuerySelectTreeBuilder.build(datasourceSettingsHelper,
+            QuerySelectNode node = QuerySelectTreeBuilder.build(
+                    fileHandler, 
+                    datasourceSettingsHelper,
                     ds,
                     userRoles,
                     tableInfo);

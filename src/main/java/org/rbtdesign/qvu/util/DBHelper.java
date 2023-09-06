@@ -206,19 +206,28 @@ public class DBHelper {
                 if ((c.getToColumns() != null) && !c.getToColumns().isEmpty()) {
                     retval.append(" on (");
 
+                    comma = "";
+                    Set<String> hs = new HashSet<>();
+                    
                     for (int i = 0; i < c.getToColumns().size(); ++i) {
                         String toColumn = c.getToColumns().get(i);
                         String fromColumn = c.getFromColumns().get(i);
 
-                        retval.append(withQuotes(dbType, c.getAlias()));
-                        retval.append(".");
-                        retval.append(withQuotes(dbType, toColumn));
+                        // sanity check to prevent duplicate columns
+                        if (!hs.contains(fromColumn)) {
+                            retval.append(comma);
+                            retval.append(withQuotes(dbType, c.getAlias()));
+                            retval.append(".");
+                            retval.append(withQuotes(dbType, toColumn));
 
-                        retval.append(" = ");
+                            retval.append(" = ");
 
-                        retval.append(withQuotes(dbType, c.getFromAlias()));
-                        retval.append(".");
-                        retval.append(withQuotes(dbType, fromColumn));
+                            retval.append(withQuotes(dbType, c.getFromAlias()));
+                            retval.append(".");
+                            retval.append(withQuotes(dbType, fromColumn));
+                            comma = ", ";
+                            hs.add(fromColumn);
+                        }
                     }
 
                     retval.append(")");

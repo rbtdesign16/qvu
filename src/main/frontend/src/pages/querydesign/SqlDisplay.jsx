@@ -110,9 +110,14 @@ const SqlDisplay = (props) => {
     const getJoinColumns = (f) => {
         let retval = "(";
         let comma = "";
+        let hs = new Set();
         for (let i = 0; i < f.fromColumns.length; ++i) {
-            retval += comma + withQuotes(f.alias) + "." + withQuotes(f.toColumns[i]) + " = " + withQuotes(f.fromAlias) + "." + withQuotes(f.fromColumns[i]);
-            comma = ", ";
+            // sanity check to prevent duplicate columns
+            if (!hs.has(f.fromColumns[i])) {
+                retval += comma + withQuotes(f.alias) + "." + withQuotes(f.toColumns[i]) + " = " + withQuotes(f.fromAlias) + "." + withQuotes(f.fromColumns[i]);
+                comma = ", ";
+            }
+            hs.add(f.fromColumns[i]);
         }
         retval += ")";
 

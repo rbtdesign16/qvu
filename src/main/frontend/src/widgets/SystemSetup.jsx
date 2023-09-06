@@ -230,6 +230,7 @@ const SystemSetup = (props) => {
     const getTitle = () => {
         return getText("System Settings");
     }
+    
 
     return  (<Modal animation={false} 
            size={config.dlgsize ? config.dlgsize : ""}

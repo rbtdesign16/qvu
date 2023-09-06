@@ -630,7 +630,7 @@ const Admin = () => {
     };
 
     const addDocumentGroup = () => {
-        setEditModal(getDocumentGroupConfig(getText("Create new group"), {newRecord: true}));
+        setEditModal(getDocumentGroupConfig(getText("Create new group"), {description: "", newRecord: true}));
     };
 
     const editDocumentGroup = (indx) => {

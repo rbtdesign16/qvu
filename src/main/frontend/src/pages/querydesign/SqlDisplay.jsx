@@ -399,7 +399,6 @@ const SqlDisplay = (props) => {
         } else {
             showMessage(INFO, getText("Running query", "...", ), null, true);
             let res = await runQuery(buildRunDocument());
-
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {

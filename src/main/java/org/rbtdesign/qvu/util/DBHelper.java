@@ -157,6 +157,11 @@ public class DBHelper {
 
                     if (StringUtils.isNotEmpty(c.getCustomSql())) {
                         retval.append(c.getCustomSql());
+                        if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
+                            aggColumn = true;
+                        } else {
+                            nonAggColumn = true;
+                        }
                     } else {
                         if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
                             aggColumn = true;

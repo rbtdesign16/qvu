@@ -42,7 +42,7 @@ const QueryResultsTable = () => {
         setCurrentFilters,
         isRowHidden} = useQueryDesign();
     const {getText} = useLang();
-    const {data, initialColumnWidths, columnTypes, header} = queryResults;
+    const {data, initialColumnWidths, columnTypes, header} = queryResults ? queryResults : {data: [], initialColumnWidth: [], columnTypes: [], header: []};
     const [showFilterModal, setShowFilterModal] = useState({show: false});
     const [pagingInfo, setPagingInfo] = useState({currentPage: 1, 
         pageSize: DEFAULT_PAGE_SIZE, 

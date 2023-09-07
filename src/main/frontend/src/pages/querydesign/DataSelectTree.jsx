@@ -23,7 +23,6 @@ const DataSelectTree = (props) => {
         selectedColumnIds,
         selectedTableIds,
         baseTable,
-        setTreeViewData,
         setSelectedColumnIds,
         setSelectedTableIds,
         setBaseTable,

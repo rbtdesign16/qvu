@@ -402,6 +402,7 @@ export const QueryDesignProvider = ({ children }) => {
         setSelectColumns([]);
         setFilterColumns([]);
         setFromClause(null);
+        setTreeViewExpandedIds([]);
         setQueryResults({header: [], data: []});
         setCurrentResultsSort({column: 0, direction: "asc"});
         setCurrentFilters({});

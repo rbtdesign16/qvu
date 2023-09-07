@@ -148,22 +148,23 @@ const QueryDesign = () => {
 
     };
 
-
     const onDatasourceChange = async (e) => {
+        setNewDocument();
         let ds = e.target.options[e.target.selectedIndex].value;
         if (ds) {
-            showMessage(INFO, getText("Loading datasource information", "..."), null, true);
-            let res = await getDatasourceTreeViewData(ds);
-            if (isApiError(res)) {
-                showMessage(ERROR, res.message);
-            } else {
-                setTreeViewData(flattenTree(res.result));
-                setDatasource(ds);
-                hideMessage();
-            }
+            updateTreeView(ds);
+        }
+    };
+
+    const updateTreeView = async (ds) => {
+        showMessage(INFO, getText("Loading datasource information", "..."), null, true);
+        let res = await getDatasourceTreeViewData(ds);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
         } else {
-            setTreeViewData(null);
-            setDatasource(null);
+            setTreeViewData(flattenTree(res.result));
+            setDatasource(ds);
+            hideMessage();
         }
     };
 
@@ -211,7 +212,12 @@ const QueryDesign = () => {
         return retval;
     };
 
-    const loadDocument = async (group, name) => {
+    const loadDocument = (group, name) => {
+        setNewDocument();
+        populateDocument(group, name);
+    };
+
+    const populateDocument = async (group, name) => {
         hideDocumentSelect();
         showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
@@ -225,6 +231,7 @@ const QueryDesign = () => {
                 showMessage(ERROR, res.message);
             } else {
                 let treeData = res.result;
+                
                 let selIds = [];
 
                 for (let i = 0; i < doc.selectColumns.length; ++i) {

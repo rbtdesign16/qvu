@@ -170,7 +170,7 @@ const SqlDisplay = (props) => {
         }
         
         return retval;
-    }
+    };
 
     const getFromColumns = () => {
         if (fromClause && Array.isArray(fromClause)) {

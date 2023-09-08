@@ -75,6 +75,8 @@ const RepositorySetup = () => {
                         <input name="password" type="password" size={20} onChange={e => onPassword(e)} />
                         <div style={{marginTop: "3px"}} className="ck-label">{getText("Repeat Password")}</div>
                         <input name="repeatPassword" type="password" size={20} onChange={e => onPassword(e)} />
+                        
+                        <div className="small-msg">{getText("password-validation-msg")}</div>
                         <div style={{marginTop: "3px"}}>
                             <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("repositorySetup-help"))}/>
                             <label className="ck-label">{getText("Repository Folder")}</label>

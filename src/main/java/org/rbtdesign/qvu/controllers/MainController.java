@@ -251,6 +251,26 @@ public class MainController {
         
         return retval;
     }
+    
+    @PostMapping("api/v1/query/run/json/objectgraph")
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectQuery(@RequestBody QueryRunWrapper runWrapper) {
+        LOG.debug("in runJsonObjectQuery()");
+        
+               throw new UnsupportedOperationException("Not supported yet."); 
+ /*
+        OperationResult<List<LinkedHashMap<String, Object>>> retval =  service.runJsonObjectGraphQuery(runWrapper);
+        
+        // for api call populate text in message
+        if (!retval.isSuccess()) {
+            List <String> replaceList = new ArrayList<>();
+            replaceList.add(runWrapper.getGroupName());
+            replaceList.add(runWrapper.getDocumentName());
+            retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
+        }
+        */
+      //  return retval;
+    }
+
 
     @PostMapping("api/v1/query/excel/export")
     public HttpEntity<byte[]> exportToExcel(@RequestBody ExcelExportWrapper wrapper) {

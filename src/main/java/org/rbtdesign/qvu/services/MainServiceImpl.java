@@ -79,6 +79,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -990,21 +991,9 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult getDocument(String type, String group, String name) {
         OperationResult retval = null;
-        String key = group + "." + name;
         try {
             if (Constants.DOCUMENT_TYPE_QUERY.equals(type)) {
-                QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
-
-                if (doc != null) {
-                    retval = new OperationResult<QueryDocument>();
-                    retval.setResult(doc);
-                } else {
-                    retval = fileHandler.getDocument(type, group, name);
-                    if (retval.isSuccess()) {
-                        doc = (QueryDocument) retval.getResult();
-                        cacheHelper.getQueryDocumentCache().put(key, doc);
-                    }
-                }
+                retval = getQueryDocument(group, name);;
             } else {
                 retval = new OperationResult();
                 retval.setErrorCode(Errors.NOT_SUPPORTED);
@@ -1148,9 +1137,24 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    private OperationResult<QueryDocument> getQueryDocument(String group, String name) {
+        OperationResult<QueryDocument> retval = new OperationResult<>();
+        
+        String key = group + "." + name;
+        QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
+        
+        if (doc == null) {
+            retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, name);
+        } else {
+            retval.setResult(doc);
+        }
+        
+        return retval;
+    }
+    
     @Override
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
-        OperationResult<QueryDocument> res = fileHandler.getDocument(FileHandler.QUERY_FOLDER, runWrapper.getGroupName(), runWrapper.getDocumentName());
+        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName());
 
         if (res.isSuccess()) {
             QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
@@ -1442,7 +1446,47 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
+        List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
+        
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+            StringTokenizer st = new StringTokenizer(c.getPath(), "|");
+            
+            while (st.hasMoreTokens()) {
+            }
+        }
+        
+        return retval;
+    }
+    
+    @Override
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
 
+        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName());
+
+        if (res.isSuccess()) {
+            QueryDocument doc = res.getResult();
+            QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
+            wrapper.setDocument(doc);
+            wrapper.setParameters(runWrapper.getParameters());
+            OperationResult<QueryResult> qres = runQuery(wrapper);
+            
+            if (qres.isSuccess()) {
+                retval.setResult(buildResultsObjectGraph(doc, qres.getResult()));
+             } else {
+                retval.setErrorCode(res.getErrorCode());
+                retval.setMessage(res.getMessage());
+            }
+        } else {
+            retval.setErrorCode(res.getErrorCode());
+            retval.setMessage(res.getMessage());
+        }
+        return retval;
+    }
+
+    
     @Override
     public OperationResult<AuthConfig> getAuthConfig() {
         OperationResult<AuthConfig> retval = new OperationResult<>();

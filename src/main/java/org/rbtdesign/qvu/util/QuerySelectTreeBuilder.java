@@ -72,8 +72,8 @@ public class QuerySelectTreeBuilder {
         Integer[] idHolder = {0};
         setIds(retval, idHolder);
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("QuerySelectTree: " + fileHandler.getGson().toJson(retval, QuerySelectNode.class));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("QuerySelectTree: " + fileHandler.getGson().toJson(retval, QuerySelectNode.class));
         }
 
         return retval;

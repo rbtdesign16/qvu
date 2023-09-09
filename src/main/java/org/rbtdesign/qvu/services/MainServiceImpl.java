@@ -79,6 +79,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
@@ -455,7 +456,7 @@ public class MainServiceImpl implements MainService {
 
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasourceName);
             QuerySelectNode node = QuerySelectTreeBuilder.build(
-                    fileHandler, 
+                    fileHandler,
                     datasourceSettingsHelper,
                     ds,
                     userRoles,
@@ -497,11 +498,7 @@ public class MainServiceImpl implements MainService {
                 conn = qvuds.getConnection(datasourceName);
                 DatabaseMetaData dmd = conn.getMetaData();
 
-                if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
-                    res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-                } else {
-                    res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-                }
+                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
 
                 while (res.next()) {
                     String schema = res.getString(2);
@@ -517,8 +514,7 @@ public class MainServiceImpl implements MainService {
 
                         t.setDatasource(datasourceName);
                         t.setType(res.getString(4));
-                        t.setColumns(getTableColumns(datasourceName, dmd, t));
-                        t.setColumns(getTableColumns(datasourceName, dmd, t));
+                        t.setColumns(getTableColumns(ds, dmd, t));
                         t.setImportedKeys(getImportedKeys(datasourceName, dmd, t));
                         t.setExportedKeys(getExportedKeys(datasourceName, dmd, t));
 
@@ -685,7 +681,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private List<Column> getTableColumns(String datasourceName, DatabaseMetaData dmd, Table t) throws Exception {
+    private List<Column> getTableColumns(DataSourceConfiguration ds, DatabaseMetaData dmd, Table t) throws Exception {
         List<Column> retval = new ArrayList<>();
         ResultSet res = null;
 
@@ -695,7 +691,7 @@ public class MainServiceImpl implements MainService {
             while (res.next()) {
                 Column c = new Column();
                 c.setSchema(res.getString(2));
-                c.setDatasource(datasourceName);
+                c.setDatasource(ds.getDatasourceName());
                 c.setTable(t.getName());
                 c.setName(res.getString(4));
                 c.setDataType(res.getInt(5));
@@ -704,7 +700,6 @@ public class MainServiceImpl implements MainService {
                 c.setDecimalDigits(res.getInt(9));
                 c.setNullable(res.getInt(11) == DatabaseMetaData.columnNullable);
                 c.setDefaultValue(res.getString(13));
-
                 retval.add(c);
             }
 
@@ -1139,19 +1134,19 @@ public class MainServiceImpl implements MainService {
 
     private OperationResult<QueryDocument> getQueryDocument(String group, String name) {
         OperationResult<QueryDocument> retval = new OperationResult<>();
-        
+
         String key = group + "." + name;
         QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
-        
+
         if (doc == null) {
             retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, name);
         } else {
             retval.setResult(doc);
         }
-        
+
         return retval;
     }
-    
+
     @Override
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
         OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName());
@@ -1446,20 +1441,79 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
         List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
-        
-        for (SqlSelectColumn c : doc.getSelectColumns()) {
-            StringTokenizer st = new StringTokenizer(c.getPath(), "|");
-            
-            while (st.hasMoreTokens()) {
+        Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
+        Set<String> dataKeySet = new HashSet<>();
+
+        for (List<Object> row : res.getData()) {
+            for (SqlFrom f : doc.getFromClause()) {
+                StringBuilder s = new StringBuilder();
+                int indx = 0;
+                s.append(f.getAlias());
+                for (SqlSelectColumn c : doc.getSelectColumns()) {
+                    if (c.isShowInResults()) {
+                        if (f.getAlias().equals(c.getTableAlias())) {
+                            s.append(".");
+                            if (row.get(indx) != null) {
+                                s.append(row.get(indx));
+                            } else {
+                                s.append("null");
+                            }
+                        }
+
+                        indx++;
+                    }
+                }
+
+                List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
+                if (l == null) {
+                    dataMap.put(f.getFromAlias(), l = new ArrayList<>());
+                }
+
+                String dataKey = s.toString();
+                if (!dataKeySet.contains(dataKey)) {
+                    LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+                    indx = 0;
+                    for (SqlSelectColumn c : doc.getSelectColumns()) {
+                        if (c.isShowInResults()) {
+                            if (f.getAlias().equals(c.getTableAlias())) {
+                                data.put(c.getColumnName(), row.get(indx));
+                            }
+
+                            indx++;
+                        }
+                    }
+
+                    l.add(data);
+                    dataKeySet.add(dataKey);
+                }
             }
         }
-        
+
+        for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
+            retval.add(r);
+            buildObjectGraph(doc, dataMap, "t0", r);
+        }
+
         return retval;
     }
-    
+
+    private void buildObjectGraph(QueryDocument doc, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String fromAlias, LinkedHashMap<String, Object> parent) {
+        for (SqlFrom f : doc.getFromClause()) {
+            if (fromAlias.equals(f.getFromAlias())) {
+                List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
+                if (l != null) {
+                    parent.put(f.getTable(), l);
+                    for (LinkedHashMap<String, Object> r : l) {
+                        buildObjectGraph(doc, dataMap, f.getAlias(), r);
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
         OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
@@ -1472,10 +1526,10 @@ public class MainServiceImpl implements MainService {
             wrapper.setDocument(doc);
             wrapper.setParameters(runWrapper.getParameters());
             OperationResult<QueryResult> qres = runQuery(wrapper);
-            
+
             if (qres.isSuccess()) {
                 retval.setResult(buildResultsObjectGraph(doc, qres.getResult()));
-             } else {
+            } else {
                 retval.setErrorCode(res.getErrorCode());
                 retval.setMessage(res.getMessage());
             }
@@ -1483,10 +1537,14 @@ public class MainServiceImpl implements MainService {
             retval.setErrorCode(res.getErrorCode());
             retval.setMessage(res.getMessage());
         }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(fileHandler.getGson(true).toJson(retval));
+        }
+
         return retval;
     }
 
-    
     @Override
     public OperationResult<AuthConfig> getAuthConfig() {
         OperationResult<AuthConfig> retval = new OperationResult<>();

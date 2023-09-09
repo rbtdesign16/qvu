@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.util.Constants;
+import org.rbtdesign.qvu.util.DBHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

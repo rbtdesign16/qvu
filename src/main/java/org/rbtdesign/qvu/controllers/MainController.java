@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * The type Main controller.
  */
 @RestController
-@CrossOrigin(origins="*")
+@CrossOrigin(origins = "*")
 public class MainController {
     private static final Logger LOG = LogManager.getLogger(MainController.class);
 
@@ -56,10 +56,9 @@ public class MainController {
 
     @Autowired
     private FileHandler fileHandler;
-    
+
     @Autowired
     private ConfigurationHelper config;
-
 
     @PostConstruct
     private void init() {
@@ -223,27 +222,43 @@ public class MainController {
     @PostMapping("api/v1/query/run/tabular")
     public OperationResult<QueryResult> runTablularQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runQuery()");
-        OperationResult<QueryResult> retval =  service.runQuery(runWrapper);
-        
+        OperationResult<QueryResult> retval = service.runQuery(runWrapper);
+
         // for api call populate text in message
         if (!retval.isSuccess()) {
-            List <String> replaceList = new ArrayList<>();
+            List<String> replaceList = new ArrayList<>();
             replaceList.add(runWrapper.getGroupName());
             replaceList.add(runWrapper.getDocumentName());
             retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
         }
-        
+
         return retval;
     }
 
     @PostMapping("api/v1/query/run/json")
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonQuery()");
-        OperationResult<List<LinkedHashMap<String, Object>>> retval =  service.runJsonQuery(runWrapper);
-        
+        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonQuery(runWrapper);
+
         // for api call populate text in message
         if (!retval.isSuccess()) {
-            List <String> replaceList = new ArrayList<>();
+            List<String> replaceList = new ArrayList<>();
+            replaceList.add(runWrapper.getGroupName());
+            replaceList.add(runWrapper.getDocumentName());
+            retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
+        }
+
+        return retval;
+    }
+
+    @PostMapping("api/v1/query/run/json/objectgraph")
+    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
+        LOG.debug("in runJsonObjectQuery()");
+        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
+
+        // for api call populate text in message
+        if (!retval.isSuccess()) {
+            List<String> replaceList = new ArrayList<>();
             replaceList.add(runWrapper.getGroupName());
             replaceList.add(runWrapper.getDocumentName());
             retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
@@ -251,26 +266,6 @@ public class MainController {
         
         return retval;
     }
-    
-    @PostMapping("api/v1/query/run/json/objectgraph")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectQuery(@RequestBody QueryRunWrapper runWrapper) {
-        LOG.debug("in runJsonObjectQuery()");
-        
-               throw new UnsupportedOperationException("Not supported yet."); 
- /*
-        OperationResult<List<LinkedHashMap<String, Object>>> retval =  service.runJsonObjectGraphQuery(runWrapper);
-        
-        // for api call populate text in message
-        if (!retval.isSuccess()) {
-            List <String> replaceList = new ArrayList<>();
-            replaceList.add(runWrapper.getGroupName());
-            replaceList.add(runWrapper.getDocumentName());
-            retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
-        }
-        */
-      //  return retval;
-    }
-
 
     @PostMapping("api/v1/query/excel/export")
     public HttpEntity<byte[]> exportToExcel(@RequestBody ExcelExportWrapper wrapper) {

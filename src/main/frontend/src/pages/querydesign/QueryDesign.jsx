@@ -74,6 +74,7 @@ const QueryDesign = () => {
     const {datasources, setDatasources, getDatasourceSchema} = useDataHandler();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
+    const [tabKey, setTabKey] = useState("dsel");
 
     const loadDatasourceOptions = () => {
         if (datasources) {
@@ -301,6 +302,7 @@ const QueryDesign = () => {
 
     const onNewDocument = () => {
         setNewDocument();
+        setTabKey("dsel");
     };
 
     const getDocumentInfo = () => {
@@ -335,7 +337,10 @@ const QueryDesign = () => {
                         <DataSelectTree/>
                     </SplitterPanel>
                     <SplitterPanel size={splitter1Sizes[1]} className="query-design-cont">
-                        <Tabs defaultActiveKey="dsel" id="qd1" className="mb-3">
+                        <Tabs 
+                            activeKey={tabKey}
+                            onSelect={(k) => setTabKey(k)}
+                            id="qd1" className="mb-3">
                             <Tab eventKey="dsel" title={getText("Data")}>
                                 <SelectColumnList className="select-column-list"/>
                             </Tab> 

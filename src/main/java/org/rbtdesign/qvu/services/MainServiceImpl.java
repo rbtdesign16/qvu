@@ -1445,6 +1445,9 @@ public class MainServiceImpl implements MainService {
     private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
         List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
         Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
+        
+        // base table will be the returned list
+        dataMap.put("t0", retval);
         Set<String> dataKeySet = new HashSet<>();
 
         for (List<Object> row : res.getData()) {
@@ -1469,7 +1472,7 @@ public class MainServiceImpl implements MainService {
 
                 List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
                 if (l == null) {
-                    dataMap.put(f.getFromAlias(), l = new ArrayList<>());
+                    dataMap.put(f.getAlias(), l = new ArrayList<>());
                 }
 
                 String dataKey = s.toString();
@@ -1493,16 +1496,15 @@ public class MainServiceImpl implements MainService {
         }
 
         for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
-            retval.add(r);
             buildObjectGraph(doc, dataMap, "t0", r);
         }
 
         return retval;
     }
 
-    private void buildObjectGraph(QueryDocument doc, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String fromAlias, LinkedHashMap<String, Object> parent) {
+    private void buildObjectGraph(QueryDocument doc, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String alias, LinkedHashMap<String, Object> parent) {
         for (SqlFrom f : doc.getFromClause()) {
-            if (fromAlias.equals(f.getFromAlias())) {
+            if (alias.equals(f.getFromAlias())) {
                 List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
                 if (l != null) {
                     parent.put(f.getTable(), l);

@@ -95,9 +95,8 @@ export const QueryDesignProvider = ({ children }) => {
         for (let i = 0; i < selectedColumnIds.length; ++i) {
             let element = treeViewData[selectedColumnIds[i]];
             let table = treeViewData[element.parent].metadata.dbname;
-
             let path = getPath(element);
-
+            
             let pos = path.lastIndexOf("|");
 
             if (pos > -1) {
@@ -127,6 +126,7 @@ export const QueryDesignProvider = ({ children }) => {
                     customSql: "",
                     showInResults: true,
                     nodeId: selectedColumnIds[i],
+
                     fromClause,
                     setFromClause
                 });
@@ -222,13 +222,14 @@ export const QueryDesignProvider = ({ children }) => {
                 fromAlias: parent.alias,
                 joinType: lastEntry.substring(pos3 + 1, pos2),
                 table: lastEntry.substring(0, pos1),
+                foreignKeyName: lastEntry.substring(pos1 + 1, pos3),
                 fromColumns: fromColumns,
                 toColumns: toColumns
             };
         }
     };
 
-    const buildFromRecords = (paths, cols) => {
+    const buildFromRecords = (paths, cols, fkname) => {
         paths.sort((a, b) => {
             return (b.length - a.length);
         });
@@ -239,7 +240,8 @@ export const QueryDesignProvider = ({ children }) => {
         let retval = [];
         retval.push({
             table: baseTable,
-            alias: ("t" + (tindx++))
+            alias: ("t" + (tindx++)),
+            foreignKeyName: fkname
         });
 
         let jMap = new Map();

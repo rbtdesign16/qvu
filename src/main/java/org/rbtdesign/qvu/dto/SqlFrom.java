@@ -14,6 +14,7 @@ import java.util.List;
 public class SqlFrom {
     private String table;
     private String joinType;
+    private String foreignKeyName;
     private String alias;
     private String fromAlias;
     private List <String> fromColumns = new ArrayList<>();
@@ -65,6 +66,14 @@ public class SqlFrom {
 
     public void setFromAlias(String fromAlias) {
         this.fromAlias = fromAlias;
+    }
+
+    public String getForeignKeyName() {
+        return foreignKeyName;
+    }
+
+    public void setForeignKeyName(String foreignKeyName) {
+        this.foreignKeyName = foreignKeyName;
     }
     
     

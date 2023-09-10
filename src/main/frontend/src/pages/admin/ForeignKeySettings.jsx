@@ -81,12 +81,11 @@ const ForeignKeySettings = (props) => {
 
     const loadForeignKeyEntries = () => {
         if (table && table.foreignKeySettings) {
-            console.log("--------->1=" + JSON.stringify(table.foreignKeySettings));
             return table.foreignKeySettings.map((fk, indx) => {
                 return <div key={"fkset" + indx} className="entrygrid-120-300 bord-b">
                     <div className="label">{getText("Name:")}</div><div className="display-field">{fk.foreignKeyName}</div>
                     <div className="label">{getText("Type:")}</div><div className="display-field">{fk.type}</div>
-                    <div className="label">{getText("To Table:")}</div><div className="display-field">{fk.toTable}</div>
+                    <div className="label">{getText("To Table:")}</div><div className="display-field">{fk.toTableName}</div>
                     <div className="label">{getText("Column Mappings:")}</div><div className="display-field">{buildColumns(fk)}</div>
                     <div className="label">{getText("Display Name:")}</div>
                     <div className="display-field">

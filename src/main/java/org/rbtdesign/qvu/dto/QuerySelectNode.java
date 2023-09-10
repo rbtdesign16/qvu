@@ -62,6 +62,4 @@ public class QuerySelectNode {
     public void setId(int id) {
         this.id = id;
     }
-
-
 }

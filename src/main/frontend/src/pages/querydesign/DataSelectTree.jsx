@@ -30,14 +30,6 @@ const DataSelectTree = (props) => {
         updateSelectColumns} = useQueryDesign();
     const [showJoinType, setShowJoinType] = useState({show: false});
     
-    const getColumnLinks = (md) => {
-        if (md.fromdiscols && md.todiscols) {
-            return ": [" + md.fromdiscols + " -> " + md.todiscols + "]";
-        } else {
-            return "";
-        }
-    };
-
     const getFkIcon = (element, type) => {
         if (selectedTableIds.includes(element.id)) {
             if (element.metadata.jointype === "inner") {
@@ -171,7 +163,7 @@ const DataSelectTree = (props) => {
 
     const getNode = (element, handleSelect, isSelected, isBranch, isExpanded) => {
         if (isBranch) {
-            return <span><TreeArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}&nbsp;{element.name}{getColumnLinks(element.metadata)}</span></span>;
+            return <span><TreeArrowIcon isOpen={isExpanded}/><span onContextMenu={(e) => handleContextMenu(e, element)} className="name">{getIcon(element)}&nbsp;{element.displayName ? element.displayName : element.name}</span></span>;
         } else {
             return <span><TreeCheckboxIcon
                     className="checkbox-icon"

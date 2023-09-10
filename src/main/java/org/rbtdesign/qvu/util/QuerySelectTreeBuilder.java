@@ -28,11 +28,10 @@ import org.slf4j.LoggerFactory;
  */
 public class QuerySelectTreeBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(QuerySelectTreeBuilder.class);
-    
+
     public static QuerySelectNode build(FileHandler fileHandler, DatasourceSettingsHelper dsHelper, DataSourceConfiguration datasource, Set<String> userRoles, List<Table> tableInfo) {
         QuerySelectNode retval = new QuerySelectNode();
         retval.getMetadata().put("type", QuerySelectNode.NODE_TYPE_ROOT);
-
 
         Map<String, Table> tMap = new HashMap<>();
         for (Table t : tableInfo) {
@@ -55,7 +54,7 @@ public class QuerySelectTreeBuilder {
                     if (StringUtils.isNotEmpty(ta.getDisplayName())) {
                         tName = ta.getDisplayName();
                     }
-                    
+
                     hide = ta.isHide();
                 }
 
@@ -73,7 +72,7 @@ public class QuerySelectTreeBuilder {
 
         Integer[] idHolder = {0};
         setIds(retval, idHolder);
-        
+
         if (LOG.isTraceEnabled()) {
             LOG.trace("QuerySelectTree: " + fileHandler.getGson().toJson(retval, QuerySelectNode.class));
         }
@@ -161,6 +160,26 @@ public class QuerySelectTreeBuilder {
         }
     }
 
+    private static String buildForeignKeyColumnString(ForeignKey fk) {
+        StringBuilder retval = new StringBuilder();
+
+        String comma = "";
+        Set<String> hs = new HashSet<>();
+        for (int i = 0; i < fk.getColumns().size(); i++) {
+            String c = fk.getColumns().get(i);
+            if (!hs.contains(c)) {
+                retval.append(comma);
+                retval.append(fk.getColumns().get(i));
+                retval.append("->");
+                retval.append(fk.getToColumns().get(i));
+                comma = ",";
+                hs.add(c);
+            }
+        }
+
+        return retval.toString();
+    }
+    
     private static void loadForeignKeys(QuerySelectNode n,
             DatasourceSettingsHelper dsHelper,
             String datasourceName,
@@ -175,8 +194,10 @@ public class QuerySelectTreeBuilder {
             Map<String, Integer> fkMap) {
         if (curDepth <= maxDepth) {
             if (fkList != null) {
+                TableSettings tsFrom = dsHelper.getTableSettings(t.getCacheKey());
+
                 for (ForeignKey fk : fkList) {
-                    if (tMap.containsKey(fk.getTableCacheKey()) 
+                    if (tMap.containsKey(fk.getTableCacheKey())
                             && tMap.containsKey(fk.getToTableCacheKey())) {
                         // using this to prevent circular references 
                         Integer cnt = fkMap.get(fk.getName());
@@ -186,33 +207,34 @@ public class QuerySelectTreeBuilder {
                                 cnt = 0;
                             }
 
-                            cnt++;
-
-                            fkMap.put(fk.getName(), cnt);
                             String toTable = fk.getToTableName();
-                            String fkDisplayName = null;
+                            
                             boolean hide = false;
-                            String key = fk.getToTableCacheKey();
-                            TableSettings ts = dsHelper.getTableSettings(key);
-                            if (userHasAccess(ts, userRoles)) {
-                                if (ts != null) {
-                                    if (!ts.isHide()) {
-                                        if (StringUtils.isNotEmpty(ts.getDisplayName())) {
-                                            toTable = ts.getDisplayName();
-                                        }
+                            TableSettings tsTo = dsHelper.getTableSettings(fk.getToTableCacheKey());
+                            if (userHasAccess(tsTo, userRoles)) {
+                                if (tsTo != null) {
+                                    hide = tsTo.isHide();
 
-                                        for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
-                                            if (fks.getForeignKeyName().equals(fk.getName())) {
+                                    if (!hide) {
+                                        if (StringUtils.isNotEmpty(tsTo.getDisplayName())) {
+                                            toTable = tsTo.getDisplayName();
+                                        }
+                                    }
+                                }
+
+                                if (!hide) {
+                                    String fkDisplayName = null;
+                                    if (tsFrom != null) {
+                                        // see if we have a foreign key display name configured
+                                        for (ForeignKeySettings fks : tsFrom.getForeignKeySettings()) {
+                                            if (fk.getName().equals(fks.getForeignKeyName())) {
                                                 fkDisplayName = fks.getDisplayName();
                                                 break;
                                             }
                                         }
                                     }
-                                    hide = ts.isHide();
-                                }
-
-                                if (!hide) {
-                                     QuerySelectNode fkn = new QuerySelectNode();
+ 
+                                    QuerySelectNode fkn = new QuerySelectNode();
                                     if (imported) {
                                         fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
                                     } else {
@@ -222,17 +244,21 @@ public class QuerySelectTreeBuilder {
                                     fkn.setName(toTable);
                                     fkn.getMetadata().put("fkname", fk.getName());
                                     if (StringUtils.isNotEmpty(fkDisplayName)) {
-                                        fkn.getMetadata().put("fkDisplayName", fkDisplayName);
+                                        fkn.setName(fkDisplayName.replace("$t", toTable).replace("$c", buildForeignKeyColumnString(fk)));
+                                    } else {
+                                        fkn.setName(toTable + ": " + buildForeignKeyColumnString(fk));
                                     }
+
+                                    fkMap.put(fk.getName(), ++cnt);
+
                                     fkn.getMetadata().put("fromcols", fk.getColumns());
                                     fkn.getMetadata().put("tocols", fk.getToColumns());
                                     n.getChildren().add(fkn);
 
-                                    Table fkt = tMap.get(key);
-
                                     List<String> fromdiscols = new ArrayList<>();
                                     List<String> todiscols = new ArrayList<>();
 
+                                    Table fkt = tMap.get(fk.getToTableCacheKey());
                                     for (int i = 0; i < fk.getColumns().size(); ++i) {
                                         String cname = fk.getColumns().get(i);
                                         String tocname = fk.getToColumns().get(i);
@@ -248,15 +274,15 @@ public class QuerySelectTreeBuilder {
                                         if (!fromdiscols.contains(nm)) {
                                             fromdiscols.add(nm);
                                         }
-                                        
-                                        cs = dsHelper.getColumnSettings(fkt.getCacheKey() + "." + tocname);
+
+                                        cs = dsHelper.getColumnSettings(t.getCacheKey() + "." + tocname);
 
                                         if ((cs != null) && StringUtils.isNotEmpty(cs.getDisplayName())) {
                                             nm = cs.getDisplayName();
                                         } else {
                                             nm = tocname;
                                         }
-                                        
+
                                         // sanity check to prevent duplicate columns
                                         if (!todiscols.contains(nm)) {
                                             todiscols.add(nm);
@@ -266,7 +292,7 @@ public class QuerySelectTreeBuilder {
                                     fkn.getMetadata().put("fromdiscols", fromdiscols);
                                     fkn.getMetadata().put("todiscols", todiscols);
 
-                                    loadColumns(fkn, ts, fkt, rootTable, userRoles);
+                                    loadColumns(fkn, tsTo, fkt, rootTable, userRoles);
                                     if (curDepth < maxDepth) {
                                         if (imported) {
                                             loadForeignKeys(fkn, dsHelper, datasourceName, tMap, userRoles, fkt, fkt.getImportedKeys(), imported, maxDepth, curDepth + 1, rootTable, fkMap);

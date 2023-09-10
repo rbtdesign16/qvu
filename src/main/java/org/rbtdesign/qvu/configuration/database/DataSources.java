@@ -135,8 +135,10 @@ public class DataSources {
 
     public void loadDataSources() {
         DataSourcesConfiguration dsc = config.getDatasourcesConfig();
-        LOG.debug("datasources: " + new Gson().toJson(dsc, DataSourcesConfiguration.class));
-
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("datasources: " + new Gson().toJson(dsc, DataSourcesConfiguration.class));
+        }
+        
         for (DataSourceConfiguration c : dsc.getDatasources()) {
             try {
                 HikariConfig pconfig = new HikariConfig();

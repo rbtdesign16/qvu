@@ -339,11 +339,19 @@ select {
 .table-settings {
     left: 10%;
     top: 10%;
+    min-width: 450px;
 }
 
 .column-settings {
     left: 5%;
     top: 5%;
+    min-width: 450px;
+}
+
+.foreignkey-settings {
+    left: 5%;
+    top: 5%;
+    min-width: 450px;
 }
 
 .custom-foreign-keys {

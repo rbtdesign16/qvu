@@ -84,4 +84,7 @@ public class Constants {
 
     public static final String INNER_JOIN = "inner";
     public static final String OUTER_JOIN = "outer";
+    
+    public static final String IMPORTED_FOREIGN_KEY_TYPE = "imported";
+    public static final String EXPORTED_FOREIGN_KEY_TYPE = "exported";
 }

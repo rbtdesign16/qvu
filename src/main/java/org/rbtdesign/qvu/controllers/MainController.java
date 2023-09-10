@@ -23,6 +23,7 @@ import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
+import org.rbtdesign.qvu.dto.ForeignKeySettings;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
@@ -193,6 +194,12 @@ public class MainController {
     public OperationResult<List<ColumnSettings>> getColumnSettings(@RequestBody DataSourceConfiguration datasource, @PathVariable String tableName) {
         LOG.debug("in getColumnSettings()");
         return service.getColumnSettings(datasource, tableName);
+    }
+
+    @PostMapping("api/v1/db/datasource/{tableName}/fksettings")
+    public OperationResult<List<ForeignKeySettings>> getForeignKeySettings(@RequestBody DataSourceConfiguration datasource, @PathVariable String tableName) {
+        LOG.debug("in getForeignKeySettings()");
+        return service.getForeignKeySettings(datasource, tableName);
     }
 
     @GetMapping("api/v1/db/datasource/{datasourceName}/tablenames")

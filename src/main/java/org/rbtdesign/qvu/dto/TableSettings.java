@@ -18,6 +18,7 @@ public class TableSettings implements Comparable<TableSettings> {
     private boolean hide;
     private List<String> roles = new ArrayList<>();
     private List <ColumnSettings> tableColumnSettings = new ArrayList<>();
+    private List <ForeignKeySettings> foreignKeySettings = new ArrayList<>();
 
     @Override
     public int compareTo(TableSettings o) {
@@ -75,4 +76,14 @@ public class TableSettings implements Comparable<TableSettings> {
     public String getCacheKey() {
         return datasourceName + "." + tableName;
     }
+
+    public List<ForeignKeySettings> getForeignKeySettings() {
+        return foreignKeySettings;
+    }
+
+    public void setForeignKeySettings(List<ForeignKeySettings> foreignKeySettings) {
+        this.foreignKeySettings = foreignKeySettings;
+    }
+    
+    
 }

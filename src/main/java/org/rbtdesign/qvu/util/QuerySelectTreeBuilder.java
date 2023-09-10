@@ -15,6 +15,7 @@ import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
 import org.rbtdesign.qvu.dto.Column;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.ForeignKey;
+import org.rbtdesign.qvu.dto.ForeignKeySettings;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -54,6 +55,7 @@ public class QuerySelectTreeBuilder {
                     if (StringUtils.isNotEmpty(ta.getDisplayName())) {
                         tName = ta.getDisplayName();
                     }
+                    
                     hide = ta.isHide();
                 }
 
@@ -157,7 +159,6 @@ public class QuerySelectTreeBuilder {
                 }
             }
         }
-
     }
 
     private static void loadForeignKeys(QuerySelectNode n,
@@ -189,20 +190,29 @@ public class QuerySelectTreeBuilder {
 
                             fkMap.put(fk.getName(), cnt);
                             String toTable = fk.getToTableName();
+                            String fkDisplayName = null;
                             boolean hide = false;
                             String key = fk.getToTableCacheKey();
                             TableSettings ts = dsHelper.getTableSettings(key);
                             if (userHasAccess(ts, userRoles)) {
                                 if (ts != null) {
-                                    if (StringUtils.isNotEmpty(ts.getDisplayName())) {
-                                        toTable = ts.getDisplayName();
-                                    }
+                                    if (!ts.isHide()) {
+                                        if (StringUtils.isNotEmpty(ts.getDisplayName())) {
+                                            toTable = ts.getDisplayName();
+                                        }
 
+                                        for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
+                                            if (fks.getForeignKeyName().equals(fk.getName())) {
+                                                fkDisplayName = fks.getDisplayName();
+                                                break;
+                                            }
+                                        }
+                                    }
                                     hide = ts.isHide();
                                 }
 
                                 if (!hide) {
-                                    QuerySelectNode fkn = new QuerySelectNode();
+                                     QuerySelectNode fkn = new QuerySelectNode();
                                     if (imported) {
                                         fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_IMPORTED_FOREIGNKEY);
                                     } else {
@@ -211,6 +221,9 @@ public class QuerySelectTreeBuilder {
                                     fkn.getMetadata().put("dbname", fk.getToTableName());
                                     fkn.setName(toTable);
                                     fkn.getMetadata().put("fkname", fk.getName());
+                                    if (StringUtils.isNotEmpty(fkDisplayName)) {
+                                        fkn.getMetadata().put("fkDisplayName", fkDisplayName);
+                                    }
                                     fkn.getMetadata().put("fromcols", fk.getColumns());
                                     fkn.getMetadata().put("tocols", fk.getToColumns());
                                     n.getChildren().add(fkn);

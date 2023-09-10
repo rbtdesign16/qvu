@@ -405,16 +405,16 @@ const Admin = () => {
     const saveTableSettings = (dataObject, datasource) => {
         let utables = [];
 
-        datasource.datasourceTables.map(t => {
+        datasource.datasourceTableSettings.map(t => {
              // only save rec with settings
             if (t.displayName
                     || t.hide
                     || (t.roles && t.roles.length > 0)
+                    || (t.foreignKeySettings && t.foreignKeySettings.length > 0)
                     || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
                utables.push(t);
             }
         });
-
         dataObject.datasourceTableSettings = utables;
         
         hideTableSettings();

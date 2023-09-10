@@ -306,6 +306,18 @@ export const loadColumnSettings = async (datasource, tableName) => {
     }
 };
 
+export const loadForeignKeySettings = async (datasource, tableName) => {
+    try {
+        let res = await axios.post(getApiURL() + "/db/datasource/" + tableName + "/fksettings", datasource, hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};
+
 export const loadDatasourceTableNames = async (datasource) => {
     try {
         let res = await axios.get(getApiURL() + "/db/datasource/" + datasource + "/tablenames", hconfig);

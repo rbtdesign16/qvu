@@ -314,7 +314,9 @@ public class DBHelper {
             }
         }
 
-        LOG.debug("generated sql: " + retval.toString());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("generated sql: " + retval.toString());
+        }
 
         return retval.toString();
     }

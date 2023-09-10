@@ -15,6 +15,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,6 +73,7 @@ import org.rbtdesign.qvu.dto.DocumentNode;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKey;
+import org.rbtdesign.qvu.dto.ForeignKeySettings;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryParameter;
@@ -130,9 +132,9 @@ public class MainServiceImpl implements MainService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("local=" + request.getLocale().toLanguageTag());
-            LOG.debug("authetication=" + auth);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("local=" + request.getLocale().toLanguageTag());
+            LOG.trace("authetication=" + auth);
         }
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             retval.setCurrentUser(getCurrentUser());
@@ -166,8 +168,8 @@ public class MainServiceImpl implements MainService {
                 u.setPassword(null);
             }
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("AuthData: " + fileHandler.getGson().toJson(retval, AuthData.class));
             }
         }
 
@@ -338,7 +340,9 @@ public class MainServiceImpl implements MainService {
             retval = fileHandler.getGson(true).toJson(langMap);
         }
 
-        LOG.debug("Language File: " + retval);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Language File: " + retval);
+        }
 
         return retval;
     }
@@ -445,10 +449,10 @@ public class MainServiceImpl implements MainService {
 
         try {
             User user = getCurrentUser();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("user: " + user.getName());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("user: " + user.getName());
                 for (String s : user.getRoles()) {
-                    LOG.debug("\trole: " + s);
+                    LOG.trace("\trole: " + s);
                 }
             }
 
@@ -916,6 +920,121 @@ public class MainServiceImpl implements MainService {
             }
         } finally {
             dbHelper.closeConnection(null, null, res);
+        }
+
+        return retval;
+    }
+
+    @Override
+    public OperationResult<List<ForeignKeySettings>> getForeignKeySettings(DataSourceConfiguration ds, String tableName) {
+        OperationResult<List<ForeignKeySettings>> retval = new OperationResult<>();
+        List<ForeignKeySettings> data = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+
+        try {
+            conn = qvuds.getConnection(ds.getDatasourceName());
+
+            if (conn == null) {
+                conn = dbHelper.getConnection(ds);
+            }
+
+            TableSettings tset = null;
+            if (ds.getDatasourceTableSettings() != null) {
+                for (TableSettings t : ds.getDatasourceTableSettings()) {
+                    if (t.getTableName().equals(tableName)) {
+                        tset = t;
+                        break;
+                    }
+                }
+            }
+
+            Set<String> curfkset = new HashSet<>();
+            Map<String, ForeignKeySettings> fkmap = new HashMap();
+
+            if (tset != null) {
+                for (ForeignKeySettings fkset : tset.getForeignKeySettings()) {
+                    data.add(fkset);
+                    curfkset.add(fkset.getForeignKeyName());
+                }
+            }
+            
+            for (ForeignKey cfk : ds.getCustomForeignKeys()) {
+                if (!curfkset.contains(cfk.getName())) {
+                    ForeignKeySettings fks = new ForeignKeySettings();
+                    fks.setDatasourceName(ds.getDatasourceName());
+                    fks.setToTableName(cfk.getTableName());
+                    fks.setForeignKeyName(cfk.getName());
+                    fks.setTableName(tableName);
+                    fks.setType(cfk.isImported() ? Constants.IMPORTED_FOREIGN_KEY_TYPE : Constants.EXPORTED_FOREIGN_KEY_TYPE);
+                    fks.setToColumns(cfk.getToColumns());
+                    fks.setColumns(cfk.getColumns());
+                    data.add(fks);
+                 } 
+            }
+
+
+            DatabaseMetaData dmd = conn.getMetaData();
+            
+            res = dmd.getImportedKeys(null, ds.getSchema(), tableName);
+
+            while (res.next()) {
+                String toTable = res.getString(3);
+                String toColumn = res.getString(4);
+                String fromColumn = res.getString(8);
+                String fkName = res.getString(12);
+                if (!curfkset.contains(fkName)) {
+                    ForeignKeySettings fk = fkmap.get(fkName);
+
+                    if (fk == null) {
+                        fk = new ForeignKeySettings();
+                        fk.setDatasourceName(ds.getDatasourceName());
+                        fk.setToTableName(toTable);
+                        fk.setForeignKeyName(fkName);
+                        fk.setTableName(tableName);
+                        fk.setType(Constants.IMPORTED_FOREIGN_KEY_TYPE);
+                        fkmap.put(fkName, fk);
+                        data.add(fk);
+                    } 
+                    
+                    fk.getToColumns().add(toColumn);
+                    fk.getColumns().add(fromColumn);
+                }
+            }
+
+            res = dmd.getExportedKeys(null, ds.getSchema(), tableName);
+
+            while (res.next()) {
+                String toColumn = res.getString(8);
+                String toTable = res.getString(7);
+                String fromColumn = res.getString(4);
+                String fkName = res.getString(12);
+                
+                if (!curfkset.contains(fkName)) {
+                    ForeignKeySettings fk = fkmap.get(fkName);
+
+                    if (fk == null) {
+                        fk = new ForeignKeySettings();
+                        fk.setDatasourceName(ds.getDatasourceName());
+                        fk.setToTableName(toTable);
+                        fk.setForeignKeyName(fkName);
+                        fk.setTableName(tableName);
+                        fk.setType(Constants.EXPORTED_FOREIGN_KEY_TYPE);
+                        fkmap.put(fkName, fk);
+                        data.add(fk);
+                    } 
+
+                    fk.getToColumns().add(toColumn);
+                    fk.getColumns().add(fromColumn);
+                }
+            }
+
+            Collections.sort(data);
+            retval.setResult(data);
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        } finally {
+            dbHelper.closeConnection(conn, null, res);
         }
 
         return retval;
@@ -1540,8 +1659,8 @@ public class MainServiceImpl implements MainService {
             retval.setMessage(res.getMessage());
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(fileHandler.getGson(true).toJson(retval));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(fileHandler.getGson(true).toJson(retval));
         }
 
         return retval;
@@ -1559,8 +1678,8 @@ public class MainServiceImpl implements MainService {
         result.setSecurityType(config.getSecurityType());
 
         retval.setResult(result);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("AuthConfig: " + fileHandler.getGson(true).toJson(result));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("AuthConfig: " + fileHandler.getGson(true).toJson(result));
         }
 
         return retval;

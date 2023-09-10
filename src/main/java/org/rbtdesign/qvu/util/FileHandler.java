@@ -75,16 +75,16 @@ public class FileHandler {
 
     public List<DataSourceConfiguration> loadDatasources() {
         List<DataSourceConfiguration> retval = config.getDatasourcesConfig().getDatasources();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Datasources: " + gson.toJson(retval, ArrayList.class));
         }
         return retval;
     }
 
     public List<DocumentGroup> loadDocumentGroups() {
         List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Datasources: " + gson.toJson(retval, ArrayList.class));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Document Groups: " + gson.toJson(retval, ArrayList.class));
         }
         return retval;
             

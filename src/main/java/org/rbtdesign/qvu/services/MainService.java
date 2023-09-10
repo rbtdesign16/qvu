@@ -13,6 +13,7 @@ import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
+import org.rbtdesign.qvu.dto.ForeignKeySettings;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
@@ -58,6 +59,8 @@ public interface MainService {
     public OperationResult<List<TableSettings>> getTableSettings(DataSourceConfiguration ds);
 
     public OperationResult<List<ColumnSettings>> getColumnSettings(DataSourceConfiguration ds, String tableName);
+
+    public OperationResult<List<ForeignKeySettings>> getForeignKeySettings(DataSourceConfiguration ds, String tableName);
 
     public OperationResult<QuerySelectNode> getDatasourceTreeViewData(String datasourceName);
 

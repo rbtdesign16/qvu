@@ -743,6 +743,11 @@ const Admin = () => {
         ],
         data: authData.allRoles
     };
+    
+    const isDocumentGroupReadOnly = (indx) => {
+        return documentGroups[indx].defaultGroup;
+    };
+    
 
     const documentGroupsConfig = {
         title: getText("Document Groups"),
@@ -772,10 +777,6 @@ const Admin = () => {
         data: documentGroups
     };
 
-    const isDocumentGroupReadOnly = (indx) => {
-        return documentGroups[indx].defaultDocumentGroup;
-    };
-    
     const isUserReadOnly = (indx) => {
         return (authData.allUsers[indx].userId === ADMIN_USER_ID);
     };

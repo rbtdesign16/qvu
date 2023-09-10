@@ -2,7 +2,7 @@ import React from "react";
 import { CiEdit } from 'react-icons/ci';
 import { MdOutlineDeleteForever, MdOutlineAddBox } from 'react-icons/md';
 import useLang from "../context/LangContext";
-import { SMALL_ICON_SIZE } from "../utils/helper";
+import { SMALL_ICON_SIZE, isEmpty, isNotEmpty } from "../utils/helper";
 import PropTypes from "prop-types";
 
 const EditableDataList = (props) => {
@@ -58,7 +58,7 @@ const EditableDataList = (props) => {
     };
     
     const isReadOnly = (indx) => {
-        if (!listConfig.isReadOnly) {
+        if (isEmpty(listConfig.isReadOnly)) {
             return false;
         } else {
             return listConfig.isReadOnly(indx);
@@ -66,14 +66,14 @@ const EditableDataList = (props) => {
     };
     
    const isEditDisabled = (indx) => {
-        return !listConfig.onEdit || isReadOnly(indx);
+        return (isReadOnly(indx) || isEmpty(listConfig.onEdit));
     };
 
     const isDeleteDisabled = (indx) => {
-        if (listConfig.isDeleteable && !listConfig.isDeleteable(indx)) {
+        if (isNotEmpty(listConfig.isDeleteabl) && !listConfig.isDeleteable(indx)) {
             return true;
         } else {
-            return !listConfig.onDelete || isReadOnly(indx);
+            return isEmpty(listConfig.onDelete) || isReadOnly(indx);
         }
     };
     

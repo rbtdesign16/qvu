@@ -225,9 +225,12 @@ const TableSettings = (props) => {
         try {
             showMessage(INFO, getText("Loading foreign settings", "..."), null, true);
             let res = await loadForeignKeySettings(config.datasource, datasource.datasourceTables[indx].tableName);
+
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
-            } else {
+            } else if (!res || !res.result || (res.result.length === 0)) {
+                showMessage(INFO, getText("No foreign keys found"));
+            } else {    
                 let t = {...datasource.datasourceTables[indx]};
                 let fkMap = new Map();
 

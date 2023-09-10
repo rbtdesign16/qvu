@@ -33,6 +33,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     grid-row-gap: 3px;
 }
 
+.entrygrid-145-300 {
+    display: grid;
+    grid-template-columns: 145px 300px;
+    margin: 5px;
+    grid-row-gap: 3px;
+}
+
 .entrygrid-150-300 {
     display: grid;
     grid-template-columns: 150px 300px;

@@ -351,7 +351,7 @@ select {
 .foreignkey-settings {
     left: 5%;
     top: 5%;
-    min-width: 450px;
+    min-width: 550px;
 }
 
 .custom-foreign-keys {

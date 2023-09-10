@@ -261,6 +261,9 @@ public class MainController {
     @PostMapping("api/v1/query/run/json/objectgraph")
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonObjectQuery()");
+        throw new UnsupportedOperationException("Not supported yet."); 
+
+        /*
         OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
 
         // for api call populate text in message
@@ -272,6 +275,7 @@ public class MainController {
         }
         
         return retval;
+*/
     }
 
     @PostMapping("api/v1/query/excel/export")

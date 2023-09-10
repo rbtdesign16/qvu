@@ -559,12 +559,11 @@ public class MainServiceImpl implements MainService {
     }
 
     private void setIndexColumns(DatabaseMetaData dmd, Table t) throws Exception {
-        ResultSet res;
+        ResultSet res = null;;
         Map<String, Column> cmap = new HashMap<>();
         for (Column c : t.getColumns()) {
             cmap.put(c.getName().toLowerCase(), c);
         }
-        res = dmd.getPrimaryKeys(null, t.getSchema(), t.getName());
 
         try {
             res = dmd.getIndexInfo(null, t.getSchema(), t.getName(), false, true);
@@ -827,11 +826,7 @@ public class MainServiceImpl implements MainService {
 
                 DatabaseMetaData dmd = conn.getMetaData();
 
-                if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
-                    res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-                } else {
-                    res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-                }
+                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
 
                 while (res.next()) {
                     TableColumnNames t = new TableColumnNames();
@@ -875,11 +870,7 @@ public class MainServiceImpl implements MainService {
 
             DatabaseMetaData dmd = conn.getMetaData();
 
-            if (DBHelper.DB_TYPE_MYSQL.equals(ds.getDatabaseType())) {
-                res = dmd.getTables(ds.getSchema(), ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-            } else {
-                res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
-            }
+            res = dmd.getTables(null, ds.getSchema(), "%", DBHelper.TABLE_TYPES);
 
             while (res.next()) {
                 String tname = res.getString(3);
@@ -957,7 +948,7 @@ public class MainServiceImpl implements MainService {
                     curfkset.add(fkset.getForeignKeyName());
                 }
             }
-            
+
             for (ForeignKey cfk : ds.getCustomForeignKeys()) {
                 if (!curfkset.contains(cfk.getName())) {
                     ForeignKeySettings fks = new ForeignKeySettings();
@@ -969,12 +960,11 @@ public class MainServiceImpl implements MainService {
                     fks.setToColumns(cfk.getToColumns());
                     fks.setColumns(cfk.getColumns());
                     data.add(fks);
-                 } 
+                }
             }
 
-
             DatabaseMetaData dmd = conn.getMetaData();
-            
+
             res = dmd.getImportedKeys(null, ds.getSchema(), tableName);
 
             while (res.next()) {
@@ -994,8 +984,8 @@ public class MainServiceImpl implements MainService {
                         fk.setType(Constants.IMPORTED_FOREIGN_KEY_TYPE);
                         fkmap.put(fkName, fk);
                         data.add(fk);
-                    } 
-                    
+                    }
+
                     fk.getToColumns().add(toColumn);
                     fk.getColumns().add(fromColumn);
                 }
@@ -1008,7 +998,7 @@ public class MainServiceImpl implements MainService {
                 String toTable = res.getString(7);
                 String fromColumn = res.getString(4);
                 String fkName = res.getString(12);
-                
+
                 if (!curfkset.contains(fkName)) {
                     ForeignKeySettings fk = fkmap.get(fkName);
 
@@ -1021,7 +1011,7 @@ public class MainServiceImpl implements MainService {
                         fk.setType(Constants.EXPORTED_FOREIGN_KEY_TYPE);
                         fkmap.put(fkName, fk);
                         data.add(fk);
-                    } 
+                    }
 
                     fk.getToColumns().add(toColumn);
                     fk.getColumns().add(fromColumn);
@@ -1106,7 +1096,8 @@ public class MainServiceImpl implements MainService {
         OperationResult retval = null;
         try {
             if (Constants.DOCUMENT_TYPE_QUERY.equals(type)) {
-                retval = getQueryDocument(group, name);;
+                User u = getCurrentUser();
+                retval = getQueryDocument(group, name, u.getName());
             } else {
                 retval = new OperationResult();
                 retval.setErrorCode(Errors.NOT_SUPPORTED);
@@ -1126,13 +1117,13 @@ public class MainServiceImpl implements MainService {
                 ReportDocument doc = docWrapper.getReportDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
-                    doc.setCreatedBy(docWrapper.getUserId());
+                    doc.setCreatedBy(docWrapper.getUser());
                 } else {
                     doc.setLastUpdated(docWrapper.getActionTimestamp());
-                    doc.setUpdatedBy(docWrapper.getUserId());
+                    doc.setUpdatedBy(docWrapper.getUser());
                 }
 
-                OperationResult<ReportDocument> opr = fileHandler.saveReportDocument(doc);
+                OperationResult<ReportDocument> opr = fileHandler.saveReportDocument(doc, docWrapper.getUser());
 
                 docWrapper.setReportDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
@@ -1141,12 +1132,12 @@ public class MainServiceImpl implements MainService {
                 QueryDocument doc = docWrapper.getQueryDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
-                    doc.setCreatedBy(docWrapper.getUserId());
+                    doc.setCreatedBy(docWrapper.getUser());
                 } else {
                     doc.setLastUpdated(docWrapper.getActionTimestamp());
-                    doc.setUpdatedBy(docWrapper.getUserId());
+                    doc.setUpdatedBy(docWrapper.getUser());
                 }
-                OperationResult<QueryDocument> opr = fileHandler.saveQueryDocument(doc);
+                OperationResult<QueryDocument> opr = fileHandler.saveQueryDocument(doc, docWrapper.getUser());
                 docWrapper.setQueryDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
@@ -1168,7 +1159,8 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult deleteDocument(String type, String group, String name) {
-        return fileHandler.deleteDocument(type, group, name);
+        User u = getCurrentUser();
+        return fileHandler.deleteDocument(type, group, u.getName(), name);
     }
 
     private QueryResult getQueryResult(ResultSet res) throws SQLException {
@@ -1250,14 +1242,20 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private OperationResult<QueryDocument> getQueryDocument(String group, String name) {
+    private OperationResult<QueryDocument> getQueryDocument(String group, String name, String user) {
         OperationResult<QueryDocument> retval = new OperationResult<>();
 
-        String key = group + "." + name;
+        String key;
+        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(group)) {
+            key = group + "." + user + "." + name;
+        } else {
+            key = group + "." + name;
+        }
+        
         QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
-            retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, name);
+            retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
         } else {
             retval.setResult(doc);
         }
@@ -1267,7 +1265,7 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult<QueryResult> runQuery(QueryRunWrapper runWrapper) {
-        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName());
+        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName(), runWrapper.getUser());
 
         if (res.isSuccess()) {
             QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
@@ -1508,7 +1506,8 @@ public class MainServiceImpl implements MainService {
                 currentNode.setName(g.getName());
                 rootNode.getChildren().add(currentNode);
             }
-            List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName());
+            
+            List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
 
             for (String fname : fileNames) {
                 DocumentNode n = new DocumentNode(id++);
@@ -1563,7 +1562,7 @@ public class MainServiceImpl implements MainService {
     private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
         List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
         Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
-        
+
         // base table will be the returned list
         dataMap.put("t0", retval);
         Set<String> dataKeySet = new HashSet<>();
@@ -1634,24 +1633,134 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+    private List<String> getPrimaryKeyColumnNames(Table t) {
+        List<String> retval = new ArrayList<>();
+
+        for (Column c : t.getColumns()) {
+            if (c.getPkIndex() > 0) {
+                retval.add(c.getName());
+            }
+        }
+
+        return retval;
+    }
+
+    private List<String> getPrimaryKeyColumnNames(String datasource, String schema, String table) {
+        List<String> retval = new ArrayList<>();
+        Connection conn = null;
+        ResultSet res = null;
+
+        try {
+            conn = qvuds.getConnection(datasource);
+
+            DatabaseMetaData dmd = conn.getMetaData();
+
+            res = dmd.getPrimaryKeys(null, schema, table);
+
+            while (res.next()) {
+                retval.add(res.getString(4));
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        } finally {
+            dbHelper.closeConnection(conn, null, res);
+        }
+
+        return retval;
+    }
+
+    private QueryDocument toObjectGraphQuery(QueryDocument doc) {
+        QueryDocument retval = SerializationUtils.clone(doc);
+        Map<String, Set<String>> pkMap = new HashMap<>();
+        Map<String, Set<String>> cMap = new HashMap<>();
+
+        // load up the primary key columns for each table
+        // we will need to ensure that these are selected
+        // for an object graph query;
+        for (SqlFrom f : doc.getFromClause()) {
+            String tkey = f.getAlias() + "." + f.getTable();
+            if (!pkMap.containsKey(tkey)) {
+                String key = doc.getDatasource() + "." + f.getTable();
+                Table t = cacheHelper.getTableCache().get(key);
+
+                if (t != null) {
+                    pkMap.put(tkey, new HashSet(getPrimaryKeyColumnNames(t)));
+                } else {
+                    pkMap.put(tkey, new HashSet(getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable())));
+                }
+            }
+        }
+
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+            String tkey = c.getTableAlias() + "." + c.getTableName();
+            Set<String> hs = cMap.get(tkey);
+            if (hs == null) {
+                cMap.put(tkey, hs = new HashSet<>());
+            }
+
+            hs.add(c.getColumnName());
+        }
+
+        for (String t : pkMap.keySet()) {
+            Set<String> pkset = pkMap.get(t);
+            Set<String> cset = cMap.get(t);
+
+            for (String c : pkset) {
+
+                if (!cset.contains(c)) {
+                    StringTokenizer st = new StringTokenizer(t, ".");
+                    String alias = st.nextToken();
+                    String table = st.nextToken();
+                    SqlSelectColumn scol = new SqlSelectColumn();
+                    scol.setColumnName(c);
+                    scol.setDatasource(doc.getDatasource());
+                    scol.setTableName(table);
+                    scol.setTableAlias(alias);
+                    doc.getSelectColumns().add(scol);
+                }
+            }
+        }
+
+        return retval;
+    }
+
+    private boolean hasAggregateFields(QueryDocument doc) {
+        boolean retval = false;
+
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+            if (StringUtils.isNotEmpty(c.getAggregateFunction())) {
+                retval = true;
+                break;
+            }
+        }
+
+        return retval;
+    }
+
     @Override
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
         OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
 
-        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName());
+        OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName(), runWrapper.getUser());
 
         if (res.isSuccess()) {
-            QueryDocument doc = res.getResult();
-            QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
-            wrapper.setDocument(doc);
-            wrapper.setParameters(runWrapper.getParameters());
-            OperationResult<QueryResult> qres = runQuery(wrapper);
-
-            if (qres.isSuccess()) {
-                retval.setResult(buildResultsObjectGraph(doc, qres.getResult()));
+            if (hasAggregateFields(res.getResult())) {
+                retval.setErrorCode(Errors.OBJECT_GRAPH_DOES_NOT_SUPPORT_AGGREGATE);
+                retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, Errors.getMessage(Errors.OBJECT_GRAPH_DOES_NOT_SUPPORT_AGGREGATE)));
             } else {
-                retval.setErrorCode(res.getErrorCode());
-                retval.setMessage(res.getMessage());
+                QueryDocument doc = res.getResult();
+                QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
+
+                wrapper.setDocument(toObjectGraphQuery(doc));
+                wrapper.setParameters(runWrapper.getParameters());
+                OperationResult<QueryResult> qres = runQuery(wrapper);
+
+                if (qres.isSuccess()) {
+                    retval.setResult(buildResultsObjectGraph(doc, qres.getResult()));
+                } else {
+                    retval.setErrorCode(res.getErrorCode());
+                    retval.setMessage(res.getMessage());
+                }
             }
         } else {
             retval.setErrorCode(res.getErrorCode());

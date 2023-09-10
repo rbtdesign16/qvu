@@ -19,6 +19,7 @@ public class Errors {
     public static final int DB_CONNECTION_FAILED = -3;
     public static final int RECORD_UPDATED = -4;
     public static final int DOCUMENT_NOT_FOUND = -5;
+    public static final int OBJECT_GRAPH_DOES_NOT_SUPPORT_AGGREGATE = -6;
     public static final int NOT_SUPPORTED = -100;
 
     static {
@@ -32,6 +33,7 @@ public class Errors {
         ERROR_MESSAGE_MAP.put(DB_CONNECTION_FAILED, "errorCode-3");
         ERROR_MESSAGE_MAP.put(RECORD_UPDATED, "errorCode-4");
         ERROR_MESSAGE_MAP.put(DOCUMENT_NOT_FOUND, "errorCode-5");
+        ERROR_MESSAGE_MAP.put(OBJECT_GRAPH_DOES_NOT_SUPPORT_AGGREGATE, "errorCode-6");
         ERROR_MESSAGE_MAP.put(NOT_SUPPORTED, "errorCode-100");
     }
 

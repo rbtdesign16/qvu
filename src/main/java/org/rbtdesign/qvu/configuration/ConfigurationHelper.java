@@ -121,10 +121,18 @@ public class ConfigurationHelper {
         return retval;
     }
     
-    public File getDocumentGroupsFolder(String groupName) {
+    public File getDocumentGroupsFolder(String groupName, String user) {
         File documents = getDocumentsFolder();
         
-        File retval = new File(documents.getPath() + File.separator + groupName);
+        String groupPath;
+        
+        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(groupName)) {
+            groupPath = groupName + File.separator + user;
+        } else {
+            groupPath = groupName;
+        }
+        
+        File retval = new File(documents.getPath() + File.separator + groupPath);
         if (!retval.exists()) {
             retval.mkdirs();
         }

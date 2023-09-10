@@ -12,7 +12,7 @@ import java.util.List;
  * @author rbtuc
  */
 public class DocumentWrapper {
-    private String userId;
+    private String user;
     private Timestamp actionTimestamp;
     private String group;
     private List<String> queryParameters;
@@ -43,15 +43,6 @@ public class DocumentWrapper {
         this.reportDocument = reportDocument;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-
     public String getGroup() {
         return group;
     }
@@ -66,6 +57,14 @@ public class DocumentWrapper {
 
     public void setActionTimestamp(Timestamp actionTimestamp) {
         this.actionTimestamp = actionTimestamp;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
     
     

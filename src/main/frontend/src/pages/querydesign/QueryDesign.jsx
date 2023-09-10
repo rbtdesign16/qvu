@@ -120,7 +120,7 @@ const QueryDesign = () => {
         let actionTimestamp = new Date().toISOString();
         showMessage(INFO, replaceTokens(getText("Saving document", "..."), [name]), null, true);
         let docWrapper = {
-            userId: userId,
+            user: userId,
             actionTimestamp: actionTimestamp,
             queryDocument: {
                 name: name,

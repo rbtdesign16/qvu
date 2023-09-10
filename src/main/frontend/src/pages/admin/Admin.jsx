@@ -752,6 +752,7 @@ const Admin = () => {
         addTitle: getText("Add group"),
         editTitle: getText("Edit group"),
         delTitle: getText("Delete group"),
+        isReadOnly: isDocumentGroupReadOnly,
         isDeleteable: isDocumentGroupDeleteable,
         onAdd: addDocumentGroup,
         onEdit: editDocumentGroup,
@@ -771,6 +772,10 @@ const Admin = () => {
         data: documentGroups
     };
 
+    const isDocumentGroupReadOnly = (indx) => {
+        return documentGroups[indx].defaultDocumentGroup;
+    };
+    
     const isUserReadOnly = (indx) => {
         return (authData.allUsers[indx].userId === ADMIN_USER_ID);
     };

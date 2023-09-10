@@ -4,11 +4,13 @@
  */
 package org.rbtdesign.qvu.dto;
 
+import java.io.Serializable;
+
 /**
  *
  * @author rbtuc
  */
-public class SqlSelectColumn {
+public class SqlSelectColumn implements Serializable {
     private String datasource;
     private String tableName;
     private int dataType;

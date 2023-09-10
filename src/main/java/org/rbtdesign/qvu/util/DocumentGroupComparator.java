@@ -16,7 +16,9 @@ public class DocumentGroupComparator implements Comparator<DocumentGroup> {
 
     @Override
     public int compare(DocumentGroup o1, DocumentGroup o2) {
-        if (StringUtils.isEmpty(o1.getName()) && StringUtils.isEmpty(o2.getName())) {
+        if (o1.isDefaultGroup()) {
+            return -1;
+        } else if (StringUtils.isEmpty(o1.getName()) && StringUtils.isEmpty(o2.getName())) {
             return 0;
         } else if (StringUtils.isEmpty(o1.getName())) {
             return 1;

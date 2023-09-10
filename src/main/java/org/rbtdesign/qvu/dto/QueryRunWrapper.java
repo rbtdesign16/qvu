@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class QueryRunWrapper {
     private List<QueryParameter> parameters = new ArrayList<>();
+    private String user;
     private String documentName;
     private String groupName;
 
@@ -38,6 +39,14 @@ public class QueryRunWrapper {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 
 }

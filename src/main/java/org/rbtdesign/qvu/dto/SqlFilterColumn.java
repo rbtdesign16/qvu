@@ -4,11 +4,13 @@
  */
 package org.rbtdesign.qvu.dto;
 
+import java.io.Serializable;
+
 /**
  *
  * @author rbtuc
  */
-public class SqlFilterColumn {
+public class SqlFilterColumn implements Serializable {
     private String datasource;
     private String tableAlias;
     private String tableName;

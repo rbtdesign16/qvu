@@ -4,6 +4,7 @@
  */
 package org.rbtdesign.qvu.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class SqlFrom {
+public class SqlFrom implements Serializable {
     private String table;
     private String joinType;
     private String foreignKeyName;

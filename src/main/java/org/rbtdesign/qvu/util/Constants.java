@@ -87,4 +87,8 @@ public class Constants {
     
     public static final String IMPORTED_FOREIGN_KEY_TYPE = "imported";
     public static final String EXPORTED_FOREIGN_KEY_TYPE = "exported";
+    
+    public static final String DEFAULT_DOCUMENT_GROUP = "user";
+    public static final String DEFAULT_DOCUMENT_GROUP_DESCRIPTION = "current user document group";
+    
 }

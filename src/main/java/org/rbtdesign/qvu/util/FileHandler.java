@@ -83,6 +83,11 @@ public class FileHandler {
 
     public List<DocumentGroup> loadDocumentGroups() {
         List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
+        DocumentGroup g = new DocumentGroup();
+        g.setDescription(Constants.DEFAULT_DOCUMENT_GROUP_DESCRIPTION);
+        g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
+        g.setDefaultGroup(true);
+        retval.add(0, g);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Document Groups: " + gson.toJson(retval, ArrayList.class));
         }
@@ -552,11 +557,11 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult getDocument(String type, String group, String name) {
+    public OperationResult getDocument(String type, String group, String user, String name) {
         OperationResult retval = new OperationResult();
 
         try {
-            File f = config.getDocumentGroupsFolder(group);
+            File f = config.getDocumentGroupsFolder(group, user);
             File docfile = new File(f.getPath() + File.separator + type + File.separator + name);
 
             if (!docfile.exists()) {
@@ -578,17 +583,17 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult<QueryDocument> saveQueryDocument(QueryDocument doc) {
+    public OperationResult<QueryDocument> saveQueryDocument(QueryDocument doc, String user) {
         OperationResult<QueryDocument> retval = new OperationResult();
 
         try {
-            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName());
+            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName(), user);
             File originalFile = null;
 
             // if new document group
             if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName())
                     && !doc.getSavedDocumentGroupName().equals(doc.getDocumentGroupName())) {
-                originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName()).getPath()
+                originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName(), user).getPath()
                         + File.separator + QUERY_FOLDER + File.separator + doc.getName());
             }
 
@@ -650,17 +655,17 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult<ReportDocument> saveReportDocument(ReportDocument doc) {
+    public OperationResult<ReportDocument> saveReportDocument(ReportDocument doc, String user) {
         OperationResult<ReportDocument> retval = new OperationResult();
 
         try {
-            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName());
+            File folder = config.getDocumentGroupsFolder(doc.getDocumentGroupName(), user);
             File originalFile = null;
 
             // if new document group
             if (StringUtils.isNotEmpty(doc.getSavedDocumentGroupName())
                     && !doc.getSavedDocumentGroupName().equals(doc.getDocumentGroupName())) {
-                originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName()).getPath()
+                originalFile = new File(config.getDocumentGroupsFolder(doc.getSavedDocumentGroupName(), user).getPath()
                         + File.separator + REPORT_FOLDER + File.separator + doc.getName());
             }
 
@@ -710,11 +715,11 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult deleteDocument(String type, String group, String name) {
+    public OperationResult deleteDocument(String type, String group, String user, String name) {
         OperationResult retval = new OperationResult();
 
         try {
-            File f = config.getDocumentGroupsFolder(group);
+            File f = config.getDocumentGroupsFolder(group, user);
             File doc = new File(f.getPath() + File.separator + type + File.separator + name);
 
             if (doc.exists()) {
@@ -728,10 +733,10 @@ public class FileHandler {
         return retval;
     }
 
-    public List<String> getGroupDocumentNames(String type, String group) {
+    public List<String> getGroupDocumentNames(String type, String group, String user) {
         List<String> retval = new ArrayList();
 
-        File f = config.getDocumentGroupsFolder(group);
+        File f = config.getDocumentGroupsFolder(group, user);
 
         if (f.exists() && f.isDirectory()) {
             f = new File(f.getPath() + File.separator + type);

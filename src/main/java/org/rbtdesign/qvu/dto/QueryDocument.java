@@ -4,6 +4,7 @@
  */
 package org.rbtdesign.qvu.dto;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class QueryDocument {
+public class QueryDocument implements Serializable {
     private String name;
     private String path;
     private String createdBy;

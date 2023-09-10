@@ -14,7 +14,7 @@ import java.util.List;
 public class QueryDocumentRunWrapper {
     private List<QueryParameter> parameters = new ArrayList<>();
     private QueryDocument document;
-
+ 
     public List<QueryParameter> getParameters() {
         return parameters;
     }

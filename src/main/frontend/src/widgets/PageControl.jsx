@@ -93,7 +93,7 @@ const PageControl = (props) => {
     const getPageDisplay = () => {
         let retval = getText("Total Records:") + " " + dataSet.length;
     
-        if (dataSet.length !== pagingInfo.visibleRecordCount) {
+        if (dataSet && pagingInfo.visibleRecordCount && (dataSet.length !== pagingInfo.visibleRecordCount)) {
             retval = retval + ", " + getText("Filtered Records:") + " " + pagingInfo.visibleRecordCount;
         }
         

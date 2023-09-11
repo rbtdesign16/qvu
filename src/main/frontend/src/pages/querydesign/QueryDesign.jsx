@@ -318,12 +318,12 @@ import { getDatasourceTreeViewData,
     };
 
     const getDocumentInfo = () => {
-        return "    "
-                + getText("Group", ":  ")
-                + currentDocument.group
-                + ",    "
-                + getText("Document", ":  ")
-                + currentDocument.name;
+        return  <span style={{marginLeft: "10px"}} className="cobaltBlue-f">
+            <span style={{color: "darkslategray"}}>{getText("Group", ":  ")}</span>
+            {currentDocument.group} 
+            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Document", ":  ")}</span>
+            {currentDocument.name}
+            </span>
     };
 
     useEffect(() => {
@@ -338,7 +338,7 @@ import { getDatasourceTreeViewData,
                 <Button size="sm"  title={getText("Load Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
                 {isQueryDesigner(authData) && <Button size="sm"  title={getText("Save Document")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
                 <Button size="sm"  title={getText("New Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewDocument()}>{getText("New")}</Button>
-                <span className="cobaltBlue-f">{getDocumentInfo()}</span>
+                {getDocumentInfo()}
                 <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
                     <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
                         <label className="ck-label">{getText("Datasource")}</label>

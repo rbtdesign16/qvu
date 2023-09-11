@@ -94,6 +94,7 @@ import org.rbtdesign.qvu.util.Errors;
 import org.rbtdesign.qvu.util.Helper;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
+import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -559,7 +560,7 @@ public class MainServiceImpl implements MainService {
     }
 
     private void setIndexColumns(DatabaseMetaData dmd, Table t) throws Exception {
-        ResultSet res = null;;
+        ResultSet res = null;
         Map<String, Column> cmap = new HashMap<>();
         for (Column c : t.getColumns()) {
             cmap.put(c.getName().toLowerCase(), c);
@@ -1251,7 +1252,7 @@ public class MainServiceImpl implements MainService {
         } else {
             key = group + "." + name;
         }
-        
+
         QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
@@ -1506,7 +1507,7 @@ public class MainServiceImpl implements MainService {
                 currentNode.setName(g.getName());
                 rootNode.getChildren().add(currentNode);
             }
-            
+
             List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
 
             for (String fname : fileNames) {
@@ -1542,7 +1543,7 @@ public class MainServiceImpl implements MainService {
 
         if (res.isSuccess()) {
             QueryResult result = res.getResult();
-            retval.setResult(new ArrayList<LinkedHashMap<String, Object>>());
+            retval.setResult(new ArrayList<>());
             for (List<Object> rowdata : result.getData()) {
                 LinkedHashMap row = new LinkedHashMap();
                 for (int i = 1; i < result.getHeader().size(); ++i) {
@@ -1559,7 +1560,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
+    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(Map<String, List<String>> pkMap, QueryDocument doc, QueryResult res) {
         List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
         Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
 
@@ -1567,47 +1568,61 @@ public class MainServiceImpl implements MainService {
         dataMap.put("t0", retval);
         Set<String> dataKeySet = new HashSet<>();
 
-        for (List<Object> row : res.getData()) {
-            for (SqlFrom f : doc.getFromClause()) {
-                StringBuilder s = new StringBuilder();
-                int indx = 0;
-                s.append(f.getAlias());
-                for (SqlSelectColumn c : doc.getSelectColumns()) {
-                    if (c.isShowInResults()) {
-                        if (f.getAlias().equals(c.getTableAlias())) {
-                            s.append(".");
-                            if (row.get(indx) != null) {
-                                s.append(row.get(indx));
-                            } else {
-                                s.append("null");
-                            }
-                        }
+        // build a list of the table aliaeses
+        Set<String> tableAliases = new HashSet<>();
+        for (SqlFrom f : doc.getFromClause()) {
+            tableAliases.add(f.getAlias());
+        }
 
-                        indx++;
+        Map<String, List<Integer[]>> aliasColumnPosMap = new HashMap<>();
+        
+        int indx1 = 0;
+        int indx2 = 0;
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+             if (c.isShowInResults()) {
+                List<Integer[]> l = aliasColumnPosMap.get(c.getTableAlias());
+            
+                if (l == null) {
+                    aliasColumnPosMap.put(c.getTableAlias(), l = new ArrayList<>());
+                }
+                
+                Integer[] pos = {indx1, indx2++};
+                l.add(pos);
+             }
+             indx1++;
+        }
+        
+         for (List<Object> row : res.getData()) {
+            for (String alias : tableAliases) {
+                StringBuilder dataKey = new StringBuilder();
+                dataKey.append(alias);
+                List <Integer[]> cpos = aliasColumnPosMap.get(alias);
+                for (Integer[] pos : cpos) {
+                    SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
+                    List<String> pkl = pkMap.get(c.getTableAlias() + "." + c.getTableName());
+                    if (pkl.contains(c.getColumnName())) {
+                        dataKey.append(".");
+                        // add one becausr first result row value is row number
+                        dataKey.append(row.get(pos[1] + 1));
                     }
                 }
 
-                List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
+                List<LinkedHashMap<String, Object>> l = dataMap.get(alias);
                 if (l == null) {
-                    dataMap.put(f.getAlias(), l = new ArrayList<>());
+                    dataMap.put(alias, l = new ArrayList<>());
                 }
 
-                String dataKey = s.toString();
-                if (!dataKeySet.contains(dataKey)) {
+                if (!dataKeySet.contains(dataKey.toString())) {
                     LinkedHashMap<String, Object> data = new LinkedHashMap<>();
-                    indx = 0;
-                    for (SqlSelectColumn c : doc.getSelectColumns()) {
-                        if (c.isShowInResults()) {
-                            if (f.getAlias().equals(c.getTableAlias())) {
-                                data.put(c.getColumnName(), row.get(indx));
-                            }
 
-                            indx++;
-                        }
+                    for (Integer[] pos : cpos) {
+                        SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
+                        // add one becausr first result row value is row number
+                        data.put(c.getColumnName(), row.get(pos[1] + 1));
                     }
 
                     l.add(data);
-                    dataKeySet.add(dataKey);
+                    dataKeySet.add(dataKey.toString());
                 }
             }
         }
@@ -1615,7 +1630,6 @@ public class MainServiceImpl implements MainService {
         for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
             buildObjectGraph(doc, dataMap, "t0", r);
         }
-
         return retval;
     }
 
@@ -1623,8 +1637,13 @@ public class MainServiceImpl implements MainService {
         for (SqlFrom f : doc.getFromClause()) {
             if (alias.equals(f.getFromAlias())) {
                 List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
-                if (l != null) {
-                    parent.put(f.getTable(), l);
+                if ((l != null) && !l.isEmpty()) {
+                    if (f.isImportedForeignKey()) {
+                        parent.put(f.getForeignKeyName(), l.get(0));
+                    } else {
+                        parent.put(f.getForeignKeyName(), l);
+                    }
+                    
                     for (LinkedHashMap<String, Object> r : l) {
                         buildObjectGraph(doc, dataMap, f.getAlias(), r);
                     }
@@ -1669,58 +1688,67 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private QueryDocument toObjectGraphQuery(QueryDocument doc) {
-        QueryDocument retval = SerializationUtils.clone(doc);
-        Map<String, Set<String>> pkMap = new HashMap<>();
-        Map<String, Set<String>> cMap = new HashMap<>();
+    private Map<String, List<String>> getDocumentTablePKColumnNames(QueryDocument doc) {
+        Map<String, List<String>> retval = new HashMap<>();
 
         // load up the primary key columns for each table
         // we will need to ensure that these are selected
         // for an object graph query;
         for (SqlFrom f : doc.getFromClause()) {
-            String tkey = f.getAlias() + "." + f.getTable();
-            if (!pkMap.containsKey(tkey)) {
+            if (!retval.containsKey(f.getTable())) {
                 String key = doc.getDatasource() + "." + f.getTable();
                 Table t = cacheHelper.getTableCache().get(key);
 
                 if (t != null) {
-                    pkMap.put(tkey, new HashSet(getPrimaryKeyColumnNames(t)));
+                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(t));
                 } else {
-                    pkMap.put(tkey, new HashSet(getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable())));
+                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable()));
                 }
             }
         }
 
+        return retval;
+    }
+
+    private QueryDocument toObjectGraphQueryDoc(Map<String, List<String>> pkMap, QueryDocument doc) {
+        QueryDocument retval = SerializationUtils.clone(doc);
+        Map<String, Set<String>> cMap = new HashMap<>();
+
         for (SqlSelectColumn c : doc.getSelectColumns()) {
-            String tkey = c.getTableAlias() + "." + c.getTableName();
-            Set<String> hs = cMap.get(tkey);
+            Set<String> hs = cMap.get(c.getTableName());
             if (hs == null) {
-                cMap.put(tkey, hs = new HashSet<>());
+                cMap.put(c.getTableAlias() + "." + c.getTableName(), hs = new HashSet<>());
             }
 
-            hs.add(c.getColumnName());
+            hs.add(c.getTableAlias() + "." + c.getColumnName());
         }
 
         for (String t : pkMap.keySet()) {
-            Set<String> pkset = pkMap.get(t);
+            List<String> pkset = pkMap.get(t);
             Set<String> cset = cMap.get(t);
 
-            for (String c : pkset) {
+            StringTokenizer st = new StringTokenizer(t, ".");
+            String alias = st.nextToken();
+            String table = st.nextToken();
 
-                if (!cset.contains(c)) {
-                    StringTokenizer st = new StringTokenizer(t, ".");
-                    String alias = st.nextToken();
-                    String table = st.nextToken();
+            int indx = 1;
+            for (String c : pkset) {
+                // add any pk columns that are not in original select
+                if (!cset.contains(alias + "." + c)) {
                     SqlSelectColumn scol = new SqlSelectColumn();
                     scol.setColumnName(c);
                     scol.setDatasource(doc.getDatasource());
                     scol.setTableName(table);
                     scol.setTableAlias(alias);
-                    doc.getSelectColumns().add(scol);
+                    scol.setShowInResults(true);
+                    scol.setPkIndex(indx++);
+                    retval.getSelectColumns().add(scol);
                 }
             }
         }
 
+        Collections.sort(retval.getSelectColumns(), new ObjectGraphColumnComparator()); 
+        
         return retval;
     }
 
@@ -1751,12 +1779,18 @@ public class MainServiceImpl implements MainService {
                 QueryDocument doc = res.getResult();
                 QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
 
-                wrapper.setDocument(toObjectGraphQuery(doc));
+                Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
+
+                // need to ensure all primary keys are included in select
+                // so we will update the incoming doc if required
+                QueryDocument ogdoc = toObjectGraphQueryDoc(pkMap, doc);
+
+                wrapper.setDocument(ogdoc);
                 wrapper.setParameters(runWrapper.getParameters());
                 OperationResult<QueryResult> qres = runQuery(wrapper);
 
                 if (qres.isSuccess()) {
-                    retval.setResult(buildResultsObjectGraph(doc, qres.getResult()));
+                    retval.setResult(buildResultsObjectGraph(pkMap, ogdoc, qres.getResult()));
                 } else {
                     retval.setErrorCode(res.getErrorCode());
                     retval.setMessage(res.getMessage());

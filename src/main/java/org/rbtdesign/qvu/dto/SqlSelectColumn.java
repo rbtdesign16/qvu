@@ -20,7 +20,7 @@ public class SqlSelectColumn implements Serializable {
     private String displayName;
     private int sortPosition = -1;
     private String sortDirection;
-    private int pkIndex;
+    private Integer pkIndex = 0;
     private boolean showInResults = true;
     private String aggregateFunction;
     private String customSql;
@@ -114,7 +114,7 @@ public class SqlSelectColumn implements Serializable {
         this.dataTypeName = dataTypeName;
     }
 
-    public int getPkIndex() {
+    public Integer getPkIndex() {
         return pkIndex;
     }
 

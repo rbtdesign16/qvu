@@ -48,7 +48,7 @@ const Message = () => {
     return (
             <Modal
                 show={messageInfo.show}
-                size="sm"
+                dialogClassName="message-dlg"                
                 onHide={onHide}
                 contentClassName={getClassName()}
                 backdrop={messageInfo.backdrop}

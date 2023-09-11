@@ -127,6 +127,11 @@ img {
     margin: 0;
 }
 
+.message-dlg {
+    min-width: 200px;
+    max-width: 450px;
+}
+
 .info-message {
     background: var(--info-message-background-color);
     color: var(--info-message-text-color);

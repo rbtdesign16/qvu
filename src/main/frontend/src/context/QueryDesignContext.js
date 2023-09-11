@@ -8,7 +8,8 @@ import {
     updateAndOr,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
-    doSortCompare
+    doSortCompare,
+    NODE_TYPE_IMPORTED_FOREIGNKEY
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -120,13 +121,13 @@ export const QueryDesignProvider = ({ children }) => {
                     columnName: element.metadata.dbname,
                     displayName: element.name,
                     sortPosition: -1,
-                    pkindex: element.metadata.pkindex ? element.metadata.pkindex : -1,
+                    pkIndex: element.metadata.pkindex ? element.metadata.pkindex : -1,
                     aggregateFunction: "",
                     path: path,
                     customSql: "",
                     showInResults: true,
                     nodeId: selectedColumnIds[i],
-
+                    parentType: treeViewData[element.parent].metadata.type,
                     fromClause,
                     setFromClause
                 });
@@ -136,7 +137,7 @@ export const QueryDesignProvider = ({ children }) => {
         setFromClause(buildFromRecords([...tablePathSet], cols));
 
         let pSet = new Set();
-
+        
         for (let i = 0; i < cols.length; ++i) {
             pSet.add(cols[i].path);
         }
@@ -229,7 +230,7 @@ export const QueryDesignProvider = ({ children }) => {
         }
     };
 
-    const buildFromRecords = (paths, cols, fkname) => {
+    const buildFromRecords = (paths, cols) => {
         paths.sort((a, b) => {
             return (b.length - a.length);
         });
@@ -241,7 +242,6 @@ export const QueryDesignProvider = ({ children }) => {
         retval.push({
             table: baseTable,
             alias: ("t" + (tindx++)),
-            foreignKeyName: fkname
         });
 
         let jMap = new Map();
@@ -281,7 +281,7 @@ export const QueryDesignProvider = ({ children }) => {
                 } while (pos > -1);
             }
         }
-
+        
         for (let i = 0; i < cols.length; ++i) {
             let cpath = cols[i].path;
             let tpath = cpath.substring(0, cpath.lastIndexOf("|"));
@@ -290,6 +290,10 @@ export const QueryDesignProvider = ({ children }) => {
 
             if (jrec) {
                 cols[i].tableAlias = jrec.alias;
+            }
+            
+            if (cols[i].parentType === NODE_TYPE_IMPORTED_FOREIGNKEY) {
+                jrec.importedForeignKey = true;
             }
         }
 

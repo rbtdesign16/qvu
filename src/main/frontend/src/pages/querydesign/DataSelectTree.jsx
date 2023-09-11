@@ -23,9 +23,15 @@ const DataSelectTree = (props) => {
         selectedColumnIds,
         selectedTableIds,
         baseTable,
+        selectColumns,
+        setSelectColumns,
         setSelectedColumnIds,
         setSelectedTableIds,
         setBaseTable,
+        fromClause,
+        filterColumns, 
+        setFilterColumns,
+        setFromClause,
         treeViewExpandedIds,
         updateSelectColumns} = useQueryDesign();
     const [showJoinType, setShowJoinType] = useState({show: false});
@@ -75,7 +81,7 @@ const DataSelectTree = (props) => {
     };
 
     const onClick = (e, element, handleSelect, isSelected) => {
-        // if currently unselected to we are selecting
+        // if currently unselected we are selecting
         if (!isSelected) {
             if (element.metadata && element.metadata.roottable) {
                 if (!baseTable) {
@@ -139,8 +145,47 @@ const DataSelectTree = (props) => {
     
     const setJoinType = (joinType, nodeId) => {
         treeViewData[nodeId].metadata.jointype = joinType;
+        let sc = [...selectColumns];
+        
+        for (let i = 0; i < sc.length; ++i) {
+            if (sc[i].path.includes("{" + treeViewData[nodeId].metadata.fkname + "@")) {
+                if ((joinType === "inner") && sc[i].path.includes("@outer}")) {
+                    sc[i].path = sc[i].path.replace("@outer}", "@inner}");
+                } else if ((joinType === "outer") && sc[i].path.includes("@inner}")) {
+                    sc[i].path = sc[i].path.replace("@inner}", "@outer}");
+                }
+            }
+        }
+
+        let filc = [...filterColumns];
+        
+        for (let i = 0; i < filc.length; ++i) {
+            if (filc[i].path.includes("{" + treeViewData[nodeId].metadata.fkname + "@")) {
+                if ((joinType === "inner") && filc[i].path.includes("@outer}")) {
+                    filc[i].path = filc[i].path.replace("@outer}", "@inner}");
+                } else if ((joinType === "outer") && filc[i].path.includes("@inner}")) {
+                    filc[i].path = filc[i].path.replace("@inner}", "@outer}");
+                }
+            }
+        }
+
+        let fc = [...fromClause];
+        
+        for (let i = 0; i < fc.length; ++i) {
+            if (fc[i].foreignKeyName === treeViewData[nodeId].metadata.fkname) {
+                if (joinType === "inner") {
+                   fc[i].joinType = joinType;
+                } else {
+                   fc[i].joinType = "";
+                }
+            }
+        }
+        
         hideJoinType();
-        updateSelectColumns();
+        setFromClause(fc);
+        setFilterColumns(filc);
+        setSelectColumns(sc);
+        
     };
     
     const handleContextMenu = (e, element) => {

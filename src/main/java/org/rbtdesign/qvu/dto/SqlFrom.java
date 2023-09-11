@@ -16,6 +16,7 @@ public class SqlFrom implements Serializable {
     private String table;
     private String joinType;
     private String foreignKeyName;
+    private boolean importedForeignKey;
     private String alias;
     private String fromAlias;
     private List <String> fromColumns = new ArrayList<>();
@@ -76,6 +77,14 @@ public class SqlFrom implements Serializable {
     public void setForeignKeyName(String foreignKeyName) {
         this.foreignKeyName = foreignKeyName;
     }
-    
-    
+
+    public boolean isImportedForeignKey() {
+        return importedForeignKey;
+    }
+
+    public void setImportedForeignKey(boolean importedForeignKey) {
+        this.importedForeignKey = importedForeignKey;
+    }
+
+
 }

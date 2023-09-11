@@ -34,7 +34,7 @@ SUCCESS,
         NODE_TYPE_COLUMN,
         NODE_TYPE_IMPORTED_FOREIGNKEY,
         NODE_TYPE_EXPORTED_FOREIGNKEY
-} from "../../utils/helper";
+        } from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
@@ -43,7 +43,7 @@ import { getDatasourceTreeViewData,
         isApiSuccess,
         getDocument} from "../../utils/apiHelper"
 
-const QueryDesign = () => {
+        const QueryDesign = () => {
     const {authData, setAuthData} = useAuth();
     const {setTreeViewData,
         treeViewData,
@@ -170,11 +170,7 @@ const QueryDesign = () => {
     };
 
     const isSqlAvailable = () => {
-        return (
-                selectColumns
-                && (selectColumns.length > 0)
-                && filterColumns
-                && (filterColumns.length > 0));
+        return (filterColumns && (filterColumns.length > 0));
     };
 
 
@@ -221,6 +217,7 @@ const QueryDesign = () => {
     const populateDocument = async (group, name) => {
         hideDocumentSelect();
         showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
+        
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
@@ -232,7 +229,7 @@ const QueryDesign = () => {
                 showMessage(ERROR, res.message);
             } else {
                 let treeData = res.result;
-                
+
                 let selIds = [];
 
                 for (let i = 0; i < doc.selectColumns.length; ++i) {
@@ -245,18 +242,33 @@ const QueryDesign = () => {
                     }
                 }
 
+
+
                 treeData = flattenTree(treeData);
-                let tids = new Set();
+                let tids = [];
                 let expandedIds = [];
                 for (let i = 0; i < selIds.length; ++i) {
                     let pid = treeData[selIds[i]].parent;
-
                     while (pid) {
-                        if (!tids.has(pid)) {
+                        if (!tids.includes(pid)) {
                             expandedIds.push(pid);
+                            tids.push(pid);
                         }
-                        tids.add(pid);
                         pid = treeData[pid].parent;
+                    }
+                }
+
+                let innerJoins = [];
+
+                for (let i = 0; i < doc.fromClause.length; ++i) {
+                    if (doc.fromClause[i].joinType && (doc.fromClause[i].joinType === "inner")) {
+                        innerJoins.push(doc.fromClause[i].foreignKeyName);
+                    }
+                }
+
+                for (let i = 0; i < tids.length; ++i) {
+                    if (innerJoins.includes(treeData[tids[i]].metadata.fkname)) {
+                        treeData[tids[i]].metadata.jointype = "inner";
                     }
                 }
 
@@ -264,11 +276,11 @@ const QueryDesign = () => {
                 setTreeViewData(treeData);
                 setBaseTable(doc.baseTable);
                 setSelectColumns(doc.selectColumns);
-                setFilterColumns(doc.filterColumns);
                 setFromClause(doc.fromClause);
                 setSelectedColumnIds(selIds);
                 setSelectedTableIds([...tids]);
                 setTreeViewExpandedIds(expandedIds);
+                setFilterColumns(doc.filterColumns);
 
                 setCurrentDocument({
                     name: doc.name,
@@ -280,7 +292,7 @@ const QueryDesign = () => {
 
             }
         }
-    };
+     };
 
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});

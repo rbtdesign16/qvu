@@ -1627,25 +1627,34 @@ public class MainServiceImpl implements MainService {
             }
         }
 
+        Map<String, ForeignKeySettings> fkSettingsMap = getDocumentTableForeignKeySettings(doc);
+
         for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
-            buildObjectGraph(doc, dataMap, "t0", r);
+            buildObjectGraph(doc, fkSettingsMap, dataMap, "t0", r);
         }
         return retval;
     }
 
-    private void buildObjectGraph(QueryDocument doc, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String alias, LinkedHashMap<String, Object> parent) {
+    private void buildObjectGraph(QueryDocument doc, Map<String, ForeignKeySettings> fkSettingsMap, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String alias, LinkedHashMap<String, Object> parent) {
         for (SqlFrom f : doc.getFromClause()) {
             if (alias.equals(f.getFromAlias())) {
                 List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
                 if ((l != null) && !l.isEmpty()) {
+                    ForeignKeySettings fks = fkSettingsMap.get(f.getFromAlias() + "." + f.getForeignKeyName());
+                    
+                    String fieldName = f.getForeignKeyName();
+                    if ((fks != null) && StringUtils.isNotEmpty(fks.getFieldName())) {
+                        fieldName = fks.getFieldName();
+                    }
+                    
                     if (f.isImportedForeignKey()) {
-                        parent.put(f.getForeignKeyName(), l.get(0));
+                        parent.put(fieldName, l.get(0));
                     } else {
-                        parent.put(f.getForeignKeyName(), l);
+                        parent.put(fieldName, l);
                     }
                     
                     for (LinkedHashMap<String, Object> r : l) {
-                        buildObjectGraph(doc, dataMap, f.getAlias(), r);
+                        buildObjectGraph(doc, fkSettingsMap, dataMap, f.getAlias(), r);
                     }
                 }
             }
@@ -1709,6 +1718,38 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    private Map<String, ForeignKeySettings> getDocumentTableForeignKeySettings(QueryDocument doc) {
+        Map<String, ForeignKeySettings> retval = new HashMap<>();
+
+        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
+
+        Map <String, ForeignKeySettings> tfkMap = new HashMap<>();
+        
+        for (TableSettings ts : ds.getDatasourceTableSettings()) {
+            for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
+                String key = ts.getTableName() + "." + fks.getForeignKeyName();
+                tfkMap.put(key, fks);
+            }
+        }
+        
+        Map<String, String> aliasMap = new HashMap<>();
+        for (SqlFrom f  : doc.getFromClause()) {
+            aliasMap.put(f.getAlias(), f.getTable());
+        }
+         
+        for (SqlFrom f  : doc.getFromClause()) {
+            if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
+                ForeignKeySettings fks = tfkMap.get(aliasMap.get(f.getFromAlias()) + "." + f.getForeignKeyName());
+                if (fks != null) {
+                    retval.put(f.getFromAlias() + "." + f.getForeignKeyName(), fks);
+                }
+            }
+        }
+        
+        return retval;
+    }
+
 
     private QueryDocument toObjectGraphQueryDoc(Map<String, List<String>> pkMap, QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);

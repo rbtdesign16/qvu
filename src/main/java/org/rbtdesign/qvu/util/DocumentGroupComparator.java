@@ -18,12 +18,8 @@ public class DocumentGroupComparator implements Comparator<DocumentGroup> {
     public int compare(DocumentGroup o1, DocumentGroup o2) {
         if (o1.isDefaultGroup()) {
             return -1;
-        } else if (StringUtils.isEmpty(o1.getName()) && StringUtils.isEmpty(o2.getName())) {
-            return 0;
-        } else if (StringUtils.isEmpty(o1.getName())) {
+        } else if (o2.isDefaultGroup()) {
             return 1;
-        } else if (StringUtils.isEmpty(o2.getName())) {
-            return -1;
         } else {
             return o1.getName().compareTo(o2.getName());
         }

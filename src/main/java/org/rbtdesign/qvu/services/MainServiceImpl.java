@@ -1501,21 +1501,26 @@ public class MainServiceImpl implements MainService {
         DocumentNode rootNode = new DocumentNode(id++);
         DocumentNode currentNode = null;
 
+        hs.clear();
         for (DocumentGroup g : userDocGroups) {
-            if ((currentNode == null) || !g.getName().equals(currentNode.getMetadata().get("group"))) {
-                currentNode = new DocumentNode(id++);
-                currentNode.setName(g.getName());
-                rootNode.getChildren().add(currentNode);
-            }
+            if (!hs.contains(g.getName())) {
+                if ((currentNode == null) 
+                        || !g.getName().equals(currentNode.getMetadata().get("group"))) {
+                    currentNode = new DocumentNode(id++);
+                    currentNode.setName(g.getName());
+                    rootNode.getChildren().add(currentNode);
+                }
 
-            List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
+                List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
 
-            for (String fname : fileNames) {
-                DocumentNode n = new DocumentNode(id++);
-                n.getMetadata().put("group", g.getName());
-                n.getMetadata().put("type", documentType);
-                n.setName(fname);
-                currentNode.getChildren().add(n);
+                for (String fname : fileNames) {
+                    DocumentNode n = new DocumentNode(id++);
+                    n.getMetadata().put("group", g.getName());
+                    n.getMetadata().put("type", documentType);
+                    n.setName(fname);
+                    currentNode.getChildren().add(n);
+                }
+                hs.add(g.getName());
             }
         }
 

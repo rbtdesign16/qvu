@@ -72,6 +72,8 @@ const EntryPanel = (props) => {
                     dataObject[c.name] = c.defaultValue;
                 } else if (c.type === "select") {
                     dataObject[c.name] = c.options[0];
+                } else {
+                    dataObject[c.name] = "";
                 }
             }
 

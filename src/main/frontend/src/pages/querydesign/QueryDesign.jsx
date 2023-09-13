@@ -178,6 +178,17 @@ import { getDatasourceTreeViewData,
         setSplitter1Sizes(e.sizes);
     };
 
+    const getForeignTableFromPathPart = (part) => {
+        let pos = part.indexOf("{");
+        return part.substring(0, pos);
+    }
+    
+    const getForeignKeyNameFromPathPart = (part) => {
+        let pos = part.indexOf("{");
+        let pos2 = part.indexOf("@");
+        return part.substring(pos + 1, pos2);
+    }
+
     const findNodeId = (parent, path) => {
         let retval;
         let parts = path.split("|");
@@ -197,12 +208,14 @@ import { getDatasourceTreeViewData,
                 case NODE_TYPE_IMPORTED_FOREIGNKEY:
                 case NODE_TYPE_EXPORTED_FOREIGNKEY:
                 {
-                    let pos = parts[0].indexOf("{");
-                    let nm = parts[0].substring(0, pos);
-                    if (nm === parent.children[i].metadata.dbname) {
+                    let fktable = getForeignTableFromPathPart(parts[0]);
+                    let fkname = getForeignKeyNameFromPathPart(parts[0]);
+                    if ((fktable === parent.children[i].metadata.dbname)
+                        && (fkname === parent.children[i].metadata.fkname)) {
                         retval = findNodeId(parent.children[i], path.substring(path.indexOf("|") + 1));
                     }
                 }
+                break;
             }
         }
 
@@ -234,15 +247,12 @@ import { getDatasourceTreeViewData,
 
                 for (let i = 0; i < doc.selectColumns.length; ++i) {
                     let nid = findNodeId(treeData, doc.selectColumns[i].path);
-
                     if (nid) {
                         if (!selIds.includes(nid)) {
                             selIds.push(nid);
                         }
                     }
-                }
-
-
+               }
 
                 treeData = flattenTree(treeData);
                 let tids = [];

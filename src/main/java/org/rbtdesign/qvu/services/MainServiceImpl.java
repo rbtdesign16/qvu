@@ -491,10 +491,9 @@ public class MainServiceImpl implements MainService {
                 // load up custom foreign keys to apply tp table definitions
                 Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
                 for (ForeignKey fk : ds.getCustomForeignKeys()) {
-                    List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
+                   List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
                     if (fklist == null) {
-                        fklist = new ArrayList<>();
-                        customForeignKeys.put(fk.getTableName(), fklist);
+                        customForeignKeys.put(fk.getTableName(), fklist = new ArrayList<>());
                     }
                     fklist.add(fk);
                 }

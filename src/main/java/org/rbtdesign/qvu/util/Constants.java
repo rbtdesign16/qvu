@@ -91,4 +91,6 @@ public class Constants {
     public static final String DEFAULT_DOCUMENT_GROUP = "user";
     public static final String DEFAULT_DOCUMENT_GROUP_DESCRIPTION = "current user document group";
     
+    public static final String CUSTOM_FK_DATA_SEPARATOR = "?";
+    
 }

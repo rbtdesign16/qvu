@@ -12,26 +12,26 @@ import { BiRun} from 'react-icons/bi';
 import useDataHandler from "../../context/DataHandlerContext";
 import ParameterEntryModal from "../../widgets/ParameterEntryModal"
 import {
-isSqlOrderByRequired,
-        isSqlGroupByRequired,
-        isSqlHavingRequired,
-        isSqlWhereRequired,
-        isDataTypeString,
-        isDataTypeDateTime,
-        UNARY_COMPARISON_OPERATORS,
-        DB_TYPE_MYSQL,
-        DB_TYPE_SQLSERVER,
-        DB_TYPE_ORACLE,
-        DB_TYPE_POSTGRES,
-        MEDIUM_ICON_SIZE,
-        isEmpty,
-        SQL_KEYWORDS,
-        getQuotedIdentifier,
-        INFO,
-        ERROR,
-        loadDocumentFromBlob,
-        checkColorString,
-        } from "../../utils/helper";
+    isSqlOrderByRequired,
+    isSqlGroupByRequired,
+    isSqlHavingRequired,
+    isSqlWhereRequired,
+    isDataTypeString,
+    isDataTypeDateTime,
+    UNARY_COMPARISON_OPERATORS,
+    DB_TYPE_MYSQL,
+    DB_TYPE_SQLSERVER,
+    DB_TYPE_ORACLE,
+    DB_TYPE_POSTGRES,
+    MEDIUM_ICON_SIZE,
+    isEmpty,
+    SQL_KEYWORDS,
+    getQuotedIdentifier,
+    INFO,
+    ERROR,
+    loadDocumentFromBlob,
+    checkColorString,
+    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
 import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -109,16 +109,42 @@ const SqlDisplay = (props) => {
 
     const getJoinColumns = (f) => {
         let retval = "(";
-        let comma = "";
+        let and  = "";
         let hs = new Set();
+      
+        let tcols = [];
+        let tcust = [];
+
+   
+         for (let i = 0; i < f.toColumns.length; ++i) {
+            if (!f.toColumns[i].includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                tcols.push(f.toColumns[i]);
+            } else {
+                tcust.push(f.toColumns[i]);
+            }
+        }
+        
         for (let i = 0; i < f.fromColumns.length; ++i) {
             // sanity check to prevent duplicate columns
             if (!hs.has(f.fromColumns[i])) {
-                retval += comma + withQuotes(f.alias) + "." + withQuotes(f.toColumns[i]) + " = " + withQuotes(f.fromAlias) + "." + withQuotes(f.fromColumns[i]);
-                comma = ", ";
+                retval += and;
+                retval += withQuotes(f.alias) + "." + withQuotes(tcols[i]);
+                
+                retval += " = ";
+                
+                retval += withQuotes(f.fromAlias) + "." + withQuotes(f.fromColumns[i]);
+                
+                and = " and ";
+                
+                hs.add(f.fromColumns[i]);
             }
-            hs.add(f.fromColumns[i]);
         }
+        
+        for (let i = 0; i < tcust.length; ++i) {
+            let pos = tcust[i].indexOf(CUSTOM_FK_DATA_SEPARATOR);
+            retval += (and +  withQuotes(f.alias) + "." + withQuotes(tcust[i].substring(0, pos)) + " " + tcust[i].substring(pos+1));
+        }
+        
         retval += ")";
 
         return <div className="sql-clause-column">{retval}</div>;

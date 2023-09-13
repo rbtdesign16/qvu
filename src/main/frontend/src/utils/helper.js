@@ -116,6 +116,7 @@ export const END_KEY = "arrowright";
 
 export const DEFAULT_EXPORTED_KEY_DEPTH  = 4;
 export const DEFAULT_IMPORTED_KEY_DEPTH  = 2;
+export const CUSTOM_FK_DATA_SEPARATOR = "?";
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;

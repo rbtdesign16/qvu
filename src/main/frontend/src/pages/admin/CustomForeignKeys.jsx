@@ -22,7 +22,8 @@ ERROR,
         MEDIUM_ICON_SIZE,
         MODAL_TITLE_SIZE,
         confirm,
-        getUUID} from "../../utils/helper";
+        getUUID,
+        CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
 
 const CustomForeignKeys = (props) => {
     const {config} = props;
@@ -63,15 +64,41 @@ const CustomForeignKeys = (props) => {
             toTableName: "",
             columns: "",
             toColumns: "",
+            custom: true,
             imported: false});
         setCustomForeignKeys(cfk);
     };
 
+    const clearCustomFkData = () => {
+        let cfk = [...customForeignKeys];
+        let toColumns = [];
+        let updateRequired = false;
+        cfk.map(fk => {
+            fk.toColumns.map(c => {
+                if (!c.includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                    toColumns.push(c);
+                } else {
+                    updateRequired = true;
+                }
+            });
+            
+            fk.toColumns = toColumns;
+        });
+        
+        if (updateRequired) {
+            setCustomForeignKeys(cfk);
+        }
+           
+    }
+   
     const onChange = (e, indx) => {
         let cfks = [...customForeignKeys];
         let fk = cfks[indx];
         if (e.target.name === "imported") {
             fk.imported = e.target.checked;
+            if (fk.imported) {
+                clearCustomFkData();
+            }
         } else if ((e.target.name === "tableName") || (e.target.name === "toTableName")) {
             fk[e.target.name] = e.target.options[e.target.selectedIndex].value;
          } else {
@@ -119,25 +146,39 @@ const CustomForeignKeys = (props) => {
 
     const saveColumnSelections = (index, selectedColumns, field) => {
         let cfks = [...customForeignKeys];
-        cfks[index][field] = selectedColumns;
+        
+        let sel = [];
+        
+        selectedColumns.map(sc => {
+            if (sc.custom) {
+                sel.push(sc.name + CUSTOM_FK_DATA_SEPARATOR + sc.custom);
+            } else {
+                sel.push(sc.name);
+            }
+        });
+        
+        cfks[index][field] = sel;
         setCustomForeignKeys(cfks);
         hideColumnSelect();
     };
 
+    const isAllowCustom = (indx, field) => {
+        return !customForeignKeys[indx].imported && (field === "toColumns");
+    };
 
     const onColumnSelect = (indx, field, tableField) => {
         let tableName = customForeignKeys[indx][tableField];
-        
         let columnNames = getColumnNames(tableName);
-        let selectedColumns = customForeignKeys[indx][field] ? customForeignKeys[indx][field] : "";
+        let selectedColumns = customForeignKeys[indx][field] ? customForeignKeys[indx][field] : [];
         
          if (columnNames && (columnNames.length > 0)) {
             setShowColumnSelect({
                 show: true,
+                allowCustom: isAllowCustom(indx, field),
                 tableName: tableName,
                 columnNames: columnNames,
                 field: field,
-                selectedColumns: selectedColumns,
+                selectedColumns: [...selectedColumns],
                 index: indx,
                 saveColumnSelections: saveColumnSelections,
                 hideColumnSelect: hideColumnSelect
@@ -145,8 +186,14 @@ const CustomForeignKeys = (props) => {
         }
     };
 
-    const getColumnSelect = (indx, field, tableField) => {
-        return <input size={25} name={field} defaultValue={customForeignKeys[indx][field] ? customForeignKeys[indx][field].join(",") : ""} readOnly onBlur={(e) => onChange(e, indx)}/>;
+    const getCustomForeignKeyDisplay = (input) => {
+        if (input && input.join) {
+            return input.join(",");
+        }
+    };
+    
+    const getColumnSelect = (indx, field) => {
+        return <input size={25} name={field} defaultValue={getCustomForeignKeyDisplay(customForeignKeys[indx][field])} readOnly />;
     };
 
     const loadForeignKeyEntries = () => {
@@ -161,14 +208,14 @@ const CustomForeignKeys = (props) => {
                             <div title={getText("select source columns")}>
                                 <AiOutlineProfile  className="icon cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => onColumnSelect(indx, "columns", "tableName")} />
                             </div>
-                            {getColumnSelect(indx, "columns", "tableName")}
+                            {getColumnSelect(indx, "columns")}
                         </div>
                         <div className="label"><span className="red-f">*</span>{getText("Target Columns:")}</div>
                         <div className="entrygrid-25-275">
                             <div title={getText("select target columns")}>
                                 <AiOutlineProfile  className="icon cobaltBlue-f" size={MEDIUM_ICON_SIZE} onClick={(e) => onColumnSelect(indx, "toColumns", "toTableName")} />
                             </div>
-                            {getColumnSelect(indx, "toColumns", "toTableName")}
+                            {getColumnSelect(indx, "toColumns")}
                         </div>
                         <div className="label"></div><div><input name="imported" type="checkbox" defaultChecked={fk.imported} onChange={(e) => onChange(e, indx)} id={"imp-" + indx}/>
                             <label className="ck-label" htmlFor={"imp-" + indx}>{getText("Imported Keys")}</label>
@@ -193,7 +240,13 @@ const CustomForeignKeys = (props) => {
     };
     
     const checkColumnLinks = (cfk) => {
-        return (cfk.columns.length === cfk.toColumns.length);
+        let cnt = 0;
+         cfk.toColumns.map(c => {
+            if (!c.includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                cnt++;
+            }
+        });
+        return (cnt === cfk.columns.length);
     };
 
     const checkValues = () => {

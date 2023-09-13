@@ -360,8 +360,8 @@ select {
 }
 
 .custom-foreign-keys {
-    left: 10%;
-    top: 10%;
+    left: 5%;
+    top: 5%;
     min-width: 550px;
 }
 
@@ -448,9 +448,8 @@ select {
 }
 
 .column-select {
-    width: 200px;
     height: 28px;
-    overflow: auto;
+    overflow: hidden;
 }
 
 textarea {

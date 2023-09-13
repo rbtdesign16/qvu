@@ -4,6 +4,7 @@
  */
 package org.rbtdesign.qvu.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +12,12 @@ import java.util.List;
  *
  * @author rbtuc
  */
-public class ForeignKey {
+public class ForeignKey implements Serializable {
     private String name;
     private String datasourceName;
     private String tableName;
     private String toTableName;
+    private boolean custom;
     private boolean imported;
     private List<String> columns = new ArrayList();
     private List<String> toColumns = new ArrayList<>();
@@ -83,5 +85,13 @@ public class ForeignKey {
     public String getToTableCacheKey() {
         return datasourceName + "." + toTableName;
     }
-    
+
+    public boolean isCustom() {
+        return custom;
+    }
+
+    public void setCustom(boolean custom) {
+        this.custom = custom;
+    }
+
 }

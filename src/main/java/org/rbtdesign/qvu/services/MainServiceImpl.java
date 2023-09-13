@@ -366,6 +366,8 @@ public class MainServiceImpl implements MainService {
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "help");
             f.mkdirs();
+            f = new File(repositoryFolder + File.separator + "backups");
+            f.mkdirs();
 
             config.setRepositoryFolder(repositoryFolder);
             config.setSecurityType(Constants.BASIC_SECURITY_TYPE);

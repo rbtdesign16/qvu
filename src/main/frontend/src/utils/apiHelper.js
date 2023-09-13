@@ -442,3 +442,15 @@ export const loadGettingStartedDocument = async () => {
         console.log("error: loadGettingStartedDocument - " + e);
     }
 };
+
+export const backupRepository = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/admin/util/backup", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};

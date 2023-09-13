@@ -348,5 +348,10 @@ public class MainController {
 
         return retval;
     }
-
+    
+    @GetMapping("api/v1/admin/util/backup")
+    public OperationResult<String> doBackup() {
+        LOG.debug("in doBackup()");
+        return service.doBackup();
+    }
 }

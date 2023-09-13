@@ -87,5 +87,7 @@ public interface MainService {
     public OperationResult<AuthConfig> getAuthConfig();
     
     public OperationResult saveAuthConfig(AuthConfig authConfig);
+    
+    public OperationResult<String> doBackup();
 
 }

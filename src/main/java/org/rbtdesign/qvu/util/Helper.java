@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Helper {
     public static final SimpleDateFormat TS = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final SimpleDateFormat TS2 = new SimpleDateFormat("yyyyMMddHHmmss");
     private static final Logger LOG = LoggerFactory.getLogger(Helper.class);
 
     public static Properties loadProperties(String fileName) {

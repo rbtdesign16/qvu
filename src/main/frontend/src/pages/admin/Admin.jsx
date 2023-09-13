@@ -4,63 +4,64 @@ import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
-import {FcServices} from "react-icons/fc";
+import {FcServices, FcDataBackup} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
 import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
-    INFO,
-    WARN,
-    ERROR,
-    SUCCESS,
-    DEFAULT_SUCCESS_TITLE,
-    DEFAULT_ERROR_TITLE,
-    ERROR_TEXT_COLOR,
-    INFO_TEXT_COLOR,
-    confirm,
-    isEmpty,
-    setFieldError,
-    setErrorMessage,
-    checkEntryFields,
-    updateJsonArray,
-    findInArray,
-    replaceTokens,
-    SMALL_ICON_SIZE,
-    DEFAULT_EXPORTED_KEY_DEPTH,
-    DEFAULT_IMPORTED_KEY_DEPTH
-    } from "../../utils/helper";
+INFO,
+        WARN,
+        ERROR,
+        SUCCESS,
+        DEFAULT_SUCCESS_TITLE,
+        DEFAULT_ERROR_TITLE,
+        ERROR_TEXT_COLOR,
+        INFO_TEXT_COLOR,
+        confirm,
+        isEmpty,
+        setFieldError,
+        setErrorMessage,
+        checkEntryFields,
+        updateJsonArray,
+        findInArray,
+        replaceTokens,
+        SMALL_ICON_SIZE,
+        DEFAULT_EXPORTED_KEY_DEPTH,
+        DEFAULT_IMPORTED_KEY_DEPTH
+        } from "../../utils/helper";
 
 import {
-    saveDatasource,
-    saveDocumentGroup,
-    deleteDocumentGroup,
-    saveUser,
-    saveRole,
-    deleteDatasource,
-    deleteRole,
-    deleteUser,
-    loadDatasources,
-    loadDocumentGroups,
-    loadAuth,
-    formatErrorResponse,
-    testDatasource,
-    isApiSuccess,
-    isApiError,
-    loadTableSettings,
-    loadDatasourceTableNames,
-    getSecurityConfig,
-    saveSecurityConfig} from "../../utils/apiHelper";
+saveDatasource,
+        saveDocumentGroup,
+        deleteDocumentGroup,
+        saveUser,
+        saveRole,
+        deleteDatasource,
+        deleteRole,
+        deleteUser,
+        loadDatasources,
+        loadDocumentGroups,
+        loadAuth,
+        formatErrorResponse,
+        testDatasource,
+        isApiSuccess,
+        isApiError,
+        loadTableSettings,
+        loadDatasourceTableNames,
+        getSecurityConfig,
+        saveSecurityConfig,
+        backupRepository} from "../../utils/apiHelper";
 import {
-    isAdministrator,
-    isQueryDesigner,
-    isReportDesigner,
-    ADMINISTRATOR_ROLE,
-    QUERY_DESIGNER_ROLE,
-    REPORT_DESIGNER_ROLE,
-    BASE_ROLES,
-    ADMIN_USER_ID
+isAdministrator,
+        isQueryDesigner,
+        isReportDesigner,
+        ADMINISTRATOR_ROLE,
+        QUERY_DESIGNER_ROLE,
+        REPORT_DESIGNER_ROLE,
+        BASE_ROLES,
+        ADMIN_USER_ID
         } from "../../utils/authHelper";
 
 
@@ -69,12 +70,12 @@ const Admin = () => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {messageInfo, showMessage, hideMessage} = useMessage();
-    const {datasources, 
-        setDatasources, 
-        databaseTypes, 
-        datasourceTableNames, 
-        setDatasourceTableNames, 
-        documentGroups, 
+    const {datasources,
+        setDatasources,
+        databaseTypes,
+        datasourceTableNames,
+        setDatasourceTableNames,
+        documentGroups,
         setDocumentGroups} = useDataHandler();
     const [editModal, setEditModal] = useState({show: false});
     const [tableSettings, setTableSettings] = useState({show: false});
@@ -249,7 +250,7 @@ const Admin = () => {
                 label: getText("Last Name:"),
                 name: "lastName",
                 type: "input"
-            }, 
+            },
             {
                 label: getText("Email:"),
                 name: "email",
@@ -300,7 +301,7 @@ const Admin = () => {
     };
 
     const setDatasourceRoles = (dataObject, selections) => {
-         if (selections) {
+        if (selections) {
             if (!dataObject.roles) {
                 dataObject.roles = [];
             } else {
@@ -406,17 +407,17 @@ const Admin = () => {
         let utables = [];
 
         datasource.datasourceTableSettings.map(t => {
-             // only save rec with settings
+            // only save rec with settings
             if (t.displayName
                     || t.hide
                     || (t.roles && t.roles.length > 0)
                     || (t.foreignKeySettings && t.foreignKeySettings.length > 0)
                     || (t.tableColumnSettings && t.tableColumnSettings.length > 0)) {
-               utables.push(t);
+                utables.push(t);
             }
         });
         dataObject.datasourceTableSettings = utables;
-        
+
         hideTableSettings();
     };
 
@@ -493,14 +494,14 @@ const Admin = () => {
 
     const testConnection = async(ds) => {
         showMessage(INFO, getText("Attempting to connect", "..."), null, true);
-         let res = await testDatasource(ds);
-         if (isApiSuccess(res)) {
-             showMessage(SUCCESS, replaceTokens(getText("Successfully connected to datasoure"), [ds.datasourceName]));
-         } else {
-             showMessage(ERROR, res.message);
-         }
+        let res = await testDatasource(ds);
+        if (isApiSuccess(res)) {
+            showMessage(SUCCESS, replaceTokens(getText("Successfully connected to datasoure"), [ds.datasourceName]));
+        } else {
+            showMessage(ERROR, res.message);
+        }
     };
-    
+
     const getDatasourceConfig = (title, dataObject) => {
         return {
             idPrefix: "emo-",
@@ -743,11 +744,11 @@ const Admin = () => {
         ],
         data: authData.allRoles
     };
-    
+
     const isDocumentGroupReadOnly = (indx) => {
         return documentGroups[indx].defaultGroup;
     };
-    
+
 
     const documentGroupsConfig = {
         title: getText("Document Groups"),
@@ -912,6 +913,21 @@ const Admin = () => {
 
     };
 
+    const runBackup = async () => {
+        showMessage(INFO, "Backing up repository", "...", null, true);
+        let res = await backupRepository();
+        if (isApiSuccess(res)) {
+            showMessage(SUCCESS, replaceTokens("repository-backup-success", [res.result]));
+        } else {
+           showMessage(ERROR, getText(res.message));
+       }
+            
+    };
+    
+    const onBackup = async() => {
+        handleOnClick(getText("Backup repository?"), runBackup);
+    };
+    
     const onSystemSettings = async () => {
         setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
     };
@@ -921,7 +937,10 @@ const Admin = () => {
                 <TableSettings config={tableSettings}/>
                 <SystemSetup config={showSystemSettings}/>
                 <CustomForeignKeys config={customForeignKeys}/>
-                <div style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;&nbsp;{getText("System Settings")}</div>
+                <div>
+                    <span style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("System Settings")}</span>
+                    <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onBackup()}><FcDataBackup className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Repository Backup")}</span>
+                </div>
                 <EditableDataList listConfig={datasourcesConfig}/>
                 <EditableDataList listConfig={rolesConfig}/>
                 <EditableDataList listConfig={usersConfig}/>

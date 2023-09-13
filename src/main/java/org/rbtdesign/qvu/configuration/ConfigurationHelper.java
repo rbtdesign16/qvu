@@ -35,9 +35,8 @@ public class ConfigurationHelper {
     @Value("${security.type:basic}")
     private String securityType;
 
-    @Value("${log.folder:#{systemProperties['java.io.tmpdir']}")
-    private String logFolder;
-
+    private String backupFolder;
+ 
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
     private DocumentGroupsConfiguration documentGroupsConfig;
@@ -239,4 +238,14 @@ public class ConfigurationHelper {
     public File getCssFolder() {
         return new File(repositoryFolder + File.separator + "css");
     }
+
+    public String getBackupFolder() {
+        return backupFolder;
+    }
+
+    public void setBackupFolder(String backupFolder) {
+        this.backupFolder = backupFolder;
+    }
+    
+    
 }

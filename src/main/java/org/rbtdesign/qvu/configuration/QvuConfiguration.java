@@ -63,6 +63,9 @@ public class QvuConfiguration {
     @Value("${cors.allowed.origins:*}")
     private String corsAllowedOrigins;
 
+    @Value("${backup.folder}")
+    private String backupFolder;
+
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
@@ -70,6 +73,7 @@ public class QvuConfiguration {
         LOG.info("server.servlet.context-path=" + servletContextPath);
         LOG.info("security.type=" + securityType);
         LOG.info("cors.allowed.origins=" + corsAllowedOrigins);
+        config.setBackupFolder(backupFolder);
     }
 
     @Autowired
@@ -137,6 +141,4 @@ public class QvuConfiguration {
         }
         return http.build();
     }
-
-    
 }

@@ -95,6 +95,7 @@ import org.rbtdesign.qvu.util.Helper;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
+import org.rbtdesign.qvu.util.ZipFolder;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -1910,5 +1911,20 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-
+    
+    @Override
+    public OperationResult<String> doBackup() {
+        OperationResult<String> retval = new OperationResult();
+        File f = new File(config.getBackupFolder() + File.separator + "qvu-backup-" + Helper.TS2.format(new Date()) + ".zip");
+        boolean res = ZipFolder.doZip(new File(config.getRepositoryFolder()), f); 
+        
+        if (res) {
+            retval.setResult(f.getAbsolutePath());
+        } else {
+            Errors.populateError(retval, Errors.BACKUP_FAILED);
+        }
+        
+        return retval;
+            
+    }
 }

@@ -216,6 +216,7 @@ public class MainServiceImpl implements MainService {
             DatabaseMetaData dmd = conn.getMetaData();
             res = dmd.getSchemas();
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             retval.setErrorCode(Errors.DB_CONNECTION_FAILED);
             retval.setMessage(config.getLanguageText(request.getLocale().toLanguageTag(),
                     Errors.getMessage(Errors.DB_CONNECTION_FAILED),

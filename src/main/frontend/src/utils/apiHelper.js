@@ -105,6 +105,10 @@ export const loadDatabaseTypes = async () => {
 
 export const saveDatasource = async (ds) => {
     try {
+        if (!ds.roles) {
+            ds.roles = [];
+        }
+ 
         let res = await axios.post(getApiURL() + "/db/datasource/save", ds, hconfig);
 
         if (res) {
@@ -117,6 +121,10 @@ export const saveDatasource = async (ds) => {
 
 export const testDatasource = async (ds) => {
     try {
+        if (!ds.roles) {
+            ds.roles = [];
+        }
+        
         let res = await axios.post(getApiURL() + "/db/datasource/test", ds, hconfig);
 
         if (res) {

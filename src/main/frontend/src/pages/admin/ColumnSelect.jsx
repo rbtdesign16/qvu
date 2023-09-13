@@ -58,7 +58,12 @@ const ColumnSelect = (props) => {
         }
 
         if (!e.target.checked) {
-            document.getElementById("inp-" + e.target.id).value = "";
+            let id = config.field + "-inp=" + indx;
+            let el = document.getElementById(id)
+                    
+            if (el) {
+                el.value = "";
+            }
         }
 
         setColumnSelections(cols);
@@ -95,14 +100,15 @@ const ColumnSelect = (props) => {
     const loadColumns = () => {
         if (columns) {
             return columns.map((c, indx) => {
-                let id = config.field + "-c-" + indx;
+                let id1 = config.field + "-c-" + indx;
+                let id2 = config.field + "-inp-" + indx;
                 return <div className="entrygrid-175-100">
                     <div className="column-select">
-                        <input id={id} type="checkbox" name={c} checked={isSelected(c)} onChange={e => onChange(e, indx)}  />
-                        <label className="ck-label" htmlFor={id}>{c}</label>
+                        <input id={id1} type="checkbox" name={c} checked={isSelected(c)} onChange={e => onChange(e, indx)}  />
+                        <label className="ck-label" htmlFor={id1}>{c}</label>
                     </div>
                     <div>
-                        <input type="text" id={"inp-" + id} disabled={!config.allowCustom || !isSelected(c)} size={10} defaultValue={getCustomValue(c)} onBlur={e => onCustomColumn(e, c)} />
+                        <input type="text" id={id2} disabled={!config.allowCustom || !isSelected(c)} size={10} defaultValue={getCustomValue(c)} onBlur={e => onCustomColumn(e, c)} />
                     </div>
                 </div>;
             });
@@ -118,7 +124,12 @@ const ColumnSelect = (props) => {
             if (el) {
                 el.checked = false;
             }
-        }
+
+            el = document.getElementById(config.field + "-inp-" + i);
+            if (el) {
+                el.value = "";
+            }
+}
         
         setColumns(config.columnNames);
 

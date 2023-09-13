@@ -9,7 +9,8 @@ import {
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
     doSortCompare,
-    NODE_TYPE_IMPORTED_FOREIGNKEY
+    NODE_TYPE_IMPORTED_FOREIGNKEY,
+    CUSTOM_FK_DATA_SEPARATOR
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -160,20 +161,27 @@ export const QueryDesignProvider = ({ children }) => {
         setSelectColumns(cols);
     };
 
-    const formatPathForDisplay = (path) => {
+    const formatPathForDisplay = (path, noColumnDisplay) => {
         let l = path.split("|");
-
-        for (let i = 0; i < l.length; ++i) {
+        
+        let end = l.length;
+        
+        if (noColumnDisplay) {
+            end -= 1;
+        }
+        
+        for (let i = 0; i < end; ++i) {
             if (l[i].includes("{")) {
                 let pos1 = l[i].indexOf("{");
                 let pos2 = l[i].indexOf("}");
-                l[i] = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
+                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1)
+                l[i] = fkcols.replace("?", "");
             }
         }
 
 
 
-        return l.join(" -> ");
+        return l.join("->");
     };
 
     const getJoinFromColumns = (part) => {
@@ -185,7 +193,9 @@ export const QueryDesignProvider = ({ children }) => {
         let retval = [];
 
         for (let i = 0; i < cols.length; ++i) {
-            retval.push(cols[i].substring(0, cols[i].indexOf("=")));
+            if (!cols[i].includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                retval.push(cols[i].substring(0, cols[i].indexOf("=")));
+            }
         }
 
         return retval;
@@ -200,7 +210,11 @@ export const QueryDesignProvider = ({ children }) => {
         let retval = [];
 
         for (let i = 0; i < cols.length; ++i) {
-            retval.push(cols[i].substring(cols[i].indexOf("=") + 1));
+            if (cols[i].includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                retval.push(cols[i]);
+            } else {
+                retval.push(cols[i].substring(cols[i].indexOf("=") + 1));
+            }
         }
 
         return retval;
@@ -241,7 +255,7 @@ export const QueryDesignProvider = ({ children }) => {
         let retval = [];
         retval.push({
             table: baseTable,
-            alias: ("t" + (tindx++)),
+            alias: ("t" + (tindx++))
         });
 
         let jMap = new Map();
@@ -356,9 +370,24 @@ export const QueryDesignProvider = ({ children }) => {
 
                 let comma = "";
                 nm += "[";
+                
+                let tcols = [];
+                let tcust = [];
+                for (let i = 0; i < p.metadata.tocols.length; ++i) {
+                    if (!p.metadata.tocols[i].includes(CUSTOM_FK_DATA_SEPARATOR)) {
+                        tcols.push(p.metadata.tocols[i]);
+                    } else {
+                        tcust.push(p.metadata.tocols[i]);
+                    }
+                }
+                
                 for (let i = 0; i < p.metadata.fromcols.length; ++i) {
-                    nm += (comma + p.metadata.fromcols[i] + "=" + p.metadata.tocols[i]);
+                    nm += (comma + p.metadata.fromcols[i] + "=" + tcols[i]);
                     comma = ",";
+                }
+                
+                for (let i = 0; i < tcust.length; ++i) {
+                    nm += comma + tcust[i];
                 }
 
                 nm += "]";

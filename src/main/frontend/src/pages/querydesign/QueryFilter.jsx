@@ -51,12 +51,14 @@ const QueryFilter = () => {
     const getOptionTitle = (s) => {
         return getText("Table Alias:", " ") + s.tableAlias + "\n" 
             + (s.aggregateFunction ? "Function: " + s.aggregateFunction : "")
-            + getText("Path:", " ") + formatPathForDisplay(s.path);
+            + getText("Path:", " ") + formatPathForDisplay(s.path, true);
     };
 
-   
+
     const loadSelectColumns = () => {
-        return selectColumns.map(s => <option title={getOptionTitle(s)} value={s.path}>{getColumnNameForDisplay(s)}</option>);
+        return selectColumns.map(s => {
+            return <option title={getOptionTitle(s)} value={s.path}>{getColumnNameForDisplay(s)}</option>
+        });
     };
 
     const setSelectedColumn = (e) => {

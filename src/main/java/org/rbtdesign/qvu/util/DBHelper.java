@@ -211,16 +211,27 @@ public class DBHelper {
                 if ((c.getToColumns() != null) && !c.getToColumns().isEmpty()) {
                     retval.append(" on (");
 
-                    comma = "";
+                    String and = "";
                     Set<String> hs = new HashSet<>();
                     
-                    for (int i = 0; i < c.getToColumns().size(); ++i) {
-                        String toColumn = c.getToColumns().get(i);
+                    List <String> tcols = new ArrayList<>();
+                    List <String> tcust = new ArrayList<>();
+                    for (String col : c.getToColumns()) {
+                        if (col.contains("=")) {
+                            tcust.add(col);
+                        } else {
+                            tcols.add(col);
+                        }
+                    }
+                    
+                    for (int i = 0; i < tcols.size(); ++i) {
+                        String toColumn = tcols.get(i);
                         String fromColumn = c.getFromColumns().get(i);
 
                         // sanity check to prevent duplicate columns
                         if (!hs.contains(fromColumn)) {
-                            retval.append(comma);
+                            retval.append(and);
+                            
                             retval.append(withQuotes(dbType, c.getAlias()));
                             retval.append(".");
                             retval.append(withQuotes(dbType, toColumn));
@@ -230,13 +241,26 @@ public class DBHelper {
                             retval.append(withQuotes(dbType, c.getFromAlias()));
                             retval.append(".");
                             retval.append(withQuotes(dbType, fromColumn));
-                            comma = ", ";
+                            
+                            and = " and ";
                             hs.add(fromColumn);
                         }
                     }
 
+                    for (String col : tcust) {
+                        int pos = col.indexOf(Constants.CUSTOM_FK_DATA_SEPARATOR);
+                        retval.append(and);
+                        retval.append(withQuotes(dbType, c.getAlias()));
+                        retval.append(".");
+                        retval.append(withQuotes(dbType, col.substring(0, pos)));
+                        retval.append(" ");
+                        retval.append(col.substring(pos + 1));
+                    }
+
+
                     retval.append(")");
                 }
+                
             }
 
             retval.append(" where ");

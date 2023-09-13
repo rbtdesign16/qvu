@@ -165,16 +165,38 @@ public class QuerySelectTreeBuilder {
 
         String comma = "";
         Set<String> hs = new HashSet<>();
+        
+        List<String> tcols = new ArrayList<>();
+        List<String> tcust = new ArrayList<>();
+         
+        for (String c : fk.getToColumns()) {
+            if (!c.contains(Constants.CUSTOM_FK_DATA_SEPARATOR)) {
+                tcols.add(c);
+            } else {
+                tcust.add(c);
+            }
+        }
+
         for (int i = 0; i < fk.getColumns().size(); i++) {
             String c = fk.getColumns().get(i);
             if (!hs.contains(c)) {
                 retval.append(comma);
                 retval.append(fk.getColumns().get(i));
                 retval.append("->");
-                retval.append(fk.getToColumns().get(i));
+                retval.append(tcols.get(i));
                 comma = ",";
                 hs.add(c);
             }
+        }
+        
+        for (String c : tcust) {
+            retval.append(comma);
+            int pos = c.indexOf(Constants.CUSTOM_FK_DATA_SEPARATOR);
+            retval.append(fk.getToTableName());
+            retval.append(".");
+            retval.append(c.substring(0, pos));
+            retval.append(" ");
+            retval.append(c.substring(pos + 1));
         }
 
         return retval.toString();
@@ -241,12 +263,18 @@ public class QuerySelectTreeBuilder {
                                         fkn.getMetadata().put("type", QuerySelectNode.NODE_TYPE_EXPORTED_FOREIGNKEY);
                                     }
                                     fkn.getMetadata().put("dbname", fk.getToTableName());
-                                    fkn.setName(toTable);
+                                   
+                                    String baseName = toTable;
+                                    
+                                    if (fk.isCustom()) {
+                                        baseName = fk.getName();
+                                    }
+                                    
                                     fkn.getMetadata().put("fkname", fk.getName());
                                     if (StringUtils.isNotEmpty(fkDisplayName)) {
                                         fkn.setName(fkDisplayName.replace("$t", toTable).replace("$c", buildForeignKeyColumnString(fk)));
                                     } else {
-                                        fkn.setName(toTable + ": " + buildForeignKeyColumnString(fk));
+                                        fkn.setName(baseName  + ": " + buildForeignKeyColumnString(fk));
                                     }
 
                                     fkMap.put(fk.getName(), ++cnt);

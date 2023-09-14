@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.rbtdesign.qvu.util;
 
 import java.util.Comparator;
@@ -18,9 +14,9 @@ public class ObjectGraphColumnComparator implements Comparator<SqlSelectColumn> 
         int retval = o1.getTableAlias().compareTo(o2.getTableAlias());
         
         if (retval == 0) {
-            if ((o1.getPkIndex() > 0) && (o2.getPkIndex() == 0)) {
+            if ((o1.getPkIndex() > 0) && (o2.getPkIndex() <= 0)) {
                 retval = -1;
-            } else if ((o2.getPkIndex() > 0) && (o1.getPkIndex() == 0)) {
+            } else if ((o2.getPkIndex() > 0) && (o1.getPkIndex() <= 0)) {
                 retval = 1;
             } else if ((o2.getPkIndex() > 0) && (o1.getPkIndex() > 0)) {
                 retval = o1.getPkIndex().compareTo(o2.getPkIndex());

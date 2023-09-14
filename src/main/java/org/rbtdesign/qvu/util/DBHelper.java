@@ -11,6 +11,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
@@ -283,8 +285,12 @@ public class DBHelper {
                 if (!UNARY_OPERATORS_SET.contains(c.getComparisonOperator())) {
                     if (Constants.COMPARISON_OPERATOR_IN.equals(c.getComparisonOperator())) {
                         retval.append("(");
+                        retval.append(addQuotesIfRequired(dbType, c, c.getComparisonValue(), indx));
+                    } else {
+                        retval.append(getComparisonValue(dbType, c, indx));
                     }
-                    retval.append(getComparisonValue(dbType, c, indx));
+                    
+                    
                     if (Constants.COMPARISON_OPERATOR_IN.equals(c.getComparisonOperator())) {
                         retval.append(")");
                     }
@@ -345,6 +351,32 @@ public class DBHelper {
         }
 
         return retval.toString();
+    }
+    
+    private String addQuotesIfRequired(String dbType, SqlFilterColumn c, String value, int indx) {
+        String retval = value;
+        
+        if (isDataTypeString(c.getDataType())|| isDataTypeDateTime(c.getDataType())) {
+            StringBuilder buf = new StringBuilder();
+            String comma = "";
+            StringTokenizer st = new StringTokenizer(value, ",");
+            SqlFilterColumn ctmp = SerializationUtils.clone(c);
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken().trim();
+                buf.append(comma);
+                
+                 if (!token.startsWith("'")) {
+                    ctmp.setComparisonValue(token);
+                    buf.append(getComparisonValue(dbType, ctmp, indx));
+                }
+                
+                comma = ",";
+            }
+            
+            retval = buf.toString();
+        }
+                
+        return retval;
     }
 
     public String getComparisonValue(String dbType, SqlFilterColumn c, int indx) {

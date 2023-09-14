@@ -252,9 +252,8 @@ const SqlDisplay = (props) => {
 
     const formatStringInClause = (input) => {
         let parts = input.split(",");
-
+        let retval = "";
         let comma = "";
-        let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
             retval += comma;
             retval += "'";
@@ -263,23 +262,19 @@ const SqlDisplay = (props) => {
             comma = ",";
         }
 
-        retval += ")";
 
         return retval;
     };
 
     const formatDateInClause = (input, dbType) => {
         let parts = input.split(",");
-
+        let retval = "";
         let comma = "";
-        let retval = "(";
         for (let i = 0; i < parts.length; ++i) {
             retval += comma;
             retval += getDateComparisonValue(parts[i].trim(), dbType);
             comma = ",";
         }
-
-        retval += ")";
 
         return retval;
     };
@@ -288,9 +283,9 @@ const SqlDisplay = (props) => {
     const getDateComparisonValue = (f, dbType) => {
         switch (dbType) {
             case DB_TYPE_ORACLE:
-                return "TO_DATE('" + f.comparisonValue + "', 'YYYY-MM-DD')";
+                return "TO_DATE('" + (f.comparisonValue ? f.comparisonValue : f) + "', 'YYYY-MM-DD')";
             default:
-                return  "'" + f.comparisonValue + "'";
+                return  "'" + (f.comparisonValue ? f.comparisonValue : f) + "'";
         }
     };
 

@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
@@ -145,7 +146,7 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -181,7 +182,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -242,43 +243,52 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
     }
 
-    public OperationResult deleteDocumentGroup(String groupName) {
+    public OperationResult deleteDocumentGroup(String groupName, String user) {
         OperationResult retval = new OperationResult();
         DocumentGroupsConfiguration docgroups = null;
         try {
-            File f = new File(config.getDocumentGroupsConfigurationFileName());
-            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-                byte[] bytes = fis.readAllBytes();
-                docgroups = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+            File dfolder = config.getDocumentGroupsFolder(groupName, user);
+            File gbackup = new File(config.getBackupFolder() + File.separator + groupName.replace(" ", "_") + "-deleted-" + Helper.TS2.format(new Date()) + ".zip");
+            
+            if (ZipFolder.doZip(dfolder, gbackup)) {
+                File f = new File(config.getDocumentGroupsConfigurationFileName());
+                try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                    byte[] bytes = fis.readAllBytes();
+                    docgroups = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
 
-                if (docgroups != null) {
-                    Iterator<DocumentGroup> it = docgroups.getDocumentGroups().iterator();
-                    while (it.hasNext()) {
-                        DocumentGroup dg = it.next();
-                        if (dg.getName().equalsIgnoreCase(groupName)) {
-                            it.remove();
-                            break;
+                    if (docgroups != null) {
+                        Iterator<DocumentGroup> it = docgroups.getDocumentGroups().iterator();
+                        while (it.hasNext()) {
+                            DocumentGroup dg = it.next();
+                            if (dg.getName().equalsIgnoreCase(groupName)) {
+                                it.remove();
+                                break;
+                            }
                         }
                     }
                 }
-            }
 
-            if (docgroups != null) {
-                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
-                    fos.write(getGson(true).toJson(docgroups).getBytes());
-                    config.setDocumentGroupsConfig(docgroups);
-                    retval.setErrorCode(OperationResult.SUCCESS);
+                if (docgroups != null) {
+                    try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                        fos.write(getGson(true).toJson(docgroups).getBytes());
+                        config.setDocumentGroupsConfig(docgroups);
+                        retval.setErrorCode(OperationResult.SUCCESS);
+                    }
                 }
+                
+                FileUtils.deleteDirectory(dfolder);
+            } else {
+                Errors.populateError(retval, Errors.BACKUP_FAILED);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -310,7 +320,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -367,7 +377,7 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -435,7 +445,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -481,7 +491,7 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -513,7 +523,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -575,7 +585,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -647,7 +657,7 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -707,7 +717,7 @@ public class FileHandler {
             retval = ex.getOpResult();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -725,7 +735,7 @@ public class FileHandler {
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -782,7 +792,7 @@ public class FileHandler {
                 pw.println(s);
             }
         } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         } finally {
             if (lnr != null) {
                 try {

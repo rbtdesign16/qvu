@@ -66,13 +66,6 @@ public class Helper {
         return DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
     }
 
-    public static void populateResultError(OperationResult res, Throwable t) {
-        if (res.isSuccess()) {
-            res.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
-            res.setMessage(t.toString());
-        }
-    }
-
     public static String getDate(Object input) {
         String retval = null;
         if (input != null) {

@@ -244,7 +244,7 @@ public class MainServiceImpl implements MainService {
                 role.setNewRecord(false);
                 retval = basicConfig.getSecurityService().saveRole(role);
             } catch (Exception ex) {
-                Helper.populateResultError(retval, ex);
+                Errors.populateError(retval, ex);
             }
         } else {
             retval = fileHandler.saveRole(role);
@@ -262,7 +262,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = basicConfig.getSecurityService().deleteRole(roleName);
             } catch (Exception ex) {
-                Helper.populateResultError(retval, ex);
+                Errors.populateError(retval, ex);
             }
         } else {
             retval = fileHandler.deleteRole(roleName);
@@ -278,7 +278,7 @@ public class MainServiceImpl implements MainService {
             group.setNewRecord(false);
             retval = fileHandler.saveDocumentGroup(group);
         } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
         return retval;
     }
@@ -287,9 +287,10 @@ public class MainServiceImpl implements MainService {
     public OperationResult deleteDocumentGroup(String groupName) {
         OperationResult retval = new OperationResult();
         try {
-            retval = fileHandler.deleteDocumentGroup(groupName);
+            User u = getCurrentUser();
+            retval = fileHandler.deleteDocumentGroup(groupName, u.getName());
         } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -305,7 +306,7 @@ public class MainServiceImpl implements MainService {
                 user.setNewRecord(false);
                 retval = basicConfig.getSecurityService().saveUser(user);
             } catch (Exception ex) {
-                Helper.populateResultError(retval, ex);
+                Errors.populateError(retval, ex);
             }
         } else {
             retval = fileHandler.saveUser(user);
@@ -323,7 +324,7 @@ public class MainServiceImpl implements MainService {
             try {
                 retval = basicConfig.getSecurityService().deleteUser(userId);
             } catch (Exception ex) {
-                Helper.populateResultError(retval, ex);
+                Errors.populateError(retval, ex);
             }
         } else {
             retval = fileHandler.deleteUser(userId);
@@ -393,14 +394,14 @@ public class MainServiceImpl implements MainService {
 
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         } finally {
             if (fos != null) {
                 try {
                     fos.close();
                 } catch (Exception ex) {
                     if (retval.isSuccess()) {
-                        Helper.populateResultError(retval, ex);
+                        Errors.populateError(retval, ex);
                     }
                 };
             }
@@ -1155,7 +1156,7 @@ public class MainServiceImpl implements MainService {
             retval.setResult(docWrapper);
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         }
 
         return retval;
@@ -1314,7 +1315,7 @@ public class MainServiceImpl implements MainService {
             retval.setResult(getQueryResult(res));
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         } finally {
             dbHelper.closeConnection(conn, stmt, res);
         }
@@ -1892,7 +1893,7 @@ public class MainServiceImpl implements MainService {
             fileHandler.updateApplicationProperties(authConfig);
 
         } catch (Exception ex) {
-            Helper.populateResultError(retval, ex);
+            Errors.populateError(retval, ex);
         } finally {
             if (fis != null) {
                 try {

@@ -32,7 +32,7 @@ public class ZipFolder {
             //create ZipOutputStream to write to the zip file
 
             for (String filePath : paths) {
-                System.out.println("Zipping " + filePath);
+                LOG.debug("zipping: " + filePath);
                 //for ZipEntry we need to keep only relative file path, so we used substring on absolute path
                 ZipEntry ze = new ZipEntry(filePath.substring(folder.getAbsolutePath().length() + 1, filePath.length()));
                 zos.putNextEntry(ze);

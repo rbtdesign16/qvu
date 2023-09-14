@@ -917,7 +917,7 @@ const Admin = () => {
         showMessage(INFO, "Backing up repository", "...", null, true);
         let res = await backupRepository();
         if (isApiSuccess(res)) {
-            showMessage(SUCCESS, replaceTokens("repository-backup-success", [res.result]));
+            showMessage(SUCCESS, replaceTokens(getText("repository-backup-success"), [res.result]));
         } else {
            showMessage(ERROR, getText(res.message));
        }

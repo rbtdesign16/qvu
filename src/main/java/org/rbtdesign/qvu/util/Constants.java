@@ -89,5 +89,6 @@ public class Constants {
     
     public static final String CUSTOM_FK_DATA_SEPARATOR = "?";
     public static final String COMPARISON_OPERATOR_IN = "in";
+    public static final String TABLE_TYPE_VIEW = "VIEW";
     
 }

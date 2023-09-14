@@ -59,9 +59,17 @@ const DataSelectTree = (props) => {
                     return <FcDatabase className="icon" size={SMALL_ICON_SIZE}/>;
                 case NODE_TYPE_TABLE:
                     if (selectedTableIds.includes(element.id)) {
-                        return <img src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        if (element.metadata.view) {
+                            return <img src="view_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        } else {   
+                            return <img src="table_sel.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        }
                     } else {
-                        return <img  src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        if (element.metadata.view) {
+                            return <img  src="view.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        } else {
+                            return <img  src="table.png" width={SMALL_ICON_SIZE} height={SMALL_ICON_SIZE} />;
+                        }
                     }
                 case NODE_TYPE_COLUMN:
                     if (element.metadata.pkindex > -1) {

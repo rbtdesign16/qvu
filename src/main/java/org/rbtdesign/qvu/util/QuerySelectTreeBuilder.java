@@ -44,6 +44,10 @@ public class QuerySelectTreeBuilder {
                 QuerySelectNode n = new QuerySelectNode();
                 n.getMetadata().put("type", QuerySelectNode.NODE_TYPE_TABLE);
                 n.getMetadata().put("dbname", t.getName());
+                if (Constants.TABLE_TYPE_VIEW.equals(t.getType())) {
+                    n.getMetadata().put("view", true);
+                }
+                n.getMetadata().put("dbname", t.getName());
                 String tName = t.getName();
                 boolean hide = false;
                 if (ta != null) {

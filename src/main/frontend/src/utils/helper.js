@@ -90,7 +90,8 @@ export const TYPE_BOOLEAN = "boolean";
 export const OPEN_PARENTHESIS = ["", "(", "((", "((("];
 export const CLOSE_PARENTHESIS = ["", ")", "))", ")))"];
 export const AND_OR = ["and", "or"];
-export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", "in", "is null", "is not null", "like"];
+export const COMPARISON_OPERATOR_IN = "in";
+export const COMPARISON_OPERATORS = ["=", "<", "<=", ">", ">=", "<>", COMPARISON_OPERATOR_IN, "is null", "is not null", "like"];
 export const UNARY_COMPARISON_OPERATORS = ["is null", "is not null"];
 
 export const NUMBER_AGGREATE_FUNCTIONS = ["min", "max", "sum", "avg", "count"];

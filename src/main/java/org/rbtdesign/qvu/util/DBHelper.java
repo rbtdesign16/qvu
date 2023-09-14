@@ -281,7 +281,13 @@ public class DBHelper {
                 retval.append(" ");
 
                 if (!UNARY_OPERATORS_SET.contains(c.getComparisonOperator())) {
+                    if (Constants.COMPARISON_OPERATOR_IN.equals(c.getComparisonOperator())) {
+                        retval.append("(");
+                    }
                     retval.append(getComparisonValue(dbType, c, indx));
+                    if (Constants.COMPARISON_OPERATOR_IN.equals(c.getComparisonOperator())) {
+                        retval.append(")");
+                    }
                     if (StringUtils.isEmpty(c.getComparisonValue())) {
                         indx++;
                     }

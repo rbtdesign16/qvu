@@ -31,7 +31,8 @@ import {
     ERROR,
     loadDocumentFromBlob,
     checkColorString,
-    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+    CUSTOM_FK_DATA_SEPARATOR,
+    COMPARISON_OPERATOR_IN} from "../../utils/helper";
 import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -295,14 +296,19 @@ const SqlDisplay = (props) => {
 
     const getComparisonValue = (f) => {
         if (f.comparisonValue) {
-            if (f.comparisonOperator === "in") {
+            if (f.comparisonOperator === COMPARISON_OPERATOR_IN) {
+                let val = "(";
                 if (isDataTypeString(f.dataType)) {
-                    return formatStringInClause(f.comparisonValue);
+                    val += formatStringInClause(f.comparisonValue);
                 } else if (isDataTypeDateTime(f.dataType)) {
-                    return formatDateInClause(f.comparisonValue, getDatabaseType(f.datasource));
+                    val +=  formatDateInClause(f.comparisonValue, getDatabaseType(f.datasource));
                 } else {
-                    return f.comparisonOperator;
+                    val += f.comparisonValue;
                 }
+                
+                val += ")";
+                
+                return val;
             } else if (isDataTypeDateTime(f.dataType)) {
                 return getDateComparisonValue(f, getDatabaseType(f.datasource));
             } else if (isDataTypeString(f.dataType)) {

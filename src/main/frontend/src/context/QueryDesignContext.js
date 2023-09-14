@@ -10,7 +10,8 @@ import {
     DEFAULT_DOCUMENT_GROUP,
     doSortCompare,
     NODE_TYPE_IMPORTED_FOREIGNKEY,
-    CUSTOM_FK_DATA_SEPARATOR
+    CUSTOM_FK_DATA_SEPARATOR,
+    COMPARISON_OPERATOR_IN
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -174,7 +175,7 @@ export const QueryDesignProvider = ({ children }) => {
             if (l[i].includes("{")) {
                 let pos1 = l[i].indexOf("{");
                 let pos2 = l[i].indexOf("}");
-                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1)
+                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
                 l[i] = fkcols.replace("?", "");
             }
         }
@@ -414,9 +415,17 @@ export const QueryDesignProvider = ({ children }) => {
         if (isDataTypeString(filter.dataType)) {
             return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
         } else if (isDataTypeNumeric(filter.dataType)) {
-            return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
+            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
+                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+            } else {
+                return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
+            }
         } else if (isDataTypeDateTime(filter.dataType)) {
-            return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
+            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
+                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+            } else {
+                return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
+            }
         }
     };
 

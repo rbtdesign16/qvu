@@ -11,14 +11,15 @@ import NumberEntry from "../../widgets/NumberEntry"
 import { MdHelpOutline } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import {
-    SMALL_ICON_SIZE,
-    confirm,
-    OPEN_PARENTHESIS,
-    CLOSE_PARENTHESIS,
-    AND_OR,
-    COMPARISON_OPERATORS,
-    UNARY_COMPARISON_OPERATORS
-} from "../../utils/helper";
+SMALL_ICON_SIZE,
+        confirm,
+        OPEN_PARENTHESIS,
+        CLOSE_PARENTHESIS,
+        AND_OR,
+        COMPARISON_OPERATORS,
+        UNARY_COMPARISON_OPERATORS,
+        COMPARISON_OPERATOR_IN
+        } from "../../utils/helper";
 
 const FilterEntry = (props) => {
     const {index} = props;
@@ -97,7 +98,7 @@ const FilterEntry = (props) => {
             }
         }
     };
-    
+
     const findColumnData = () => {
         for (let i = 0; i < selectColumns.length; ++i) {
             if (selectColumns[i].path === filterColumns[index].path) {
@@ -140,7 +141,7 @@ const FilterEntry = (props) => {
 
     const onChange = (e) => {
         let val = "";
-        
+
         if (e.target.selectedIndex > -1) {
             val = e.target.options[e.target.selectedIndex].value;
         } else {
@@ -148,20 +149,20 @@ const FilterEntry = (props) => {
         }
 
         let f = [...filterColumns];
-        
+
         f[index][e.target.name] = val;
         setFilterColumns(f);
     };
 
     const getComparisonInput = () => {
-         if (isComparisonValueDisabled()) {
+        if (isComparisonValueDisabled()) {
             filterColumns[index].comparisonValue = "";
             return <input type="text" name="comparisonValue" style={{width: "98%"}} disabled />;
         } else {
             return getFilterComparisonInput(filterColumns[index], index, onChange);
         }
     }
-    
+
     const isComparisonValueDisabled = () => {
         if (filterColumns[index].comparisonOperator) {
             return UNARY_COMPARISON_OPERATORS.includes(filterColumns[index].comparisonOperator);
@@ -174,14 +175,14 @@ const FilterEntry = (props) => {
 
     const getDetail = () => {
         return <tr style={{paddingLeft: "10px"}}>
-            <td title={getText("Remove entry")}><AiOutlineDelete  className="icon crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
-            <td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={!filterColumns[index].andOr}>{loadAndOr()}</select></td>
-            <td><select name="openParenthesis" onChange={e => onChange(e)}>{loadOpenParenthesis()}</select></td>
-            <td><span className="fc-name">{getColumnNameForDisplay(filterColumns[index])}</span></td>
-            <td><select name="comparisonOperator" onChange={e => onChange(e)}>{loadFilterComparisonOperators()}</select></td>
-            <td>{getComparisonInput()}</td>
-            <td><select name="closeParenthesis" onChange={e => onChange(e)}>{loadCloseParenthesis()}</select></td>
-            </tr>;
+    <td title={getText("Remove entry")}><AiOutlineDelete  className="icon crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove()} /></td>
+<td><select name="andOr" onChange={e => onChange(e)} style={{width: "100%"}}  disabled={!filterColumns[index].andOr}>{loadAndOr()}</select></td>
+<td><select name="openParenthesis" onChange={e => onChange(e)}>{loadOpenParenthesis()}</select></td>
+<td><span className="fc-name">{getColumnNameForDisplay(filterColumns[index])}</span></td>
+<td><select name="comparisonOperator" onChange={e => onChange(e)}>{loadFilterComparisonOperators()}</select></td>
+<td>{getComparisonInput()}</td>
+<td><select name="closeParenthesis" onChange={e => onChange(e)}>{loadCloseParenthesis()}</select></td>
+</tr>;
     };
 
     return <div key={"fe-" + index}>

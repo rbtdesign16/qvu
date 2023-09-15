@@ -24,6 +24,7 @@ public class DataSourceConfiguration {
     private Long maxLifeTime;
     private Integer maxPoolSize;
     private boolean newDatasource;
+    boolean enabled = true;
     private Integer maxImportedKeyDepth = Constants.DEFAULT_MAX_IMPORTED_KEY_DEPTH;
     private Integer maxExportedKeyDepth = Constants.DEFAULT_MAX_EXPORTED_KEY_DEPTH;
 
@@ -183,6 +184,14 @@ public class DataSourceConfiguration {
 
     public void setMaxExportedKeyDepth(Integer maxExportedKeyDepth) {
         this.maxExportedKeyDepth = maxExportedKeyDepth;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

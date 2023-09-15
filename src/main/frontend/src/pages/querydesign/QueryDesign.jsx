@@ -84,7 +84,7 @@ import { getDatasourceTreeViewData,
         if (datasources) {
             return datasources.map(d => {
                 // handle acces by role if required
-                if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
+                if (d.enabled && hasRoleAccess(d.roles, authData.currentUser.roles)) {
                     if (treeViewData && datasource && (d.datasourceName === datasource)) {
                         return <option value={d.datasourceName} selected>{getDatasourceDisplayName(d)}</option>;
                     } else {

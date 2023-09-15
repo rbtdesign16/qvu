@@ -164,16 +164,6 @@ const Admin = () => {
                 type: "number"
             },
             {
-                label: getText("Idle Timeout:"),
-                name: "idleTimeout",
-                type: "number"
-            },
-            {
-                label: getText("Max Life Time:"),
-                name: "maxLifeTime",
-                type: "number"
-            },
-            {
                 label: getText("Max Pool Size:"),
                 name: "maxPoolSize",
                 type: "number"
@@ -188,7 +178,13 @@ const Admin = () => {
                 valueRenderer: rolesValueRenderer,
                 showHelp: showHelpMessage,
                 helpText: getText("datasourceRoles-help")
-            }];
+            },
+            {
+                label: getText("Enabled:"),
+                name: "enabled",
+                type: "checkbox"
+            }
+        ];
     };
 
     const getDocumentGroupEntryConfig = () => {
@@ -709,6 +705,10 @@ const Admin = () => {
             {
                 label: getText("Description:"),
                 field: "description"
+            },
+            {
+                label: getText("Enabled:"),
+                field: "enabled"
             }
         ]
     };

@@ -139,7 +139,9 @@ public class FileHandler {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                 }
                 config.setDatasourcesConfig(datasources);
-                dbDatasources.reloadDatasource(datasource);
+                if (datasource.isEnabled()) {
+                    dbDatasources.reloadDatasource(datasource);
+                }
                 retval.setResult(config.getDatasourcesConfig().getDatasources());
             }
         } catch (SaveException ex) {
@@ -292,7 +294,6 @@ public class FileHandler {
         }
 
         return retval;
-
     }
 
     public OperationResult saveDocumentGroups(DocumentGroupsConfiguration docgroups) {

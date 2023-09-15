@@ -19,8 +19,17 @@ const EditableDataList = (props) => {
     
     const getFieldValue = (rec, field, useLang) => {
         if (field) {
+            console.log("----------->field=" + rec[field] + ",  " + (typeof rec[field]));
             if (typeof field === "function") {
                 return field(rec);
+            } else if (typeof rec[field] === "boolean") {
+                if (rec[field]) {
+                    return getText("true");
+                } else {
+                    return getText("false");
+                }
+            } else if (typeof rec[field] === "number") {
+                return rec[field];
             } else {
                 return useLang ? getText(rec[field]) : rec[field];
             }

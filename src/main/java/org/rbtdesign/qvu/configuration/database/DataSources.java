@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.util.Constants;
-import org.rbtdesign.qvu.util.DBHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class DataSources {
 
     private static Logger LOG = LoggerFactory.getLogger(DataSources.class);
     private Map<String, HikariDataSource> dbDataSources = new HashMap<>();
-    
+
     @Autowired
     private ConfigurationHelper config;
 
@@ -102,7 +101,7 @@ public class DataSources {
         if (ds != null) {
             ds.close();
         }
-        
+
         HikariConfig pconfig = new HikariConfig();
         pconfig.setJdbcUrl(c.getUrl());
         pconfig.setUsername(c.getUsername());
@@ -134,37 +133,39 @@ public class DataSources {
         if (LOG.isTraceEnabled()) {
             LOG.trace("datasources: " + new Gson().toJson(dsc, DataSourcesConfiguration.class));
         }
-        
+
         for (DataSourceConfiguration c : dsc.getDatasources()) {
-            try {
-                HikariConfig pconfig = new HikariConfig();
-                pconfig.setJdbcUrl(c.getUrl());
-                pconfig.setUsername(c.getUsername());
-                pconfig.setPassword(c.getPassword());
-                pconfig.setDriverClassName(c.getDriver());
+            if (c.isEnabled()) {
+                try {
+                    HikariConfig pconfig = new HikariConfig();
+                    pconfig.setJdbcUrl(c.getUrl());
+                    pconfig.setUsername(c.getUsername());
+                    pconfig.setPassword(c.getPassword());
+                    pconfig.setDriverClassName(c.getDriver());
 
-                if (c.getConnectionTimeout() != null) {
-                    pconfig.setConnectionTimeout(c.getConnectionTimeout());
+                    if (c.getConnectionTimeout() != null) {
+                        pconfig.setConnectionTimeout(c.getConnectionTimeout());
+                    }
+
+                    if (c.getIdleTimeout() != null) {
+                        pconfig.setIdleTimeout(c.getIdleTimeout());
+                    }
+
+                    if (c.getMaxLifeTime() != null) {
+                        pconfig.setMaxLifetime(c.getMaxLifeTime());
+                    }
+
+                    if (c.getMaxPoolSize() != null) {
+                        pconfig.setMaximumPoolSize(c.getMaxPoolSize());
+                    }
+
+                    dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
+                    c.setStatus(Constants.ONLINE);
+                } catch (Exception ex) {
+                    c.setStatus(Constants.OFFLINE);
+                    LOG.error("error loading datasource " + c.getDatasourceName());
+                    LOG.error(ex.toString(), ex);
                 }
-
-                if (c.getIdleTimeout() != null) {
-                    pconfig.setIdleTimeout(c.getIdleTimeout());
-                }
-
-                if (c.getMaxLifeTime() != null) {
-                    pconfig.setMaxLifetime(c.getMaxLifeTime());
-                }
-
-                if (c.getMaxPoolSize() != null) {
-                    pconfig.setMaximumPoolSize(c.getMaxPoolSize());
-                }
-
-                dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
-                c.setStatus(Constants.ONLINE);
-            } catch (Exception ex) {
-                c.setStatus(Constants.OFFLINE);
-                LOG.error("error loading datasource " + c.getDatasourceName());
-                LOG.error(ex.toString(), ex);
             }
         }
     }

@@ -80,6 +80,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.Table;
@@ -96,6 +97,7 @@ import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
 import org.rbtdesign.qvu.util.ZipFolder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -381,6 +383,7 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-scheduler.properties"), new File(config.getHelpFolder() + File.separator + "scheduler.properties"));
 
             // update admin password
             SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);
@@ -496,7 +499,7 @@ public class MainServiceImpl implements MainService {
                 // load up custom foreign keys to apply tp table definitions
                 Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
                 for (ForeignKey fk : ds.getCustomForeignKeys()) {
-                   List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
+                    List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
                     if (fklist == null) {
                         customForeignKeys.put(fk.getTableName(), fklist = new ArrayList<>());
                     }
@@ -1508,7 +1511,7 @@ public class MainServiceImpl implements MainService {
         hs.clear();
         for (DocumentGroup g : userDocGroups) {
             if (!hs.contains(g.getName())) {
-                if ((currentNode == null) 
+                if ((currentNode == null)
                         || !g.getName().equals(currentNode.getMetadata().get("group"))) {
                     currentNode = new DocumentNode(id++);
                     currentNode.setName(g.getName());
@@ -1584,30 +1587,30 @@ public class MainServiceImpl implements MainService {
         }
 
         Map<String, List<Integer[]>> aliasColumnPosMap = new HashMap<>();
-        
+
         int indx1 = 0;
         int indx2 = 0;
         for (SqlSelectColumn c : doc.getSelectColumns()) {
-             if (c.isShowInResults()) {
+            if (c.isShowInResults()) {
                 List<Integer[]> l = aliasColumnPosMap.get(c.getTableAlias());
-            
+
                 if (l == null) {
                     aliasColumnPosMap.put(c.getTableAlias(), l = new ArrayList<>());
                 }
-                
+
                 Integer[] pos = {indx1, indx2++};
                 l.add(pos);
-             }
-             indx1++;
+            }
+            indx1++;
         }
-        
-         for (List<Object> row : res.getData()) {
+
+        for (List<Object> row : res.getData()) {
             for (String alias : tableAliases) {
                 StringBuilder dataKey = new StringBuilder();
                 dataKey.append(alias);
-                List <Integer[]> cpos = aliasColumnPosMap.get(alias);
+                List<Integer[]> cpos = aliasColumnPosMap.get(alias);
                 for (Integer[] pos : cpos) {
-                    SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
+                    SqlSelectColumn c = doc.getSelectColumns().get(pos[0]);
                     List<String> pkl = pkMap.get(c.getTableAlias() + "." + c.getTableName());
                     if (pkl.contains(c.getColumnName())) {
                         dataKey.append(".");
@@ -1625,7 +1628,7 @@ public class MainServiceImpl implements MainService {
                     LinkedHashMap<String, Object> data = new LinkedHashMap<>();
 
                     for (Integer[] pos : cpos) {
-                        SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
+                        SqlSelectColumn c = doc.getSelectColumns().get(pos[0]);
                         // add one becausr first result row value is row number
                         data.put(c.getColumnName(), row.get(pos[1] + 1));
                     }
@@ -1650,18 +1653,18 @@ public class MainServiceImpl implements MainService {
                 List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
                 if ((l != null) && !l.isEmpty()) {
                     ForeignKeySettings fks = fkSettingsMap.get(f.getFromAlias() + "." + f.getForeignKeyName());
-                    
+
                     String fieldName = f.getForeignKeyName();
                     if ((fks != null) && StringUtils.isNotEmpty(fks.getFieldName())) {
                         fieldName = fks.getFieldName();
                     }
-                    
+
                     if (f.isImportedForeignKey()) {
                         parent.put(fieldName, l.get(0));
                     } else {
                         parent.put(fieldName, l);
                     }
-                    
+
                     for (LinkedHashMap<String, Object> r : l) {
                         buildObjectGraph(doc, fkSettingsMap, dataMap, f.getAlias(), r);
                     }
@@ -1727,27 +1730,27 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private Map<String, ForeignKeySettings> getDocumentTableForeignKeySettings(QueryDocument doc) {
         Map<String, ForeignKeySettings> retval = new HashMap<>();
 
         DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
 
-        Map <String, ForeignKeySettings> tfkMap = new HashMap<>();
-        
+        Map<String, ForeignKeySettings> tfkMap = new HashMap<>();
+
         for (TableSettings ts : ds.getDatasourceTableSettings()) {
             for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
                 String key = ts.getTableName() + "." + fks.getForeignKeyName();
                 tfkMap.put(key, fks);
             }
         }
-        
+
         Map<String, String> aliasMap = new HashMap<>();
-        for (SqlFrom f  : doc.getFromClause()) {
+        for (SqlFrom f : doc.getFromClause()) {
             aliasMap.put(f.getAlias(), f.getTable());
         }
-         
-        for (SqlFrom f  : doc.getFromClause()) {
+
+        for (SqlFrom f : doc.getFromClause()) {
             if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
                 ForeignKeySettings fks = tfkMap.get(aliasMap.get(f.getFromAlias()) + "." + f.getForeignKeyName());
                 if (fks != null) {
@@ -1755,10 +1758,9 @@ public class MainServiceImpl implements MainService {
                 }
             }
         }
-        
+
         return retval;
     }
-
 
     private QueryDocument toObjectGraphQueryDoc(Map<String, List<String>> pkMap, QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);
@@ -1797,8 +1799,8 @@ public class MainServiceImpl implements MainService {
             }
         }
 
-        Collections.sort(retval.getSelectColumns(), new ObjectGraphColumnComparator()); 
-        
+        Collections.sort(retval.getSelectColumns(), new ObjectGraphColumnComparator());
+
         return retval;
     }
 
@@ -1912,20 +1914,24 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     @Override
     public OperationResult<String> doBackup() {
         OperationResult<String> retval = new OperationResult();
         File f = new File(config.getBackupFolder() + File.separator + "qvu-backup-" + Helper.TS2.format(new Date()) + ".zip");
-        boolean res = ZipFolder.doZip(new File(config.getRepositoryFolder()), f); 
-        
+        boolean res = ZipFolder.doZip(new File(config.getRepositoryFolder()), f);
+
         if (res) {
             retval.setResult(f.getAbsolutePath());
         } else {
             Errors.populateError(retval, Errors.BACKUP_FAILED);
         }
-        
+
         return retval;
-            
+
+    }
+
+    @Async
+    public void runScheduledDocument(ScheduledDocument docinfo) {
     }
 }

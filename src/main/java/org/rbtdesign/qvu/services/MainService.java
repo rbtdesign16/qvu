@@ -18,6 +18,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -89,5 +90,8 @@ public interface MainService {
     public OperationResult saveAuthConfig(AuthConfig authConfig);
     
     public OperationResult<String> doBackup();
+    
+    public void runScheduledDocument(ScheduledDocument docs);
+
 
 }

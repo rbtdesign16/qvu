@@ -76,10 +76,6 @@ public class DataSources {
             LOG.error("QvuDataSource - unable to get DB name for datasource[" + dsname + "]: " + ex.getMessage());
         }
 
-        if (retval == null) {
-            retval = Constants.NONE;
-        }
-
         return retval;
     }
 
@@ -125,7 +121,6 @@ public class DataSources {
         }
 
         dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
-        c.setStatus(Constants.ONLINE);
     }
 
     public void loadDataSources() {
@@ -160,9 +155,8 @@ public class DataSources {
                     }
 
                     dbDataSources.put(c.getDatasourceName(), new HikariDataSource(pconfig));
-                    c.setStatus(Constants.ONLINE);
                 } catch (Exception ex) {
-                    c.setStatus(Constants.OFFLINE);
+                    c.setEnabled(false);
                     LOG.error("error loading datasource " + c.getDatasourceName());
                     LOG.error(ex.toString(), ex);
                 }

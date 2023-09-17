@@ -28,7 +28,6 @@ public class DataSourceConfiguration {
     private Integer maxImportedKeyDepth = Constants.DEFAULT_MAX_IMPORTED_KEY_DEPTH;
     private Integer maxExportedKeyDepth = Constants.DEFAULT_MAX_EXPORTED_KEY_DEPTH;
 
-    private String status = Constants.OFFLINE;
     private List<String> roles = new ArrayList<>();
     private List<TableSettings> datasourceTableSettings = new ArrayList<>();
     private List<ForeignKey> customForeignKeys = new ArrayList<>();
@@ -112,14 +111,6 @@ public class DataSourceConfiguration {
 
     public void setMaxPoolSize(Integer maxPoolSize) {
         this.maxPoolSize = maxPoolSize;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getDescription() {

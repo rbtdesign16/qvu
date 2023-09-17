@@ -37,11 +37,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 @EnableScheduling
-@EnableAsync
 @PropertySources({
     @PropertySource(value = "classpath:default-application.properties"),
     @PropertySource(value = "file:${repository.folder}/config/application.properties", ignoreResourceNotFound = true)
 })
+
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 
@@ -65,7 +65,7 @@ public class QvuConfiguration {
 
     @Value("${backup.folder}")
     private String backupFolder;
-
+    
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");

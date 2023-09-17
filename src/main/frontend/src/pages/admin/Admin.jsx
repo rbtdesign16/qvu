@@ -4,7 +4,7 @@ import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
-import {FcServices, FcDataBackup} from "react-icons/fc";
+import {FcServices, FcDataBackup, FcPlanner} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
@@ -924,6 +924,10 @@ const Admin = () => {
             
     };
     
+    const onShowSchedule = () => {
+        alert("on show schedule");
+    };
+    
     const onBackup = async() => {
         handleOnClick(getText("Backup repository?"), runBackup);
     };
@@ -931,6 +935,7 @@ const Admin = () => {
     const onSystemSettings = async () => {
         setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
     };
+    
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
@@ -939,6 +944,7 @@ const Admin = () => {
                 <CustomForeignKeys config={customForeignKeys}/>
                 <div>
                     <span style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("System Settings")}</span>
+                    <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onShowSchedule()}><FcPlanner className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Scheduling")}</span>
                     <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onBackup()}><FcDataBackup className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Repository Backup")}</span>
                 </div>
                 <EditableDataList listConfig={datasourcesConfig}/>

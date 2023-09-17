@@ -218,6 +218,7 @@
         "Saving user": "Saving user $1...",
         "Saving": "Saving",
         "Schema:": "Schema",
+        "Scheduling": "Scheduling",
         "securityServiceClass-help": "To enable custom authentication/security processing implement interface org.rbt.client.utils.Security service and put class name here.",
         "Select a datasource":"Select a datasource",
         "Select query document": "Select query document",

@@ -30,6 +30,7 @@
         <beanutils.version>1.9.4</beanutils.version>
         <io.utils.version>2.13.0</io.utils.version>
         <poi.version>5.2.3</poi.version>
+        <angus.mail.version>2.0.2</angus.mail.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -140,6 +141,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
+            <version>${angus.mail.version}</version>
         </dependency>
     </dependencies>
 

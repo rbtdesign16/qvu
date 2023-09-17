@@ -2,6 +2,7 @@ package org.rbtdesign.qvu.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.rbtdesign.qvu.util.Constants;
 
 /**
  *
@@ -10,8 +11,9 @@ import java.util.List;
 public class ScheduledDocument {
     private String group;
     private String document;
+    private String resultType = Constants.RESULT_TYPE_TABULAR;
     private List<QueryParameter> parameters  = new ArrayList<>();
-    private List<String> emails = new ArrayList<>();
+    private String emails;
 
     public String getGroup() {
         return group;
@@ -37,12 +39,22 @@ public class ScheduledDocument {
         this.parameters = parameters;
     }
 
-    public List<String> getEmails() {
+    public String getEmails() {
         return emails;
     }
 
-    public void setEmails(List<String> emails) {
+    public void setEmails(String emails) {
         this.emails = emails;
     }
+
+
+    public String getResultType() {
+        return resultType;
+    }
+
+    public void setResultType(String resultType) {
+        this.resultType = resultType;
+    }
+  
     
 }

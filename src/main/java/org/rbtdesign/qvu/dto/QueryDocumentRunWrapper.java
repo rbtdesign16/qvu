@@ -11,6 +11,17 @@ public class QueryDocumentRunWrapper {
     private List<QueryParameter> parameters = new ArrayList<>();
     private QueryDocument document;
  
+    public QueryDocumentRunWrapper() {};
+    public QueryDocumentRunWrapper(QueryDocument document) {
+        this.document = document;
+    }
+    
+    public QueryDocumentRunWrapper(QueryDocument document, List<QueryParameter> parameters) {
+        this.document = document;
+        this.parameters = parameters;
+    }
+
+    
     public List<QueryParameter> getParameters() {
         return parameters;
     }

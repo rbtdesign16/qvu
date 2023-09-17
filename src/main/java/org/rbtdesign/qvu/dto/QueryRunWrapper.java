@@ -13,6 +13,15 @@ public class QueryRunWrapper {
     private String documentName;
     private String groupName;
 
+    public QueryRunWrapper(String user, String groupName, String documentName,List<QueryParameter> parameters) {
+        this.user = user;
+        this.groupName = groupName;
+        this.documentName = documentName;
+        this.parameters = parameters;
+    }
+    
+    public QueryRunWrapper() {};
+    
     public List<QueryParameter> getParameters() {
         return parameters;
     }

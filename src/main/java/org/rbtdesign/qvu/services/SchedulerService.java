@@ -174,10 +174,10 @@ public class SchedulerService implements AsyncConfigurer {
         String retval = docinfo.getDocument();
         switch (docinfo.getResultType()) {
             case Constants.RESULT_TYPE_EXCEL:
-                retval = docinfo.getDocument().replace(".json", "") + "xlsx";
+                retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
                 break;
             case Constants.RESULT_TYPE_CSV:
-                retval = docinfo.getDocument().replace(".json", "") + "csv";
+                retval = docinfo.getDocument().replace(".json", "") + ".csv";
                 break;
             case Constants.RESULT_TYPE_JSON_FLAT:
             case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
@@ -225,10 +225,9 @@ public class SchedulerService implements AsyncConfigurer {
 
     private byte[] toCsv(QueryResult queryResult) {
         byte[] retval = null;
-        try (StringWriter strwriter = new StringWriter()) {
-            // create CSVWriter object filewriter object as parameter
-            CSVWriter writer = new CSVWriter(strwriter);
-
+        try (StringWriter strwriter = new StringWriter();
+            CSVWriter writer = new CSVWriter(strwriter);) {
+ 
             String[] row = new String[queryResult.getHeader().size()];
             writer.writeNext(queryResult.getHeader().toArray(row));
 
@@ -236,10 +235,7 @@ public class SchedulerService implements AsyncConfigurer {
             for (List<Object> l : queryResult.getData()) {
                 writer.writeNext(toStringArray(l));
             }
-
-            // closing writer connection
-            writer.close();
-            strwriter.flush();
+            
             retval = strwriter.toString().getBytes();
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

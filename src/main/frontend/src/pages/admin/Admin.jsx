@@ -114,11 +114,13 @@ const Admin = () => {
                 label: getText("JDBC Url:"),
                 name: "url",
                 type: "input",
+                size: 40,
                 required: true
             },
             {
                 label: getText("JDBC Driver:"),
                 name: "driver",
+                size: 40,
                 type: "input",
                 required: true
             },
@@ -141,7 +143,7 @@ const Admin = () => {
                 required: true
             },
             {
-                label: getText("Max Imported Key Depth:"),
+                label: getText("Imported Key Depth:"),
                 name: "maxImportedKeyDepth",
                 defaultValue: DEFAULT_IMPORTED_KEY_DEPTH,
                 type: "number",
@@ -150,7 +152,7 @@ const Admin = () => {
                 helpText: getText("datasourceMaxImportedKey-help")
             },
             {
-                label: getText("Max Exported Key Depth:"),
+                label: getText("Exported Key Depth:"),
                 name: "maxExportedKeyDepth",
                 defaultValue: DEFAULT_EXPORTED_KEY_DEPTH,
                 type: "number",
@@ -507,7 +509,7 @@ const Admin = () => {
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
-            gridClass: "entrygrid-225-425",
+            gridClass: "entrygrid-210-425",
             dlgsize: "ds-admin",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,

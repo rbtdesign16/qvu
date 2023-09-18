@@ -11,7 +11,7 @@ import org.rbtdesign.qvu.util.Constants;
 public class ScheduledDocument {
     private String group;
     private String document;
-    private String resultType = Constants.RESULT_TYPE_TABULAR;
+    private String resultType = Constants.RESULT_TYPE_CSV;
     private List<QueryParameter> parameters  = new ArrayList<>();
     private String emails;
 

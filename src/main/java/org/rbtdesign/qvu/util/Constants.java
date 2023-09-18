@@ -88,7 +88,7 @@ public class Constants {
     public static final String TABLE_TYPE_VIEW = "VIEW";
     
     public static final String RESULT_TYPE_EXCEL = "excel";
-    public static final String RESULT_TYPE_TABULAR = "tabular";
+    public static final String RESULT_TYPE_CSV = "csv";
     public static final String RESULT_TYPE_JSON_FLAT = "jsonflat";
     public static final String RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
     

@@ -598,3 +598,10 @@ textarea {
     font-size: var(--small-font-size);
     color: var(--info-message-text-color);
 }
+
+.schedule-entries {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: var(--query-results-table-border);
+}

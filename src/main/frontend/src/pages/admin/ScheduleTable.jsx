@@ -1,32 +1,25 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
- */
 import React, {useState} from "react";
-import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
-import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import ColumnSettings from "./ColumnSettings";
-import { MultiSelect } from "react-multi-select-component";
-import { MdHelpOutline } from 'react-icons/md';
+import { MdOutlineDeleteForever, MdOutlineAddBox, MdHelpOutline } from 'react-icons/md';
+import { CiEdit } from 'react-icons/ci';
 import PropTypes from "prop-types";
 import {
-    ERROR,
-    SMALL_ICON_SIZE,
-    MODAL_TITLE_SIZE,
-    confirm,
-    getUUID,
-    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+ERROR,
+        SMALL_ICON_SIZE,
+        MODAL_TITLE_SIZE,
+        confirm,
+        getUUID,
+        CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
 
 const ScheduleTable = (props) => {
     const {config} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
-    
+
     const onHelp = () => {
         showHelp(getText("scheduleEntry-help"));
     };
@@ -40,6 +33,8 @@ const ScheduleTable = (props) => {
         config.save();
     };
 
+    const onAdd = () => {
+    };
 
     const onShow = () => {
     };
@@ -47,7 +42,7 @@ const ScheduleTable = (props) => {
     const loadScheduledReports = () => {
         return "";
     };
-    
+
     return (
             <div className="static-modal">
                 <Modal animation={false} 
@@ -62,7 +57,8 @@ const ScheduleTable = (props) => {
                             &nbsp;&nbsp;{getText("Scheduled Reports") }</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div style={{height: "300px", overflow: "auto"}}>{loadScheduledReports()}</div>
+                        <div title={getText("Add Schedule")}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" onClick={onAdd()}/>{getText("Add Schedule")}</div>
+                        <div className="schedule-entries">{loadScheduledReports()}</div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>

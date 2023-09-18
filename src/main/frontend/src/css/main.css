@@ -365,6 +365,12 @@ select {
     min-width: 550px;
 }
 
+.schedule-table {
+    left: 5%;
+    top: 5%;
+    min-width: 800px;
+}
+
 .p-splitter-panel {
     flex-grow: 1;
     min-width: 5px;

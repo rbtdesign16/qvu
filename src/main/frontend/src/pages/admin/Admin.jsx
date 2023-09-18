@@ -8,6 +8,7 @@ import {FcServices, FcDataBackup, FcPlanner} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
+import ScheduleTable from "./ScheduleTable";
 import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
@@ -81,6 +82,7 @@ const Admin = () => {
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
     const [showSystemSettings, setShowSystemSettings] = useState({show: false});
+    const [showScheduleTable, setShowScheduleTable] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -926,8 +928,15 @@ const Admin = () => {
             
     };
     
-    const onShowSchedule = () => {
-        alert("on show schedule");
+    const hideScheduleTable = () => {
+        setShowScheduleTable({show: false});
+    };
+    
+    const saveSchedules = (schedules) => {
+    }
+    
+    const onShowScheduleTable = () => {
+        setShowScheduleTable({show: true, hide: hideScheduleTable, save: saveSchedules});
     };
     
     const onBackup = async() => {
@@ -943,10 +952,11 @@ const Admin = () => {
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
                 <SystemSetup config={showSystemSettings}/>
+                <ScheduleTable config={showScheduleTable}/>
                 <CustomForeignKeys config={customForeignKeys}/>
                 <div>
                     <span style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("System Settings")}</span>
-                    <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onShowSchedule()}><FcPlanner className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Scheduling")}</span>
+                    <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onShowScheduleTable()}><FcPlanner className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Scheduling")}</span>
                     <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onBackup()}><FcDataBackup className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Repository Backup")}</span>
                 </div>
                 <EditableDataList listConfig={datasourcesConfig}/>

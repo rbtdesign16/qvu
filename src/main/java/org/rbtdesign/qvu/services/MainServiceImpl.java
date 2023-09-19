@@ -730,10 +730,10 @@ public class MainServiceImpl implements MainService {
         if (auth != null) {
             Object o = auth.getPrincipal();
             if (o != null) {
-                if (o instanceof User) {
-                    retval = (User) o;
-                } else if (o instanceof DefaultOAuth2User) {
-                    retval = toUser((DefaultOAuth2User) o);
+                if (o instanceof User user) {
+                    retval = user;
+                } else if (o instanceof DefaultOAuth2User defaultOAuth2User) {
+                    retval = toUser(defaultOAuth2User);
                 }
             }
         }
@@ -1202,8 +1202,8 @@ public class MainServiceImpl implements MainService {
                     cwidths[i] = cwidths[i] + o.toString().length();
                     // format timestamp
                     if (rmd.getColumnType(i + 1) == java.sql.Types.TIMESTAMP) {
-                        if (o instanceof LocalDateTime) {
-                            o = Timestamp.valueOf((LocalDateTime) o);
+                        if (o instanceof LocalDateTime localDateTime) {
+                            o = Timestamp.valueOf(localDateTime);
                         }
                     }
                 }

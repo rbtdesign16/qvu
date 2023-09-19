@@ -32,6 +32,7 @@
         "Column Settings": "Column Settings",
         "Column:": "Column:",
         "Column Mappings:": "Column Mappings:",
+        "complete-required-entries": "Please complete all required $1 entries",
         "configuration complete": "configuration complete",
         "configuration incomplete": "configuration incomplete",
         "Configure Security": "Configure Security",

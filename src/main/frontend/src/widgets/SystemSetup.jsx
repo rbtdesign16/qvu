@@ -125,14 +125,22 @@ const SystemSetup = (props) => {
     };
 
     const checkData = () => {
-        return checkOidcData();
+        let retval = "";
+         if (systemSettings.authConfig.securityType === SECURITY_TYPE_OIDC) {
+            if (!checkOidcData()) {
+                retval = replaceTokens(getText("complete-required-entries"), ["OIDC"]);
+            }
+        }
+    
+        return retval;
     };
 
     const saveSetup = async () => {
-        if (checkData()) {
+        let err = checkData();
+        if (!err) {
             config.save(systemSettings);
         } else {
-            showMessage(ERROR, getText("please complete all required entries"));
+            showMessage(ERROR, err);
         }
     };
 
@@ -152,12 +160,6 @@ const SystemSetup = (props) => {
 
             retval = ok;
         }
-
-        return retval;
-    };
-
-    const canSave = () => {
-        let retval = false;
 
         return retval;
     };
@@ -208,7 +210,7 @@ const SystemSetup = (props) => {
         let type = e.target.value;
 
         ss.authConfig.securityType = type;
-        setSecurityConfig(ss);
+        setSystemSettings(ss);
     };
 
     const getTabPanel = () => {

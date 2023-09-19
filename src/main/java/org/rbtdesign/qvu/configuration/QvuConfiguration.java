@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -63,7 +62,7 @@ public class QvuConfiguration {
     @Value("${cors.allowed.origins:*}")
     private String corsAllowedOrigins;
 
-    @Value("${backup.folder}:")
+    @Value("${backup.folder:}")
     private String backupFolder;
     
     @PostConstruct

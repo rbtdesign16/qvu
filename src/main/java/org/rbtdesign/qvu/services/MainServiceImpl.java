@@ -363,8 +363,6 @@ public class MainServiceImpl implements MainService {
 
             File f = new File(repositoryFolder + File.separator + "documents");
             f.mkdirs();
-            f = new File(repositoryFolder + File.separator + "config" + File.separator + "certs");
-            f.mkdirs();
             f = new File(repositoryFolder + File.separator + "logs");
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "help");

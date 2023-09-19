@@ -29,6 +29,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -302,16 +303,16 @@ public class MainController {
         return service.getDocument(type, group, name);
     }
 
-    @GetMapping("api/v1/auth/config/load")
-    public OperationResult<AuthConfig> getAuthConfig() {
-        LOG.debug("in getAuthConfig()");
-        return service.getAuthConfig();
+    @GetMapping("api/v1/system/settings/load")
+    public OperationResult<SystemSettings> getSystemSettings() {
+        LOG.debug("in getSystemSettings()");
+        return service.getSystemSettings();
     }
 
-    @PostMapping("api/v1/auth/config/save")
-    public OperationResult saveAuthConfig(@RequestBody AuthConfig authConfig) {
+    @PostMapping("api/v1/system/settings/save")
+    public OperationResult saveSystemSettings(@RequestBody SystemSettings systemSettings) {
         LOG.debug("in saveAuthConfig()");
-        return service.saveAuthConfig(authConfig);
+        return service.saveSystemSettings(systemSettings);
     }
 
     @GetMapping("api/v1/help/{lang}")

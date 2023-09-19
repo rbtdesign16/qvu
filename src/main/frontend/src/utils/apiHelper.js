@@ -400,9 +400,9 @@ export const getDocument = async (documentType, documentGroup, documentName) => 
     }
 };
 
-export const getSecurityConfig = async() => {
+export const getSystemSettings = async() => {
     try {
-        let res = await axios.get(getApiURL() + "/auth/config/load");
+        let res = await axios.get(getApiURL() + "/system/settings/load");
 
         if (res) {
             return res.data;
@@ -413,9 +413,9 @@ export const getSecurityConfig = async() => {
     }
 };
 
-export const saveSecurityConfig = async (config) => {
+export const saveSystemSettings = async (config) => {
     try {
-        let res = await axios.post(getApiURL() + "/auth/config/save", config, hconfig);
+        let res = await axios.post(getApiURL() + "/system/settings/save", config, hconfig);
 
         if (res) {
             return res.data;

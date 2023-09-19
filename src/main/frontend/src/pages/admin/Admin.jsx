@@ -48,7 +48,7 @@ import {
     loadTableSettings,
     loadDatasourceTableNames,
     getSecurityConfig,
-    saveSecurityConfig,
+    saveSystemSettings,
     backupRepository} from "../../utils/apiHelper";
 import {
     isAdministrator,
@@ -900,10 +900,10 @@ const Admin = () => {
         setShowSystemSettings({show: false});
     };
 
-    const saveSystemSettings = async (settings) => {
+    const updateSystemSettings = async (settings) => {
         hideSystemSettings();
-        showMessage(INFO, getText("Saving security settings", "..."), null, true);
-        let res = await saveSecurityConfig(settings);
+        showMessage(INFO, getText("Saving systems settings", "..."), null, true);
+        let res = await saveSystemSettings(settings);
 
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
@@ -940,7 +940,7 @@ const Admin = () => {
     };
     
     const onSystemSettings = async () => {
-        setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
+        setShowSystemSettings({show: true, hide: hideSystemSettings, save: updateSystemSettings, dlgsize: "lg"});
     };
     
     return (

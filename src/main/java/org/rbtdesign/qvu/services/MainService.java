@@ -6,7 +6,6 @@ import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -19,7 +18,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
-import org.rbtdesign.qvu.dto.ScheduledDocument;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -86,9 +85,9 @@ public interface MainService {
     
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper);
 
-    public OperationResult<AuthConfig> getAuthConfig();
+    public OperationResult<SystemSettings> getSystemSettings();
     
-    public OperationResult saveAuthConfig(AuthConfig authConfig);
+    public OperationResult saveSystemSettings(SystemSettings systemSettings);
     
     public OperationResult<String> doBackup();
     

@@ -14,23 +14,23 @@ INFO,
         ERROR,
         replaceTokens,
         MODAL_TITLE_SIZE
-} from "../utils/helper";
+        } from "../utils/helper";
 
 import {
         SECURITY_TYPE_BASIC,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
-} from "../utils/authHelper";
+        } from "../utils/authHelper";
 
 import {
 isApiError,
         isApiSuccess,
-        getSecurityConfig} from "../utils/apiHelper";
+        getSystemSettings} from "../utils/apiHelper";
 
 const SystemSetup = (props) => {
     const {authData} = useAuth();
     const {config} = props;
-    const [securityConfig, setSecurityConfig] = useState(null);
+    const [systemSettings, setSystemSettings] = useState(null);
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
@@ -46,7 +46,7 @@ const SystemSetup = (props) => {
     const getOidcConfig = () => {
         return {
             gridClass: "entrygrid-225-350",
-            dataObject: {...securityConfig.oidcConfiguration},
+            dataObject: {...systemSettings.authConfig.oidcConfiguration},
             idPrefix: "oidc-",
             afterChange: onOidcChange,
             entryConfig: [
@@ -85,7 +85,6 @@ const SystemSetup = (props) => {
                     showHelp: showHelpMessage,
                     helpText: getText("adminRoleMapping-help")
                 },
-
                 {
                     label: getText("Use Email for User Id"),
                     name: "useEmailForUserId",
@@ -98,7 +97,7 @@ const SystemSetup = (props) => {
         return {
             gridClass: "entrygrid-225-350",
             idPrefix: "bas-",
-            dataObject: {...securityConfig.basicConfiguration},
+            dataObject: {...systemSettings.authConfig.basicConfiguration},
             afterChange: onBasicChange,
             entryConfig: [
                 {
@@ -114,24 +113,24 @@ const SystemSetup = (props) => {
 
 
     const onBasicChange = (e, entryConfig, dataObject) => {
-        let sc = {...securityConfig};
-        sc.basicConfiguration = dataObject;
-        setSecurityConfig(sc);
+        let ss = {...systemSettings};
+        ss.authConfig.basicConfiguration = dataObject;
+        setSystemSettings(ss);
     };
 
     const onOidcChange = (e, entryConfig, dataObject) => {
-        let sc = {...securityConfig};
-        sc.oidcConfiguration = dataObject;
-        setSecurityConfig(sc);
+        let ss = {...systemSettings};
+        ss.authConfig.oidcConfiguration = dataObject;
+        setSystemSettings(ss);
     };
-    
+
     const checkData = () => {
         return checkOidcData();
     };
 
     const saveSetup = async () => {
         if (checkData()) {
-            config.save(securityConfig);
+            config.save(systemSettings);
         } else {
             showMessage(ERROR, getText("please complete all required entries"));
         }
@@ -140,12 +139,12 @@ const SystemSetup = (props) => {
     const checkOidcData = () => {
         let retval = true;
 
-        if (securityConfig.oidcConfiguration && securityConfig.oidcConfiguration.enabled) {
+        if (systemSettings.authConfig.oidcConfiguration) {
             let ok = true;
 
             let entryConfig = getOidcConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !securityConfig.oidcConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !systemSettings.authConfig.oidcConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -165,7 +164,7 @@ const SystemSetup = (props) => {
 
     const getDefaultActiveTabKey = () => {
         let retval = SECURITY_TYPE_BASIC;
-        switch (securityConfig.securityType) {
+        switch (systemSettings.authConfig.securityType) {
             case  SECURITY_TYPE_BASIC:
                 retval = "key-" + SECURITY_TYPE_BASIC;
                 break;
@@ -181,21 +180,21 @@ const SystemSetup = (props) => {
     const onShow = async () => {
         showMessage(INFO, getText("Loading system settings", "..."), null, true);
 
-        let res = await getSecurityConfig();
+        let res = await getSystemSettings();
 
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             res.newRecord = false;
             hideMessage();
-            setSecurityConfig(res.result);
+            setSystemSettings(res.result);
         }
     };
 
     const loadSecurityTypes = () => {
-        if (securityConfig && securityConfig.securityType) {
+        if (systemSettings && systemSettings.authConfig && systemSettings.authConfig.securityType) {
             return SECURITY_TYPES.map(t => {
-                if (t === securityConfig.securityType) {
+                if (t === systemSettings.authConfig.securityType) {
                     return <option value={t} selected>{t}</option>;
                 } else {
                     return <option value={t}>{t}</option>;
@@ -203,18 +202,18 @@ const SystemSetup = (props) => {
             });
         }
     };
-    
+
     const onSecurityTypeChange = (e) => {
-        let sc = {...securityConfig};
+        let ss = {...systemSettings};
         let type = e.target.value;
-        
-        sc.securityType = type;
-        setSecurityConfig(sc);
+
+        ss.authConfig.securityType = type;
+        setSecurityConfig(ss);
     };
 
     const getTabPanel = () => {
-        if (securityConfig) {
-            return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+        if (systemSettings) {
+            return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t2" className="mb-3">
                 <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
                     <EntryPanel config={getBasicConfig()}/>
                 </Tab>
@@ -226,11 +225,11 @@ const SystemSetup = (props) => {
             return "";
         }
     };
-    
+
     const getTitle = () => {
         return getText("System Settings");
-    }
-    
+    };
+
 
     return  (<Modal animation={false} 
            size={config.dlgsize ? config.dlgsize : ""}
@@ -243,14 +242,24 @@ const SystemSetup = (props) => {
             <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <div>   
-                <div style={{textAlign: "center"}} className="entrygrid-225-225">
-                    <label className="label">{getText("Default Security Type")}</label>
-                    <select onChange={e => onSecurityTypeChange(e)}> 
-                        {loadSecurityTypes()}
-                    </select>   
-                </div>
-                { getTabPanel() }
+            <div style={{height: "400px"}}>   
+                <Tabs id="t1" className="mb-3">
+                    <Tab eventKey="auth" title={getText("Authentication")}>
+                        <div style={{textAlign: "center"}} className="entrygrid-225-225">
+                            <label className="label">{getText("Default Security Type")}</label>
+                            <select onChange={e => onSecurityTypeChange(e)}> 
+                                {loadSecurityTypes()}
+                            </select>   
+                        </div>
+                        { getTabPanel() }
+                    </Tab>
+                    <Tab eventKey="mail"  title={getText("Email")}>
+                        <div>Email</div>
+                    </Tab>
+                    <Tab eventKey="misc"  title={getText("Misc")}>
+                        <div>Misc</div>
+                    </Tab>
+                </Tabs>
             </div>
         </Modal.Body>
         <Modal.Footer>

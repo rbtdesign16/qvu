@@ -83,6 +83,7 @@ import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -1859,32 +1860,36 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<AuthConfig> getAuthConfig() {
-        OperationResult<AuthConfig> retval = new OperationResult<>();
+    public OperationResult<SystemSettings> getSystemSettings() {
+        OperationResult<SystemSettings> retval = new OperationResult<>();
 
         SecurityConfiguration scfg = config.getSecurityConfig();
         AuthConfig result = new AuthConfig();
 
+        
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setSecurityType(config.getSecurityType());
 
-        retval.setResult(result);
+        SystemSettings systemSettings = new SystemSettings();
+        systemSettings.setAuthConfig(result);
+        retval.setResult(systemSettings);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("AuthConfig: " + fileHandler.getGson(true).toJson(result));
+            LOG.trace("SYstemSettings: " + fileHandler.getGson(true).toJson(systemSettings));
         }
 
         return retval;
     }
 
     @Override
-    public OperationResult saveAuthConfig(AuthConfig authConfig) {
+    public OperationResult saveSystemSettings(SystemSettings systemSettings) {
         OperationResult<AuthConfig> retval = new OperationResult<>();
         FileInputStream fis = null;
         FileOutputStream fos = null;
         try {
             SecurityConfiguration scfg = config.getSecurityConfig();
 
+            AuthConfig authConfig = systemSettings.getAuthConfig();
             scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
             scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
             config.setSecurityType(authConfig.getSecurityType());

@@ -137,6 +137,7 @@ public class MainServiceImpl implements MainService {
             LOG.trace("local=" + request.getLocale().toLanguageTag());
             LOG.trace("authetication=" + auth);
         }
+        
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             retval.setCurrentUser(getCurrentUser());
             boolean localUser = isLocalUser();
@@ -361,8 +362,6 @@ public class MainServiceImpl implements MainService {
             String adminPassword = initialInfo.substring(pos + 1);
 
             File f = new File(repositoryFolder + File.separator + "documents");
-            f.mkdirs();
-            f = new File(repositoryFolder + File.separator + "config" + File.separator + "certs");
             f.mkdirs();
             f = new File(repositoryFolder + File.separator + "logs");
             f.mkdirs();

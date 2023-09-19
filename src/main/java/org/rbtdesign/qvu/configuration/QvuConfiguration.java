@@ -63,7 +63,7 @@ public class QvuConfiguration {
     @Value("${cors.allowed.origins:*}")
     private String corsAllowedOrigins;
 
-    @Value("${backup.folder}")
+    @Value("${backup.folder}:")
     private String backupFolder;
     
     @PostConstruct

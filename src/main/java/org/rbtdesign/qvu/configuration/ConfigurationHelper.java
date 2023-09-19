@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.SecurityConfiguration;
 import org.rbtdesign.qvu.util.Constants;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class ConfigurationHelper {
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
     private DocumentGroupsConfiguration documentGroupsConfig;
+    private DocumentSchedulesConfiguration documentSchedulesConfig;
     private Map<String, Map<String, String>> langResources = new HashMap<>();
     private boolean initializingApplication;
 
@@ -50,16 +52,13 @@ public class ConfigurationHelper {
             if (StringUtils.isEmpty(repositoryFolder)) {
                 initializingApplication = true;
                 LOG.info("inital setup is required");
-                securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
-                datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
-                langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
-                documentGroupsConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-document-groups.json"), DocumentGroupsConfiguration.class);
             } else {
-                loadConfiguration();
                 LOG.info("repository.folder=" + repositoryFolder);
                 LOG.info("security.type=" + securityType);
             }
             
+            loadConfiguration(initializingApplication);
+
             if (securityConfig == null) {
                 throw new Exception("failed to load security configuration");
             } 
@@ -74,23 +73,22 @@ public class ConfigurationHelper {
 
     }
 
-    public void loadConfiguration() throws Exception {
-        langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
-        securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
-        datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
-        
-        String dgfile = getDocumentGroupsConfigurationFileName();
-        File f = new File(dgfile);
-        
-        // if document groups file does not exist initialze it
-        if (!f.exists()) {
-            f.getParentFile().mkdirs();
-            FileUtils.write(f, DEFAULT_DOCUMENT_GROUPS, "UTF-8");
+    public void loadConfiguration(boolean initialize) throws Exception {
+        if (initialize) {
+            securityConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-security-configuration.json"), SecurityConfiguration.class);
+            datasourcesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-datasource-configuration.json"), DataSourcesConfiguration.class);
+            langResources = ConfigBuilder.build(getClass().getResourceAsStream("/initial-language.json"), langResources.getClass());
+            documentGroupsConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-document-groups.json"), DocumentGroupsConfiguration.class);
+            documentSchedulesConfig = ConfigBuilder.build(getClass().getResourceAsStream("/initial-document-schedules.json"), DocumentSchedulesConfiguration.class);
+        } else {
+            langResources = ConfigBuilder.build(getLanguageFileName(), langResources.getClass());
+            securityConfig = ConfigBuilder.build(getSecurityConfigurationFileName(), SecurityConfiguration.class);
+            datasourcesConfig = ConfigBuilder.build(getDatasourceConfigurationFileName(), DataSourcesConfiguration.class);
+            documentGroupsConfig = ConfigBuilder.build(getDocumentGroupsConfigurationFileName(), DocumentGroupsConfiguration.class);
+            documentSchedulesConfig = ConfigBuilder.build(getDocumentSchedulesConfigurationFileName(), DocumentSchedulesConfiguration.class);
         }
-        
-        documentGroupsConfig = ConfigBuilder.build(dgfile, DocumentGroupsConfiguration.class);
     }
-
+    
     public String getSecurityConfigurationFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.SECURITY_CONFIG_FILE_NAME;
     }
@@ -102,7 +100,12 @@ public class ConfigurationHelper {
     public String getDocumentGroupsConfigurationFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.DOCUMENT_GROUPS_CONFIG_FILE_NAME;
     }
+    
+    public String getDocumentSchedulesConfigurationFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + Constants.DOCUMENT_SCHEDULES_CONFIG_FILE_NAME;
+    }
 
+    
     public String getApplicationPropertiesFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + "application.properties";
     }
@@ -148,6 +151,10 @@ public class ConfigurationHelper {
         return documentGroupsConfig;
     }
 
+    public DocumentSchedulesConfiguration getDocumentSchedulesConfig() {
+        return documentSchedulesConfig;
+    }
+
     public String getSecurityType() {
         return securityType;
     }
@@ -172,7 +179,9 @@ public class ConfigurationHelper {
         this.documentGroupsConfig = documentGroupsConfig;
     }
     
-    
+    public void setDocumentSchedulesConfig(DocumentSchedulesConfiguration documentSchedulesConfig) {
+        this.documentSchedulesConfig = documentSchedulesConfig;
+    }
 
     public void setSecurityConfig(SecurityConfiguration securityConfig) {
         this.securityConfig = securityConfig;
@@ -210,11 +219,7 @@ public class ConfigurationHelper {
         
         return retval;
     }
-
-    public String getDefaultsCertFileName() {
-        return repositoryFolder + File.separator + "config" + File.separator + "certs" + File.separator + Constants.DEFAULT_CERT_FILE_NAME;
-    }
-
+    
     public String getLanguageFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + Constants.LANGUAGE_FILE_NAME;
     }
@@ -231,10 +236,6 @@ public class ConfigurationHelper {
         return new File(repositoryFolder + File.separator + "help");
     }
 
-    public File getCssFolder() {
-        return new File(repositoryFolder + File.separator + "css");
-    }
-
     public String getBackupFolder() {
         return backupFolder;
     }
@@ -242,6 +243,4 @@ public class ConfigurationHelper {
     public void setBackupFolder(String backupFolder) {
         this.backupFolder = backupFolder;
     }
-    
-    
 }

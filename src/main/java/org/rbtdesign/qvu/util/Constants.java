@@ -42,6 +42,7 @@ public class Constants {
     public static final String SECURITY_CONFIG_FILE_NAME = "qvu-security.json";
     public static final String DATASOURCES_CONFIG_FILE_NAME = "qvu-datasources.json";
     public static final String DOCUMENT_GROUPS_CONFIG_FILE_NAME = "qvu-document-groups.json";
+    public static final String DOCUMENT_SCHEDULES_CONFIG_FILE_NAME = "qvu-document-schedules.json";
     public static final String LANGUAGE_FILE_NAME = "qvu-language.json";
     public static final String DEFAULT_CERT_FILE_NAME = "qvu-self-signed.p12";
     public static final String DEFAULT_LANGUAGE_KEY = "en-US";

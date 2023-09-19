@@ -28,9 +28,11 @@ import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
 import org.rbtdesign.qvu.configuration.database.DataSources;
 import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.SecurityConfiguration;
 import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.DocumentGroup;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.slf4j.Logger;
@@ -855,6 +857,49 @@ public class FileHandler {
         }
 
         return retval;
+    }
+
+    public List<DocumentSchedule> loadDocumentSchedules() {
+        List<DocumentSchedule> retval = config.getDocumentSchedulesConfig().getDocumentSchedules();
+        
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Document Schedules: " + gson.toJson(retval, ArrayList.class));
+        }
+
+        return retval;
+            
+    }
+
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration docschedules) {
+        OperationResult retval = new OperationResult();
+        try {
+            File f = new File(config.getDocumentGroupsConfigurationFileName());
+            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                DocumentGroupsConfiguration dg = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+
+                if (dg != null) {
+                    if (docschedules.getLastUpdated() > config.getDocumentSchedulesConfig().getLastUpdated()) {
+                        retval.setErrorCode(Errors.RECORD_UPDATED);
+                        retval.setMessage(Errors.getMessage(retval.getErrorCode(), new String[]{"document schedules"}));
+                    }
+                }
+            }
+
+            if (retval.isSuccess()) {
+                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(docschedules).getBytes());
+                    config.setDocumentSchedulesConfig(docschedules);
+                    retval.setErrorCode(OperationResult.SUCCESS);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Errors.populateError(retval, ex);
+        }
+
+        return retval;
+
     }
 
 }

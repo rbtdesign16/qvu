@@ -20,8 +20,6 @@ public class DocumentSchedulesConfiguration {
     public void setDocumentSchedules(List<DocumentSchedule> documentSchedules) {
         this.documentSchedules = documentSchedules;
     }
-    
-    
 
     public long getLastUpdated() {
         return lastUpdated;

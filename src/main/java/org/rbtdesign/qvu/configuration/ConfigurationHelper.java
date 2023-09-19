@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;

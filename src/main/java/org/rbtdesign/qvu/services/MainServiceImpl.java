@@ -91,6 +91,7 @@ import org.rbtdesign.qvu.util.ConfigBuilder;
 import org.rbtdesign.qvu.util.DBHelper;
 import org.rbtdesign.qvu.util.DatasourceSettingsHelper;
 import org.rbtdesign.qvu.util.DocumentGroupComparator;
+import org.rbtdesign.qvu.util.DocumentScheduleComparator;
 import org.rbtdesign.qvu.util.Errors;
 import org.rbtdesign.qvu.util.Helper;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
@@ -1931,6 +1932,12 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
         OperationResult<List<DocumentSchedule>> retval = new OperationResult<>();
+         
+        List <DocumentSchedule> sched = config.getDocumentSchedulesConfig().getDocumentSchedules();
+        
+        Collections.sort(sched, new DocumentScheduleComparator());
+        
+        retval.setResult(sched);
         
         return retval;
     }

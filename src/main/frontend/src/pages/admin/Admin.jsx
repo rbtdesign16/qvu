@@ -8,7 +8,7 @@ import {FcServices, FcDataBackup, FcPlanner} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
-import ScheduleTable from "./ScheduleTable";
+import DocumentScheduleTable from "./DocumentScheduleTable";
 import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
@@ -948,7 +948,7 @@ const Admin = () => {
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
                 <SystemSetup config={showSystemSettings}/>
-                <ScheduleTable config={showScheduleTable}/>
+                <DocumentScheduleTable config={showScheduleTable}/>
                 <CustomForeignKeys config={customForeignKeys}/>
                 <div>
                     <span style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("System Settings")}</span>

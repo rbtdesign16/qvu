@@ -21,6 +21,7 @@ import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;
@@ -353,5 +354,11 @@ public class MainController {
     public OperationResult<String> doBackup() {
         LOG.debug("in doBackup()");
         return service.doBackup();
+    }
+    
+    @GetMapping("api/v1/admin/document/schedules")
+    public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
+        LOG.debug("in getDocumentSchedules()");
+        return service.getDocumentSchedules();
     }
 }

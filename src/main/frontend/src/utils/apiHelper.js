@@ -454,3 +454,15 @@ export const backupRepository = async () => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
+
+export const loadDocumentSchedules = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/admin/document/schedules", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};

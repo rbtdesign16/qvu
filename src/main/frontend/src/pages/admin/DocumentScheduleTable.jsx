@@ -8,18 +8,21 @@ import { MdOutlineDeleteForever, MdOutlineAddBox, MdHelpOutline } from 'react-ic
 import { CiEdit } from 'react-icons/ci';
 import PropTypes from "prop-types";
 import {
-ERROR,
-        SMALL_ICON_SIZE,
-        MODAL_TITLE_SIZE,
-        confirm,
-        getUUID,
-        CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+    INFO,
+    ERROR,
+    SMALL_ICON_SIZE,
+    MODAL_TITLE_SIZE,
+    confirm,
+    getUUID,
+    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper"; 
+import { loadDocumentSchedules, isApiSuccess } from "../../utils/apiHelper";
 
-const ScheduleTable = (props) => {
+const DocumentScheduleTable = (props) => {
     const {config} = props;
     const {getText} = useLang();
     const {showHelp} = useHelp();
-
+    const {showMessage, hideMessage} = useMessage();
+    const [scheduledReports, setScheduledReports] = useState(null);
     const onHelp = () => {
         showHelp(getText("scheduleEntry-help"));
     };
@@ -36,12 +39,24 @@ const ScheduleTable = (props) => {
     const onAdd = () => {
     };
 
-    const onShow = () => {
+    const onShow = async () => {
+        showMessage(INFO, getText("Loading schedules", "..."), null, true);
+        let res = await loadDocumentSchedules();
+        
+        if (isApiSuccess(res)) {
+            hideMessage();
+            setScheduledReports(res);
+        } else {
+            showMessage(ERROR, res.message);
+        }
     };
-
+    
     const loadScheduledReports = () => {
-        return "";
-    };
+        if (scheduledReports) {
+        } else {
+            return "";
+        }
+    }
 
     return (
             <div className="static-modal">
@@ -69,4 +84,8 @@ const ScheduleTable = (props) => {
             );
 };
 
-export default ScheduleTable;
+DocumentScheduleTable.propTypes = {
+    config: PropTypes.object.isRequired
+};
+
+export default DocumentScheduleTable;

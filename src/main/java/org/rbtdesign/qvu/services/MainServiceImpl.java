@@ -69,6 +69,7 @@ import org.rbtdesign.qvu.dto.Column;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKey;
@@ -80,7 +81,6 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
-import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.Table;
@@ -97,7 +97,6 @@ import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
 import org.rbtdesign.qvu.util.ZipFolder;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -1931,7 +1930,11 @@ public class MainServiceImpl implements MainService {
 
     }
 
-    @Async
-    public void runScheduledDocument(ScheduledDocument docinfo) {
+    @Override
+    public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
+        OperationResult<List<DocumentSchedule>> retval = new OperationResult<>();
+        
+        return retval;
     }
+
 }

@@ -14,13 +14,13 @@ INFO,
         ERROR,
         replaceTokens,
         MODAL_TITLE_SIZE
-        } from "../utils/helper";
+} from "../utils/helper";
 
 import {
-        SECURITY_TYPE_BASIC,
+SECURITY_TYPE_BASIC,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
-        } from "../utils/authHelper";
+} from "../utils/authHelper";
 
 import {
 isApiError,
@@ -41,6 +41,71 @@ const SystemSetup = (props) => {
 
     const onHide = () => {
         config.hide();
+    };
+
+    const getEmailConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.emailConfig},
+            idPrefix: "email-",
+            afterChange: onEmailChange,
+            entryConfig: [
+                {
+                    label: getText("SMTP Host"),
+                    name: "smtpHost",
+                    type: "input",
+                    size: 60,
+                    required: true
+                },
+                {
+                    label: getText("SMTP Port"),
+                    name: "smtpPort",
+                    type: "number",
+                    size: 40,
+                    required: true,
+                },
+                {
+                    label: getText("SMTP Auth"),
+                    name: "smtpAuth",
+                    type: "checkbox",
+                },
+                {
+                    label: getText("Start TTLS Enable"),
+                    name: "smtpStartTtlsEnable ",
+                    type: "checkbox",
+                    showHelp: showHelpMessage,
+                    helpText: getText("mtpStartTtlsEnable-help")
+                },
+                {
+                    label: getText("Use Email for User Id"),
+                    name: "useEmailForUserId",
+                    type: "checkbox"
+                },
+                {
+                    label: getText("Mail User"),
+                    name: "mailUser",
+                    type: "input",
+                    size: 40,
+                },
+                {
+                    label: getText("Mail Password"),
+                    name: "mailPassword",
+                    type: "password",
+                    size: 40
+                },
+                {
+                    label: getText("Mail From"),
+                    name: "mailFrom",
+                    type: "input",
+                    size: 40
+                },
+                {
+                    label: getText("Mail Subject"),
+                    name: "mailSubject",
+                    type: "input",
+                    size: 40
+                }]
+        };
     };
 
     const getOidcConfig = () => {
@@ -124,14 +189,20 @@ const SystemSetup = (props) => {
         setSystemSettings(ss);
     };
 
+    const onEmailChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.emailConfig = dataObject;
+        setSystemSettings(ss);
+    };
+
     const checkData = () => {
         let retval = "";
-         if (systemSettings.authConfig.securityType === SECURITY_TYPE_OIDC) {
+        if (systemSettings.authConfig.securityType === SECURITY_TYPE_OIDC) {
             if (!checkOidcData()) {
                 retval = replaceTokens(getText("complete-required-entries"), ["OIDC"]);
             }
         }
-    
+
         return retval;
     };
 
@@ -256,7 +327,9 @@ const SystemSetup = (props) => {
                         { getTabPanel() }
                     </Tab>
                     <Tab eventKey="mail"  title={getText("Email")}>
-                        <div>Email</div>
+                    {systemSettings &&
+                        <EntryPanel config={getEmailConfig()}/>
+                        }
                     </Tab>
                     <Tab eventKey="misc"  title={getText("Misc")}>
                         <div>Misc</div>

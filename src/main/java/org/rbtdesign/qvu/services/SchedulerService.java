@@ -24,6 +24,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import org.rbtdesign.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.dto.EmailConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryResult;
@@ -64,32 +65,6 @@ public class SchedulerService implements AsyncConfigurer {
     @Value("${scheduler.execute.timeout.seconds:120}")
     private int schedulerExecuteTimeoutSeconds;
 
-    @Value("${mail.smtp.auth:true}")
-    private boolean mailSmtpAuth;
-
-    @Value("${mail.smtp.starttls.enable:true}")
-    private boolean mailSmtpStartTtls;
-
-    @Value("${mail.from:}")
-    private String mailFrom;
-
-    @Value("${mail.smtp.host:}")
-    private String mailSmtpHost;
-
-    @Value("${mail.smtp.host:}")
-    private String mailSmtpPort;
-
-    @Value("${mail.smtp.ssl.trust:}")
-    private String mailSmtpSslTrust;
-
-    @Value("${mail.user:}")
-    private String mailUser;
-
-    @Value("${mail.password:}")
-    private String mailPassword;
-
-    @Value("${mail.subject:}")
-    private String mailSubject;
 
     @PostConstruct
     private void init() {
@@ -131,16 +106,17 @@ public class SchedulerService implements AsyncConfigurer {
             byte[] attachment = getAttachment(docinfo.getResultType(), result);
             if (attachment != null) {
                 Properties prop = new Properties();
-                prop.put("mail.smtp.auth", mailSmtpAuth);
-                prop.put("mail.smtp.starttls.enable", mailSmtpStartTtls);
-                prop.put("mail.smtp.host", mailSmtpHost);
-                prop.put("mail.smtp.port", mailSmtpPort);
-                prop.put("mail.smtp.ssl.trust", mailSmtpSslTrust);
+                EmailConfig config = mainService.getEmailConfig();
+                prop.put("mail.smtp.auth", config.isSmtpAuth());
+                prop.put("mail.smtp.starttls.enable", config.isSmtpStartTtlsEnable());
+                prop.put("mail.smtp.host", config.getSmtpHost());
+                prop.put("mail.smtp.port", config.getSmtpPort());
+                prop.put("mail.smtp.ssl.trust", config.getSmtpSslTrust());
 
                 Session session = Session.getInstance(prop, new Authenticator() {
                     @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(mailUser, mailPassword);
+                        return new PasswordAuthentication(config.getMailUser(), config.getMailPassword());
                     }
                 });
 
@@ -148,10 +124,10 @@ public class SchedulerService implements AsyncConfigurer {
                 DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));
 
                 Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(mailFrom));
+                message.setFrom(new InternetAddress(config.getMailFrom()));
 
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(docinfo.getEmails()));
-                message.setSubject(mailSubject);
+                message.setSubject(config.getMailSubject());
 
                 BodyPart messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setText("Mail Body");

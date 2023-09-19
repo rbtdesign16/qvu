@@ -71,6 +71,7 @@ import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
 import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
+import org.rbtdesign.qvu.dto.EmailConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKey;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;
@@ -99,9 +100,12 @@ import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
 import org.rbtdesign.qvu.util.ZipFolder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
+@PropertySource(value = "file:${repository.folder}/config/scheduler.properties", ignoreResourceNotFound = true)
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
@@ -119,6 +123,34 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
+    
+    @Value("${mail.smtp.auth:true}")
+    private boolean mailSmtpAuth;
+
+    @Value("${mail.smtp.starttls.enable:true}")
+    private boolean mailSmtpStartTtls;
+
+    @Value("${mail.from:}")
+    private String mailFrom;
+
+    @Value("${mail.smtp.host:}")
+    private String mailSmtpHost;
+
+    @Value("${mail.smtp.host:}")
+    private String mailSmtpPort;
+
+    @Value("${mail.smtp.ssl.trust:}")
+    private String mailSmtpSslTrust;
+
+    @Value("${mail.user:}")
+    private String mailUser;
+
+    @Value("${mail.password:}")
+    private String mailPassword;
+
+    @Value("${mail.subject:}")
+    private String mailSubject;
+
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -1865,22 +1897,36 @@ public class MainServiceImpl implements MainService {
 
         SecurityConfiguration scfg = config.getSecurityConfig();
         AuthConfig result = new AuthConfig();
-
-        
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setSecurityType(config.getSecurityType());
-
         SystemSettings systemSettings = new SystemSettings();
         systemSettings.setAuthConfig(result);
+        systemSettings.setEmailConfig(getEmailConfig());
         retval.setResult(systemSettings);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("SYstemSettings: " + fileHandler.getGson(true).toJson(systemSettings));
+            LOG.trace("SystemSettings: " + fileHandler.getGson(true).toJson(systemSettings));
         }
 
         return retval;
     }
 
+    public EmailConfig getEmailConfig() {
+        EmailConfig retval = new EmailConfig();
+        
+        retval.setMailFrom(mailFrom);
+        retval.setMailPassword(mailPassword);
+        retval.setMailUser(mailUser);
+        retval.setSmtpAuth(mailSmtpAuth);
+        retval.setSmtpHost(mailSmtpHost);
+        retval.setSmtpSslTrust(mailSmtpSslTrust);
+        retval.setSmtpStartTtlsEnable(mailSmtpStartTtls);
+        retval.setSmtpAuth(mailSmtpAuth);
+        retval.setMailSubject(mailSubject);
+        
+        return retval;
+    }
+        
     @Override
     public OperationResult saveSystemSettings(SystemSettings systemSettings) {
         OperationResult<AuthConfig> retval = new OperationResult<>();

@@ -61,7 +61,7 @@ const Header = (props) => {
     return (
             <div className="header">
                 <div className="logo">
-                    <img height="24" src={logo} />
+                    <img height="28" src={logo} />
                     <span>{"Qvu " + version}</span>
                     {isHelpVisible() && 
                     <span className="help-control" onClick={(e) => setShowMenu(!showMenu)}>

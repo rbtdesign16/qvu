@@ -31,7 +31,53 @@ public class Constants {
     
     public static final String DEFAULT_ADMIN_USER = "admin";
     public static final String SECURITY_TYPE_PROPERTY = "security.type";
+    public static final String SERVER_PORT_PROPERTY = "server.port";
+    public static final String BACKUP_FOLDER_PROPERTY = "backup.folder";
+    public static final String CORS_ALLOWED_ORIGINS_PROPERTY = "cors.allowed.origins";
     
+    public static final String SSL_ENABLED_PROPERTY = "ssl.enabled";
+    public static final String SSL_KEYSTORE_PROPERTY = "server.ssl.key-store";
+    public static final String SSL_KEYSTORE_TYPE_PROPERTY = "server.ssl.key-store-type";
+    public static final String SSL_KEY_ALIAS_PROPERTY = "server.ssl.key-alias";
+    public static final String SSL_KEYSTORE_PASSWORD_PROPERTY = "server.ssl.key-store-password";
+    public static final String SSL_KEY_PASSWORD_PROPERTY = "server.ssl.key-password";
+    
+    public static final String[] SSL_PROPERTIES = {
+        SSL_ENABLED_PROPERTY,
+        SSL_KEYSTORE_PROPERTY,
+        SSL_KEYSTORE_TYPE_PROPERTY,
+        SSL_KEY_ALIAS_PROPERTY,
+        SSL_KEYSTORE_PASSWORD_PROPERTY,
+        SSL_KEY_PASSWORD_PROPERTY};
+    
+    
+    public static final String SCHEDULER_ENABLED_PROPERTY = "scheduler.enabled";
+    public static final String SCHEDULER_FIXED_RATE_SECONDS_PROPERTY = "scheduler.fixed.rate.seconds";
+    public static final String SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY = "max.scheduler.pool.size";
+    public static final String SCHEDULER_EXECUTE_TIMEOUT_PROPERTY = "scheduler.execute.timeout.seconds";
+    public static final String MAIL_SMTP_AUTH_PROPERTY = "mail.smtp.auth";
+    public static final String MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY = "mail.smtp.starttls.enable";
+    public static final String MAIL_SMTP_HOST_PROPERTY = "mail.smtp.host";
+    public static final String MAIL_SMTP_PORT_PROPERTY = "mail.smtp.port";
+    public static final String MAIL_USER_PROPERTY = "mail.user";
+    public static final String MAIL_PASSWORD_PROPERTY = "mail.password";
+    public static final String MAIL_FROM_PROPERTY = "mail.from";
+    public static final String MAIL_SUBJECT_PROPERTY = "mail.subject";
+    
+    public static final String[] SCHEDULER_PROPERTIES = {
+        SCHEDULER_ENABLED_PROPERTY,
+        SCHEDULER_FIXED_RATE_SECONDS_PROPERTY,
+        SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY,
+        SCHEDULER_EXECUTE_TIMEOUT_PROPERTY,
+        MAIL_SMTP_AUTH_PROPERTY,
+        MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY,
+        MAIL_SMTP_HOST_PROPERTY,
+        MAIL_SMTP_PORT_PROPERTY,
+        MAIL_USER_PROPERTY,
+        MAIL_PASSWORD_PROPERTY,
+        MAIL_FROM_PROPERTY,
+        MAIL_SUBJECT_PROPERTY};
+
     public static final String OIDC_REGISTRATION_ID = "qvuoidc";
     public static final String OIDC_REDIRECT_TEMPLATE = "{baseUrl}/login/oauth2/code/{registrationId}";
     public static final int DEFAULT_MAX_EXPORTED_KEY_DEPTH = 4;

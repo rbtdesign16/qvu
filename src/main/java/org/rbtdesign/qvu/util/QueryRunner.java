@@ -1,12 +1,9 @@
 package org.rbtdesign.qvu.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.services.MainService;
-import org.rbtdesign.qvu.services.SchedulerService;
 import static org.rbtdesign.qvu.util.Constants.RESULT_TYPE_JSON_OBJECTGRAPH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,9 +20,6 @@ public class QueryRunner implements Runnable {
 
     @Autowired
     private MainService mainService;
-
-    @Autowired
-    private SchedulerService schedulerService;
 
     public QueryRunner(ScheduledDocument docinfo) {
         this.docinfo = docinfo;
@@ -48,7 +42,7 @@ public class QueryRunner implements Runnable {
         }
 
         if ((qres != null) && qres.isSuccess()) {
-            schedulerService.sendEmail(docinfo, qres.getResult());
+            mainService.sendEmail(docinfo, qres.getResult());
         }
     }
 

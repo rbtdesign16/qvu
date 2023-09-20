@@ -10,6 +10,7 @@ import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.SecurityConfiguration;
+import org.rbtdesign.qvu.dto.SSLConfig;
 import org.rbtdesign.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,7 @@ import org.springframework.stereotype.Component;
 @Component("config")
 public class ConfigurationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
-    private static final String DEFAULT_DOCUMENT_GROUPS = "{\"lastUpdated\": null, \"documentGroups\": [{\"name\": \"general\", \"description\": \"default document group\", \"defaultGroup\": true, \"roles\":[]}]}";
-    
+   
     @Value("#{systemProperties['repository.folder'] ?: ''}")
     private String repositoryFolder;
 
@@ -32,6 +32,9 @@ public class ConfigurationHelper {
     private String securityType;
 
     private String backupFolder;
+    private SSLConfig sslConfig;
+    private int serverPort;
+    private String corsAllowedOrigins;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -107,6 +110,10 @@ public class ConfigurationHelper {
     
     public String getApplicationPropertiesFileName() {
         return repositoryFolder + File.separator + "config" + File.separator + "application.properties";
+    }
+
+    public String getSchedulerPropertiesFileName() {
+        return repositoryFolder + File.separator + "config" + File.separator + "scheduler.properties";
     }
 
     public File getDocumentsFolder() {
@@ -242,4 +249,30 @@ public class ConfigurationHelper {
     public void setBackupFolder(String backupFolder) {
         this.backupFolder = backupFolder;
     }
+    
+    public void setSslConfig(SSLConfig sslConfig) {
+        this.sslConfig = sslConfig;
+    }
+    
+    public SSLConfig getSslConfig() {
+        return sslConfig;
+    }
+    
+    public int getServerPort() {
+        return serverPort;
+    }
+    
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+    
+    public String getCorsAllowedOrigins() {
+        return corsAllowedOrigins;
+    }
+    
+    public void setCorsAllowedOrigins(String corsAllowedOrigins) {
+        this.corsAllowedOrigins = corsAllowedOrigins;
+    }
+    
+    
 }

@@ -6,8 +6,10 @@ package org.rbtdesign.qvu.dto;
  */
 public class SystemSettings {
     private AuthConfig authConfig;
-    private EmailConfig emailConfig;
-
+    private SchedulerConfig schedulerConfig;
+    private SSLConfig sslConfig;
+    private MiscConfig miscConfig;
+    
     public AuthConfig getAuthConfig() {
         return authConfig;
     }
@@ -16,12 +18,28 @@ public class SystemSettings {
         this.authConfig = authConfig;
     }
 
-    public EmailConfig getEmailConfig() {
-        return emailConfig;
+    public SchedulerConfig getSchedulerConfig() {
+        return schedulerConfig;
     }
 
-    public void setEmailConfig(EmailConfig emailConfig) {
-        this.emailConfig = emailConfig;
+    public void setSchedulerConfig(SchedulerConfig schedulerConfig) {
+        this.schedulerConfig = schedulerConfig;
+    }
+
+    public SSLConfig getSslConfig() {
+        return sslConfig;
+    }
+
+    public void setSslConfig(SSLConfig sslConfig) {
+        this.sslConfig = sslConfig;
+    }
+
+    public MiscConfig getMiscConfig() {
+        return miscConfig;
+    }
+
+    public void setMiscConfig(MiscConfig miscConfig) {
+        this.miscConfig = miscConfig;
     }
     
     

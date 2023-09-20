@@ -43,18 +43,91 @@ const SystemSetup = (props) => {
         config.hide();
     };
 
-    const getEmailConfig = () => {
+    const onBasicChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.authConfig.basicConfiguration = dataObject;
+        setSystemSettings(ss);
+    };
+
+   const onSslChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.sslConfig = dataObject;
+        ss.sslConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onMiscChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.miscConfig = dataObject;
+        ss.miscConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onOidcChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.authConfig.oidcConfiguration = dataObject;
+        ss.authConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onSchedulerChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.schedulerConfig = dataObject;
+        ss.schedulerConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const getMiscConfig = () => {
         return {
             gridClass: "entrygrid-225-350",
-            dataObject: {...systemSettings.emailConfig},
-            idPrefix: "email-",
-            afterChange: onEmailChange,
+            dataObject: {...systemSettings.miscConfig},
+            idPrefix: "misc-",
+            afterChange: onMiscChange,
+            entryConfig: [
+                {
+                    label: getText("Server Port"),
+                    name: "serverPort",
+                    type: "number",
+                    required: true,
+                    restartRequired: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("serverPort-help")
+                },
+                {
+                    label: getText("Backup Folder"),
+                    name: "backupFolder",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("backupFolder-help")
+                },
+                {
+                    label: getText("CORS Allowed Origins"),
+                    name: "corsAllowedOrigins",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("corsAllowedOrigins-help")
+                }
+            ]
+        };
+    };
+
+    const getSchedulerConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.schedulerConfig},
+            idPrefix: "sched-",
+            afterChange: onSchedulerChange,
             entryConfig: [
                 {
                     label: getText("SMTP Host"),
                     name: "smtpHost",
                     type: "input",
                     size: 60,
+                    restartRequired: true,
                     required: true
                 },
                 {
@@ -62,30 +135,27 @@ const SystemSetup = (props) => {
                     name: "smtpPort",
                     type: "number",
                     size: 40,
-                    required: true,
+                    required: true
                 },
                 {
                     label: getText("SMTP Auth"),
                     name: "smtpAuth",
                     type: "checkbox",
+                    showHelp: showHelpMessage,
+                    helpText: getText("smtpAuth-help")
                 },
                 {
                     label: getText("Start TTLS Enable"),
                     name: "smtpStartTtlsEnable ",
                     type: "checkbox",
                     showHelp: showHelpMessage,
-                    helpText: getText("mtpStartTtlsEnable-help")
-                },
-                {
-                    label: getText("Use Email for User Id"),
-                    name: "useEmailForUserId",
-                    type: "checkbox"
+                    helpText: getText("smtpStartTtlsEnable-help")
                 },
                 {
                     label: getText("Mail User"),
                     name: "mailUser",
                     type: "input",
-                    size: 40,
+                    size: 40
                 },
                 {
                     label: getText("Mail Password"),
@@ -104,7 +174,98 @@ const SystemSetup = (props) => {
                     name: "mailSubject",
                     type: "input",
                     size: 40
-                }]
+                },
+                {
+                    label: getText("Max Thread Pool Size"),
+                    name: "maxSchedulerPoolSize",
+                    type: "number",
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("maxSchedulerPoolSize-help")
+                },
+                {
+                    label: getText("Execute Timeout Seconds"),
+                    name: "schedulerExecuteTimeoutSeconds",
+                    type: "number",
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("schedulerExecuteTimeoutSeconds-help")
+                },
+                {
+                    label: getText("Polling Interval Seconds"),
+                    name: "schedulerFixedRateSeconds",
+                    type: "number",
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("schedulerFixedRateSeconds-help")
+                },
+                {
+                    label: getText("Enable Scheduler"),
+                    name: "schedulerEnabled",
+                    type: "checkbox",
+                    size: 40
+                }
+            ]
+        };
+    };
+
+    const getSslConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.sslConfig},
+            idPrefix: "ssl-",
+            afterChange: onSslChange,
+            entryConfig: [
+                {
+                    label: getText("SSL Key Store"),
+                    name: "sslKeyStore",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    restartRequired: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStore-help")
+                },
+                {
+                    label: getText("Keystore Type"),
+                    name: "sslKeyStoreType",
+                    type: "input",
+                    size: 40,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStore-help")
+                },
+                {
+                    label: getText("Key Alias"),
+                    name: "sslKeyAlias",
+                    type: "input",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyAlias-help")
+                },
+                {
+                    label: getText("Keystore Password"),
+                    name: "sslKeyStorePassword",
+                    type: "password",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStorePassword-help")
+                },
+                {
+                    label: getText("Key Password"),
+                    name: "sslKeyPassword",
+                    type: "password",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyPassword-help")
+                },
+                {
+                    label: getText("Enable SSL"),
+                    name: "enabled",
+                    type: "checkbox",
+                    size: 40
+                }
+            ]
         };
     };
 
@@ -151,6 +312,14 @@ const SystemSetup = (props) => {
                     helpText: getText("adminRoleMapping-help")
                 },
                 {
+                    label: getText("Role Claim Property Name"),
+                    name: "roleClaimPropertyName",
+                    type: "input",
+                    size: 50,
+                    showHelp: showHelpMessage,
+                    helpText: getText("roleClaimPropertyName-help")
+                },
+                {
                     label: getText("Use Email for User Id"),
                     name: "useEmailForUserId",
                     type: "checkbox"
@@ -177,24 +346,6 @@ const SystemSetup = (props) => {
     };
 
 
-    const onBasicChange = (e, entryConfig, dataObject) => {
-        let ss = {...systemSettings};
-        ss.authConfig.basicConfiguration = dataObject;
-        setSystemSettings(ss);
-    };
-
-    const onOidcChange = (e, entryConfig, dataObject) => {
-        let ss = {...systemSettings};
-        ss.authConfig.oidcConfiguration = dataObject;
-        setSystemSettings(ss);
-    };
-
-    const onEmailChange = (e, entryConfig, dataObject) => {
-        let ss = {...systemSettings};
-        ss.emailConfig = dataObject;
-        setSystemSettings(ss);
-    };
-
     const checkData = () => {
         let retval = "";
         if (systemSettings.authConfig.securityType === SECURITY_TYPE_OIDC) {
@@ -202,6 +353,13 @@ const SystemSetup = (props) => {
                 retval = replaceTokens(getText("complete-required-entries"), ["OIDC"]);
             }
         }
+
+        if (systemSettings.schedulerConfig.enabled) {
+            if (!checkSchedulerData()) {
+                retval = replaceTokens(getText("complete-required-entries"), ["scheduler"]);
+            }
+        }
+
 
         return retval;
     };
@@ -234,6 +392,21 @@ const SystemSetup = (props) => {
 
         return retval;
     };
+
+    const checkSchedulerData = () => {
+        let retval = true;
+
+        let entryConfig = getSchedulerConfig().entryConfig;
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].required && !systemSettings.schedulerConfig[entryConfig[i].name]) {
+                retval = false;
+                break;
+            }
+        }
+        
+        return retval;
+    };
+
 
     const getDefaultActiveTabKey = () => {
         let retval = SECURITY_TYPE_BASIC;
@@ -315,7 +488,7 @@ const SystemSetup = (props) => {
             <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <div style={{height: "400px"}}>   
+            <div style={{height: "450px"}}>   
                 <Tabs id="t1" className="mb-3">
                     <Tab eventKey="auth" title={getText("Authentication")}>
                         <div style={{textAlign: "center"}} className="entrygrid-225-225">
@@ -326,13 +499,14 @@ const SystemSetup = (props) => {
                         </div>
                         { getTabPanel() }
                     </Tab>
-                    <Tab eventKey="mail"  title={getText("Email")}>
-                    {systemSettings &&
-                        <EntryPanel config={getEmailConfig()}/>
-                        }
+                    <Tab eventKey="sched"  title={getText("Scheduler")}>
+                        { systemSettings && <EntryPanel config={getSchedulerConfig()}/> }
+                    </Tab>
+                    <Tab eventKey="ssl"  title={getText("SSL")}>
+                        { systemSettings && <EntryPanel config={getSslConfig()}/> }
                     </Tab>
                     <Tab eventKey="misc"  title={getText("Misc")}>
-                        <div>Misc</div>
+                        { systemSettings && <EntryPanel config={getMiscConfig()}/> }
                     </Tab>
                 </Tabs>
             </div>

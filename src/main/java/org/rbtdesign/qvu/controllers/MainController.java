@@ -16,7 +16,6 @@ import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -263,8 +262,6 @@ public class MainController {
     @PostMapping("api/v1/query/run/json/objectgraph")
     public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonObjectQuery()");
-   //     throw new UnsupportedOperationException("Not supported yet."); 
-
         
         OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
 

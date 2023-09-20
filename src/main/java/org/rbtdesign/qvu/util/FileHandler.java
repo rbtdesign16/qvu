@@ -30,11 +30,18 @@ import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.SecurityConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.SchedulerConfig;
+import org.rbtdesign.qvu.dto.SystemSettings;
+import static org.rbtdesign.qvu.util.Constants.SSL_ENABLED_PROPERTY;
+import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_PASSWORD_PROPERTY;
+import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_PROPERTY;
+import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_TYPE_PROPERTY;
+import static org.rbtdesign.qvu.util.Constants.SSL_KEY_ALIAS_PROPERTY;
+import static org.rbtdesign.qvu.util.Constants.SSL_KEY_PASSWORD_PROPERTY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -768,7 +775,7 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult updateApplicationProperties(AuthConfig authConfig) {
+    public OperationResult updateApplicationProperties(SystemSettings systemSettings) {
         OperationResult retval = new OperationResult();
 
         LineNumberReader lnr = null;
@@ -779,13 +786,50 @@ public class FileHandler {
             lnr = new LineNumberReader(new FileReader(config.getApplicationPropertiesFileName()));
             String line;
             while ((line = lnr.readLine()) != null) {
-                if (line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
-                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + authConfig.getSecurityType());
-                } else {
+                if (systemSettings.getAuthConfig().isModified() && line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
+                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + systemSettings.getAuthConfig().getSecurityType());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.SERVER_PORT_PROPERTY)) {
+                    lines.add(Constants.SERVER_PORT_PROPERTY + "=" + systemSettings.getMiscConfig().getServerPort());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.BACKUP_FOLDER_PROPERTY)) {
+                    lines.add(Constants.BACKUP_FOLDER_PROPERTY + "=" + systemSettings.getMiscConfig().getBackupFolder());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.CORS_ALLOWED_ORIGINS_PROPERTY)) {
+                    lines.add(Constants.CORS_ALLOWED_ORIGINS_PROPERTY + "=" + systemSettings.getMiscConfig().getCorsAllowedOrigins());
+                } else if (!isSSLProperty(line)) {
                     lines.add(line);
                 }
             }
 
+            
+            for (String p : Constants.SSL_PROPERTIES) {
+                String val = "";
+                switch(p) {
+                    case Constants.SSL_ENABLED_PROPERTY:
+                        val = "" + systemSettings.getSslConfig().isEnabled();
+                        break;
+                    case Constants.SSL_KEYSTORE_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyStore();
+                        break;
+                    case Constants.SSL_KEYSTORE_TYPE_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyStoreType();
+                        break;
+                    case Constants.SSL_KEY_ALIAS_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyAlias();
+                        break;
+                    case Constants.SSL_KEYSTORE_PASSWORD_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyStorePassword();
+                        break;
+                    case Constants.SSL_KEY_PASSWORD_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyPassword();
+                        break;
+                }
+                
+                if (!Constants.SSL_ENABLED_PROPERTY.equals(p) && !systemSettings.getSslConfig().isEnabled()) {
+                    lines.add("#" + p + "=" + val);
+                } else {
+                    lines.add(p + "=" + val);
+                }
+            }
+ 
             lnr.close();
             lnr = null;
 
@@ -814,6 +858,84 @@ public class FileHandler {
 
         return retval;
     }
+    
+    private boolean isSSLProperty(String line) {
+        boolean retval = false;
+        for (String p : Constants.SSL_PROPERTIES) {
+            if (line.contains(p)) {
+                retval = true;
+                break;
+            }
+        }
+        
+        return retval;
+    }
+    
+    public OperationResult updateSchedulerProperties(SchedulerConfig schedulerConfig) {
+        OperationResult retval = new OperationResult();
+        LineNumberReader lnr = null;
+        PrintWriter pw = null;
+        List<String> lines = new ArrayList<>();
+
+        try {
+            pw = new PrintWriter(config.getSchedulerPropertiesFileName());
+            for (String p : Constants.SCHEDULER_PROPERTIES) {
+                String value="";
+                switch(p) {
+                    case Constants.SCHEDULER_ENABLED_PROPERTY:
+                        value = "" + schedulerConfig.isEnabled();
+                        break;
+                    case Constants.SCHEDULER_FIXED_RATE_SECONDS_PROPERTY:
+                        value = "" + schedulerConfig.getSchedulerFixedRateSeconds();
+                        break;
+                    case Constants.SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY:
+                        value = "" + schedulerConfig.getMaxSchedulerPoolSize();
+                        break;
+                    case Constants.SCHEDULER_EXECUTE_TIMEOUT_PROPERTY:
+                        value = "" + schedulerConfig.getSchedulerExecuteTimeoutSeconds();
+                        break;
+                    case Constants.MAIL_SMTP_AUTH_PROPERTY:
+                        value = "" + schedulerConfig.isSmtpAuth();
+                        break;
+                    case Constants.MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY:
+                        value = "" + schedulerConfig.isSmtpStartTtlsEnable();
+                        break;
+                    case Constants.MAIL_SMTP_HOST_PROPERTY:
+                        value = schedulerConfig.getSmtpHost();
+                        break;
+                    case Constants.MAIL_SMTP_PORT_PROPERTY:
+                        value = "" + schedulerConfig.getSmtpPort();
+                        break;
+                    case Constants.MAIL_USER_PROPERTY:
+                       value = schedulerConfig.getMailUser();
+                        break;
+                    case Constants.MAIL_PASSWORD_PROPERTY:
+                       value = schedulerConfig.getMailPassword();
+                        break;
+                    case Constants.MAIL_FROM_PROPERTY:
+                        value = schedulerConfig.getMailFrom();
+                       break;
+                    case Constants.MAIL_SUBJECT_PROPERTY:
+                        value = schedulerConfig.getMailSubject();
+                        break;
+                }
+                
+                pw.println(p + "=" + value);
+            }
+        } catch (Exception ex) {
+            Errors.populateError(retval, ex);
+        } finally {
+                 if (pw != null) {
+                try {
+                    pw.close();
+                } catch (Exception ex) {
+                };
+            }
+        }
+
+        return retval;
+    }
+
 
     public byte[] getHelpDocument(String lang) {
         byte[] retval = null;

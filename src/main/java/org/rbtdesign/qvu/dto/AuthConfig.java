@@ -11,6 +11,7 @@ public class AuthConfig {
     private String securityType;
     private BasicConfiguration basicConfiguration;
     private OidcConfiguration oidcConfiguration;
+    private boolean modified;
 
     public String getSecurityType() {
         return securityType;
@@ -34,5 +35,13 @@ public class AuthConfig {
 
     public void setOidcConfiguration(OidcConfiguration oidcConfiguration) {
         this.oidcConfiguration = oidcConfiguration;
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 }

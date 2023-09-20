@@ -1,10 +1,25 @@
 package org.rbtdesign.qvu.services;
 
+import com.opencsv.CSVWriter;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.Authenticator;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Message;
+import jakarta.mail.Multipart;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -24,8 +39,12 @@ import java.util.LinkedHashMap;
 import org.rbtdesign.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.binary.Hex;
@@ -71,10 +90,11 @@ import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
 import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
-import org.rbtdesign.qvu.dto.EmailConfig;
+import org.rbtdesign.qvu.dto.SchedulerConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKey;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;
+import org.rbtdesign.qvu.dto.MiscConfig;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryParameter;
@@ -82,6 +102,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.SystemSettings;
@@ -99,9 +120,11 @@ import org.rbtdesign.qvu.util.Helper;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
+import org.rbtdesign.qvu.util.QueryRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
@@ -123,11 +146,11 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
-    
-    @Value("${mail.smtp.auth:true}")
+
+    @Value("${mail.smtp.auth:false}")
     private boolean mailSmtpAuth;
 
-    @Value("${mail.smtp.starttls.enable:true}")
+    @Value("${mail.smtp.starttls.enable:false}")
     private boolean mailSmtpStartTtls;
 
     @Value("${mail.from:}")
@@ -136,11 +159,8 @@ public class MainServiceImpl implements MainService {
     @Value("${mail.smtp.host:}")
     private String mailSmtpHost;
 
-    @Value("${mail.smtp.host:}")
+    @Value("${mail.smtp.port:}")
     private String mailSmtpPort;
-
-    @Value("${mail.smtp.ssl.trust:}")
-    private String mailSmtpSslTrust;
 
     @Value("${mail.user:}")
     private String mailUser;
@@ -151,6 +171,17 @@ public class MainServiceImpl implements MainService {
     @Value("${mail.subject:}")
     private String mailSubject;
 
+    @Value("${scheduler.enabled:false}")
+    private boolean schedulerEnabled;
+
+    @Value("${max.scheduler.pool.size:10}")
+    private int maxSchedulerPoolSize;
+
+    @Value("${scheduler.execute.timeout.seconds:120}")
+    private int schedulerExecuteTimeoutSeconds;
+
+    @Value("${scheduler.fixed.rate.seconds:30}")
+    private int schedulerFixedRateSeconds;
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -159,6 +190,9 @@ public class MainServiceImpl implements MainService {
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
+        LOG.info("scheduler.enabled=" + schedulerEnabled);
+        LOG.info("max.scheduler.pool.size=" + maxSchedulerPoolSize);
+        LOG.info("scheduler.execute.timeout.seconds=" + schedulerExecuteTimeoutSeconds);
         datasourceSettingsHelper.load(config.getDatasourcesConfig());
     }
 
@@ -1902,8 +1936,11 @@ public class MainServiceImpl implements MainService {
         result.setSecurityType(config.getSecurityType());
         SystemSettings systemSettings = new SystemSettings();
         systemSettings.setAuthConfig(result);
-        systemSettings.setEmailConfig(getEmailConfig());
+        systemSettings.setSchedulerConfig(getSchedulerConfig());
+        systemSettings.setSslConfig(config.getSslConfig());
+        systemSettings.setMiscConfig(getMiscConfig());
         retval.setResult(systemSettings);
+
         if (LOG.isTraceEnabled()) {
             LOG.trace("SystemSettings: " + fileHandler.getGson(true).toJson(systemSettings));
         }
@@ -1911,54 +1948,65 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    public EmailConfig getEmailConfig() {
-        EmailConfig retval = new EmailConfig();
-        
+    public MiscConfig getMiscConfig() {
+        MiscConfig retval = new MiscConfig();
+
+        retval.setCorsAllowedOrigins(config.getCorsAllowedOrigins());
+        retval.setBackupFolder(config.getBackupFolder());
+        retval.setServerPort(config.getServerPort());
+
+        return retval;
+    }
+
+    public SchedulerConfig getSchedulerConfig() {
+        SchedulerConfig retval = new SchedulerConfig();
+
         retval.setMailFrom(mailFrom);
         retval.setMailPassword(mailPassword);
         retval.setMailUser(mailUser);
         retval.setSmtpAuth(mailSmtpAuth);
         retval.setSmtpHost(mailSmtpHost);
-        retval.setSmtpSslTrust(mailSmtpSslTrust);
+        retval.setSmtpPort(mailSmtpPort);
         retval.setSmtpStartTtlsEnable(mailSmtpStartTtls);
         retval.setSmtpAuth(mailSmtpAuth);
         retval.setMailSubject(mailSubject);
-        
+        retval.setMaxSchedulerPoolSize(maxSchedulerPoolSize);
+        retval.setEnabled(schedulerEnabled);
+        retval.setSchedulerExecuteTimeoutSeconds(schedulerExecuteTimeoutSeconds);
+        retval.setSchedulerFixedRateSeconds(schedulerFixedRateSeconds);
+
         return retval;
     }
-        
+
     @Override
     public OperationResult saveSystemSettings(SystemSettings systemSettings) {
-        OperationResult<AuthConfig> retval = new OperationResult<>();
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
+        OperationResult retval = new OperationResult<>();
         try {
-            SecurityConfiguration scfg = config.getSecurityConfig();
+            if (systemSettings.getAuthConfig().isModified()) {
+                SecurityConfiguration scfg = config.getSecurityConfig();
 
-            AuthConfig authConfig = systemSettings.getAuthConfig();
-            scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
-            scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
-            config.setSecurityType(authConfig.getSecurityType());
+                AuthConfig authConfig = systemSettings.getAuthConfig();
+                scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
+                scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
+                config.setSecurityType(authConfig.getSecurityType());
 
-            fileHandler.saveSecurityConfig(scfg);
-            fileHandler.updateApplicationProperties(authConfig);
+                retval = fileHandler.saveSecurityConfig(scfg);
+            }
+
+            if (retval.isSuccess() && systemSettings.getSchedulerConfig().isModified()) {
+                retval = fileHandler.updateSchedulerProperties(systemSettings.getSchedulerConfig());
+            }
+
+            if (retval.isSuccess()
+                    && (systemSettings.getMiscConfig().isModified()
+                    || systemSettings.getAuthConfig().isModified()
+                    || systemSettings.getSslConfig().isModified())) {
+                retval = fileHandler.updateApplicationProperties(systemSettings);
+            }
 
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (Exception ex) {
-                };
-            }
-
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (Exception ex) {
-                };
-            }
         }
 
         return retval;
@@ -1983,14 +2031,194 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
         OperationResult<List<DocumentSchedule>> retval = new OperationResult<>();
-         
-        List <DocumentSchedule> sched = config.getDocumentSchedulesConfig().getDocumentSchedules();
-        
+
+        List<DocumentSchedule> sched = config.getDocumentSchedulesConfig().getDocumentSchedules();
+
         Collections.sort(sched, new DocumentScheduleComparator());
-        
+
         retval.setResult(sched);
-        
+
         return retval;
+    }
+
+    @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{60}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
+    public void runScheduledJobs() throws InterruptedException {
+        if (schedulerEnabled) {
+            ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
+            for (ScheduledDocument docinfo : getScheduledDocuments()) {
+                OperationResult<QueryDocument> dres = getDocument(Constants.DOCUMENT_TYPE_QUERY, docinfo.getGroup(), docinfo.getDocument());
+                if (dres.isSuccess()) {
+                    executor.execute(new QueryRunner(docinfo));
+                }
+            }
+
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(schedulerExecuteTimeoutSeconds, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    private List<ScheduledDocument> getScheduledDocuments() {
+        List<ScheduledDocument> retval = new ArrayList<>();
+
+        return retval;
+    }
+
+    @Override
+    public void sendEmail(ScheduledDocument docinfo, Object result) {
+        try {
+            byte[] attachment = getAttachment(docinfo.getResultType(), result);
+            if (attachment != null) {
+                Properties prop = new Properties();
+                SchedulerConfig schConfig = getSchedulerConfig();
+                prop.put("mail.smtp.auth", schConfig.isSmtpAuth());
+                prop.put("mail.smtp.starttls.enable", schConfig.isSmtpStartTtlsEnable());
+                prop.put("mail.smtp.host", schConfig.getSmtpHost());
+                prop.put("mail.smtp.port", schConfig.getSmtpPort());
+
+                Session session = Session.getInstance(prop, new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(schConfig.getMailUser(), schConfig.getMailPassword());
+                    }
+                });
+
+                // Now use your ByteArrayDataSource as
+                DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(schConfig.getMailFrom()));
+
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(docinfo.getEmails()));
+                message.setSubject(schConfig.getMailSubject());
+
+                BodyPart messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setText("Mail Body");
+
+                MimeBodyPart attachmentPart = new MimeBodyPart();
+                attachmentPart.setDataHandler(new DataHandler(fds));
+                attachmentPart.setFileName(getFileName(docinfo));
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(messageBodyPart);
+                multipart.addBodyPart(attachmentPart);
+                message.setContent(multipart);
+                Transport.send(message);
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+    }
+
+    private String getFileName(ScheduledDocument docinfo) {
+        String retval = docinfo.getDocument();
+        switch (docinfo.getResultType()) {
+            case Constants.RESULT_TYPE_EXCEL:
+                retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
+                break;
+            case Constants.RESULT_TYPE_CSV:
+                retval = docinfo.getDocument().replace(".json", "") + ".csv";
+                break;
+            case Constants.RESULT_TYPE_JSON_FLAT:
+            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
+                break;
+        }
+
+        return retval;
+    }
+
+    private String getMimeType(ScheduledDocument docinfo) {
+        String retval = docinfo.getDocument();
+        switch (docinfo.getResultType()) {
+            case Constants.RESULT_TYPE_EXCEL:
+                retval = "application/vnd.ms-excel";
+                break;
+            case Constants.RESULT_TYPE_CSV:
+                retval = "text/csv";
+                break;
+            case Constants.RESULT_TYPE_JSON_FLAT:
+            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
+                retval = "application/json";
+                break;
+        }
+
+        return retval;
+    }
+
+    private byte[] getAttachment(String resultType, Object queryResult) throws Exception {
+        byte[] retval = null;
+        switch (resultType) {
+            case Constants.RESULT_TYPE_EXCEL:
+                retval = exportToExcel(getExcelWrapper((QueryResult) queryResult));
+                break;
+            case Constants.RESULT_TYPE_CSV:
+                retval = toCsv((QueryResult) queryResult);
+                break;
+            case Constants.RESULT_TYPE_JSON_FLAT:
+            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
+                retval = fileHandler.getGson(true).toJson(queryResult).getBytes();
+                break;
+        }
+
+        return retval;
+    }
+
+    private byte[] toCsv(QueryResult queryResult) {
+        byte[] retval = null;
+        try (StringWriter strwriter = new StringWriter(); CSVWriter writer = new CSVWriter(strwriter);) {
+
+            String[] row = new String[queryResult.getHeader().size()];
+            writer.writeNext(queryResult.getHeader().toArray(row));
+
+            // add data to csv
+            for (List<Object> l : queryResult.getData()) {
+                writer.writeNext(toStringArray(l));
+            }
+
+            retval = strwriter.toString().getBytes();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+
+        return retval;
+    }
+
+    private String[] toStringArray(List<Object> in) {
+        String[] retval = new String[in.size()];
+
+        for (int i = 0; i < retval.length; ++i) {
+            Object o = in.get(i);
+            if (o == null) {
+                retval[i] = null;
+            } else {
+                retval[i] = o.toString();
+            }
+        }
+
+        return retval;
+    }
+
+    private ExcelExportWrapper getExcelWrapper(QueryResult queryResult) {
+        ExcelExportWrapper retval = new ExcelExportWrapper();
+
+        retval.setHeaderFontColor("2F4F4F");
+        retval.setHeaderBackgroundColor("85C1E9");
+        retval.setHeaderFontSize(12);
+        retval.setDetailFontColor("2F4F4F");
+        retval.setDetailBackgroundColor1("FFFFFF");
+        retval.setDetailBackgroundColor2("F0FFFF");
+        retval.setDetailFontSize(11);
+
+        retval.setQueryResults(queryResult);
+
+        return retval;
+    }
+
+    private void updateSchedulerProperties(SchedulerConfig schedulerConfig) {
     }
 
 }

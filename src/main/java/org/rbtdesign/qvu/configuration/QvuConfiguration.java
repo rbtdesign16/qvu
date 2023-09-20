@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbtdesign.qvu.configuration.security.OidcConfiguration;
+import org.rbtdesign.qvu.dto.SSLConfig;
 import org.rbtdesign.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,18 @@ public class QvuConfiguration {
     @Value("${server.ssl.key-store:}")
     private String sslKeyStore;
 
+    @Value("${server.ssl.key-store-type:}")
+    private String sslKeyStoreType;
+
+    @Value("${server.ssl.key-alias:}")
+    private String sslKeyAlias;
+    
+    @Value("${server.ssl.key-store-password:}")
+    private String sslKeyStorePassword;
+
+    @Value("${server.ssl.key-password:}")
+    private String sslKeyPassword;
+
     @Value("${server.port}")
     private Integer serverPort;
 
@@ -69,10 +82,14 @@ public class QvuConfiguration {
     private void init() {
         LOG.info("in QvuConfiguration.init()");
         LOG.info("server.port=" + serverPort);
+        LOG.info("backup.folder=" + backupFolder);
         LOG.info("server.servlet.context-path=" + servletContextPath);
         LOG.info("security.type=" + securityType);
         LOG.info("cors.allowed.origins=" + corsAllowedOrigins);
         config.setBackupFolder(backupFolder);
+        config.setSslConfig(getSslConfig());
+        config.setServerPort(serverPort);
+        config.setCorsAllowedOrigins(corsAllowedOrigins);
     }
 
     @Autowired
@@ -140,4 +157,18 @@ public class QvuConfiguration {
         }
         return http.build();
     }
+    
+    private SSLConfig getSslConfig() {
+        SSLConfig retval = new SSLConfig();
+        
+        retval.setSslKeyAlias(sslKeyAlias);
+        retval.setSslKeyPassword(sslKeyPassword);
+        retval.setSslKeyStore(sslKeyStore);
+        retval.setSslKeyStorePassword(sslKeyStorePassword);
+        retval.setSslKeyStoreType(sslKeyStoreType);
+        return retval;
+    }
+    
+    
+         
 }

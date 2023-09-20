@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbtdesign.qvu.configuration.security.OidcConfiguration;
 import org.rbtdesign.qvu.dto.SSLConfig;
@@ -47,6 +46,9 @@ public class QvuConfiguration {
 
     @Autowired
     private ConfigurationHelper config;
+
+    @Value("${server.ssl.enabled:false}")
+    private boolean sslEnabled;
 
     @Value("${server.ssl.key-store:}")
     private String sslKeyStore;
@@ -152,7 +154,7 @@ public class QvuConfiguration {
         
         http.cors(c -> c.configurationSource(getCorsConfigurationSource())).csrf(c -> c.disable());
 
-        if (StringUtils.isNotEmpty(sslKeyStore)) {
+        if (sslEnabled) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         }
         return http.build();
@@ -161,6 +163,7 @@ public class QvuConfiguration {
     private SSLConfig getSslConfig() {
         SSLConfig retval = new SSLConfig();
         
+        retval.setEnabled(sslEnabled);
         retval.setSslKeyAlias(sslKeyAlias);
         retval.setSslKeyPassword(sslKeyPassword);
         retval.setSslKeyStore(sslKeyStore);

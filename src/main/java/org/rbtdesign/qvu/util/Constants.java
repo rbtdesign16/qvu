@@ -35,7 +35,7 @@ public class Constants {
     public static final String BACKUP_FOLDER_PROPERTY = "backup.folder";
     public static final String CORS_ALLOWED_ORIGINS_PROPERTY = "cors.allowed.origins";
     
-    public static final String SSL_ENABLED_PROPERTY = "ssl.enabled";
+    public static final String SSL_ENABLED_PROPERTY = "server.ssl.enabled";
     public static final String SSL_KEYSTORE_PROPERTY = "server.ssl.key-store";
     public static final String SSL_KEYSTORE_TYPE_PROPERTY = "server.ssl.key-store-type";
     public static final String SSL_KEY_ALIAS_PROPERTY = "server.ssl.key-alias";

@@ -36,12 +36,6 @@ import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.SchedulerConfig;
 import org.rbtdesign.qvu.dto.SystemSettings;
-import static org.rbtdesign.qvu.util.Constants.SSL_ENABLED_PROPERTY;
-import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_PASSWORD_PROPERTY;
-import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_PROPERTY;
-import static org.rbtdesign.qvu.util.Constants.SSL_KEYSTORE_TYPE_PROPERTY;
-import static org.rbtdesign.qvu.util.Constants.SSL_KEY_ALIAS_PROPERTY;
-import static org.rbtdesign.qvu.util.Constants.SSL_KEY_PASSWORD_PROPERTY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -807,7 +801,7 @@ public class FileHandler {
                         val = "" + systemSettings.getSslConfig().isEnabled();
                         break;
                     case Constants.SSL_KEYSTORE_PROPERTY:
-                        val = systemSettings.getSslConfig().getSslKeyStore();
+                        val = getKeystoreFileName(systemSettings.getSslConfig().getSslKeyStore());
                         break;
                     case Constants.SSL_KEYSTORE_TYPE_PROPERTY:
                         val = systemSettings.getSslConfig().getSslKeyStoreType();
@@ -823,11 +817,7 @@ public class FileHandler {
                         break;
                 }
                 
-                if (!Constants.SSL_ENABLED_PROPERTY.equals(p) && !systemSettings.getSslConfig().isEnabled()) {
-                    lines.add("#" + p + "=" + val);
-                } else {
-                    lines.add(p + "=" + val);
-                }
+                lines.add(p + "=" + val);
             }
  
             lnr.close();
@@ -856,6 +846,17 @@ public class FileHandler {
             }
         }
 
+        return retval;
+    }
+    
+    private String getKeystoreFileName(String input) {
+        String retval = input;
+        if (StringUtils.isNotEmpty(input)) {
+            if (!input.startsWith("file:")) {
+                retval = "file:" + input;
+            }
+        }
+            
         return retval;
     }
     

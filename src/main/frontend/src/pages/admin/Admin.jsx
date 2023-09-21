@@ -265,6 +265,7 @@ const Admin = () => {
 
         if (isnew) {
             retval.splice(1, 0, {label: getText("Password:"), name: "password", type: "password", required: true, validator: {type: "password"}});
+            retval.splice(2, 0, {label: getText("Repeat Password:"), name: "repeatPassword", type: "password", required: true, validator: {type: "password"}});
         }
 
         return retval;
@@ -862,6 +863,9 @@ const Admin = () => {
 
         if (ok) {
             showMessage(INFO, replaceTokens(getText("Saving document group"), [config.dataObject.name]), null, true);
+            if (!config.dataObject.roles) {
+                config.dataObject.roles = [];
+            }
             let res = await saveDocumentGroup(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
@@ -877,22 +881,47 @@ const Admin = () => {
     };
 
     const saveModifiedUser = async (config) => {
-        let ok = checkEntryFields(config);
-
-        if (ok) {
-            setErrorMessage(config.idPrefix, "");
-            showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
-            let res = await saveUser(config.dataObject);
-            if (isApiSuccess(res)) {
-                setErrorMessage(config.idPrefix, "");
-                setAuthData(await loadAuth());
-                setEditModal({show: false});
-                showMessage(SUCCESS, replaceTokens(getText("User saved"), [config.dataObject.userId]));
-            } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
+        let ok = true;
+        if (config.dataObject.newRecord) {
+            if (config.dataObject.password !== config.dataObject.repeatPassword) {
+                setErrorMessage(config.idPrefix, getText("Passwords do not match"));
+                ok = false;
             }
-        } else {
-            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
+        }
+        
+       if (ok) {
+            setErrorMessage(config.idPrefix, "");
+           
+       //     config.dataObject.repeatPassword = "";
+            ok = checkEntryFields(config);
+            if (ok) {
+                setErrorMessage(config.idPrefix, "");
+                showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
+                config.dataObject.repeatPassword = "";
+                
+                let user = {...config.dataObject};
+                
+                // get rid of the repeat password field
+                if (user.newRecord) {
+                    delete user.repeatPassword;
+                }
+                
+                if (!user.roles) {
+                    user.roles = [];
+                }
+
+                let res = await saveUser(user);
+                if (isApiSuccess(res)) {
+                    setErrorMessage(config.idPrefix, "");
+                    setAuthData(await loadAuth());
+                    setEditModal({show: false});
+                    showMessage(SUCCESS, replaceTokens(getText("User saved"), [config.dataObject.userId]));
+                } else {
+                    showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
+                }
+            } else {
+                setErrorMessage(config.idPrefix, getText("please complete all required entries"));
+            }
         }
     };
 

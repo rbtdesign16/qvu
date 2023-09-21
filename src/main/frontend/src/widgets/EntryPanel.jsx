@@ -200,7 +200,6 @@ const EntryPanel = (props) => {
     const haveRestartRequired = () => {
         for (let i = 0; i < entryConfig.length; ++i) {
             if (entryConfig[i].restartRequired) {
-                console.log("----------->rest");
                 return true;
             }
         }

@@ -237,7 +237,7 @@ const SystemSetup = (props) => {
                     size: 40,
                     required: true,
                     showHelp: showHelpMessage,
-                    helpText: getText("sslKeyStore-help")
+                    helpText: getText("sslKeyStoreType-help")
                 },
                 {
                     label: getText("Key Alias"),

@@ -93,7 +93,7 @@ const EditableDataList = (props) => {
      };
 
     const loadPanels = () => {
-        if (listConfig.data) {
+        if (listConfig && listConfig.data) {
             return listConfig.data.map((rec, indx) => {
                 return <div>
                     { getDisplay(listConfig.displayConfig, rec) }

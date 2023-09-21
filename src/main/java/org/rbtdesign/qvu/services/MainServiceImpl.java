@@ -445,10 +445,11 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-document-groups.json"), new File(config.getDocumentGroupsConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
-            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-scheduler.properties"), new File(config.getHelpFolder() + File.separator + "scheduler.properties"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-scheduler.properties"), new File(config.getSchedulerPropertiesFileName()));
 
             // update admin password
             SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);
@@ -2217,8 +2218,4 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-
-    private void updateSchedulerProperties(SchedulerConfig schedulerConfig) {
-    }
-
 }

@@ -46,6 +46,7 @@ const SystemSetup = (props) => {
     const onBasicChange = (e, entryConfig, dataObject) => {
         let ss = {...systemSettings};
         ss.authConfig.basicConfiguration = dataObject;
+        ss.authConfig.modified = true;
         setSystemSettings(ss);
     };
 

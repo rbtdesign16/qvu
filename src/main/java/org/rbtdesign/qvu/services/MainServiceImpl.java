@@ -2095,7 +2095,7 @@ public class MainServiceImpl implements MainService {
                 message.setFrom(new InternetAddress(schConfig.getMailFrom()));
 
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(docinfo.getEmails()));
-                message.setSubject(schConfig.getMailSubject());
+                message.setSubject(schConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
 
                 BodyPart messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setText("Mail Body");

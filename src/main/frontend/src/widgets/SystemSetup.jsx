@@ -167,13 +167,17 @@ const SystemSetup = (props) => {
                     label: getText("Mail From"),
                     name: "mailFrom",
                     type: "input",
+                    required: true,
                     size: 40
                 },
                 {
                     label: getText("Mail Subject"),
                     name: "mailSubject",
                     type: "input",
-                    size: 40
+                    required: true,
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("mailSubject-help")
                 },
                 {
                     label: getText("Max Thread Pool Size"),

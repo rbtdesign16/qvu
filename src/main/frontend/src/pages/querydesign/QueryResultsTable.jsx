@@ -250,32 +250,6 @@ const QueryResultsTable = () => {
         return retval;
     };
 
-    const onPageSize = (e) => {
-        e.preventDefault();
-        let sz = Number(e.target.options[e.target.selectedIndex].value);
-        let pages = Math.max(0, Math.ceil(data.length / sz));
-        setTotalPages(pages);
-        setPageSize(sz);
-    };
-
-    const getPageSizes = () => {
-        return RESULT_SET_PAGE_SIZES.map(s => {
-            if (s === pagingInfo.pageSize) {
-                return <option value={s} selected>{s}</option>;
-            } else {
-                return <option value={s}>{s}</option>;
-            }
-        });
-    };
-
-    const onPage = (e) => {
-       let pg = e.target.value;
-       
-       if ((pg > 0) && (pg <= pagingInfo.pageCount)) {
-           setCurrentPage(pg);
-       }
-    };
-
     if (initialColumnWidths) {
         return <div className="query-results-panel">
             <div className="query-results-cont">
@@ -288,7 +262,7 @@ const QueryResultsTable = () => {
                 </div>
             </div>
             <div className="query-results-footer">
-                <PageControl pagingInfo={pagingInfo} setPagingInfo={setPagingInfo} dataSet={data}/>
+                <PageControl pagingInfo={pagingInfo} setPagingInfo={setPagingInfo} dataSet={data} elapsedTime={queryResults.elapsedTimeSeconds}/>
              </div>
         </div>;
     } else {

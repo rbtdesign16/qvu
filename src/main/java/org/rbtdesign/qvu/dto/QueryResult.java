@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class QueryResult {
     private Integer rowCount;
+    private double elapsedTimeSeconds = 0;
     private List<String> header = new ArrayList<>();
     private List<Integer> columnTypes = new ArrayList<>();
     private List<Integer> initialColumnWidths = new ArrayList<>();
@@ -54,5 +55,13 @@ public class QueryResult {
         this.rowCount = rowCount;
     }
 
+    public double getElapsedTimeSeconds() {
+        return elapsedTimeSeconds;
+    }
 
+    public void setElapsedTimeSeconds(double elapsedTimeSeconds) {
+        this.elapsedTimeSeconds = elapsedTimeSeconds;
+    }
+
+   
 }

@@ -19,7 +19,7 @@ import {
 } from "../utils/helper";
 
 const PageControl = (props) => {
-    const {dataSet, pagingInfo, setPagingInfo} = props;
+    const {dataSet, pagingInfo, setPagingInfo, elapsedTime} = props;
     const {getText} = useLang();
     
      const onPageSize = (e) => {
@@ -98,11 +98,19 @@ const PageControl = (props) => {
         let retval = getText("Total Records:") + " " + dataSet.length;
     
         if (dataSet && pagingInfo.visibleRecordCount && (dataSet.length !== pagingInfo.visibleRecordCount)) {
-            retval = retval + ", " + getText("Filtered Records:") + " " + pagingInfo.visibleRecordCount;
+            retval = retval + ", " + getText("Filtered Records:") + " " + pagingInfo.visibleRecordCount; 
         }
         
         return retval;
     };
+    
+    const getElapsedTime = () => {
+        if (elapsedTime && (elapsedTime > -1)) {
+            return getText("Time(sec):", " ") + elapsedTime;
+        } else {
+            return "";
+        }
+    }
     
     return (<div className="page-input">
         {getText("Page Size:")}
@@ -124,13 +132,15 @@ const PageControl = (props) => {
         {" " + getText("of")  + " " + pagingInfo.pageCount}
         &nbsp;&nbsp;&nbsp;&nbsp;
         {getPageDisplay()}
+        <span style={{marginLeft: "25px"}}>{getElapsedTime()}</span>
     </div>);
 };
 
 PageControl.propTypes = {
     dataSet: PropTypes.object.isRequired,
     pagingInfo: PropTypes.object.isRequired,
-    setPagingInfo: PropTypes.func.isRequired
+    setPagingInfo: PropTypes.func.isRequired,
+    elapsedTime: PropTypes.number
 };
 
 

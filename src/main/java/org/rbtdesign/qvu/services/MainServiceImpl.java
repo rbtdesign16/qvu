@@ -1364,6 +1364,7 @@ public class MainServiceImpl implements MainService {
         ResultSet res = null;
 
         try {
+            long start = System.currentTimeMillis();
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(runWrapper.getDocument().getDatasource());
             runWrapper.getDocument().setDatabaseType(ds.getDatabaseType());
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
@@ -1383,6 +1384,8 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setResult(getQueryResult(res));
+            
+            retval.getResult().setElapsedTimeSeconds((((double)System.currentTimeMillis() - (double)start)/1000.0));
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);

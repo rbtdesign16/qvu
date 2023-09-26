@@ -43,7 +43,16 @@ const DocumentScheduleTable = (props) => {
     };
 
     const saveSchedule = (indx, schedule) => {
+        schedule.newRecord = false;
+        let sd = {...scheduledDocuments};
+        if (indx > -1) {
+            sd[indx] = schedule;
+        } else {
+            sd.push(schedule);
+        }
+        
         setShowDocumentSchedule({show: false});
+        setScheduledDocuments(sd);
     };
 
     const onAdd = () => {

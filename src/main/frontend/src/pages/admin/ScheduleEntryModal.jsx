@@ -117,16 +117,18 @@ const ScheduleEntryModal = (props) => {
         config.hide();
     };
 
-
     const isValidSchedule = () => {
-        return false;
+        let retval = ((isDaysOfMonthDisabled() || isDaysOfWeekDisabled()) 
+            && schedule.hoursOfDay 
+            && (schedule.hoursOfDay.length > 0));
+    
+        return retval;
     };
 
     const isValidEmailList = () => {
-        if (schedule.emailAddresses) {
-            let addresses = schedule.emailAddresses.split(",");
-            for (let i = 0; i < addresses.length; ++i) {
-                if (!addresses[i].includes("@")) {
+        if (schedule.emailAddresses && (schedule.emailAddresses.length > 0)) {
+            for (let i = 0; i < schedule.emailAddresses.length; ++i) {
+                if (!schedule.emailAddresses[i].includes("@")) {
                     return false;
                 }
             }
@@ -237,6 +239,38 @@ const ScheduleEntryModal = (props) => {
         setToggle(!toggle);
     };
 
+    const isDaysOfWeekDisabled = () => {
+        let retval = (schedule && schedule.daysOfMonth && (schedule.daysOfMonth.length > 0));
+        
+        if (retval && schedule.daysOfWeek && (schedule.daysOfWeek.length > 0)) {
+            schedule.daysOfWeek = [];
+            setToggle(!toggle);
+        }
+        
+        return retval;
+    };
+    
+    const isDaysOfMonthDisabled = () => {
+        let retval = (schedule && schedule.daysOfWeek && (schedule.daysOfWeek.length > 0));
+        
+        if (retval && schedule.daysOfMonth && (schedule.daysOfMonth.length > 0)) {
+            schedule.daysOfMonth = [];
+            setToggle(!toggle);
+        }
+        
+        return retval;
+    };
+
+    const getSelectedDaysOfMonth = () => {
+        let retval = [];
+        if (schedule && schedule.daysOfMonth) {
+            schedule.daysOfMonth.map(d => {
+                retval.push({value: d, label: d});
+            });
+        }
+        
+        return retval;
+    };
 
     const setEmails = (input) => {
         schedule.emailAddresses = [];
@@ -266,11 +300,11 @@ const ScheduleEntryModal = (props) => {
                             </div>
                             <div className="label">{getText("Days of Month:")}</div>
                             <div>
-                                <MultiSelect options={getDaysOfMonth()} value={(schedule && schedule.daysOfMonth) ? schedule.daysOfMonth : []} onChange={selections => setDaysOfMonth(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
+                                <MultiSelect options={getDaysOfMonth()} disabled={isDaysOfMonthDisabled()} value={getSelectedDaysOfMonth()} onChange={selections => setDaysOfMonth(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Day of Week:")}</div>
                             <div>
-                                <MultiSelect options={daysOfWeek} value={getSelectedDaysOfWeek()} onChange={selections => setDaysOfWeek(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
+                                <MultiSelect options={daysOfWeek} disabled={isDaysOfWeekDisabled()} value={getSelectedDaysOfWeek()} onChange={selections => setDaysOfWeek(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Hour:")}</div>
                             <div>

@@ -42,7 +42,7 @@ const DocumentScheduleTable = (props) => {
         setShowDocumentSchedule({show: false});
     };
 
-    const saveSchedule = (schedule) => {
+    const saveSchedule = (indx, schedule) => {
         setShowDocumentSchedule({show: false});
     };
 

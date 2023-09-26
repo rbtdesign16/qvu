@@ -4,6 +4,7 @@ import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import ScheduleEntryModal from "./ScheduleEntryModal";
 import { MdOutlineDeleteForever, MdOutlineAddBox, MdHelpOutline } from 'react-icons/md';
 import { CiEdit } from 'react-icons/ci';
 import PropTypes from "prop-types";
@@ -22,7 +23,8 @@ const DocumentScheduleTable = (props) => {
     const {getText} = useLang();
     const {showHelp} = useHelp();
     const {showMessage, hideMessage} = useMessage();
-    const [scheduledReports, setScheduledReports] = useState(null);
+    const [scheduledDocuments, setScheduledDocuments] = useState(null);
+    const [showDocumentSchedule, setShowDocumentSchedule] = useState({show: false, schedule: {newRecord: true}});
     const onHelp = () => {
         showHelp(getText("scheduleEntry-help"));
     };
@@ -35,31 +37,46 @@ const DocumentScheduleTable = (props) => {
     const onSave = () => {
         config.save();
     };
+    
+    const hideSchedule = () => {
+        setShowDocumentSchedule({show: false});
+    };
+
+    const saveSchedule = (schedule) => {
+        setShowDocumentSchedule({show: false});
+    };
 
     const onAdd = () => {
+        setShowDocumentSchedule({show: true, indx: -1, schedule: {newRecord: true}, hide: hideSchedule, saveSchedule: saveSchedule});
+    };
+
+    const onEdit = (indx) => {
+        setShowDocumentSchedule({show: true, indx: indx, schedule: {...scheduledDocuments[indx]}, saveSchedule: saveSchedule, hide: hideSchedule});
     };
 
     const onShow = async () => {
-        showMessage(INFO, getText("Loading schedules", "..."), null, true);
+        showMessage(INFO, getText("Loading scheduled documents", "..."), null, true);
         let res = await loadDocumentSchedules();
         
         if (isApiSuccess(res)) {
             hideMessage();
-            setScheduledReports(res);
+            setScheduledDocuments(res);
         } else {
             showMessage(ERROR, res.message);
         }
     };
     
-    const loadScheduledReports = () => {
-        if (scheduledReports) {
+    const loadScheduledDocuments = () => {
+        if (scheduledDocuments) {
+            return "";
         } else {
             return "";
         }
-    }
+    };
 
     return (
             <div className="static-modal">
+                <ScheduleEntryModal config={showDocumentSchedule}/>
                 <Modal animation={false} 
                        dialogClassName="schedule-table"
                        show={config.show} 
@@ -68,16 +85,16 @@ const DocumentScheduleTable = (props) => {
                        backdrop={true} 
                        keyboard={true}>
                     <Modal.Header closeButton>
-                        <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
-                            &nbsp;&nbsp;{getText("Scheduled Reports") }</Modal.Title>
+                        <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={e => onHelp()}/>
+                            &nbsp;&nbsp;{getText("Scheduled Documents") }</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div title={getText("Add Schedule")}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" onClick={onAdd()}/>{getText("Add Schedule")}</div>
-                        <div className="schedule-entries">{loadScheduledReports()}</div>
+                        <div title={getText("Add Schedule")}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" onClick={e => onAdd()}/>{getText("Add Schedule")}</div>
+                        <div className="schedule-entries">{loadScheduledDocuments()}</div>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={() => onSave()}>{getText("Save")}</Button>
+                        <Button size="sm" onClick={e => onHide() }>{getText("Cancel")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={e => onSave()}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

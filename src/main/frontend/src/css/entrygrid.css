@@ -6,14 +6,14 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     display: grid;
     grid-template-columns: 150px 200px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-175-100 {
     display: grid;
     grid-template-columns: 150px 100px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-150-200 input[type=number] {
@@ -24,33 +24,33 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     display: grid;
     grid-template-columns: 25px 275px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 .entrygrid-120-300 {
     display: grid;
     grid-template-columns: 120px 300px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-130-300 {
     display: grid;
     grid-template-columns: 130px 300px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-145-300 {
     display: grid;
     grid-template-columns: 145px 300px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-150-300 {
     display: grid;
     grid-template-columns: 150px 300px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
@@ -58,56 +58,56 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .entrygrid-150-425 {
     display: grid;
     grid-template-columns: 150px 425px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-200-425 {
     display: grid;
     grid-template-columns: 200px 425px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-210-425 {
     display: grid;
     grid-template-columns: 210px 425px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-125-425 {
     display: grid;
     grid-template-columns: 125px 425px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-125-550 {
     display: grid;
     grid-template-columns: 125px 550px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-175-425 {
     display: grid;
     grid-template-columns: 175px 425px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-100-150 {
     display: grid;
     grid-template-columns: 100px 150px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
 .entrygrid-100-175 {
     display: grid;
     grid-template-columns: 100px 175px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
     margin: 5px;
 }
 
@@ -115,35 +115,35 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     display: grid;
     grid-template-columns: 225px 150px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-225-225 {
     display: grid;
     grid-template-columns: 225px 225px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-225-425 {
     display: grid;
     grid-template-columns: 225px 425px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-225-350 {
     display: grid;
     grid-template-columns: 225px 350px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-selcolentry {
     display: grid;
     grid-template-columns: 120px 190px 120px 100px 75px 75px 75px 75px;
     margin: 5px;
-    grid-row-gap: 3px;
+    grid-row-gap: 6px;
 }
 
 .entrygrid-selcolentry input[type=number] {

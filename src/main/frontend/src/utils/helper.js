@@ -620,3 +620,7 @@ export const getParameterTypeFromId = (id) => {
     
     return retval;
 };
+
+export const getCurrentSelectValue = (e) => {
+    return e.target.options[e.target.selectedIndex].value;
+};

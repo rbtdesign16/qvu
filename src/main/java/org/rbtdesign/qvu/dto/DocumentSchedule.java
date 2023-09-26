@@ -8,45 +8,53 @@ import java.util.List;
  * @author rbtuc
  */
 public class DocumentSchedule {
-    private int month;
-    private int dayOfWeek;
-    private int dayOfMonth;
-    private int time;
+    private List<Integer> months = new ArrayList<>();;
+    private List <Integer> daysOfWeek = new ArrayList<>();
+    private List<Integer> daysOfMonth = new ArrayList<>();
+    private List<Integer> hoursOfDay = new ArrayList<>();
     private String documentType;
     private String documentName;
     private String documentGroup;
     private List<String> emailAddresses = new ArrayList<>();
 
-    public int getMonth() {
-        return month;
+    public List<Integer> getMonths() {
+        return months;
     }
 
-    public void setMonth(int month) {
-        this.month = month;
+    public void setMonths(List<Integer> months) {
+        this.months = months;
     }
 
-    public int getDayOfWeek() {
-        return dayOfWeek;
+    public List<Integer> getDaysOfWeek() {
+        return daysOfWeek;
     }
 
-    public void setDayOfWeek(int dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
+    public void setDaysOfWeek(List<Integer> daysOfWeek) {
+        this.daysOfWeek = daysOfWeek;
     }
 
-    public int getDayOfMonth() {
-        return dayOfMonth;
+    public List<Integer> getDaysOfMonth() {
+        return daysOfMonth;
     }
 
-    public void setDayOfMonth(int dayOfMonth) {
-        this.dayOfMonth = dayOfMonth;
+    public void setDaysOfMonth(List<Integer> daysOfMonth) {
+        this.daysOfMonth = daysOfMonth;
     }
 
-    public int getTime() {
-        return time;
+    public List<Integer> getHoursOfDay() {
+        return hoursOfDay;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public void setHoursOfDay(List<Integer> hoursOfDay) {
+        this.hoursOfDay = hoursOfDay;
+    }
+
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
     }
 
     public String getDocumentName() {
@@ -73,11 +81,5 @@ public class DocumentSchedule {
         this.emailAddresses = emailAddresses;
     }
 
-    public String getDocumentType() {
-        return documentType;
-    }
 
-    public void setDocumentType(String documentType) {
-        this.documentType = documentType;
-    }
 }

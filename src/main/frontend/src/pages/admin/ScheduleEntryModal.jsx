@@ -298,7 +298,6 @@ const ScheduleEntryModal = (props) => {
     };
 
     const loadDocument = (group, name) => {
-        alert("group: " + group + ", document: " + name);
         schedule.documentType = QUERY_DOCUMENT_TYPE;
         schedule.documentGroup = group;
         schedule.documentName = name;

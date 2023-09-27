@@ -6,7 +6,18 @@ import useMessage from "../../context/MessageContext";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE, getCurrentSelectValue} from "../../utils/helper";
+import { flattenTree } from "react-accessible-treeview";
+import {FcDocument} from "react-icons/fc";
+import DocumentSelectModal from "../../widgets/DocumentSelectModal";
+import {
+    INFO,
+    ERROR,
+    MODAL_TITLE_SIZE, 
+    QUERY_DOCUMENT_TYPE, 
+    SMALL_ICON_SIZE,
+    getCurrentSelectValue} from "../../utils/helper";
+
+import { getAvailableDocuments, isApiSuccess } from "../../utils/apiHelper";
 
 const ScheduleEntryModal = (props) => {
     const {config} = props;
@@ -15,6 +26,7 @@ const ScheduleEntryModal = (props) => {
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [toggle, setToggle] = useState(false);
+    const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
 
     const months = [
         {
@@ -281,11 +293,49 @@ const ScheduleEntryModal = (props) => {
         setToggle(!toggle);
     };
 
+    const hideDocumentSelect = () => {
+        setShowDocumentSelect({show: false});
+    };
+
+    const loadDocument = (group, name) => {
+        alert("group: " + group + ", document: " + name);
+        schedule.documentType = QUERY_DOCUMENT_TYPE;
+        schedule.documentGroup = group;
+        schedule.documentName = name;
+        hideDocumentSelect();
+    };
+
+    const onShowDocumentSelect = async () => {
+        showMessage(INFO, getText("Loading available documents", "..."), null, true);
+
+        let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
+
+        hideMessage();
+
+        if (isApiSuccess(res)) {
+            setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
+        } else {
+            showMessage(ERROR, res.message);
+        }
+    };
+
+
+    const getSelectedDocument = () => {
+        if (schedule && schedule.documentName) {
+            return getText("Group:", " ") + schedule.documentGroup + ",    " + getText("Name:", " ") + schedule.documentName;
+        } else {
+            return getText("Select a document", "...");
+        }
+    };
+
     return (
             <div className="static-modal">
+                <DocumentSelectModal config={showDocumentSelect}/>
+
                 <Modal animation={false} 
                        show={config.show} 
                        onShow={onShow}
+                       dialogClassName="foreignkey-settings"
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>
@@ -293,24 +343,29 @@ const ScheduleEntryModal = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="entrygrid-120-300">
+                        <div className="entrygrid-120-375">
+                            <div title={getText("Select Document")} className="label">{getText("Document:")}</div>
+                            <div style={{whiteSpace: "nowrap"}}>
+                                <FcDocument className="icon" size={SMALL_ICON_SIZE} onClick={e => onShowDocumentSelect()}/>
+                                <input type="text" readOnly={true} size={43} value={getSelectedDocument()}/>
+                            </div>
                             <div className="label">{getText("Months:")}</div>
-                            <div>
+                            <div style={{width: "50%"}}>
                                 <MultiSelect options={months} value={getSelectedMonths()} onChange={selections => setMonths(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Days of Month:")}</div>
-                            <div>
+                            <div style={{width: "50%"}}>
                                 <MultiSelect options={getDaysOfMonth()} disabled={isDaysOfMonthDisabled()} value={getSelectedDaysOfMonth()} onChange={selections => setDaysOfMonth(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Day of Week:")}</div>
-                            <div>
+                            <div  style={{width: "50%"}}>
                                 <MultiSelect options={daysOfWeek} disabled={isDaysOfWeekDisabled()} value={getSelectedDaysOfWeek()} onChange={selections => setDaysOfWeek(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Hour:")}</div>
-                            <div>
+                            <div style={{width: "50%"}}>
                                 <MultiSelect options={getHoursOfDay()} value={getSelectedHoursOfDay()} onChange={selections => setHoursOfDay(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
-                            <div className="label">{getText("Emails:")}</div><div><input type="text" size={40} defaultValue={(schedule && schedule.emailAddresses) ? schedule.emailAddresses.join(",") : ""} onBlur={e => setEmails(e.target.value)}/></div>
+                            <div className="label">{getText("Emails:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.emailAddresses) ? schedule.emailAddresses.join(",") : ""} onBlur={e => setEmails(e.target.value)}/></div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>

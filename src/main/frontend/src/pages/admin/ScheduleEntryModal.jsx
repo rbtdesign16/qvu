@@ -131,6 +131,8 @@ const ScheduleEntryModal = (props) => {
 
     const isValidSchedule = () => {
         let retval = ((isDaysOfMonthDisabled() || isDaysOfWeekDisabled()) 
+            && schedule.documentGroup
+            && schedule.documentName
             && schedule.hoursOfDay 
             && (schedule.hoursOfDay.length > 0));
     

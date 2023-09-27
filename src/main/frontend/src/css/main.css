@@ -361,8 +361,8 @@ select {
 
 .schedule-entry {
     left: 5%;
-    top: 5%;
-    min-width: 500px;
+    top: 10%;
+    min-width: 550px;
 }
 .custom-foreign-keys {
     left: 5%;

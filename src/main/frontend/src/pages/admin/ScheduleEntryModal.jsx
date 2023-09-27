@@ -334,7 +334,7 @@ const ScheduleEntryModal = (props) => {
                 <Modal animation={false} 
                        show={config.show} 
                        onShow={onShow}
-                       dialogClassName="foreignkey-settings"
+                       dialogClassName="schedule-entry"
                        onHide={onHide}
                        backdrop={true} 
                        keyboard={true}>

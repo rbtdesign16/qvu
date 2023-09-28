@@ -10,12 +10,16 @@ import { flattenTree } from "react-accessible-treeview";
 import {FcDocument} from "react-icons/fc";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import {
-    INFO,
-    ERROR,
-    MODAL_TITLE_SIZE, 
-    QUERY_DOCUMENT_TYPE, 
-    SMALL_ICON_SIZE,
-    getCurrentSelectValue} from "../../utils/helper";
+        INFO,
+        ERROR,
+        MODAL_TITLE_SIZE,
+        QUERY_DOCUMENT_TYPE,
+        SMALL_ICON_SIZE,
+        RESULT_TYPE_EXCEL,
+        RESULT_TYPE_CSV,
+        RESULT_TYPE_JSON_FLAT,
+        RESULT_TYPE_JSON_OBJECTGRAPH,
+        getCurrentSelectValue} from "../../utils/helper";
 
 import { getAvailableDocuments, isApiSuccess } from "../../utils/apiHelper";
 
@@ -109,6 +113,24 @@ const ScheduleEntryModal = (props) => {
             label: getText("Saturday")
         }];
 
+    const attachmentTypes = [
+    {
+        value: RESULT_TYPE_CSV,
+        label: getText(RESULT_TYPE_CSV)
+    },
+    {
+        value: RESULT_TYPE_EXCEL,
+        label: getText(RESULT_TYPE_EXCEL)
+    },
+    {
+        value: RESULT_TYPE_JSON_FLAT,
+        label: getText(RESULT_TYPE_JSON_FLAT)
+    },
+    {
+        value: RESULT_TYPE_JSON_OBJECTGRAPH,
+        label: getText(RESULT_TYPE_JSON_OBJECTGRAPH)
+    }];
+
     const multiSelectValueRenderer = (selected) => {
         if (selected.length > 0) {
             return getText("Item(s) selected");
@@ -130,12 +152,13 @@ const ScheduleEntryModal = (props) => {
     };
 
     const isValidSchedule = () => {
-        let retval = ((isDaysOfMonthDisabled() || isDaysOfWeekDisabled()) 
-            && schedule.documentGroup
-            && schedule.documentName
-            && schedule.hoursOfDay 
-            && (schedule.hoursOfDay.length > 0));
-    
+        let retval = ((isDaysOfMonthDisabled() || isDaysOfWeekDisabled())
+                && schedule.attachmentType
+                && schedule.documentGroup
+                && schedule.documentName
+                && schedule.hoursOfDay
+                && (schedule.hoursOfDay.length > 0));
+
         return retval;
     };
 
@@ -255,23 +278,23 @@ const ScheduleEntryModal = (props) => {
 
     const isDaysOfWeekDisabled = () => {
         let retval = (schedule && schedule.daysOfMonth && (schedule.daysOfMonth.length > 0));
-        
+
         if (retval && schedule.daysOfWeek && (schedule.daysOfWeek.length > 0)) {
             schedule.daysOfWeek = [];
             setToggle(!toggle);
         }
-        
+
         return retval;
     };
-    
+
     const isDaysOfMonthDisabled = () => {
         let retval = (schedule && schedule.daysOfWeek && (schedule.daysOfWeek.length > 0));
-        
+
         if (retval && schedule.daysOfMonth && (schedule.daysOfMonth.length > 0)) {
             schedule.daysOfMonth = [];
             setToggle(!toggle);
         }
-        
+
         return retval;
     };
 
@@ -282,7 +305,7 @@ const ScheduleEntryModal = (props) => {
                 retval.push({value: d, label: d});
             });
         }
-        
+
         return retval;
     };
 
@@ -320,6 +343,20 @@ const ScheduleEntryModal = (props) => {
         }
     };
 
+    const onAttachmentType = (e) => {
+        schedule.attachmentType = e.target.options[e.target.selectedIndex].value;
+        setToggle(!toggle);
+    };
+    
+    const loadAttachmentTypes = () => {
+        return attachmentTypes.map(a => {
+            if (schedule && (schedule.attachmentType === a.value)) {
+                return <option value={a.value} selected>{a.label}</option>;
+            } else {
+                return <option value={a.value}>{a.label}</option>;
+            }
+        });
+    };
 
     const getSelectedDocument = () => {
         if (schedule && schedule.documentName) {
@@ -332,7 +369,7 @@ const ScheduleEntryModal = (props) => {
     return (
             <div className="static-modal">
                 <DocumentSelectModal config={showDocumentSelect}/>
-
+            
                 <Modal animation={false} 
                        show={config.show} 
                        onShow={onShow}
@@ -366,6 +403,7 @@ const ScheduleEntryModal = (props) => {
                             <div style={{width: "50%"}}>
                                 <MultiSelect options={getHoursOfDay()} value={getSelectedHoursOfDay()} onChange={selections => setHoursOfDay(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
+                            <div className="label">{getText("Attachment:")}</div><div><select onChange={e => onAttachmentType(e)}><option value=""></option>{loadAttachmentTypes()}</select></div>
                             <div className="label">{getText("Emails:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.emailAddresses) ? schedule.emailAddresses.join(",") : ""} onBlur={e => setEmails(e.target.value)}/></div>
                         </div>
                     </Modal.Body>

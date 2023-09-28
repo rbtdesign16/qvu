@@ -15,6 +15,7 @@ public class DocumentSchedule {
     private String documentType;
     private String documentName;
     private String documentGroup;
+    private String attachmentType;
     private List<String> emailAddresses = new ArrayList<>();
 
     public List<Integer> getMonths() {
@@ -79,6 +80,14 @@ public class DocumentSchedule {
 
     public void setEmailAddresses(List<String> emailAddresses) {
         this.emailAddresses = emailAddresses;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
     }
 
 

@@ -119,6 +119,11 @@ export const DEFAULT_EXPORTED_KEY_DEPTH  = 4;
 export const DEFAULT_IMPORTED_KEY_DEPTH  = 2;
 export const CUSTOM_FK_DATA_SEPARATOR = "?";
 
+export const RESULT_TYPE_EXCEL = "excel";
+export const RESULT_TYPE_CSV = "csv";
+export const RESULT_TYPE_JSON_FLAT = "jsonflat";
+export const RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
+
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
 };

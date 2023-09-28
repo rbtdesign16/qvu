@@ -44,6 +44,7 @@ const DocumentScheduleTable = (props) => {
 
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
+        schedule.modified = true;
         let sd = [...scheduledDocuments];
         
         if (indx > -1) {

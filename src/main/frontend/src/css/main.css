@@ -370,10 +370,38 @@ select {
     min-width: 550px;
 }
 
+.schedule-modal {
+    left: 10px;
+    top: 10px;
+    min-width: 900px;
+}
+
+
+
 .schedule-table {
-    left: 5%;
-    top: 5%;
-    min-width: 800px;
+    border: solid 1px darkslategray;
+}
+
+.schedule-table-body {
+    display: grid;
+    grid-template-columns: 50px 100px 100px 100px 100px 100px 100px 100px 100px;
+};
+
+.schedule-table-body>div {
+    border-right: solid 1px darkslategray;
+    border-bottom: solid 1px darkslategray;
+}
+
+.schedule-table-hdr {
+    display: grid;
+    text-align: center;
+    background-color: var(--query-results-table-hdr-data-bkcolor);
+    grid-template-columns: 50px 100px 100px 100px 100px 100px 100px 100px 100px;
+} 
+
+.schedule-table-hdr>div {
+    border-right: solid 1px darkslategray;
+    border-bottom: solid 1px darkslategray;
 }
 
 .p-splitter-panel {

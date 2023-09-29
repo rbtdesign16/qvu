@@ -9,12 +9,21 @@ const DataTable = (props) => {
 
     const getColumns = (rownum, row) => {
         return columnDefs.map(c => {
+            let myStyle = {};
+            if (c.align) {
+                myStyle.textAlign = c.align;
+            }
+            
             if (c.fieldName) {
-                return <div>{row[c.fieldName]}</div>;
+                if (c.formatForDisplay) {
+                    return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
+                } else {
+                    return <div style={myStyle}>{row[c.fieldName]}</div>;
+                }
             } else if (c.render) {
-                return render(rownum);
+                return c.render(rownum, row);
             } else {
-                return <div></div>
+                return <div></div>;
             }
         });
     };

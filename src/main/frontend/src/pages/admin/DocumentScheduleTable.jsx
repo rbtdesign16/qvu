@@ -10,13 +10,15 @@ import { CiEdit } from 'react-icons/ci';
 import { MdOutlineDeleteForever, MdOutlineAddBox, MdHelpOutline } from 'react-icons/md';
 import PropTypes from "prop-types";
 import {
-INFO,
-        ERROR,
-        SMALL_ICON_SIZE,
-        MODAL_TITLE_SIZE,
-        confirm,
-        getUUID,
-        CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+    INFO,
+    ERROR,
+    SMALL_ICON_SIZE,
+    MODAL_TITLE_SIZE,
+    confirm,
+    getUUID,
+    CUSTOM_FK_DATA_SEPARATOR,
+    MONTHS,
+    DAYS_OF_WEEK} from "../../utils/helper";
 import { loadDocumentSchedules, isApiSuccess } from "../../utils/apiHelper";
 
 const DocumentScheduleTable = (props) => {
@@ -39,16 +41,17 @@ const DocumentScheduleTable = (props) => {
 
     const columnDefs = [
         {
-            render: (indx) => {
-                return <div>
-                    <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => editSchedule(indx)} /></span>
-                    <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => deleteSchedule(indx)} /></span>
+            render: (rownum, row) => {
+                return <div style={{textAlign: "center"}}>
+                    <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => editSchedule(rownum)} /></span>
+                    <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => deleteSchedule(rownum)} /></span>
                 </div>;
             }
         },
         {
             title: getText("Group"),
-            fieldName: "documentGroup"
+            fieldName: "documentGroup",
+            align: "center"
         },
         {
             title: getText("Document"),
@@ -56,7 +59,19 @@ const DocumentScheduleTable = (props) => {
         },
         {
             title: getText("Months"),
-            fieldName: "months"
+            fieldName: "months",
+            formatForDisplay: (val) => {
+                let retval = "";
+                if (val) {
+                    let comma = "";
+                    val.map(m => {
+                        retval += (comma + getText(MONTHS[m].substring(0, 3)));
+                        comma = ", ";
+                    });
+                }
+                
+                return retval;
+            }
         },
         {
             title: getText("Days of Month"),
@@ -64,11 +79,43 @@ const DocumentScheduleTable = (props) => {
         },
         {
             title: getText("Days of Week"),
-            fieldName: "daysOfWeek"
+            fieldName: "daysOfWeek",
+            formatForDisplay: (val) => {
+                let retval = "";
+                if (val) {
+                    let comma = "";
+                    val.map(d => {
+                        retval += (comma + getText(DAYS_OF_WEEK[d].substring(0, 3)));
+                        comma = ", ";
+                    });
+                }
+                
+                return retval;
+            }
         },
         {
             title: getText("Hours of Day"),
-            fieldName: "hoursOfDay"
+            fieldName: "hoursOfDay",
+            formatForDisplay: (val) => {
+                let retval = "";
+                if (val) {
+                    let comma = "";
+                    val.map(h => {
+                        if (h === 0) {
+                            retval += (comma + getText("midnight"));
+                        } else if (h === 12) {
+                            retval += (comma + getText("noon"));
+                        } else if (h < 12) {
+                            retval += (comma + h + "am");
+                        } else {
+                            retval += (comma + (h - 12) + "pm");
+                        }   
+                        comma = ", ";
+                    });
+                }
+                
+                return retval;
+            }
         },
         {
             title: getText("Attachment"),
@@ -95,7 +142,10 @@ const DocumentScheduleTable = (props) => {
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
         schedule.modified = true;
-        let sd = [...scheduledDocuments];
+        let sd = [];
+        if (scheduledDocuments && (scheduledDocuments.length > 0)) {
+            sd = [...scheduledDocuments];
+        }
 
         if (indx > -1) {
             sd[indx] = schedule;
@@ -135,6 +185,18 @@ const DocumentScheduleTable = (props) => {
         }
     };
 
+    const canSave = () => {
+        if (scheduledDocuments && (scheduledDocuments.length > 0)) {
+            for (let i = 0; i < scheduledDocuments.length; ++i) {
+                if (scheduledDocuments[i].modified) {
+                    return true;
+                }
+            }
+        } 
+        
+        return false;
+    };
+        
     return (
             <div className="static-modal">
                 <ScheduleEntryModal config={showDocumentSchedule}/>
@@ -160,7 +222,7 @@ const DocumentScheduleTable = (props) => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={e => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={e => onSave()}>{getText("Save")}</Button>
+                        <Button size="sm" variant="primary" disabled={!canSave()} type="submit" onClick={e => onSave()}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

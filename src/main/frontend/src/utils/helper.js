@@ -629,3 +629,7 @@ export const getParameterTypeFromId = (id) => {
 export const getCurrentSelectValue = (e) => {
     return e.target.options[e.target.selectedIndex].value;
 };
+
+
+export const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "Octorber", "November", "December"];
+export const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

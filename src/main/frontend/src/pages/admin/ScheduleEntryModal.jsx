@@ -19,6 +19,8 @@ import {
         RESULT_TYPE_CSV,
         RESULT_TYPE_JSON_FLAT,
         RESULT_TYPE_JSON_OBJECTGRAPH,
+        MONTHS,
+        DAYS_OF_WEEK,
         getCurrentSelectValue} from "../../utils/helper";
 
 import { getAvailableDocuments, isApiSuccess } from "../../utils/apiHelper";
@@ -31,87 +33,6 @@ const ScheduleEntryModal = (props) => {
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [toggle, setToggle] = useState(false);
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
-
-    const months = [
-        {
-            value: 0,
-            label: getText("January")
-        },
-        {
-            value: 1,
-            label: getText("February")
-        },
-        {
-            value: 2,
-            label: getText("March")
-        },
-        {
-            value: 3,
-            label: getText("April")
-        },
-        {
-            value: 4,
-            label: getText("May")
-        },
-        {
-            value: 5,
-            label: getText("June")
-        },
-        {
-            value: 6,
-            label: getText("July")
-        },
-        {
-            value: 7,
-            label: getText("August")
-        },
-        {
-            value: 8,
-            label: getText("September")
-        },
-        {
-            value: 9,
-            label: getText("October")
-        },
-        {
-            value: 10,
-            label: getText("November")
-        },
-        {
-            value: 11,
-            label: getText("December")
-        }
-    ];
-
-    const daysOfWeek = [
-        {
-            value: 0,
-            label: getText("Sunday")
-        },
-        {
-            value: 1,
-            label: getText("Monday")
-        },
-        {
-            value: 2,
-            label: getText("Tuesday")
-        },
-        {
-            value: 3,
-            label: getText("Wednesday")
-        },
-        {
-            value: 4,
-            label: getText("Thursday")
-        },
-        {
-            value: 5,
-            label: getText("Friday")
-        },
-        {
-            value: 6,
-            label: getText("Saturday")
-        }];
 
     const attachmentTypes = [
     {
@@ -130,6 +51,19 @@ const ScheduleEntryModal = (props) => {
         value: RESULT_TYPE_JSON_OBJECTGRAPH,
         label: getText(RESULT_TYPE_JSON_OBJECTGRAPH)
     }];
+
+
+    const getMonths = () => {
+        let retval = [];
+        MONTHS.map((m, indx) => retval.push({value: indx, label: getText(m)}));
+        return retval;
+    };
+    
+    const getDaysOfWeek = () => {
+        let retval = [];
+        DAYS_OF_WEEK.map((d, indx) => retval.push({value: indx, label: getText(d)}));
+        return retval;
+    };
 
     const multiSelectValueRenderer = (selected) => {
         if (selected.length > 0) {
@@ -191,7 +125,7 @@ const ScheduleEntryModal = (props) => {
         let retval = [];
         if (schedule && schedule.months) {
             schedule.months.map(m => {
-                retval.push(months[m]);
+                retval.push({value: m, label: getText(MONTHS[m])});
             });
         }
 
@@ -238,7 +172,7 @@ const ScheduleEntryModal = (props) => {
         let retval = [];
         if (schedule && schedule.daysOfWeek) {
             schedule.daysOfWeek.map(d => {
-                retval.push(daysOfWeek[d]);
+                retval.push({value: d, label: getText(DAYS_OF_WEEK[d])});
             });
         }
 
@@ -383,13 +317,13 @@ const ScheduleEntryModal = (props) => {
                     <Modal.Body>
                         <div className="entrygrid-120-375">
                             <div title={getText("Select Document")} className="label">{getText("Document:")}</div>
-                            <div style={{whiteSpace: "nowrap"}}>
+                            <div style={{whiteSpace: "nowrap", height: "30px", border: "solid 1px darkslategray"}}>
                                 <FcDocument className="icon" size={SMALL_ICON_SIZE} onClick={e => onShowDocumentSelect()}/>
-                                <input type="text" readOnly={true} size={43} value={getSelectedDocument()}/>
+                                {getSelectedDocument()}
                             </div>
                             <div className="label">{getText("Months:")}</div>
                             <div style={{width: "50%"}}>
-                                <MultiSelect options={months} value={getSelectedMonths()} onChange={selections => setMonths(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
+                                <MultiSelect options={getMonths()} value={getSelectedMonths()} onChange={selections => setMonths(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Days of Month:")}</div>
                             <div style={{width: "50%"}}>
@@ -397,7 +331,7 @@ const ScheduleEntryModal = (props) => {
                             </div>
                             <div className="label">{getText("Day of Week:")}</div>
                             <div  style={{width: "50%"}}>
-                                <MultiSelect options={daysOfWeek} disabled={isDaysOfWeekDisabled()} value={getSelectedDaysOfWeek()} onChange={selections => setDaysOfWeek(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
+                                <MultiSelect options={getDaysOfWeek()} disabled={isDaysOfWeekDisabled()} value={getSelectedDaysOfWeek()} onChange={selections => setDaysOfWeek(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Hour:")}</div>
                             <div style={{width: "50%"}}>

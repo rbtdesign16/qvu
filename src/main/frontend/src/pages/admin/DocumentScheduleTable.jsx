@@ -41,8 +41,10 @@ const DocumentScheduleTable = (props) => {
 
     const columnDefs = [
         {
+            hstyle: {left: 0, position: "sticky"},
+            style: {textAlign: "center", left: 0, position: "sticky"},
             render: (rownum, row) => {
-                return <div style={{textAlign: "center"}}>
+                return <div>
                     <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => editSchedule(rownum)} /></span>
                     <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => deleteSchedule(rownum)} /></span>
                 </div>;
@@ -51,7 +53,7 @@ const DocumentScheduleTable = (props) => {
         {
             title: getText("Group"),
             fieldName: "documentGroup",
-            align: "center"
+            style: {textAlign: "center"}
         },
         {
             title: getText("Document"),

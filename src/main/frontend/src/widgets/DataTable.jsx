@@ -4,24 +4,33 @@ import PropTypes from "prop-types";
 const DataTable = (props) => {
     const {columnDefs, containerClass, headerClass, bodyClass, data} = props;
     const getHeader = () => {
-        return columnDefs.map(h => <div>{h.title}</div>);
+         return columnDefs.map(c => {
+            let myStyle = {};
+            if (c.hstyle) {
+                myStyle = c.hstyle;
+            }
+           
+            return <div style={myStyle}>{c.title}</div>;
+        });
     };
 
     const getColumns = (rownum, row) => {
         return columnDefs.map(c => {
             let myStyle = {};
-            if (c.align) {
-                myStyle.textAlign = c.align;
+            if (c.style) {
+                myStyle = c.style;
             }
             
             if (c.fieldName) {
                 if (c.formatForDisplay) {
                     return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
+                } else if (Array.isArray(row[c.fieldName])) {
+                    return <div style={myStyle}>{row[c.fieldName].join(",")}</div>;
                 } else {
                     return <div style={myStyle}>{row[c.fieldName]}</div>;
                 }
             } else if (c.render) {
-                return c.render(rownum, row);
+                return <div style={myStyle}>{c.render(rownum, row)}</div>;
             } else {
                 return <div></div>;
             }

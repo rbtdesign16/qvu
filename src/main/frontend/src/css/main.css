@@ -371,15 +371,21 @@ select {
 }
 
 .schedule-modal {
-    left: 10px;
-    top: 10px;
-    min-width: 1275px;
+    left: 5px;
+    top: 5px;
+    min-width: 95%;
+    overflow-x: auto;
+    overflow-y: hidden
 }
 
 
 
 .schedule-table {
     border: solid 1px darkslategray;
+    width: 100%;
+    height: 300px;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .schedule-table-body {
@@ -387,7 +393,7 @@ select {
     grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 150px 250px;
 };
 
-.schedule-table-body div {
+.schedule-table-body-item {
     border-right: solid 1px darkslategray;
     border-bottom: solid 1px darkslategray;
     overflow: hidden;
@@ -396,13 +402,13 @@ select {
 .schedule-table-hdr {
     display: grid;
     text-align: center;
-    background-color: var(--query-results-table-hdr-data-bkcolor);
     grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 150px 250px;
 } 
 
-.schedule-table-hdr>div {
+.schedule-table-hdr > div {
     border-right: solid 1px darkslategray;
     border-bottom: solid 1px darkslategray;
+    background-color: var(--query-results-table-hdr-data-bkcolor);
 }
 
 .p-splitter-panel {

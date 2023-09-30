@@ -960,10 +960,11 @@ const Admin = () => {
     
     const saveSchedules = async (schedules) => {
         try {
+            hideScheduleTable();
             showMessage(INFO, getText("Saving schedules..."), null, true);
             let res = await saveDocumentSchedules(schedules);
             if (isApiError(res)) {
-                showMessage(ERROR, res.messahe);
+                showMessage(ERROR, res.message);
             } else {
                 showMessage(SUCCESS, getText("Schedules saved"));
             }

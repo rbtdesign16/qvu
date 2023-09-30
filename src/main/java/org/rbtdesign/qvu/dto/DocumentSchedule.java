@@ -16,7 +16,6 @@ public class DocumentSchedule {
     private String documentName;
     private String documentGroup;
     private String attachmentType;
-    private boolean modified = false;
     private List<String> emailAddresses = new ArrayList<>();
 
     public List<Integer> getMonths() {
@@ -90,14 +89,5 @@ public class DocumentSchedule {
     public void setAttachmentType(String attachmentType) {
         this.attachmentType = attachmentType;
     }
-
-    public boolean isModified() {
-        return modified;
-    }
-
-    public void setModified(boolean modified) {
-        this.modified = modified;
-    }
-
 
 }

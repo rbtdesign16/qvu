@@ -32,21 +32,14 @@ const DocumentScheduleTable = (props) => {
         showHelp(getText("scheduleEntry-help"));
     };
 
-
-    const editSchedule = (indx) => {
-    };
-
-    const deleteSchedule = (indx) => {
-    };
-
     const columnDefs = [
         {
             hstyle: {position: "sticky", left: 0},
             style: {textAlign: "center", position: "sticky", left: 0},
             render: (rownum, row) => {
                 return <div>
-                    <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => editSchedule(rownum)} /></span>
-                    <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => deleteSchedule(rownum)} /></span>
+                    <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => onEdit(rownum)} /></span>
+                    <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => onDelete(rownum)} /></span>
                 </div>;
             }
         },
@@ -143,12 +136,14 @@ const DocumentScheduleTable = (props) => {
 
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
-        schedule.modified = true;
         let sd = {documentSchedules: []};
+        
         if (scheduledDocuments && scheduledDocuments.documentSchedules && (scheduledDocuments.documentSchedules.length > 0)) {
-            sd = [...scheduledDocuments];
+            sd = {...scheduledDocuments};
         }
 
+        sd.modified = true;
+        
         if (indx > -1) {
             sd.documentSchedules[indx] = schedule;
         } else {
@@ -167,6 +162,15 @@ const DocumentScheduleTable = (props) => {
         setShowDocumentSchedule({show: true, indx: indx, schedule: {...scheduledDocuments.documentSchedules[indx]}, saveSchedule: saveSchedule, hide: hideSchedule});
     };
 
+    const onDelete = async (indx) => {
+        if (await confirm(getText("Delete schedule?"))) {
+            let s = {...scheduledDocuments};
+            s.modified = true;
+            s.documentSchedules.splice(indx, 1);
+            setScheduledDocuments(s);
+        }
+    };
+    
     const onShow = async () => {
         showMessage(INFO, getText("Loading scheduled documents", "..."), null, true);
         let res = await loadDocumentSchedules();
@@ -180,15 +184,7 @@ const DocumentScheduleTable = (props) => {
     };
 
     const canSave = () => {
-        if (scheduledDocuments && scheduledDocuments.documentSchedules && (scheduledDocuments.documentSchedules.length > 0)) {
-            for (let i = 0; i < scheduledDocuments.documentSchedules.length; ++i) {
-                if (scheduledDocuments.documentSchedules[i].modified) {
-                    return true;
-                }
-            }
-        } 
-        
-        return false;
+        return (scheduledDocuments && scheduledDocuments.modified);
     };
         
     return (

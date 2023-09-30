@@ -10,6 +10,7 @@ import org.rbtdesign.qvu.dto.DocumentSchedule;
  */
 public class DocumentSchedulesConfiguration {
     private long lastUpdated;
+    private boolean modified;
     
     private List<DocumentSchedule> documentSchedules = new ArrayList<>();
 
@@ -28,4 +29,14 @@ public class DocumentSchedulesConfiguration {
     public void setLastUpdated(long lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
+    
+    
 }

@@ -999,9 +999,9 @@ public class FileHandler {
             File f = new File(config.getDocumentSchedulesConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
-                DocumentSchedulesConfiguration dg = gson.fromJson(new String(bytes), DocumentSchedulesConfiguration.class);
+                DocumentSchedulesConfiguration ds = gson.fromJson(new String(bytes), DocumentSchedulesConfiguration.class);
 
-                if (dg != null) {
+                if (ds != null) {
                     if (docschedules.getLastUpdated() > config.getDocumentSchedulesConfig().getLastUpdated()) {
                         retval.setErrorCode(Errors.RECORD_UPDATED);
                         retval.setMessage(Errors.getMessage(retval.getErrorCode(), new String[]{"document schedules"}));
@@ -1010,6 +1010,7 @@ public class FileHandler {
             }
 
             if (retval.isSuccess()) {
+                docschedules.setLastUpdated(System.currentTimeMillis());
                 try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                     fos.write(getGson(true).toJson(docschedules).getBytes());
                     config.setDocumentSchedulesConfig(docschedules);

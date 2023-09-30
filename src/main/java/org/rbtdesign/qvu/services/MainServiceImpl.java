@@ -2222,11 +2222,7 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules) {
         Collections.sort(schedules.getDocumentSchedules(), new DocumentScheduleComparator());
-        for (DocumentSchedule ds : schedules.getDocumentSchedules()) {
-            ds.setModified(false);
-        }
-        
-        schedules.setLastUpdated(System.currentTimeMillis());
+        schedules.setModified(false);
         OperationResult retval = fileHandler.saveDocumentSchedules(schedules);
         if (retval.isSuccess()) {
             config.setDocumentSchedulesConfig(schedules);

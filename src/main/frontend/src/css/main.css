@@ -380,35 +380,21 @@ select {
 
 
 
-.schedule-table {
-    border: solid 1px darkslategray;
-    width: 100%;
+.schedule-table-cont {
     height: 300px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    width: 100%;
+    overflow: auto;
+    border: var(--query-results-table-border);
 }
 
-.schedule-table-body {
+.schedule-table {
     display: grid;
     grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 150px 250px;
-};
-
-.schedule-table-body-item {
-    border-right: solid 1px darkslategray;
-    border-bottom: solid 1px darkslategray;
-    overflow: hidden;
 }
 
-.schedule-table-hdr {
-    display: grid;
-    text-align: center;
-    grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 150px 250px;
-} 
-
-.schedule-table-hdr > div {
-    border-right: solid 1px darkslategray;
-    border-bottom: solid 1px darkslategray;
-    background-color: var(--query-results-table-hdr-data-bkcolor);
+.schedule-table > div {
+    outline: var(--query-results-table-border);
+    background-color: var(--default-background-color);
 }
 
 .p-splitter-panel {

@@ -6,6 +6,7 @@ import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -92,7 +93,10 @@ public interface MainService {
     
     public OperationResult<String> doBackup();
     
-    public OperationResult<List<DocumentSchedule>> getDocumentSchedules();
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules();
     
     public void sendEmail(ScheduledDocument docinfo, Object result);
+    
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules);
+
 }

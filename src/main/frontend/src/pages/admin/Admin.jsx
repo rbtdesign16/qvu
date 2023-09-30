@@ -49,7 +49,8 @@ import {
     loadDatasourceTableNames,
     getSecurityConfig,
     saveSystemSettings,
-    backupRepository} from "../../utils/apiHelper";
+    backupRepository,
+    saveDocumentSchedules} from "../../utils/apiHelper";
 import {
     isAdministrator,
     isQueryDesigner,
@@ -957,7 +958,22 @@ const Admin = () => {
         setShowScheduleTable({show: false});
     };
     
-    const saveSchedules = (schedules) => {
+    const saveSchedules = async (schedules) => {
+        try {
+            showMessage(INFO, getText("Saving schedules..."), null, true);
+            let res = await saveDocumentSchedules(schedules);
+            if (isApiError(res)) {
+                showMessage(ERROR, res.messahe);
+            } else {
+                showMessage(SUCCESS, getText("Schedules saved"));
+            }
+        }
+        
+        catch (e) {
+            showMessage(ERROR, e);
+        }
+                
+        
     }
     
     const onShowScheduleTable = () => {

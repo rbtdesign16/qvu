@@ -1,15 +1,26 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { isNotEmpty } from "../utils/helper";
 
 const DataTable = (props) => {
-    const {columnDefs, containerClass, headerClass, bodyClass, data} = props;
+    const {columnDefs, className, data} = props;
     const getHeader = () => {
-         return columnDefs.map(c => {
-            let myStyle = {};
+        let style = getComputedStyle(document.documentElement);
+        return columnDefs.map(c => {
+            let myStyle = {
+                top: 0,
+                position: "sticky",
+                zIndex: 100,
+                textAlign: "center",
+                backgroundColor: style.getPropertyValue('--query-results-table-hdr-data-bkcolor')
+            };
+
             if (c.hstyle) {
-                myStyle = c.hstyle;
+                for (let p in c.hstyle) {
+                    myStyle[p] = c.hstyle[p];
+                }
             }
-           
+
             return <div style={myStyle}>{c.title}</div>;
         });
     };
@@ -20,7 +31,8 @@ const DataTable = (props) => {
             if (c.style) {
                 myStyle = c.style;
             }
-            
+
+
             if (c.fieldName) {
                 if (c.formatForDisplay) {
                     return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
@@ -48,9 +60,11 @@ const DataTable = (props) => {
     };
 
     return (
-            <div className={containerClass}>
-                <div className={headerClass}>{getHeader()}</div>
-                <div className={bodyClass}>{getBody()}</div>
+            <div className={className + "-cont"}>
+                <div className={className}>
+                    {getHeader()}
+                    {getBody()}
+                </div>
             </div>);
 };
 

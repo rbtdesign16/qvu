@@ -81,6 +81,7 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.rbtdesign.qvu.client.utils.SecurityService;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.BasicConfiguration;
 import org.rbtdesign.qvu.configuration.security.OidcConfiguration;
 import org.rbtdesign.qvu.dto.AuthConfig;
@@ -2034,14 +2035,9 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
-        OperationResult<List<DocumentSchedule>> retval = new OperationResult<>();
-
-        List<DocumentSchedule> sched = config.getDocumentSchedulesConfig().getDocumentSchedules();
-
-        Collections.sort(sched, new DocumentScheduleComparator());
-
-        retval.setResult(sched);
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules() {
+        OperationResult<DocumentSchedulesConfiguration> retval = new OperationResult<>();
+        retval.setResult(config.getDocumentSchedulesConfig());
 
         return retval;
     }
@@ -2222,4 +2218,21 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
+    
+    @Override
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules) {
+        Collections.sort(schedules.getDocumentSchedules(), new DocumentScheduleComparator());
+        for (DocumentSchedule ds : schedules.getDocumentSchedules()) {
+            ds.setModified(false);
+        }
+        
+        schedules.setLastUpdated(System.currentTimeMillis());
+        OperationResult retval = fileHandler.saveDocumentSchedules(schedules);
+        if (retval.isSuccess()) {
+            config.setDocumentSchedulesConfig(schedules);
+        }
+        
+        return retval;
+    }
+
 }

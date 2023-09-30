@@ -466,3 +466,15 @@ export const loadDocumentSchedules = async () => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
+
+export const saveDocumentSchedules = async (schedules) => {
+        try {
+        let res = await axios.post(getApiURL() + "/admin/document/schedules/save", schedules, hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};

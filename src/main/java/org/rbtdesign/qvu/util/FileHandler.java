@@ -996,10 +996,10 @@ public class FileHandler {
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration docschedules) {
         OperationResult retval = new OperationResult();
         try {
-            File f = new File(config.getDocumentGroupsConfigurationFileName());
+            File f = new File(config.getDocumentSchedulesConfigurationFileName());
             try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                 byte[] bytes = fis.readAllBytes();
-                DocumentGroupsConfiguration dg = gson.fromJson(new String(bytes), DocumentGroupsConfiguration.class);
+                DocumentSchedulesConfiguration dg = gson.fromJson(new String(bytes), DocumentSchedulesConfiguration.class);
 
                 if (dg != null) {
                     if (docschedules.getLastUpdated() > config.getDocumentSchedulesConfig().getLastUpdated()) {

@@ -16,6 +16,7 @@ import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -355,8 +356,15 @@ public class MainController {
     }
     
     @GetMapping("api/v1/admin/document/schedules")
-    public OperationResult<List<DocumentSchedule>> getDocumentSchedules() {
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules() {
         LOG.debug("in getDocumentSchedules()");
         return service.getDocumentSchedules();
     }
+    
+    @PostMapping("api/v1/admin/document/schedules/save")
+    public OperationResult saveDocumentSchedules(@RequestBody DocumentSchedulesConfiguration schedules) {
+        LOG.debug("in saveDocumentSchedules()");
+        return service.saveDocumentSchedules(schedules);
+    }
+
 }

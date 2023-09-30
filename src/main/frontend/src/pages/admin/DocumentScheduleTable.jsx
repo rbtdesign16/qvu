@@ -41,8 +41,8 @@ const DocumentScheduleTable = (props) => {
 
     const columnDefs = [
         {
-            hstyle: {left: 0, position: "sticky"},
-            style: {textAlign: "center", left: 0, position: "sticky"},
+            hstyle: {position: "sticky", left: 0},
+            style: {textAlign: "center", position: "sticky", left: 0},
             render: (rownum, row) => {
                 return <div>
                     <span title={getText("Edit Schedule")}><CiEdit className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => editSchedule(rownum)} /></span>
@@ -134,7 +134,7 @@ const DocumentScheduleTable = (props) => {
     };
 
     const onSave = () => {
-        config.save();
+        config.save(scheduledDocuments);
     };
 
     const hideSchedule = () => {
@@ -144,15 +144,15 @@ const DocumentScheduleTable = (props) => {
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
         schedule.modified = true;
-        let sd = [];
-        if (scheduledDocuments && (scheduledDocuments.length > 0)) {
+        let sd = {documentSchedules: []};
+        if (scheduledDocuments && scheduledDocuments.documentSchedules && (scheduledDocuments.documentSchedules.length > 0)) {
             sd = [...scheduledDocuments];
         }
 
         if (indx > -1) {
-            sd[indx] = schedule;
+            sd.documentSchedules[indx] = schedule;
         } else {
-            sd.push(schedule);
+            sd.documentSchedules.push(schedule);
         }
 
         setShowDocumentSchedule({show: false});
@@ -164,7 +164,7 @@ const DocumentScheduleTable = (props) => {
     };
 
     const onEdit = (indx) => {
-        setShowDocumentSchedule({show: true, indx: indx, schedule: {...scheduledDocuments[indx]}, saveSchedule: saveSchedule, hide: hideSchedule});
+        setShowDocumentSchedule({show: true, indx: indx, schedule: {...scheduledDocuments.documentSchedules[indx]}, saveSchedule: saveSchedule, hide: hideSchedule});
     };
 
     const onShow = async () => {
@@ -173,24 +173,16 @@ const DocumentScheduleTable = (props) => {
 
         if (isApiSuccess(res)) {
             hideMessage();
-            setScheduledDocuments(res);
+            setScheduledDocuments(res.result);
         } else {
             showMessage(ERROR, res.message);
         }
     };
 
-    const loadScheduledDocuments = () => {
-        if (scheduledDocuments) {
-            return "";
-        } else {
-            return "";
-        }
-    };
-
     const canSave = () => {
-        if (scheduledDocuments && (scheduledDocuments.length > 0)) {
-            for (let i = 0; i < scheduledDocuments.length; ++i) {
-                if (scheduledDocuments[i].modified) {
+        if (scheduledDocuments && scheduledDocuments.documentSchedules && (scheduledDocuments.documentSchedules.length > 0)) {
+            for (let i = 0; i < scheduledDocuments.documentSchedules.length; ++i) {
+                if (scheduledDocuments.documentSchedules[i].modified) {
                     return true;
                 }
             }
@@ -214,13 +206,11 @@ const DocumentScheduleTable = (props) => {
                             &nbsp;&nbsp;{getText("Scheduled Documents") }</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div title={getText("Add Schedule")}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" onClick={e => onAdd()}/>{getText("Add Schedule")}</div>
+                        <div title={getText("Add Schedule")} style={{cursor: "pointer"}} onClick={e => onAdd()}><MdOutlineAddBox size={SMALL_ICON_SIZE} className="icon cloverGreen-f" />{getText("Add Schedule")}</div>
                         <DataTable 
                             columnDefs={columnDefs} 
-                            containerClass="schedule-table" 
-                            headerClass="schedule-table-hdr" 
-                            bodyClass="schedule-table-body" 
-                            data={scheduledDocuments}/>
+                            className="schedule-table" 
+                            data={scheduledDocuments.documentSchedules}/>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={e => onHide() }>{getText("Cancel")}</Button>

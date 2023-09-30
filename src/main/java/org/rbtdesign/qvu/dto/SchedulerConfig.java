@@ -16,7 +16,6 @@ public class SchedulerConfig {
     private String mailSubject;
     private int maxSchedulerPoolSize;
     private int schedulerExecuteTimeoutSeconds;
-    private int schedulerFixedRateSeconds;
     private boolean enabled = false;
     private boolean modified = false;
     
@@ -107,14 +106,6 @@ public class SchedulerConfig {
 
     public void setSchedulerExecuteTimeoutSeconds(int schedulerExecuteTimeoutSeconds) {
         this.schedulerExecuteTimeoutSeconds = schedulerExecuteTimeoutSeconds;
-    }
-
-    public int getSchedulerFixedRateSeconds() {
-        return schedulerFixedRateSeconds;
-    }
-
-    public void setSchedulerFixedRateSeconds(int schedulerFixedRateSeconds) {
-        this.schedulerFixedRateSeconds = schedulerFixedRateSeconds;
     }
 
     public boolean isEnabled() {

@@ -197,14 +197,6 @@ const SystemSetup = (props) => {
                     helpText: getText("schedulerExecuteTimeoutSeconds-help")
                 },
                 {
-                    label: getText("Polling Interval Seconds"),
-                    name: "schedulerFixedRateSeconds",
-                    type: "number",
-                    required: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("schedulerFixedRateSeconds-help")
-                },
-                {
                     label: getText("Enable Scheduler"),
                     name: "schedulerEnabled",
                     type: "checkbox",

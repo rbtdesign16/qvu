@@ -89,7 +89,6 @@ import org.rbtdesign.qvu.dto.Column;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
-import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.SchedulerConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
@@ -1979,7 +1978,6 @@ public class MainServiceImpl implements MainService {
         retval.setMaxSchedulerPoolSize(maxSchedulerPoolSize);
         retval.setEnabled(schedulerEnabled);
         retval.setSchedulerExecuteTimeoutSeconds(schedulerExecuteTimeoutSeconds);
-        retval.setSchedulerFixedRateSeconds(schedulerFixedRateSeconds);
 
         return retval;
     }
@@ -2042,7 +2040,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{60}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
+    @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{30}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
     public void runScheduledJobs() throws InterruptedException {
         if (schedulerEnabled) {
             ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);

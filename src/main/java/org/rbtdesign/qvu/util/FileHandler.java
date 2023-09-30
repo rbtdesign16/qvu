@@ -886,9 +886,6 @@ public class FileHandler {
                     case Constants.SCHEDULER_ENABLED_PROPERTY:
                         value = "" + schedulerConfig.isEnabled();
                         break;
-                    case Constants.SCHEDULER_FIXED_RATE_SECONDS_PROPERTY:
-                        value = "" + schedulerConfig.getSchedulerFixedRateSeconds();
-                        break;
                     case Constants.SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY:
                         value = "" + schedulerConfig.getMaxSchedulerPoolSize();
                         break;

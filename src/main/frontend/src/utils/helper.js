@@ -633,3 +633,21 @@ export const getCurrentSelectValue = (e) => {
 
 export const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "Octorber", "November", "December"];
 export const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+export const arraysEqual = (a1, a2) => {
+    if (!a1 && !a2) {
+        return true;
+    } else if (a1 && a2 && (a1.length === a2.length)) {
+        a1.sort();
+        a2.sort();
+        
+        for (let i = 0; i < a1.length; ++i) {
+            if (a1[i] !== a2[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+        
+};

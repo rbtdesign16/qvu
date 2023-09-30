@@ -18,7 +18,8 @@ import {
     getUUID,
     CUSTOM_FK_DATA_SEPARATOR,
     MONTHS,
-    DAYS_OF_WEEK} from "../../utils/helper";
+    DAYS_OF_WEEK,
+    arraysEqual} from "../../utils/helper";
 import { loadDocumentSchedules, isApiSuccess } from "../../utils/apiHelper";
 
 const DocumentScheduleTable = (props) => {
@@ -113,8 +114,12 @@ const DocumentScheduleTable = (props) => {
             }
         },
         {
+            style: {textAlign: "center"},
             title: getText("Attachment"),
-            fieldName: "attachmentType"
+            fieldName: "attachmentType",
+            formatForDisplay: (val) => {
+                return getText(val);
+            }
         },
         {
             title: getText("Email(s)"),
@@ -133,25 +138,80 @@ const DocumentScheduleTable = (props) => {
     const hideSchedule = () => {
         setShowDocumentSchedule({show: false});
     };
+    
+    const checkForDuplicateSchedule = (schedule, schedules) => {
+        for (let i = 0; i < schedules.length; ++i) {
+            if (schedule.documentGroup === schedules[i].documentGroup) {
+                if (schedule.documentName === schedules[i].documentName) {
+                    if (schedule.attachmentType === schedules[i].attachmentType) {
+                        if (arraysEqual(schedule.months, schedules[i].months)) {
+                            if (arraysEqual(schedule.daysOfMonth, schedules[i].daysOfMonth)) {
+                                if (arraysEqual(schedule.daysOfWeek, schedules[i].daysOfWeek)) {
+                                    if (arraysEqual(schedule.hoursOfDay, schedules[i].hoursOfDay)) {
+                                        return schedules[i];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
+        
+        if (schedule.months) {
+            schedule.months.sort();
+        }
+        
+        if (schedule.daysOfWeek) {
+            schedule.daysOfWeek.sort();
+        }
+        
+        if (schedule.daysOfMonth) {
+            schedule.daysOfMonth.sort();
+        }
+        
+        if (schedule.hoursOfDay) {
+            schedule.hoursOfDay.sort();
+        }
+        
         let sd = {documentSchedules: []};
         
-        if (scheduledDocuments && scheduledDocuments.documentSchedules && (scheduledDocuments.documentSchedules.length > 0)) {
+        if (scheduledDocuments 
+                && scheduledDocuments.documentSchedules 
+                && (scheduledDocuments.documentSchedules.length > 0)) {
             sd = {...scheduledDocuments};
         }
 
-        sd.modified = true;
         
-        if (indx > -1) {
-            sd.documentSchedules[indx] = schedule;
+        let dup = checkForDuplicateSchedule(schedule, sd.documentSchedules);
+        
+        
+        if (!dup) {
+            sd.modified = true;
+
+            if (indx > -1) {
+                sd.documentSchedules[indx] = schedule;
+            } else {
+                sd.documentSchedules.push(schedule);
+            }
         } else {
-            sd.documentSchedules.push(schedule);
+            let emails = new Set();
+            dup.emailAddresses.map(e => emails.add(e));
+            schedule.emailAddresses.map(e => emails.add(e));
+            dup.emailAddresses = Array.from(emails);
+            dup.modified = true;
         }
 
         setShowDocumentSchedule({show: false});
         setScheduledDocuments(sd);
+        
+        if (dup) {
+            showMessage(INFO, getText("duplicate-schedule-message"));
+        }
     };
 
     const onAdd = () => {

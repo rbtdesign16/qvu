@@ -103,6 +103,7 @@
         "Document:": "Document:",
         "Duplicate entry": "Duplicate entry",
         "Duplicate name exists:": "Duplicate name exists:",
+        "duplicate-schedule-message": "The entered schedule is a duplicate of an existing schedule with the exception of the email addresses - the new email addresses will be added to the existing schedule.",
         "Edit datasource": "Edit datasource",
         "Edit role": "Edit role",
         "Edit role": "Edit role",

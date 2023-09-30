@@ -37,7 +37,7 @@ const DataTable = (props) => {
                 if (c.formatForDisplay) {
                     return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
                 } else if (Array.isArray(row[c.fieldName])) {
-                    return <div style={myStyle}>{row[c.fieldName].join(",")}</div>;
+                    return <div style={myStyle}>{row[c.fieldName].join(", ")}</div>;
                 } else {
                     return <div style={myStyle}>{row[c.fieldName]}</div>;
                 }

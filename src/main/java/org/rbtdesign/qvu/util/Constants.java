@@ -139,5 +139,7 @@ public class Constants {
     public static final String RESULT_TYPE_JSON_FLAT = "jsonflat";
     public static final String RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
     
+    public static final String CURRENT_DATE_PLACEHOLDER = "$dt";
+    
     
 }

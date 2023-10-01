@@ -50,6 +50,7 @@ export const NODE_TYPE_IMPORTED_FOREIGNKEY = "ifk";
 export const NODE_TYPE_EXPORTED_FOREIGNKEY = "efk";
 
 export const JDBC_TYPE_TINYINT = -6;
+export const JDBC_TYPE_BIT = -7;
 export const JDBC_TYPE_SMALLINT = 5;
 export const JDBC_TYPE_INTEGER = 4;
 export const JDBC_TYPE_BIGINT = -5;
@@ -356,6 +357,7 @@ export const getAggregateFunctionsByDataType = (dataType) => {
 
 export const isDataTypeNumeric = (type) => {
     return ((type === JDBC_TYPE_TINYINT)
+            || (type === JDBC_TYPE_BIT)
             || (type === JDBC_TYPE_SMALLINT)
             || (type === JDBC_TYPE_INTEGER)
             || (type === JDBC_TYPE_BIGINT)

@@ -21,7 +21,6 @@ import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
-import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;

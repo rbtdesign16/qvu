@@ -99,12 +99,12 @@ import org.rbtdesign.qvu.dto.ForeignKeySettings;
 import org.rbtdesign.qvu.dto.MiscConfig;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
-import org.rbtdesign.qvu.dto.QueryParameter;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.ScheduledDocument;
+import org.rbtdesign.qvu.dto.SqlFilterColumn;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.dto.SystemSettings;
@@ -1355,6 +1355,18 @@ public class MainServiceImpl implements MainService {
             return retval;
         }
     }
+    
+    private String getDateFromPlaceholder(String ph) {
+        Calendar c = Calendar.getInstance();
+        
+        String offset = ph.replace(Constants.CURRENT_DATE_PLACEHOLDER, "").replace(" ", "");
+        if (StringUtils.isNotEmpty(ph)) {
+            c.add(Calendar.DATE, Integer.parseInt(offset));
+        }
+        
+        return Constants.DATE_FORMAT.format(c.getTime());
+    }
+        
 
     @Override
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
@@ -1374,9 +1386,28 @@ public class MainServiceImpl implements MainService {
             if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 stmt = ps;
-                for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
-                    QueryParameter p = runWrapper.getParameters().get(i);
-                    ps.setObject(i + 1, p.getValue(), dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
+                int pindx = 0;
+                for (SqlFilterColumn f : runWrapper.getDocument().getFilterColumns()) {
+                    if (StringUtils.isEmpty(f.getComparisonValue())) {
+                        String p = runWrapper.getParameters().get(pindx);
+                        if ((p != null) 
+                            && dbHelper.isDataTypeDateTime(f.getDataType()) 
+                            && p.contains(Constants.CURRENT_DATE_PLACEHOLDER)) {
+                            p = getDateFromPlaceholder(p);
+                        }
+                        
+                        if (dbHelper.isDataTypeNumeric(f.getDataType())) {
+                            Double d = Double.valueOf(p);
+                            if (dbHelper.isDataTypeFloat(f.getDataType())) {
+                                ps.setObject(pindx + 1, d, f.getDataType());
+                            } else {
+                                ps.setObject(pindx + 1, d.intValue(), f.getDataType());
+                            } 
+                        } else {
+                            ps.setString(pindx + 1, p);
+                        }
+                        pindx++;
+                    }
                 }
                 res = ps.executeQuery();
             } else {

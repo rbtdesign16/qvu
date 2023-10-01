@@ -2146,6 +2146,7 @@ public class MainServiceImpl implements MainService {
                                 doc.setGroup(ds.getDocumentGroup());
                                 doc.setEmailAddresses(ds.getEmailAddresses());
                                 doc.setResultType(ds.getAttachmentType());
+                                doc.setParameters(ds.getParameters());
                                 docs.add(doc);
                             }
                         }

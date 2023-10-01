@@ -30,6 +30,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,6 +90,7 @@ import org.rbtdesign.qvu.dto.Column;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.SchedulerConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
@@ -180,8 +182,7 @@ public class MainServiceImpl implements MainService {
     @Value("${scheduler.execute.timeout.seconds:120}")
     private int schedulerExecuteTimeoutSeconds;
 
-    @Value("${scheduler.fixed.rate.seconds:30}")
-    private int schedulerFixedRateSeconds;
+    private List<ScheduledDocument> scheduledDocuments = null;
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
@@ -2040,32 +2041,90 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    private boolean isLoadScheduledDocumentsRequired() {
+        boolean retval = false;
+        
+        if (scheduledDocuments == null) {
+            Calendar c = Calendar.getInstance();
+            
+            int min = c.get(Calendar.MINUTE);
+            
+            retval = ((min > 54) && (min <= 59));
+        }
+        
+        return retval;
+    }
+    
+    private boolean isExecuteScheduledDocumentsRequired() {
+        boolean retval = false;
+        
+        if (scheduledDocuments != null) {
+            Calendar c = Calendar.getInstance();
+            retval = (c.get(Calendar.MINUTE) >= 0);
+        }
+        
+        return retval;
+    }
+            
     @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{30}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
     public void runScheduledJobs() throws InterruptedException {
         if (schedulerEnabled) {
-            ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
-            for (ScheduledDocument docinfo : getScheduledDocuments()) {
-                OperationResult<QueryDocument> dres = getDocument(Constants.DOCUMENT_TYPE_QUERY, docinfo.getGroup(), docinfo.getDocument());
-                if (dres.isSuccess()) {
-                    executor.execute(new QueryRunner(docinfo));
-                }
+            if (isLoadScheduledDocumentsRequired()) {
+                loadScheduledDocuments();
             }
+            
+            if (isExecuteScheduledDocumentsRequired()) {
+                List<ScheduledDocument> docs = new ArrayList(scheduledDocuments);
+                scheduledDocuments = null;
+                ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
+                for (ScheduledDocument docinfo : docs) {
+                    OperationResult<QueryDocument> dres = getDocument(Constants.DOCUMENT_TYPE_QUERY, docinfo.getGroup(), docinfo.getDocument());
+                    if (dres.isSuccess()) {
+                        executor.execute(new QueryRunner(docinfo));
+                    }
+                }
 
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(schedulerExecuteTimeoutSeconds, TimeUnit.SECONDS)) {
+                executor.shutdown();
+                try {
+                    if (!executor.awaitTermination(schedulerExecuteTimeoutSeconds, TimeUnit.SECONDS)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
                     executor.shutdownNow();
                 }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
             }
         }
     }
 
-    private List<ScheduledDocument> getScheduledDocuments() {
-        List<ScheduledDocument> retval = new ArrayList<>();
-
-        return retval;
+    private void loadScheduledDocuments() {
+        List <DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
+        List <ScheduledDocument> docs = new ArrayList<>();
+        if (schedules != null) {
+            Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            c.add(Calendar.HOUR_OF_DAY, 1);
+            for (DocumentSchedule ds : schedules) {
+                if (ds.getMonths().isEmpty() 
+                        || ds.getMonths().contains(c.get(Calendar.MONTH))) {
+                    if (ds.getDaysOfMonth().isEmpty() 
+                            || ds.getDaysOfMonth().contains(c.get(Calendar.DAY_OF_MONTH))) {
+                        if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
+                            if (ds.getHoursOfDay().contains(hour)) {
+                                ScheduledDocument doc = new ScheduledDocument();
+                                doc.setDocument(ds.getDocumentName());
+                                doc.setGroup(ds.getDocumentGroup());
+                                doc.setEmailAddresses(ds.getEmailAddresses());
+                                doc.setResultType(ds.getAttachmentType());
+                                docs.add(doc);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            scheduledDocuments = new ArrayList(docs);
+        }
+            
     }
 
     @Override
@@ -2093,7 +2152,13 @@ public class MainServiceImpl implements MainService {
                 Message message = new MimeMessage(session);
                 message.setFrom(new InternetAddress(schConfig.getMailFrom()));
 
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(docinfo.getEmails()));
+                InternetAddress[] addresses = new InternetAddress[docinfo.getEmailAddresses().size()];
+                
+                for (int i = 0; i < addresses.length; ++i) {
+                    addresses[i] = new InternetAddress(docinfo.getEmailAddresses().get(i));
+                }
+                
+                message.setRecipients(Message.RecipientType.TO, addresses);
                 message.setSubject(schConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
 
                 BodyPart messageBodyPart = new MimeBodyPart();

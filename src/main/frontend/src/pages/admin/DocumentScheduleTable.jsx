@@ -10,16 +10,16 @@ import { CiEdit } from 'react-icons/ci';
 import { MdOutlineDeleteForever, MdOutlineAddBox, MdHelpOutline } from 'react-icons/md';
 import PropTypes from "prop-types";
 import {
-    INFO,
-    ERROR,
-    SMALL_ICON_SIZE,
-    MODAL_TITLE_SIZE,
-    confirm,
-    getUUID,
-    CUSTOM_FK_DATA_SEPARATOR,
-    MONTHS,
-    DAYS_OF_WEEK,
-    arraysEqual} from "../../utils/helper";
+INFO,
+        ERROR,
+        SMALL_ICON_SIZE,
+        MODAL_TITLE_SIZE,
+        confirm,
+        getUUID,
+        CUSTOM_FK_DATA_SEPARATOR,
+        MONTHS,
+        DAYS_OF_WEEK,
+        arraysEqual} from "../../utils/helper";
 import { loadDocumentSchedules, isApiSuccess } from "../../utils/apiHelper";
 
 const DocumentScheduleTable = (props) => {
@@ -65,7 +65,7 @@ const DocumentScheduleTable = (props) => {
                         comma = ", ";
                     });
                 }
-                
+
                 return retval;
             }
         },
@@ -85,7 +85,7 @@ const DocumentScheduleTable = (props) => {
                         comma = ", ";
                     });
                 }
-                
+
                 return retval;
             }
         },
@@ -105,13 +105,17 @@ const DocumentScheduleTable = (props) => {
                             retval += (comma + h + "am");
                         } else {
                             retval += (comma + (h - 12) + "pm");
-                        }   
+                        }
                         comma = ", ";
                     });
                 }
-                
+
                 return retval;
             }
+        },
+        {
+            title: getText("Parameters"),
+            fieldName: "parameters"
         },
         {
             style: {textAlign: "center"},
@@ -138,17 +142,19 @@ const DocumentScheduleTable = (props) => {
     const hideSchedule = () => {
         setShowDocumentSchedule({show: false});
     };
-    
-    const checkForDuplicateSchedule = (schedule, schedules) => {
+
+    const checkForDuplicateSchedule = (schedule, indx, schedules) => {
         for (let i = 0; i < schedules.length; ++i) {
-            if (schedule.documentGroup === schedules[i].documentGroup) {
-                if (schedule.documentName === schedules[i].documentName) {
-                    if (schedule.attachmentType === schedules[i].attachmentType) {
-                        if (arraysEqual(schedule.months, schedules[i].months)) {
-                            if (arraysEqual(schedule.daysOfMonth, schedules[i].daysOfMonth)) {
-                                if (arraysEqual(schedule.daysOfWeek, schedules[i].daysOfWeek)) {
-                                    if (arraysEqual(schedule.hoursOfDay, schedules[i].hoursOfDay)) {
-                                        return schedules[i];
+            if (i !== indx) {
+                if (schedule.documentGroup === schedules[i].documentGroup) {
+                    if (schedule.documentName === schedules[i].documentName) {
+                        if (schedule.attachmentType === schedules[i].attachmentType) {
+                            if (arraysEqual(schedule.months, schedules[i].months)) {
+                                if (arraysEqual(schedule.daysOfMonth, schedules[i].daysOfMonth)) {
+                                    if (arraysEqual(schedule.daysOfWeek, schedules[i].daysOfWeek)) {
+                                        if (arraysEqual(schedule.hoursOfDay, schedules[i].hoursOfDay)) {
+                                            return schedules[i];
+                                        }
                                     }
                                 }
                             }
@@ -161,35 +167,35 @@ const DocumentScheduleTable = (props) => {
 
     const saveSchedule = (indx, schedule) => {
         schedule.newRecord = false;
-        
+
         if (schedule.months) {
             schedule.months.sort();
         }
-        
+
         if (schedule.daysOfWeek) {
             schedule.daysOfWeek.sort();
         }
-        
+
         if (schedule.daysOfMonth) {
             schedule.daysOfMonth.sort();
         }
-        
+
         if (schedule.hoursOfDay) {
             schedule.hoursOfDay.sort();
         }
-        
+
         let sd = {documentSchedules: []};
-        
-        if (scheduledDocuments 
-                && scheduledDocuments.documentSchedules 
+
+        if (scheduledDocuments
+                && scheduledDocuments.documentSchedules
                 && (scheduledDocuments.documentSchedules.length > 0)) {
             sd = {...scheduledDocuments};
         }
 
-        
-        let dup = checkForDuplicateSchedule(schedule, sd.documentSchedules);
-        
-        
+
+        let dup = checkForDuplicateSchedule(schedule, indx, sd.documentSchedules);
+
+
         if (!dup) {
             sd.modified = true;
 
@@ -208,7 +214,7 @@ const DocumentScheduleTable = (props) => {
 
         setShowDocumentSchedule({show: false});
         setScheduledDocuments(sd);
-        
+
         if (dup) {
             showMessage(INFO, getText("duplicate-schedule-message"));
         }
@@ -230,7 +236,7 @@ const DocumentScheduleTable = (props) => {
             setScheduledDocuments(s);
         }
     };
-    
+
     const onShow = async () => {
         showMessage(INFO, getText("Loading scheduled documents", "..."), null, true);
         let res = await loadDocumentSchedules();
@@ -246,7 +252,7 @@ const DocumentScheduleTable = (props) => {
     const canSave = () => {
         return (scheduledDocuments && scheduledDocuments.modified);
     };
-        
+
     return (
             <div className="static-modal">
                 <ScheduleEntryModal config={showDocumentSchedule}/>

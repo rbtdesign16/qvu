@@ -13,7 +13,7 @@ public class ScheduledDocument {
     private String document;
     private String resultType = Constants.RESULT_TYPE_CSV;
     private List<QueryParameter> parameters  = new ArrayList<>();
-    private String emails;
+    private List<String> emailAddresses = new ArrayList<>();
 
     public String getGroup() {
         return group;
@@ -39,21 +39,20 @@ public class ScheduledDocument {
         this.parameters = parameters;
     }
 
-    public String getEmails() {
-        return emails;
-    }
-
-    public void setEmails(String emails) {
-        this.emails = emails;
-    }
-
-
     public String getResultType() {
         return resultType;
     }
 
     public void setResultType(String resultType) {
         this.resultType = resultType;
+    }
+
+    public List<String> getEmailAddresses() {
+        return emailAddresses;
+    }
+
+    public void setEmailAddresses(List<String> emailAddresses) {
+        this.emailAddresses = emailAddresses;
     }
   
     

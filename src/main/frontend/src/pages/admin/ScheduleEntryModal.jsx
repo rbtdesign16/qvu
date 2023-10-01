@@ -251,6 +251,15 @@ const ScheduleEntryModal = (props) => {
         }
         setToggle(!toggle);
     };
+    
+    const setParameters = (input) => {
+        schedule.parameters = [];
+
+        if (input) {
+            schedule.parameters = input.split(",");
+        }
+        setToggle(!toggle);
+    };
 
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});
@@ -337,6 +346,7 @@ const ScheduleEntryModal = (props) => {
                             <div style={{width: "50%"}}>
                                 <MultiSelect options={getHoursOfDay()} value={getSelectedHoursOfDay()} onChange={selections => setHoursOfDay(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
+                            <div className="label">{getText("Parameters:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.parameters) ? schedule.parameters.join(",") : ""} onBlur={e => setParameters(e.target.value)}/></div>
                             <div className="label">{getText("Attachment:")}</div><div><select onChange={e => onAttachmentType(e)}><option value=""></option>{loadAttachmentTypes()}</select></div>
                             <div className="label">{getText("Emails:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.emailAddresses) ? schedule.emailAddresses.join(",") : ""} onBlur={e => setEmails(e.target.value)}/></div>
                         </div>

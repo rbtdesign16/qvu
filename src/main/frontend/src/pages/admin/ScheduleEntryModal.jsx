@@ -61,7 +61,7 @@ const ScheduleEntryModal = (props) => {
     
     const getDaysOfWeek = () => {
         let retval = [];
-        DAYS_OF_WEEK.map((d, indx) => retval.push({value: indx, label: getText(d)}));
+        DAYS_OF_WEEK.map((d, indx) => retval.push({value: indx + 1, label: getText(d)}));
         return retval;
     };
 

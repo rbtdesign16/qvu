@@ -916,6 +916,9 @@ public class FileHandler {
                     case Constants.MAIL_SUBJECT_PROPERTY:
                         value = schedulerConfig.getMailSubject();
                         break;
+                    case Constants.SCHEDULER_FIXED_RATE_SECONDS_PROPERTY:
+                        value = Constants.DEFAULT_SCHEDULER_FIXED_RATE_SECONDS;
+                        break;
                 }
                 
                 pw.println(p + "=" + value);

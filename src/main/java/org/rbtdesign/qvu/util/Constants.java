@@ -63,6 +63,7 @@ public class Constants {
     public static final String MAIL_PASSWORD_PROPERTY = "mail.password";
     public static final String MAIL_FROM_PROPERTY = "mail.from";
     public static final String MAIL_SUBJECT_PROPERTY = "mail.subject";
+    public static final String DEFAULT_SCHEDULER_FIXED_RATE_SECONDS = "30";
     
     public static final String[] SCHEDULER_PROPERTIES = {
         SCHEDULER_ENABLED_PROPERTY,

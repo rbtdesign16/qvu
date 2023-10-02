@@ -1355,18 +1355,17 @@ public class MainServiceImpl implements MainService {
             return retval;
         }
     }
-    
+
     private String getDateFromPlaceholder(String ph) {
         Calendar c = Calendar.getInstance();
-        
+
         String offset = ph.replace(Constants.CURRENT_DATE_PLACEHOLDER, "").replace(" ", "");
         if (StringUtils.isNotEmpty(ph)) {
             c.add(Calendar.DATE, Integer.parseInt(offset));
         }
-        
+
         return Constants.DATE_FORMAT.format(c.getTime());
     }
-        
 
     @Override
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
@@ -1390,19 +1389,19 @@ public class MainServiceImpl implements MainService {
                 for (SqlFilterColumn f : runWrapper.getDocument().getFilterColumns()) {
                     if (StringUtils.isEmpty(f.getComparisonValue())) {
                         String p = runWrapper.getParameters().get(pindx);
-                        if ((p != null) 
-                            && dbHelper.isDataTypeDateTime(f.getDataType()) 
-                            && p.contains(Constants.CURRENT_DATE_PLACEHOLDER)) {
+                        if ((p != null)
+                                && dbHelper.isDataTypeDateTime(f.getDataType())
+                                && p.contains(Constants.CURRENT_DATE_PLACEHOLDER)) {
                             p = getDateFromPlaceholder(p);
                         }
-                        
+
                         if (dbHelper.isDataTypeNumeric(f.getDataType())) {
                             Double d = Double.valueOf(p);
                             if (dbHelper.isDataTypeFloat(f.getDataType())) {
                                 ps.setObject(pindx + 1, d, f.getDataType());
                             } else {
                                 ps.setObject(pindx + 1, d.intValue(), f.getDataType());
-                            } 
+                            }
                         } else {
                             ps.setString(pindx + 1, p);
                         }
@@ -1416,8 +1415,8 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setResult(getQueryResult(res));
-            
-            retval.getResult().setElapsedTimeSeconds((((double)System.currentTimeMillis() - (double)start)/1000.0));
+
+            retval.getResult().setElapsedTimeSeconds((((double) System.currentTimeMillis() - (double) start) / 1000.0));
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
@@ -2074,37 +2073,38 @@ public class MainServiceImpl implements MainService {
 
     private boolean isLoadScheduledDocumentsRequired() {
         boolean retval = false;
-        
+
         if (scheduledDocuments == null) {
             Calendar c = Calendar.getInstance();
-            
+
             int min = c.get(Calendar.MINUTE);
-            
+
             retval = ((min > 54) && (min <= 59));
         }
-        
+
         return retval;
     }
-    
+
     private boolean isExecuteScheduledDocumentsRequired() {
         boolean retval = false;
-        
+
         if (scheduledDocuments != null) {
             Calendar c = Calendar.getInstance();
             retval = (c.get(Calendar.MINUTE) >= 0);
         }
-        
+
         return retval;
     }
-            
+
     @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{30}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
     public void runScheduledJobs() throws InterruptedException {
         if (schedulerEnabled) {
             if (isLoadScheduledDocumentsRequired()) {
                 loadScheduledDocuments();
             }
-            
+
             if (isExecuteScheduledDocumentsRequired()) {
+                LOG.debug("executing " + scheduledDocuments.size() + " scheduled documents");
                 List<ScheduledDocument> docs = new ArrayList(scheduledDocuments);
                 scheduledDocuments = null;
                 ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
@@ -2128,19 +2128,20 @@ public class MainServiceImpl implements MainService {
     }
 
     private void loadScheduledDocuments() {
-        List <DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
-        List <ScheduledDocument> docs = new ArrayList<>();
-        if (schedules != null) {
+        List<DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
+        List<ScheduledDocument> docs = new ArrayList<>();
+        if ((schedules != null) && !schedules.isEmpty()) {
             Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            c.add(Calendar.HOUR_OF_DAY, 1);
             for (DocumentSchedule ds : schedules) {
-                if (ds.getMonths().isEmpty() 
+                if (ds.getMonths().isEmpty()
                         || ds.getMonths().contains(c.get(Calendar.MONTH))) {
-                    if (ds.getDaysOfMonth().isEmpty() 
+                    if (ds.getDaysOfMonth().isEmpty()
                             || ds.getDaysOfMonth().contains(c.get(Calendar.DAY_OF_MONTH))) {
                         if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
+                            c.add(Calendar.HOUR_OF_DAY, 1);
+                            int hour = c.get(Calendar.HOUR_OF_DAY);
                             if (ds.getHoursOfDay().contains(hour)) {
+                                System.out.println("------------>match");
                                 ScheduledDocument doc = new ScheduledDocument();
                                 doc.setDocument(ds.getDocumentName());
                                 doc.setGroup(ds.getDocumentGroup());
@@ -2153,10 +2154,20 @@ public class MainServiceImpl implements MainService {
                     }
                 }
             }
-            
-            scheduledDocuments = new ArrayList(docs);
+
+            System.out.println("-------->docs.size=" + docs.size());
+
+            if (!docs.isEmpty()) {
+                scheduledDocuments = new ArrayList(docs);
+            }
         }
-            
+
+        if (scheduledDocuments != null) {
+            LOG.debug("in loadScheduledDocuments() - loaded " + scheduledDocuments.size() + " documents");
+        } else {
+            LOG.debug("in loadScheduledDocuments() no documents found");
+        }
+
     }
 
     @Override
@@ -2185,11 +2196,11 @@ public class MainServiceImpl implements MainService {
                 message.setFrom(new InternetAddress(schConfig.getMailFrom()));
 
                 InternetAddress[] addresses = new InternetAddress[docinfo.getEmailAddresses().size()];
-                
+
                 for (int i = 0; i < addresses.length; ++i) {
                     addresses[i] = new InternetAddress(docinfo.getEmailAddresses().get(i));
                 }
-                
+
                 message.setRecipients(Message.RecipientType.TO, addresses);
                 message.setSubject(schConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
 
@@ -2313,7 +2324,7 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     @Override
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules) {
         Collections.sort(schedules.getDocumentSchedules(), new DocumentScheduleComparator());
@@ -2322,7 +2333,7 @@ public class MainServiceImpl implements MainService {
         if (retval.isSuccess()) {
             config.setDocumentSchedulesConfig(schedules);
         }
-        
+
         return retval;
     }
 

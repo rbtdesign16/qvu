@@ -198,7 +198,7 @@ const SystemSetup = (props) => {
                 },
                 {
                     label: getText("Enable Scheduler"),
-                    name: "schedulerEnabled",
+                    name: "enabled",
                     type: "checkbox",
                     size: 40
                 }

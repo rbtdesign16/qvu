@@ -38,9 +38,9 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryRunner implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(QueryRunner.class);
-    private SchedulerConfig schedulerConfig;
-    private ScheduledDocument docinfo;
-    private MainService mainService;
+    private final SchedulerConfig schedulerConfig;
+    private final ScheduledDocument docinfo;
+    private final MainService mainService;
     private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").disableHtmlEscaping().create();
 
     public QueryRunner(MainService mainService, SchedulerConfig schedulerConfig, ScheduledDocument docinfo) {
@@ -100,6 +100,8 @@ public class QueryRunner implements Runnable {
                         return new PasswordAuthentication(schedulerConfig.getMailUser(), schedulerConfig.getMailPassword());
                     }
                 });
+
+                session.setDebug(LOG.isDebugEnabled());
 
                 // Now use your ByteArrayDataSource as
                 DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));

@@ -147,10 +147,18 @@ const SystemSetup = (props) => {
                 },
                 {
                     label: getText("Start TTLS Enable"),
-                    name: "smtpStartTtlsEnable ",
+                    name: "smtpStartTlsEnable",
                     type: "checkbox",
                     showHelp: showHelpMessage,
-                    helpText: getText("smtpStartTtlsEnable-help")
+                    helpText: getText("smtpStartTlsEnable-help")
+                },
+                {
+                    label: getText("SSL Trust"),
+                    name: "smtpSslTrust",
+                    type: "input",
+                    size: 60,
+                    showHelp: showHelpMessage,
+                    helpText: getText("smtpSslTrust-help")
                 },
                 {
                     label: getText("Mail User"),

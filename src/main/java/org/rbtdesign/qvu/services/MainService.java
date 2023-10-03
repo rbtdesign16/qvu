@@ -11,7 +11,6 @@ import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
-import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;
@@ -94,8 +93,6 @@ public interface MainService {
     public OperationResult<String> doBackup();
     
     public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules();
-    
-    public void sendEmail(ScheduledDocument docinfo, Object result);
     
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules);
 

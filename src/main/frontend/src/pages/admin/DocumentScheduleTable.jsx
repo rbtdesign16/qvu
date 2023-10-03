@@ -81,7 +81,7 @@ const DocumentScheduleTable = (props) => {
                 if (val) {
                     let comma = "";
                     val.map(d => {
-                        retval += (comma + getText(DAYS_OF_WEEK[d].substring(0, 3)));
+                        retval += (comma + getText(DAYS_OF_WEEK[d-1].substring(0, 3)));
                         comma = ", ";
                     });
                 }
@@ -153,7 +153,9 @@ const DocumentScheduleTable = (props) => {
                                 if (arraysEqual(schedule.daysOfMonth, schedules[i].daysOfMonth)) {
                                     if (arraysEqual(schedule.daysOfWeek, schedules[i].daysOfWeek)) {
                                         if (arraysEqual(schedule.hoursOfDay, schedules[i].hoursOfDay)) {
-                                            return schedules[i];
+                                            if (arraysEqual(schedule.parameters, schedules[i].parameters, true)) {
+                                                return schedules[i];
+                                            }
                                         }
                                     }
                                 }
@@ -169,7 +171,9 @@ const DocumentScheduleTable = (props) => {
         schedule.newRecord = false;
 
         if (schedule.months) {
-            schedule.months.sort();
+            schedule.months.sort((a,b) => {
+                return Number(a) - Number(b);
+            });
         }
 
         if (schedule.daysOfWeek) {
@@ -177,11 +181,15 @@ const DocumentScheduleTable = (props) => {
         }
 
         if (schedule.daysOfMonth) {
-            schedule.daysOfMonth.sort();
+            schedule.daysOfMonth.sort((a, b) => {
+                return Number(a) - Number(b);
+            });
         }
 
         if (schedule.hoursOfDay) {
-            schedule.hoursOfDay.sort();
+            schedule.hoursOfDay.sort((a, b) => {
+                return Number(a) - Number(b);
+            });
         }
 
         let sd = {documentSchedules: []};

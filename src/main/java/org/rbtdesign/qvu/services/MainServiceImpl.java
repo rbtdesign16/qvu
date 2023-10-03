@@ -1,25 +1,9 @@
 package org.rbtdesign.qvu.services;
 
-import com.opencsv.CSVWriter;
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.mail.Authenticator;
-import jakarta.mail.BodyPart;
-import jakarta.mail.Message;
-import jakarta.mail.Multipart;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-import jakarta.mail.util.ByteArrayDataSource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -40,7 +24,6 @@ import java.util.LinkedHashMap;
 import org.rbtdesign.qvu.configuration.database.DataSources;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
@@ -152,8 +135,11 @@ public class MainServiceImpl implements MainService {
     @Value("${mail.smtp.auth:false}")
     private boolean mailSmtpAuth;
 
+    @Value("${mail.smtp.ssl.trust:}")
+    private String mailSmtpSslTrust;
+    
     @Value("${mail.smtp.starttls.enable:false}")
-    private boolean mailSmtpStartTtls;
+    private boolean mailSmtpStartTls;
 
     @Value("${mail.from:}")
     private String mailFrom;
@@ -1204,6 +1190,11 @@ public class MainServiceImpl implements MainService {
                 docWrapper.setReportDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
+                
+                if (retval.isSuccess()) {
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, docWrapper.getGroup(), docWrapper.getReportDocument().getName(), docWrapper.getUser());
+                    cacheHelper.getQueryDocumentCache().remove(key);
+                }
             } else if (docWrapper.getQueryDocument() != null) {
                 QueryDocument doc = docWrapper.getQueryDocument();
                 if (doc.getCreateDate() == null) {
@@ -1219,7 +1210,7 @@ public class MainServiceImpl implements MainService {
                 retval.setMessage(opr.getMessage());
 
                 if (retval.isSuccess()) {
-                    String key = docWrapper.getGroup() + "." + doc.getName();
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, docWrapper.getGroup(), doc.getName(), docWrapper.getUser());
                     cacheHelper.getQueryDocumentCache().remove(key);
                 }
             }
@@ -1236,7 +1227,13 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult deleteDocument(String type, String group, String name) {
         User u = getCurrentUser();
-        return fileHandler.deleteDocument(type, group, u.getName(), name);
+        OperationResult retval = fileHandler.deleteDocument(type, group, u.getName(), name);
+        if (retval.isSuccess()) {
+            String key = this.getDocumentCacheKey(type, group, name, u.getName());
+            cacheHelper.getQueryDocumentCache().remove(key);
+        }
+        
+        return retval;
     }
 
     private QueryResult getQueryResult(ResultSet res) throws SQLException {
@@ -1318,20 +1315,29 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    private String getDocumentCacheKey(String type, String group, String name, String user) {
+        String retval = null;
+        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(group)) {
+            retval = type + "." + group + "." + user + "." + name;
+        } else {
+            retval = type + "." + group + "." + name;
+        }
+
+        return retval;
+    }
+    
     private OperationResult<QueryDocument> getQueryDocument(String group, String name, String user) {
         OperationResult<QueryDocument> retval = new OperationResult<>();
 
-        String key;
-        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(group)) {
-            key = group + "." + user + "." + name;
-        } else {
-            key = group + "." + name;
-        }
-
+        String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
+    
         QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
             retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
+            if (retval.isSuccess()) {
+                cacheHelper.getQueryDocumentCache().put(key, retval.getResult());
+            }
         } else {
             retval.setResult(doc);
         }
@@ -2000,10 +2006,10 @@ public class MainServiceImpl implements MainService {
         retval.setMailFrom(mailFrom);
         retval.setMailPassword(mailPassword);
         retval.setMailUser(mailUser);
-        retval.setSmtpAuth(mailSmtpAuth);
         retval.setSmtpHost(mailSmtpHost);
         retval.setSmtpPort(mailSmtpPort);
-        retval.setSmtpStartTtlsEnable(mailSmtpStartTtls);
+        retval.setSmtpStartTlsEnable(mailSmtpStartTls);
+        retval.setSmtpSslTrust(mailSmtpSslTrust);
         retval.setSmtpAuth(mailSmtpAuth);
         retval.setMailSubject(mailSubject);
         retval.setMaxSchedulerPoolSize(maxSchedulerPoolSize);
@@ -2090,7 +2096,7 @@ public class MainServiceImpl implements MainService {
 
         if (scheduledDocuments != null) {
             Calendar c = Calendar.getInstance();
-            retval = (c.get(Calendar.MINUTE) >= 0);
+            retval = ((c.get(Calendar.MINUTE) >= 0) && (c.get(Calendar.MINUTE) < 3));
         }
 
         return retval;
@@ -2109,9 +2115,9 @@ public class MainServiceImpl implements MainService {
                 scheduledDocuments = null;
                 ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
                 for (ScheduledDocument docinfo : docs) {
-                    OperationResult<QueryDocument> dres = getDocument(Constants.DOCUMENT_TYPE_QUERY, docinfo.getGroup(), docinfo.getDocument());
+                    OperationResult<QueryDocument> dres = getQueryDocument(docinfo.getGroup(), docinfo.getDocument(), Constants.DEFAULT_ADMIN_USER);
                     if (dres.isSuccess()) {
-                        executor.execute(new QueryRunner(docinfo));
+                        executor.execute(new QueryRunner(this, getSchedulerConfig(), docinfo));
                     }
                 }
 
@@ -2129,19 +2135,25 @@ public class MainServiceImpl implements MainService {
 
     private void loadScheduledDocuments() {
         List<DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
+System.out.println("------------>schedsize=" + schedules.size());
         List<ScheduledDocument> docs = new ArrayList<>();
         if ((schedules != null) && !schedules.isEmpty()) {
+System.out.println("------------>1");
             Calendar c = Calendar.getInstance();
             for (DocumentSchedule ds : schedules) {
+System.out.println("------------>2");
                 if (ds.getMonths().isEmpty()
                         || ds.getMonths().contains(c.get(Calendar.MONTH))) {
+System.out.println("------------>3");
                     if (ds.getDaysOfMonth().isEmpty()
                             || ds.getDaysOfMonth().contains(c.get(Calendar.DAY_OF_MONTH))) {
+System.out.println("------------>4");
                         if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
+System.out.println("------------>5");
                             c.add(Calendar.HOUR_OF_DAY, 1);
                             int hour = c.get(Calendar.HOUR_OF_DAY);
                             if (ds.getHoursOfDay().contains(hour)) {
-                                System.out.println("------------>match");
+System.out.println("------------>6");
                                 ScheduledDocument doc = new ScheduledDocument();
                                 doc.setDocument(ds.getDocumentName());
                                 doc.setGroup(ds.getDocumentGroup());
@@ -2155,8 +2167,6 @@ public class MainServiceImpl implements MainService {
                 }
             }
 
-            System.out.println("-------->docs.size=" + docs.size());
-
             if (!docs.isEmpty()) {
                 scheduledDocuments = new ArrayList(docs);
             }
@@ -2168,161 +2178,6 @@ public class MainServiceImpl implements MainService {
             LOG.debug("in loadScheduledDocuments() no documents found");
         }
 
-    }
-
-    @Override
-    public void sendEmail(ScheduledDocument docinfo, Object result) {
-        try {
-            byte[] attachment = getAttachment(docinfo.getResultType(), result);
-            if (attachment != null) {
-                Properties prop = new Properties();
-                SchedulerConfig schConfig = getSchedulerConfig();
-                prop.put("mail.smtp.auth", schConfig.isSmtpAuth());
-                prop.put("mail.smtp.starttls.enable", schConfig.isSmtpStartTtlsEnable());
-                prop.put("mail.smtp.host", schConfig.getSmtpHost());
-                prop.put("mail.smtp.port", schConfig.getSmtpPort());
-
-                Session session = Session.getInstance(prop, new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(schConfig.getMailUser(), schConfig.getMailPassword());
-                    }
-                });
-
-                // Now use your ByteArrayDataSource as
-                DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));
-
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(schConfig.getMailFrom()));
-
-                InternetAddress[] addresses = new InternetAddress[docinfo.getEmailAddresses().size()];
-
-                for (int i = 0; i < addresses.length; ++i) {
-                    addresses[i] = new InternetAddress(docinfo.getEmailAddresses().get(i));
-                }
-
-                message.setRecipients(Message.RecipientType.TO, addresses);
-                message.setSubject(schConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
-
-                BodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText("Mail Body");
-
-                MimeBodyPart attachmentPart = new MimeBodyPart();
-                attachmentPart.setDataHandler(new DataHandler(fds));
-                attachmentPart.setFileName(getFileName(docinfo));
-                Multipart multipart = new MimeMultipart();
-                multipart.addBodyPart(messageBodyPart);
-                multipart.addBodyPart(attachmentPart);
-                message.setContent(multipart);
-                Transport.send(message);
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
-        }
-    }
-
-    private String getFileName(ScheduledDocument docinfo) {
-        String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = docinfo.getDocument().replace(".json", "") + ".csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                break;
-        }
-
-        return retval;
-    }
-
-    private String getMimeType(ScheduledDocument docinfo) {
-        String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = "application/vnd.ms-excel";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = "text/csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                retval = "application/json";
-                break;
-        }
-
-        return retval;
-    }
-
-    private byte[] getAttachment(String resultType, Object queryResult) throws Exception {
-        byte[] retval = null;
-        switch (resultType) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = exportToExcel(getExcelWrapper((QueryResult) queryResult));
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = toCsv((QueryResult) queryResult);
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                retval = fileHandler.getGson(true).toJson(queryResult).getBytes();
-                break;
-        }
-
-        return retval;
-    }
-
-    private byte[] toCsv(QueryResult queryResult) {
-        byte[] retval = null;
-        try (StringWriter strwriter = new StringWriter(); CSVWriter writer = new CSVWriter(strwriter);) {
-
-            String[] row = new String[queryResult.getHeader().size()];
-            writer.writeNext(queryResult.getHeader().toArray(row));
-
-            // add data to csv
-            for (List<Object> l : queryResult.getData()) {
-                writer.writeNext(toStringArray(l));
-            }
-
-            retval = strwriter.toString().getBytes();
-        } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
-        }
-
-        return retval;
-    }
-
-    private String[] toStringArray(List<Object> in) {
-        String[] retval = new String[in.size()];
-
-        for (int i = 0; i < retval.length; ++i) {
-            Object o = in.get(i);
-            if (o == null) {
-                retval[i] = null;
-            } else {
-                retval[i] = o.toString();
-            }
-        }
-
-        return retval;
-    }
-
-    private ExcelExportWrapper getExcelWrapper(QueryResult queryResult) {
-        ExcelExportWrapper retval = new ExcelExportWrapper();
-
-        retval.setHeaderFontColor("2F4F4F");
-        retval.setHeaderBackgroundColor("85C1E9");
-        retval.setHeaderFontSize(12);
-        retval.setDetailFontColor("2F4F4F");
-        retval.setDetailBackgroundColor1("FFFFFF");
-        retval.setDetailBackgroundColor2("F0FFFF");
-        retval.setDetailFontSize(11);
-
-        retval.setQueryResults(queryResult);
-
-        return retval;
     }
 
     @Override

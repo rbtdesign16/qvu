@@ -5,11 +5,11 @@ package org.rbtdesign.qvu.dto;
  * @author rbtuc
  */
 public class SchedulerConfig {
-    private boolean smtpAuth = false;
-    private boolean smtpStartTtlsEnable = false;
+    private boolean smtpAuth;
+    private boolean smtpStartTlsEnable;
+    private String smtpSslTrust;
     private String smtpHost;
     private String smtpPort;
-    private String smtpSslTrust;
     private String mailUser;
     private String mailPassword;
     private String mailFrom;
@@ -19,22 +19,6 @@ public class SchedulerConfig {
     private boolean enabled = false;
     private boolean modified = false;
     
-
-    public boolean isSmtpAuth() {
-        return smtpAuth;
-    }
-
-    public void setSmtpAuth(boolean smtpAuth) {
-        this.smtpAuth = smtpAuth;
-    }
-
-    public boolean isSmtpStartTtlsEnable() {
-        return smtpStartTtlsEnable;
-    }
-
-    public void setSmtpStartTtlsEnable(boolean smtpStartTtlsEnable) {
-        this.smtpStartTtlsEnable = smtpStartTtlsEnable;
-    }
 
     public String getSmtpHost() {
         return smtpHost;
@@ -123,6 +107,21 @@ public class SchedulerConfig {
     public void setModified(boolean modified) {
         this.modified = modified;
     }
-    
+
+    public boolean isSmtpAuth() {
+        return smtpAuth;
+    }
+
+    public void setSmtpAuth(boolean smtpAuth) {
+        this.smtpAuth = smtpAuth;
+    }
+
+    public boolean isSmtpStartTlsEnable() {
+        return smtpStartTlsEnable;
+    }
+
+    public void setSmtpStartTlsEnable(boolean smtpStartTlsEnable) {
+        this.smtpStartTlsEnable = smtpStartTlsEnable;
+    }
     
 }

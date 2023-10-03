@@ -56,9 +56,10 @@ public class Constants {
     public static final String SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY = "max.scheduler.pool.size";
     public static final String SCHEDULER_EXECUTE_TIMEOUT_PROPERTY = "scheduler.execute.timeout.seconds";
     public static final String MAIL_SMTP_AUTH_PROPERTY = "mail.smtp.auth";
-    public static final String MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY = "mail.smtp.starttls.enable";
+    public static final String MAIL_SMTP_STARTTLS_ENABLE_PROPERTY = "mail.smtp.starttls.enable";
     public static final String MAIL_SMTP_HOST_PROPERTY = "mail.smtp.host";
     public static final String MAIL_SMTP_PORT_PROPERTY = "mail.smtp.port";
+    public static final String MAIL_SMTP_SSL_TRUST_PROPERTY = "mail.smtp.ssl.trust";
     public static final String MAIL_USER_PROPERTY = "mail.user";
     public static final String MAIL_PASSWORD_PROPERTY = "mail.password";
     public static final String MAIL_FROM_PROPERTY = "mail.from";
@@ -71,7 +72,8 @@ public class Constants {
         SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY,
         SCHEDULER_EXECUTE_TIMEOUT_PROPERTY,
         MAIL_SMTP_AUTH_PROPERTY,
-        MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY,
+        MAIL_SMTP_STARTTLS_ENABLE_PROPERTY,
+        MAIL_SMTP_SSL_TRUST_PROPERTY,
         MAIL_SMTP_HOST_PROPERTY,
         MAIL_SMTP_PORT_PROPERTY,
         MAIL_USER_PROPERTY,

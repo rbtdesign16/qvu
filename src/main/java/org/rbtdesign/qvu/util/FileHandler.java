@@ -575,17 +575,15 @@ public class FileHandler {
         try {
             File f = config.getDocumentGroupsFolder(group, user);
             File docfile = new File(f.getPath() + File.separator + type + File.separator + name);
-
+ 
             if (!docfile.exists()) {
                 retval.setErrorCode(Errors.DOCUMENT_NOT_FOUND);
                 retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{type, name}));
             } else {
-                try (FileInputStream fis = new FileInputStream(docfile); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-                    byte[] bytes = fis.readAllBytes();
-                    QueryDocument doc = gson.fromJson(new String(bytes), QueryDocument.class);
-                    doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
-                    retval.setResult(doc);
-                }
+                byte[] bytes = FileUtils.readFileToByteArray(docfile);
+                QueryDocument doc = gson.fromJson(new String(bytes), QueryDocument.class);
+                doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
+                retval.setResult(doc);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -842,7 +840,7 @@ public class FileHandler {
                 try {
                     pw.close();
                 } catch (Exception ex) {
-                };
+                }
             }
         }
 
@@ -895,8 +893,11 @@ public class FileHandler {
                     case Constants.MAIL_SMTP_AUTH_PROPERTY:
                         value = "" + schedulerConfig.isSmtpAuth();
                         break;
-                    case Constants.MAIL_SMTP_STARTTTLS_ENABLE_PROPERTY:
-                        value = "" + schedulerConfig.isSmtpStartTtlsEnable();
+                    case Constants.MAIL_SMTP_STARTTLS_ENABLE_PROPERTY:
+                        value = "" + schedulerConfig.isSmtpStartTlsEnable();
+                        break;
+                    case Constants.MAIL_SMTP_SSL_TRUST_PROPERTY:
+                        value = "" + schedulerConfig.getSmtpSslTrust();
                         break;
                     case Constants.MAIL_SMTP_HOST_PROPERTY:
                         value = schedulerConfig.getSmtpHost();

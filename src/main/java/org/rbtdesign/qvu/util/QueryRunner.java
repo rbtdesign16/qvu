@@ -83,9 +83,7 @@ public class QueryRunner implements Runnable {
     private void sendEmail(ScheduledDocument docinfo, Object result) {
         try {
             byte[] attachment = getAttachment(docinfo.getResultType(), result);
-            System.out.println("---------------->a");
             if (attachment != null) {
-                System.out.println("---------------->b=" + schedulerConfig.isSmtpStartTlsEnable());
                 Properties props = new Properties();
                 props.put("mail.smtp.auth", "" + schedulerConfig.isSmtpAuth());
                 props.put("mail.smtp.starttls.enable", "" + schedulerConfig.isSmtpStartTlsEnable());
@@ -102,7 +100,6 @@ public class QueryRunner implements Runnable {
                         return new PasswordAuthentication(schedulerConfig.getMailUser(), schedulerConfig.getMailPassword());
                     }
                 });
-                System.out.println("---------------->c");
 
                 // Now use your ByteArrayDataSource as
                 DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));
@@ -118,8 +115,7 @@ public class QueryRunner implements Runnable {
 
                 message.setRecipients(Message.RecipientType.TO, addresses);
                 message.setSubject(schedulerConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
-                System.out.println("---------------->d");
-
+      
                 BodyPart messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setText("Mail Body");
 
@@ -130,9 +126,7 @@ public class QueryRunner implements Runnable {
                 multipart.addBodyPart(messageBodyPart);
                 multipart.addBodyPart(attachmentPart);
                 message.setContent(multipart);
-                System.out.println("---------------->e");
                 Transport.send(message);
-                System.out.println("---------------->f");
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);

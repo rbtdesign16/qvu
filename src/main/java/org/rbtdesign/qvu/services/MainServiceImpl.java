@@ -2135,25 +2135,18 @@ public class MainServiceImpl implements MainService {
 
     private void loadScheduledDocuments() {
         List<DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
-System.out.println("------------>schedsize=" + schedules.size());
         List<ScheduledDocument> docs = new ArrayList<>();
         if ((schedules != null) && !schedules.isEmpty()) {
-System.out.println("------------>1");
             Calendar c = Calendar.getInstance();
+            c.add(Calendar.HOUR_OF_DAY, 1);
+            int hour = c.get(Calendar.HOUR_OF_DAY);
             for (DocumentSchedule ds : schedules) {
-System.out.println("------------>2");
                 if (ds.getMonths().isEmpty()
                         || ds.getMonths().contains(c.get(Calendar.MONTH))) {
-System.out.println("------------>3");
                     if (ds.getDaysOfMonth().isEmpty()
                             || ds.getDaysOfMonth().contains(c.get(Calendar.DAY_OF_MONTH))) {
-System.out.println("------------>4");
                         if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
-System.out.println("------------>5");
-                            c.add(Calendar.HOUR_OF_DAY, 1);
-                            int hour = c.get(Calendar.HOUR_OF_DAY);
                             if (ds.getHoursOfDay().contains(hour)) {
-System.out.println("------------>6");
                                 ScheduledDocument doc = new ScheduledDocument();
                                 doc.setDocument(ds.getDocumentName());
                                 doc.setGroup(ds.getDocumentGroup());

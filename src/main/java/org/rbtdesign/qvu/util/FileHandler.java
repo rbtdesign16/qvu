@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
@@ -83,7 +85,7 @@ public class FileHandler {
 
     public List<DocumentGroup> loadDocumentGroups() {
         List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
-        
+
         DocumentGroup g = new DocumentGroup();
         g.setDescription(Constants.DEFAULT_DOCUMENT_GROUP_DESCRIPTION);
         g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
@@ -94,7 +96,7 @@ public class FileHandler {
         }
 
         return retval;
-            
+
     }
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
@@ -260,7 +262,7 @@ public class FileHandler {
         try {
             File dfolder = config.getDocumentGroupsFolder(groupName, user);
             File gbackup = new File(config.getBackupFolder() + File.separator + groupName.replace(" ", "_") + "-deleted-" + Helper.TS2.format(new Date()) + ".zip");
-            
+
             if (ZipFolder.doZip(dfolder, gbackup)) {
                 File f = new File(config.getDocumentGroupsConfigurationFileName());
                 try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
@@ -286,7 +288,7 @@ public class FileHandler {
                         retval.setErrorCode(OperationResult.SUCCESS);
                     }
                 }
-                
+
                 FileUtils.deleteDirectory(dfolder);
             } else {
                 Errors.populateError(retval, Errors.BACKUP_FAILED);
@@ -575,7 +577,7 @@ public class FileHandler {
         try {
             File f = config.getDocumentGroupsFolder(group, user);
             File docfile = new File(f.getPath() + File.separator + type + File.separator + name);
- 
+
             if (!docfile.exists()) {
                 retval.setErrorCode(Errors.DOCUMENT_NOT_FOUND);
                 retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{type, name}));
@@ -791,10 +793,9 @@ public class FileHandler {
                 }
             }
 
-            
             for (String p : Constants.SSL_PROPERTIES) {
                 String val = "";
-                switch(p) {
+                switch (p) {
                     case Constants.SSL_ENABLED_PROPERTY:
                         val = "" + systemSettings.getSslConfig().isEnabled();
                         break;
@@ -814,10 +815,10 @@ public class FileHandler {
                         val = systemSettings.getSslConfig().getSslKeyPassword();
                         break;
                 }
-                
+
                 lines.add(p + "=" + val);
             }
- 
+
             lnr.close();
             lnr = null;
 
@@ -846,7 +847,7 @@ public class FileHandler {
 
         return retval;
     }
-    
+
     private String getKeystoreFileName(String input) {
         String retval = input;
         if (StringUtils.isNotEmpty(input)) {
@@ -854,10 +855,10 @@ public class FileHandler {
                 retval = "file:" + input;
             }
         }
-            
+
         return retval;
     }
-    
+
     private boolean isSSLProperty(String line) {
         boolean retval = false;
         for (String p : Constants.SSL_PROPERTIES) {
@@ -866,21 +867,20 @@ public class FileHandler {
                 break;
             }
         }
-        
+
         return retval;
     }
-    
+
     public OperationResult updateSchedulerProperties(SchedulerConfig schedulerConfig) {
         OperationResult retval = new OperationResult();
         LineNumberReader lnr = null;
         PrintWriter pw = null;
         List<String> lines = new ArrayList<>();
-
+        Map<String, String> updateValues = new HashMap<>();
         try {
-            pw = new PrintWriter(config.getSchedulerPropertiesFileName());
             for (String p : Constants.SCHEDULER_PROPERTIES) {
-                String value="";
-                switch(p) {
+                String value = "";
+                switch (p) {
                     case Constants.SCHEDULER_ENABLED_PROPERTY:
                         value = "" + schedulerConfig.isEnabled();
                         break;
@@ -906,14 +906,14 @@ public class FileHandler {
                         value = "" + schedulerConfig.getSmtpPort();
                         break;
                     case Constants.MAIL_USER_PROPERTY:
-                       value = schedulerConfig.getMailUser();
+                        value = schedulerConfig.getMailUser();
                         break;
                     case Constants.MAIL_PASSWORD_PROPERTY:
-                       value = schedulerConfig.getMailPassword();
+                        value = schedulerConfig.getMailPassword();
                         break;
                     case Constants.MAIL_FROM_PROPERTY:
                         value = schedulerConfig.getMailFrom();
-                       break;
+                        break;
                     case Constants.MAIL_SUBJECT_PROPERTY:
                         value = schedulerConfig.getMailSubject();
                         break;
@@ -921,13 +921,48 @@ public class FileHandler {
                         value = Constants.DEFAULT_SCHEDULER_FIXED_RATE_SECONDS;
                         break;
                 }
-                
-                pw.println(p + "=" + value);
+
+                updateValues.put(p, value);
+            }
+
+            lnr = new LineNumberReader(new FileReader(config.getSchedulerPropertiesFileName()));
+
+            String line;
+            while ((line = lnr.readLine()) != null) {
+                line = line.trim();
+                if (!line.startsWith("#")) {
+                    int pos = line.indexOf("=");
+                    if (pos > -1) {
+                        String key = line.substring(0, pos);
+                        if (updateValues.containsKey(key)) {
+                            lines.add(key + "=" + updateValues.get(key));
+                        } else {
+                            lines.add(line);
+                        }
+                    } else {
+                        lines.add(line);
+                    }
+                } else {
+                    lines.add(line);
+                }
+            }
+
+            lnr.close();
+            lnr = null;
+            pw = new PrintWriter(config.getSchedulerPropertiesFileName());
+            for (String l : lines) {
+                pw.println(l);
             }
         } catch (Exception ex) {
             Errors.populateError(retval, ex);
         } finally {
-                 if (pw != null) {
+            if (lnr != null) {
+                try {
+                    lnr.close();
+                } catch (Exception ex) {
+                };
+            }
+            if (pw != null) {
                 try {
                     pw.close();
                 } catch (Exception ex) {
@@ -937,7 +972,6 @@ public class FileHandler {
 
         return retval;
     }
-
 
     public byte[] getHelpDocument(String lang) {
         byte[] retval = null;
@@ -985,13 +1019,13 @@ public class FileHandler {
 
     public List<DocumentSchedule> loadDocumentSchedules() {
         List<DocumentSchedule> retval = config.getDocumentSchedulesConfig().getDocumentSchedules();
-        
+
         if (LOG.isTraceEnabled()) {
             LOG.trace("Document Schedules: " + gson.toJson(retval, ArrayList.class));
         }
 
         return retval;
-            
+
     }
 
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration docschedules) {

@@ -189,22 +189,6 @@ const SystemSetup = (props) => {
                     helpText: getText("mailSubject-help")
                 },
                 {
-                    label: getText("Max Thread Pool Size"),
-                    name: "maxSchedulerPoolSize",
-                    type: "number",
-                    required: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("maxSchedulerPoolSize-help")
-                },
-                {
-                    label: getText("Execute Timeout Seconds"),
-                    name: "schedulerExecuteTimeoutSeconds",
-                    type: "number",
-                    required: true,
-                    showHelp: showHelpMessage,
-                    helpText: getText("schedulerExecuteTimeoutSeconds-help")
-                },
-                {
                     label: getText("Enable Scheduler"),
                     name: "enabled",
                     type: "checkbox",
@@ -493,7 +477,7 @@ const SystemSetup = (props) => {
             <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <div style={{height: "450px"}}>   
+            <div style={{height: "375px"}}>   
                 <Tabs id="t1" className="mb-3">
                     <Tab eventKey="auth" title={getText("Authentication")}>
                         <div style={{textAlign: "center"}} className="entrygrid-225-225">

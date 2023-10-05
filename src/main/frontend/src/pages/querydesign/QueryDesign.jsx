@@ -141,7 +141,9 @@ import { getDatasourceTreeViewData,
                 filterColumns: filterColumns,
                 fromClause: fromClause
             }
-        };
+            
+         };
+           console.log("--------------->" + JSON.stringify(fromClause));
 
         let res = await saveDocument(docWrapper);
         if (isApiError(res)) {

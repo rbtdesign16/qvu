@@ -7,12 +7,14 @@ import org.rbtdesign.qvu.dto.SqlSelectColumn;
  *
  * @author rbtuc
  */
-public class ObjectGraphColumnComparator implements Comparator<SqlSelectColumn> {
+public class PkColumnComparator implements Comparator<SqlSelectColumn> {
 
     @Override
     public int compare(SqlSelectColumn o1, SqlSelectColumn o2) {
-        int retval = o1.getTableAlias().compareTo(o2.getTableAlias());
-        
+        Integer a1 = Integer.valueOf(o1.getTableAlias().replace("t", ""));
+        Integer a2 = Integer.valueOf(o2.getTableAlias().replace("t", ""));
+
+        int retval = a1.compareTo(a2);
         if (retval == 0) {
             if ((o1.getPkIndex() > 0) && (o2.getPkIndex() <= 0)) {
                 retval = -1;
@@ -26,6 +28,6 @@ public class ObjectGraphColumnComparator implements Comparator<SqlSelectColumn> 
         }
         
         return retval;
-        
+
     }
 }

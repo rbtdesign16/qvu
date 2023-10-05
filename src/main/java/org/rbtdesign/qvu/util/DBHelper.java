@@ -208,7 +208,9 @@ public class DBHelper {
                     } else {
                         retval.append(" join ");
                     }
-                }
+                } else if (StringUtils.isNotEmpty(c.getFromAlias())){
+                    retval.append(" left outer join ");
+                }   
 
                 retval.append(getFromTableName(dbType, schema, c.getTable()));
                 retval.append(" ");

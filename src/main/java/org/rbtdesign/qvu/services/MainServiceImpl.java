@@ -102,9 +102,10 @@ import org.rbtdesign.qvu.util.DocumentGroupComparator;
 import org.rbtdesign.qvu.util.DocumentScheduleComparator;
 import org.rbtdesign.qvu.util.Errors;
 import org.rbtdesign.qvu.util.Helper;
+import org.rbtdesign.qvu.util.JsonObjectGraphConfig;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
-import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
+import org.rbtdesign.qvu.util.PkColumnComparator;
 import org.rbtdesign.qvu.util.QueryRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
 import org.springframework.beans.factory.annotation.Value;
@@ -137,7 +138,7 @@ public class MainServiceImpl implements MainService {
 
     @Value("${mail.smtp.ssl.trust:}")
     private String mailSmtpSslTrust;
-    
+
     @Value("${mail.smtp.starttls.enable:false}")
     private boolean mailSmtpStartTls;
 
@@ -1175,7 +1176,7 @@ public class MainServiceImpl implements MainService {
     public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper docWrapper) {
         OperationResult<DocumentWrapper> retval = new OperationResult();
         try {
-            if (docWrapper.getReportDocument() != null) {
+            if (docWrapper.isReportDocument()) {
                 ReportDocument doc = docWrapper.getReportDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
@@ -1190,12 +1191,12 @@ public class MainServiceImpl implements MainService {
                 docWrapper.setReportDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
-                
+
                 if (retval.isSuccess()) {
                     String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, docWrapper.getGroup(), docWrapper.getReportDocument().getName(), docWrapper.getUser());
                     cacheHelper.getQueryDocumentCache().remove(key);
                 }
-            } else if (docWrapper.getQueryDocument() != null) {
+            } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
@@ -1211,7 +1212,8 @@ public class MainServiceImpl implements MainService {
 
                 if (retval.isSuccess()) {
                     String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, docWrapper.getGroup(), doc.getName(), docWrapper.getUser());
-                    cacheHelper.getQueryDocumentCache().remove(key);
+                    cacheHelper.getQueryDocumentCache().put(key, doc);
+
                 }
             }
 
@@ -1232,7 +1234,7 @@ public class MainServiceImpl implements MainService {
             String key = this.getDocumentCacheKey(type, group, name, u.getName());
             cacheHelper.getQueryDocumentCache().remove(key);
         }
-        
+
         return retval;
     }
 
@@ -1325,12 +1327,12 @@ public class MainServiceImpl implements MainService {
 
         return retval;
     }
-    
+
     private OperationResult<QueryDocument> getQueryDocument(String group, String name, String user) {
         OperationResult<QueryDocument> retval = new OperationResult<>();
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
-    
+
         QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
@@ -1679,105 +1681,93 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(Map<String, List<String>> pkMap, QueryDocument doc, QueryResult res) {
-        List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
-        Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
+    private boolean isImportedKey(String datasource, String tableName, String foreignKeyName) {
+        boolean retval = false;
+        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasource);
 
-        // base table will be the returned list
-        dataMap.put("t0", retval);
-        Set<String> dataKeySet = new HashSet<>();
-
-        // build a list of the table aliaeses
-        Set<String> tableAliases = new HashSet<>();
-        for (SqlFrom f : doc.getFromClause()) {
-            tableAliases.add(f.getAlias());
-        }
-
-        Map<String, List<Integer[]>> aliasColumnPosMap = new HashMap<>();
-
-        int indx1 = 0;
-        int indx2 = 0;
-        for (SqlSelectColumn c : doc.getSelectColumns()) {
-            if (c.isShowInResults()) {
-                List<Integer[]> l = aliasColumnPosMap.get(c.getTableAlias());
-
-                if (l == null) {
-                    aliasColumnPosMap.put(c.getTableAlias(), l = new ArrayList<>());
-                }
-
-                Integer[] pos = {indx1, indx2++};
-                l.add(pos);
+        for (ForeignKey fk : ds.getCustomForeignKeys()) {
+            if (fk.getTableName().equals(tableName) && fk.getName().equals(foreignKeyName)) {
+                retval = fk.isImported();
+                break;
             }
-            indx1++;
         }
 
-        for (List<Object> row : res.getData()) {
-            for (String alias : tableAliases) {
-                StringBuilder dataKey = new StringBuilder();
-                dataKey.append(alias);
-                List<Integer[]> cpos = aliasColumnPosMap.get(alias);
-                for (Integer[] pos : cpos) {
-                    SqlSelectColumn c = doc.getSelectColumns().get(pos[0]);
-                    List<String> pkl = pkMap.get(c.getTableAlias() + "." + c.getTableName());
-                    if (pkl.contains(c.getColumnName())) {
-                        dataKey.append(".");
-                        // add one becausr first result row value is row number
-                        dataKey.append(row.get(pos[1] + 1));
+        if (!retval) {
+            Table t = cacheHelper.getTableCache().get(datasource + "." + tableName);
+
+            if (t != null) {
+                for (ForeignKey fk : t.getImportedKeys()) {
+                    if (fk.getName().equals(foreignKeyName)) {
+                        retval = true;
+                        break;
                     }
                 }
-
-                List<LinkedHashMap<String, Object>> l = dataMap.get(alias);
-                if (l == null) {
-                    dataMap.put(alias, l = new ArrayList<>());
-                }
-
-                if (!dataKeySet.contains(dataKey.toString())) {
-                    LinkedHashMap<String, Object> data = new LinkedHashMap<>();
-
-                    for (Integer[] pos : cpos) {
-                        SqlSelectColumn c = doc.getSelectColumns().get(pos[0]);
-                        // add one becausr first result row value is row number
-                        data.put(c.getColumnName(), row.get(pos[1] + 1));
+            } else {
+                try (Connection conn = qvuds.getConnection(datasource);) {
+                    t = new Table();
+                    t.setSchema(ds.getSchema());
+                    t.setName(tableName);
+                    DatabaseMetaData dmd = conn.getMetaData();
+                    List<ForeignKey> fkList = getImportedKeys(datasource, dmd, t);
+                    for (ForeignKey fk : fkList) {
+                        if (fk.getName().equals(foreignKeyName)) {
+                            retval = true;
+                            break;
+                        }
                     }
-
-                    l.add(data);
-                    dataKeySet.add(dataKey.toString());
+                } catch (Exception ex) {
+                    LOG.error(ex.toString(), ex);
                 }
             }
         }
 
-        Map<String, ForeignKeySettings> fkSettingsMap = getDocumentTableForeignKeySettings(doc);
-
-        for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
-            buildObjectGraph(doc, fkSettingsMap, dataMap, "t0", r);
-        }
         return retval;
     }
 
-    private void buildObjectGraph(QueryDocument doc, Map<String, ForeignKeySettings> fkSettingsMap, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String alias, LinkedHashMap<String, Object> parent) {
-        for (SqlFrom f : doc.getFromClause()) {
-            if (alias.equals(f.getFromAlias())) {
-                List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
-                if ((l != null) && !l.isEmpty()) {
-                    ForeignKeySettings fks = fkSettingsMap.get(f.getFromAlias() + "." + f.getForeignKeyName());
-
-                    String fieldName = f.getForeignKeyName();
-                    if ((fks != null) && StringUtils.isNotEmpty(fks.getFieldName())) {
-                        fieldName = fks.getFieldName();
-                    }
-
-                    if (f.isImportedForeignKey()) {
-                        parent.put(fieldName, l.get(0));
-                    } else {
-                        parent.put(fieldName, l);
-                    }
-
-                    for (LinkedHashMap<String, Object> r : l) {
-                        buildObjectGraph(doc, fkSettingsMap, dataMap, f.getAlias(), r);
-                    }
+    private void populateObjectGraphConfig(QueryDocument doc, JsonObjectGraphConfig parent, Map<String, ForeignKeySettings> fkSettings) {
+        List<Integer> pkpos = new ArrayList<>();
+        int indx = 1;
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+            if (c.isShowInResults() && (c.getPkIndex() > 0)) {
+                if (c.getTableAlias().equals(parent.getAlias())) {
+                    pkpos.add(indx);
                 }
+
+                indx++;
             }
         }
+
+        parent.setPrimaryKeyPositions(pkpos);
+
+        for (SqlFrom f : doc.getFromClause()) {
+            if (StringUtils.isNotEmpty(f.getFromAlias()) && f.getFromAlias().equals(parent.getAlias())) {
+                String fieldName = f.getForeignKeyName();
+                ForeignKeySettings fk = fkSettings.get(f.getAlias() + "." + f.getForeignKeyName());
+                if (fk != null) {
+                    fieldName = fk.getFieldName();
+                }
+
+                JsonObjectGraphConfig child = new JsonObjectGraphConfig(parent, f.getAlias(), f.getTable(), fieldName, isImportedKey(doc.getDatasource(), f.getTable(), f.getForeignKeyName()));
+                parent.getChildren().add(child);
+                populateObjectGraphConfig(doc, child, fkSettings);
+            }
+
+        }
+    }
+
+    private JsonObjectGraphConfig createObjectGraphConfig(QueryDocument doc) {
+        JsonObjectGraphConfig retval = new JsonObjectGraphConfig(null, "t0", doc.getBaseTable(), null, false);
+        Map<String, ForeignKeySettings> fkSettings = getDocumentTableForeignKeySettings(doc);
+        populateObjectGraphConfig(doc, retval, fkSettings);
+
+        return retval;
+
+    }
+
+    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
+        List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
+        JsonObjectGraphConfig objectGraphConfig = createObjectGraphConfig(doc);
+        return retval;
     }
 
     private List<String> getPrimaryKeyColumnNames(Table t) {
@@ -1823,7 +1813,7 @@ public class MainServiceImpl implements MainService {
         // we will need to ensure that these are selected
         // for an object graph query;
         for (SqlFrom f : doc.getFromClause()) {
-            if (!retval.containsKey(f.getTable())) {
+            if (!retval.containsKey(f.getAlias() + "." + f.getTable())) {
                 String key = doc.getDatasource() + "." + f.getTable();
                 Table t = cacheHelper.getTableCache().get(key);
 
@@ -1869,44 +1859,48 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private QueryDocument toObjectGraphQueryDoc(Map<String, List<String>> pkMap, QueryDocument doc) {
+    private QueryDocument toObjectGraphQueryDoc(QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);
-        Map<String, Set<String>> cMap = new HashMap<>();
+        Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
 
-        for (SqlSelectColumn c : doc.getSelectColumns()) {
-            Set<String> hs = cMap.get(c.getTableName());
-            if (hs == null) {
-                cMap.put(c.getTableAlias() + "." + c.getTableName(), hs = new HashSet<>());
+        // need to ensure all primary keys are included in select so we will 
+        // update the incoming doc to ensure all pks columns are included, first
+        // remove ant current keys
+        Iterator<SqlSelectColumn> it = retval.getSelectColumns().iterator();
+        while (it.hasNext()) {
+            SqlSelectColumn c = it.next();
+            if (c.getPkIndex() > 0) {
+                it.remove();
             }
-
-            hs.add(c.getTableAlias() + "." + c.getColumnName());
         }
 
+        // now add in all pk columns
+        List<SqlSelectColumn> cols = new ArrayList<>();
         for (String t : pkMap.keySet()) {
             List<String> pkset = pkMap.get(t);
-            Set<String> cset = cMap.get(t);
 
             StringTokenizer st = new StringTokenizer(t, ".");
             String alias = st.nextToken();
             String table = st.nextToken();
 
             int indx = 1;
+            List<SqlSelectColumn> l = new ArrayList<>();
             for (String c : pkset) {
-                // add any pk columns that are not in original select
-                if (!cset.contains(alias + "." + c)) {
-                    SqlSelectColumn scol = new SqlSelectColumn();
-                    scol.setColumnName(c);
-                    scol.setDatasource(doc.getDatasource());
-                    scol.setTableName(table);
-                    scol.setTableAlias(alias);
-                    scol.setShowInResults(true);
-                    scol.setPkIndex(indx++);
-                    retval.getSelectColumns().add(scol);
-                }
+                SqlSelectColumn scol = new SqlSelectColumn();
+                scol.setColumnName(c);
+                scol.setDatasource(doc.getDatasource());
+                scol.setTableName(table);
+                scol.setTableAlias(alias);
+                scol.setShowInResults(true);
+                scol.setPkIndex(indx++);
+                cols.add(scol);
             }
-        }
 
-        Collections.sort(retval.getSelectColumns(), new ObjectGraphColumnComparator());
+        }
+        System.out.println("------------>" + cols.size());
+        Collections.sort(cols, new PkColumnComparator());
+        cols.addAll(retval.getSelectColumns());
+        retval.setSelectColumns(cols);
 
         return retval;
     }
@@ -1938,18 +1932,12 @@ public class MainServiceImpl implements MainService {
                 QueryDocument doc = res.getResult();
                 QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
 
-                Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
-
-                // need to ensure all primary keys are included in select
-                // so we will update the incoming doc if required
-                QueryDocument ogdoc = toObjectGraphQueryDoc(pkMap, doc);
-
-                wrapper.setDocument(ogdoc);
+                wrapper.setDocument(toObjectGraphQueryDoc(doc));
                 wrapper.setParameters(runWrapper.getParameters());
                 OperationResult<QueryResult> qres = runQuery(wrapper);
 
                 if (qres.isSuccess()) {
-                    retval.setResult(buildResultsObjectGraph(pkMap, ogdoc, qres.getResult()));
+                    retval.setResult(buildResultsObjectGraph(wrapper.getDocument(), qres.getResult()));
                 } else {
                     retval.setErrorCode(res.getErrorCode());
                     retval.setMessage(res.getMessage());

@@ -102,7 +102,6 @@ import org.rbtdesign.qvu.util.DocumentGroupComparator;
 import org.rbtdesign.qvu.util.DocumentScheduleComparator;
 import org.rbtdesign.qvu.util.Errors;
 import org.rbtdesign.qvu.util.Helper;
-import org.rbtdesign.qvu.util.JsonObjectGraphConfig;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.PkColumnComparator;
@@ -1681,7 +1680,23 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private boolean isImportedKey(String datasource, String tableName, String foreignKeyName) {
+    private Map<String, Boolean> getImportedAliases(QueryDocument doc) {
+        Map<String, Boolean> retval = new HashMap<>();
+        try (Connection conn = qvuds.getConnection(doc.getDatasource());) {
+            DatabaseMetaData dmd = conn.getMetaData();
+            for (SqlFrom f : doc.getFromClause()) {
+                if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
+                    retval.put(f.getAlias(), isImportedKey(dmd, doc.getDatasource(), f.getTable(), f.getForeignKeyName()));
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+        
+        return retval;
+    }
+
+    private boolean isImportedKey(DatabaseMetaData dmd, String datasource, String tableName, String foreignKeyName) {
         boolean retval = false;
         DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasource);
 
@@ -1703,11 +1718,10 @@ public class MainServiceImpl implements MainService {
                     }
                 }
             } else {
-                try (Connection conn = qvuds.getConnection(datasource);) {
+                try {
                     t = new Table();
                     t.setSchema(ds.getSchema());
                     t.setName(tableName);
-                    DatabaseMetaData dmd = conn.getMetaData();
                     List<ForeignKey> fkList = getImportedKeys(datasource, dmd, t);
                     for (ForeignKey fk : fkList) {
                         if (fk.getName().equals(foreignKeyName)) {
@@ -1724,49 +1738,33 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private void populateObjectGraphConfig(QueryDocument doc, JsonObjectGraphConfig parent, Map<String, ForeignKeySettings> fkSettings) {
-        List<Integer> pkpos = new ArrayList<>();
+    private Map<String, List<Integer>> getPrimaryKeyPositions(QueryDocument doc) {
+        Map<String, List<Integer>> retval = new HashMap<>();
+        
         int indx = 1;
         for (SqlSelectColumn c : doc.getSelectColumns()) {
-            if (c.isShowInResults() && (c.getPkIndex() > 0)) {
-                if (c.getTableAlias().equals(parent.getAlias())) {
-                    pkpos.add(indx);
+            if (c.isShowInResults()) {
+                if (c.getPkIndex() > 0) {
+                    List<Integer> l = retval.get(c.getTableAlias());
+                    if (l == null) {
+                        retval.put(c.getTableAlias(), l = new ArrayList<>());
+                    }
+                    
+                    l.add(indx);
                 }
-
                 indx++;
             }
         }
-
-        parent.setPrimaryKeyPositions(pkpos);
-
-        for (SqlFrom f : doc.getFromClause()) {
-            if (StringUtils.isNotEmpty(f.getFromAlias()) && f.getFromAlias().equals(parent.getAlias())) {
-                String fieldName = f.getForeignKeyName();
-                ForeignKeySettings fk = fkSettings.get(f.getAlias() + "." + f.getForeignKeyName());
-                if (fk != null) {
-                    fieldName = fk.getFieldName();
-                }
-
-                JsonObjectGraphConfig child = new JsonObjectGraphConfig(parent, f.getAlias(), f.getTable(), fieldName, isImportedKey(doc.getDatasource(), f.getTable(), f.getForeignKeyName()));
-                parent.getChildren().add(child);
-                populateObjectGraphConfig(doc, child, fkSettings);
-            }
-
-        }
-    }
-
-    private JsonObjectGraphConfig createObjectGraphConfig(QueryDocument doc) {
-        JsonObjectGraphConfig retval = new JsonObjectGraphConfig(null, "t0", doc.getBaseTable(), null, false);
-        Map<String, ForeignKeySettings> fkSettings = getDocumentTableForeignKeySettings(doc);
-        populateObjectGraphConfig(doc, retval, fkSettings);
-
+        
         return retval;
-
     }
 
     private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
         List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
-        JsonObjectGraphConfig objectGraphConfig = createObjectGraphConfig(doc);
+        Map<String, Boolean> importedForeignAliases = getImportedAliases(doc);
+        Map<String, List<Integer>> primaryKeyPositions = getPrimaryKeyPositions(doc);
+        
+        
         return retval;
     }
 
@@ -1897,7 +1895,6 @@ public class MainServiceImpl implements MainService {
             }
 
         }
-        System.out.println("------------>" + cols.size());
         Collections.sort(cols, new PkColumnComparator());
         cols.addAll(retval.getSelectColumns());
         retval.setSelectColumns(cols);

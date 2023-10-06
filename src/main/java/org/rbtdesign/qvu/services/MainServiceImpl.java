@@ -1656,8 +1656,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper) {
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<Map<String, Object>>> retval = new OperationResult<>();
 
         OperationResult<QueryResult> res = runQuery(runWrapper);
 
@@ -1692,7 +1692,7 @@ public class MainServiceImpl implements MainService {
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
-        
+
         return retval;
     }
 
@@ -1739,8 +1739,8 @@ public class MainServiceImpl implements MainService {
     }
 
     private Map<String, List<Integer>> getPrimaryKeyPositions(QueryDocument doc) {
-        Map<String, List<Integer>> retval = new HashMap<>();
-        
+        Map<String, List<Integer>> retval = new LinkedHashMap<>();
+
         int indx = 1;
         for (SqlSelectColumn c : doc.getSelectColumns()) {
             if (c.isShowInResults()) {
@@ -1749,22 +1749,60 @@ public class MainServiceImpl implements MainService {
                     if (l == null) {
                         retval.put(c.getTableAlias(), l = new ArrayList<>());
                     }
-                    
+
                     l.add(indx);
                 }
                 indx++;
             }
         }
-        
+
         return retval;
     }
 
-    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
-        List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
+    private String buildObjectGraphKey(String alias, List<Object> row, Map<String, List<Integer>> primaryKeyPositions) {
+        StringBuilder retval = new StringBuilder();
+
+        List<Integer> l = primaryKeyPositions.get(alias);
+        retval.append(alias);
+        retval.append("-");
+        String dot = "";
+        for (Integer pos : primaryKeyPositions.get(alias)) {
+            retval.append(dot);
+            retval.append(row.get(pos));
+            dot = ".";
+        }
+
+        return retval.toString();
+    }
+
+    private List<Map<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
+        List<Map<String, Object>> retval = new ArrayList<>();
         Map<String, Boolean> importedForeignAliases = getImportedAliases(doc);
         Map<String, List<Integer>> primaryKeyPositions = getPrimaryKeyPositions(doc);
-        
-        
+
+        Set<String> keySet = new HashSet<>();
+        for (List<Object> row : res.getData()) {
+            String key = buildObjectGraphKey("t0", row, primaryKeyPositions);
+
+            if (!keySet.contains(key)) {
+                Map<String, Object> rec = new LinkedHashMap<>();
+
+                for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
+                    SqlSelectColumn c = doc.getSelectColumns().get(i);
+                    if (c.isShowInResults() && "t0".equals(c.getTableAlias())) {
+                        String name = c.getDisplayName();
+                        if (StringUtils.isEmpty(name)) {
+                            name = c.getColumnName();
+                        }
+
+                        rec.put(name, row.get(i + 1));
+                    }
+                }
+                retval.add(rec);
+                keySet.add(key);
+            }
+        }
+
         return retval;
     }
 
@@ -1916,8 +1954,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<Map<String, Object>>> retval = new OperationResult<>();
 
         OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName(), runWrapper.getUser());
 

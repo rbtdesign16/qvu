@@ -3,6 +3,7 @@ package org.rbtdesign.qvu.controllers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.rbtdesign.qvu.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -244,9 +245,9 @@ public class MainController {
     }
 
     @PostMapping("api/v1/query/run/json")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonQuery()");
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonQuery(runWrapper);
+        OperationResult<List<Map<String, Object>>> retval = service.runJsonQuery(runWrapper);
 
         // for api call populate text in message
         if (!retval.isSuccess()) {
@@ -260,10 +261,10 @@ public class MainController {
     }
 
     @PostMapping("api/v1/query/run/json/objectgraph")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonObjectQuery()");
         
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
+        OperationResult<List<Map<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
 
         // for api call populate text in message
         if (!retval.isSuccess()) {

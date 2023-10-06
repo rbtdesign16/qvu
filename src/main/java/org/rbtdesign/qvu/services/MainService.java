@@ -1,7 +1,7 @@
 package org.rbtdesign.qvu.services;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
@@ -18,7 +18,6 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
-import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
@@ -82,9 +81,9 @@ public interface MainService {
 
     public OperationResult<DocumentNode> getAvailableDocuments(String documentType);
 
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper);
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper);
     
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper);
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper);
 
     public OperationResult<SystemSettings> getSystemSettings();
     

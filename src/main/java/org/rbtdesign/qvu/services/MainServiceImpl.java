@@ -1759,10 +1759,15 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private String buildObjectGraphKey(String alias, List<Object> row, Map<String, List<Integer>> primaryKeyPositions) {
+    private String buildObjectGraphKey(String parentKey, String alias, List<Object> row, Map<String, List<Integer>> primaryKeyPositions) {
         StringBuilder retval = new StringBuilder();
 
         List<Integer> l = primaryKeyPositions.get(alias);
+        if (StringUtils.isNotEmpty(parentKey)) {
+            retval.append(parentKey);
+            retval.append("|");
+        }
+
         retval.append(alias);
         retval.append("-");
         String dot = "";
@@ -1775,31 +1780,111 @@ public class MainServiceImpl implements MainService {
         return retval.toString();
     }
 
+    private Map<String, Object> buildObjectGraphRecord(QueryDocument doc, String alias, List<Object> row) {
+        Map<String, Object> retval = new LinkedHashMap<>();
+        for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
+            SqlSelectColumn c = doc.getSelectColumns().get(i);
+            if (c.isShowInResults() && "t0".equals(c.getTableAlias())) {
+                String name = c.getDisplayName();
+                if (StringUtils.isEmpty(name)) {
+                    name = c.getColumnName();
+                }
+
+                retval.put(name, row.get(i + 1));
+            }
+        }
+
+        return retval;
+    }
+
+    private void loadObjectGraph(QueryDocument doc,
+            List<Object> row,
+            String parentAlias,
+            String parentKey,
+            Map<String, Map<String, Object>> objMap,
+            Map<String, Boolean> importedForeignAliases,
+            Map<String, List<Integer>> primaryKeyPositions,
+            Map<String, String> foreignKeyFieldNames) {
+
+        for (SqlFrom f : doc.getFromClause()) {
+            if (StringUtils.isNotEmpty(f.getFromAlias())) {
+                if (f.getFromAlias().equals(parentAlias)) {
+                    String key = buildObjectGraphKey(parentKey, f.getAlias(), row, primaryKeyPositions);
+
+                    Map<String, Object> parentObject = objMap.get(parentKey);
+
+                    if (parentObject != null) {
+                        if (!objMap.containsKey(key)) {
+                            Map<String, Object> rec = buildObjectGraphRecord(doc, f.getAlias(), row);
+                            String fieldName = foreignKeyFieldNames.get(f.getAlias());
+                            if (importedForeignAliases.get(f.getAlias())) {
+                                parentObject.put(fieldName, rec);
+                            } else {
+                                List<Object> l = (List<Object>) parentObject.get(fieldName);
+                                if (l == null) {
+                                    parentObject.put(fieldName, l = new ArrayList<>());
+                                }
+
+                                l.add(rec);
+                            }
+
+                            objMap.put(key, rec);
+                            loadObjectGraph(doc, row, f.getAlias(), key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private Map<String, String> getForeignKeyFieldNames(QueryDocument doc) {
+        Map<String, String> retval = new HashMap<>();
+
+        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
+
+        Set<String> hs = new HashSet<>();
+        Map<String, List<ForeignKeySettings>> tmap = new HashMap<>();
+        if (ds.getDatasourceTableSettings() != null) {
+            for (TableSettings ts : ds.getDatasourceTableSettings()) {
+                if (hs.contains(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
+                    tmap.put(ts.getTableName(), ts.getForeignKeySettings());
+                }
+            }
+        }
+
+        for (SqlFrom f : doc.getFromClause()) {
+            List<ForeignKeySettings> l = tmap.get(f.getTable());
+            if (l != null) {
+                for (ForeignKeySettings fks : l) {
+                    if (StringUtils.isNotEmpty(fks.getFieldName())) {
+                        retval.put(f.getAlias(), fks.getFieldName());
+                    } else {
+                        retval.put(f.getAlias(), fks.getForeignKeyName());
+                    }
+                }
+            } else {
+                retval.put(f.getAlias(), f.getForeignKeyName());
+            }
+        }
+
+        return retval;
+    }
+
     private List<Map<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
         List<Map<String, Object>> retval = new ArrayList<>();
         Map<String, Boolean> importedForeignAliases = getImportedAliases(doc);
         Map<String, List<Integer>> primaryKeyPositions = getPrimaryKeyPositions(doc);
+        Map<String, String> foreignKeyFieldNames = getForeignKeyFieldNames(doc);
 
-        Set<String> keySet = new HashSet<>();
+        Map<String, Map<String, Object>> objMap = new HashMap<>();
         for (List<Object> row : res.getData()) {
-            String key = buildObjectGraphKey("t0", row, primaryKeyPositions);
+            String key = buildObjectGraphKey(null, "t0", row, primaryKeyPositions);
 
-            if (!keySet.contains(key)) {
-                Map<String, Object> rec = new LinkedHashMap<>();
-
-                for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
-                    SqlSelectColumn c = doc.getSelectColumns().get(i);
-                    if (c.isShowInResults() && "t0".equals(c.getTableAlias())) {
-                        String name = c.getDisplayName();
-                        if (StringUtils.isEmpty(name)) {
-                            name = c.getColumnName();
-                        }
-
-                        rec.put(name, row.get(i + 1));
-                    }
-                }
+            if (!objMap.containsKey(key)) {
+                Map<String, Object> rec = buildObjectGraphRecord(doc, "t0", row);
                 retval.add(rec);
-                keySet.add(key);
+                objMap.put(key, rec);
+                loadObjectGraph(doc, row, "t0", key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
             }
         }
 

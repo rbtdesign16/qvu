@@ -122,6 +122,9 @@ public class Constants {
     public static final String QUERY_DOCUMENT_CACHE_NAME = "query.document.cache";
     public static final int QUERY_DOCUMENT_CACHE_ENTRIES = 50;
 
+    public static final String REPORT_DOCUMENT_CACHE_NAME = "report.document.cache";
+    public static final int REPORT_DOCUMENT_CACHE_ENTRIES = 50;
+
     public static final String INNER_JOIN = "inner";
     public static final String OUTER_JOIN = "outer";
     

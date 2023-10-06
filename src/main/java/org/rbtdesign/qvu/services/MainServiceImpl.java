@@ -117,6 +117,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
+    private CacheHelper cacheHelper = new CacheHelper();
     @Autowired
     private DataSources qvuds;
 
@@ -171,8 +172,6 @@ public class MainServiceImpl implements MainService {
     private List<ScheduledDocument> scheduledDocuments = null;
 
     private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
-
-    private final CacheHelper cacheHelper = new CacheHelper();
 
     @PostConstruct
     private void init() {
@@ -251,8 +250,7 @@ public class MainServiceImpl implements MainService {
             retval = fileHandler.saveDatasource(datasource);
 
             if (retval.isSuccess()) {
-                cacheHelper.getTableCache().clear();
-                cacheHelper.clearDatasource(datasource.getDatasourceName());
+                cacheHelper.getTableCache().invalidateAll();
                 config.getDatasourcesConfig().setDatasources(retval.getResult());
                 datasourceSettingsHelper.load(config.getDatasourcesConfig());
             }
@@ -570,7 +568,7 @@ public class MainServiceImpl implements MainService {
                     String tname = res.getString(3);
                     String key = ds.getDatasourceName() + "." + tname;
 
-                    Table t = cacheHelper.getTableCache().get(key);
+                    Table t = cacheHelper.getTableCache().getIfPresent(key);
 
                     if (t == null) {
                         t = new Table();
@@ -1192,8 +1190,8 @@ public class MainServiceImpl implements MainService {
                 retval.setMessage(opr.getMessage());
 
                 if (retval.isSuccess()) {
-                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, docWrapper.getGroup(), docWrapper.getReportDocument().getName(), docWrapper.getUser());
-                    cacheHelper.getQueryDocumentCache().remove(key);
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
+                    cacheHelper.getReportDocumentCache().invalidate(key);
                 }
             } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
@@ -1210,9 +1208,8 @@ public class MainServiceImpl implements MainService {
                 retval.setMessage(opr.getMessage());
 
                 if (retval.isSuccess()) {
-                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, docWrapper.getGroup(), doc.getName(), docWrapper.getUser());
-                    cacheHelper.getQueryDocumentCache().put(key, doc);
-
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
+                    cacheHelper.getQueryDocumentCache().invalidate(key);
                 }
             }
 
@@ -1231,7 +1228,7 @@ public class MainServiceImpl implements MainService {
         OperationResult retval = fileHandler.deleteDocument(type, group, u.getName(), name);
         if (retval.isSuccess()) {
             String key = this.getDocumentCacheKey(type, group, name, u.getName());
-            cacheHelper.getQueryDocumentCache().remove(key);
+            cacheHelper.getQueryDocumentCache().invalidate(key);
         }
 
         return retval;
@@ -1332,7 +1329,7 @@ public class MainServiceImpl implements MainService {
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
 
-        QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
+        QueryDocument doc = null; //cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
             retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
@@ -1708,7 +1705,7 @@ public class MainServiceImpl implements MainService {
         }
 
         if (!retval) {
-            Table t = cacheHelper.getTableCache().get(datasource + "." + tableName);
+            Table t = cacheHelper.getTableCache().getIfPresent(datasource + "." + tableName);
 
             if (t != null) {
                 for (ForeignKey fk : t.getImportedKeys()) {
@@ -1936,7 +1933,7 @@ public class MainServiceImpl implements MainService {
         for (SqlFrom f : doc.getFromClause()) {
             if (!retval.containsKey(f.getAlias() + "." + f.getTable())) {
                 String key = doc.getDatasource() + "." + f.getTable();
-                Table t = cacheHelper.getTableCache().get(key);
+                Table t = cacheHelper.getTableCache().getIfPresent(key);
 
                 if (t != null) {
                     retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(t));

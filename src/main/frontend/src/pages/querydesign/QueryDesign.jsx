@@ -143,7 +143,6 @@ import { getDatasourceTreeViewData,
             }
             
          };
-           console.log("--------------->" + JSON.stringify(fromClause));
 
         let res = await saveDocument(docWrapper);
         if (isApiError(res)) {

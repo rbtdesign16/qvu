@@ -1679,11 +1679,21 @@ public class MainServiceImpl implements MainService {
 
     private Map<String, Boolean> getImportedAliases(QueryDocument doc) {
         Map<String, Boolean> retval = new HashMap<>();
+        Map<String, String> tmap = new HashMap<>();
+
+        for (SqlFrom f : doc.getFromClause()) {
+            tmap.put(f.getAlias(), f.getTable());
+        }
+
         try (Connection conn = qvuds.getConnection(doc.getDatasource());) {
             DatabaseMetaData dmd = conn.getMetaData();
             for (SqlFrom f : doc.getFromClause()) {
                 if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
-                    retval.put(f.getAlias(), isImportedKey(dmd, doc.getDatasource(), f.getTable(), f.getForeignKeyName()));
+                    if (StringUtils.isNotEmpty(f.getFromAlias())) {
+                        retval.put(f.getAlias(), isImportedKey(dmd, doc.getDatasource(), tmap.get(f.getFromAlias()), f.getForeignKeyName()));
+                    } else {
+                        retval.put(f.getAlias(), false);
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -1759,7 +1769,6 @@ public class MainServiceImpl implements MainService {
     private String buildObjectGraphKey(String parentKey, String alias, List<Object> row, Map<String, List<Integer>> primaryKeyPositions) {
         StringBuilder retval = new StringBuilder();
 
-        List<Integer> l = primaryKeyPositions.get(alias);
         if (StringUtils.isNotEmpty(parentKey)) {
             retval.append(parentKey);
             retval.append("|");
@@ -1768,6 +1777,7 @@ public class MainServiceImpl implements MainService {
         retval.append(alias);
         retval.append("-");
         String dot = "";
+
         for (Integer pos : primaryKeyPositions.get(alias)) {
             retval.append(dot);
             retval.append(row.get(pos));
@@ -1779,15 +1789,17 @@ public class MainServiceImpl implements MainService {
 
     private Map<String, Object> buildObjectGraphRecord(QueryDocument doc, String alias, List<Object> row) {
         Map<String, Object> retval = new LinkedHashMap<>();
-        for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
-            SqlSelectColumn c = doc.getSelectColumns().get(i);
-            if (c.isShowInResults() && "t0".equals(c.getTableAlias())) {
-                String name = c.getDisplayName();
-                if (StringUtils.isEmpty(name)) {
-                    name = c.getColumnName();
-                }
+        if (StringUtils.isNotEmpty(alias)) {
+            for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
+                SqlSelectColumn c = doc.getSelectColumns().get(i);
+                if (c.isShowInResults() && alias.equals(c.getTableAlias())) {
+                    String name = c.getDisplayName();
+                    if (StringUtils.isEmpty(name)) {
+                        name = c.getColumnName();
+                    }
 
-                retval.put(name, row.get(i + 1));
+                    retval.put(name, row.get(i + 1));
+                }
             }
         }
 
@@ -1876,13 +1888,13 @@ public class MainServiceImpl implements MainService {
         Map<String, Map<String, Object>> objMap = new HashMap<>();
         for (List<Object> row : res.getData()) {
             String key = buildObjectGraphKey(null, "t0", row, primaryKeyPositions);
-
             if (!objMap.containsKey(key)) {
                 Map<String, Object> rec = buildObjectGraphRecord(doc, "t0", row);
                 retval.add(rec);
                 objMap.put(key, rec);
-                loadObjectGraph(doc, row, "t0", key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
             }
+            
+            loadObjectGraph(doc, row, "t0", key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
         }
 
         return retval;
@@ -1931,46 +1943,19 @@ public class MainServiceImpl implements MainService {
         // we will need to ensure that these are selected
         // for an object graph query;
         for (SqlFrom f : doc.getFromClause()) {
-            if (!retval.containsKey(f.getAlias() + "." + f.getTable())) {
+            String pkkey = f.getAlias() + "." + f.getTable();
+            if (!retval.containsKey(pkkey)) {
                 String key = doc.getDatasource() + "." + f.getTable();
                 Table t = cacheHelper.getTableCache().getIfPresent(key);
 
+                List<String> pkcols = null;
                 if (t != null) {
-                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(t));
+                    pkcols = getPrimaryKeyColumnNames(t);
                 } else {
-                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable()));
+                    pkcols = getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable());
                 }
-            }
-        }
 
-        return retval;
-    }
-
-    private Map<String, ForeignKeySettings> getDocumentTableForeignKeySettings(QueryDocument doc) {
-        Map<String, ForeignKeySettings> retval = new HashMap<>();
-
-        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
-
-        Map<String, ForeignKeySettings> tfkMap = new HashMap<>();
-
-        for (TableSettings ts : ds.getDatasourceTableSettings()) {
-            for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
-                String key = ts.getTableName() + "." + fks.getForeignKeyName();
-                tfkMap.put(key, fks);
-            }
-        }
-
-        Map<String, String> aliasMap = new HashMap<>();
-        for (SqlFrom f : doc.getFromClause()) {
-            aliasMap.put(f.getAlias(), f.getTable());
-        }
-
-        for (SqlFrom f : doc.getFromClause()) {
-            if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
-                ForeignKeySettings fks = tfkMap.get(aliasMap.get(f.getFromAlias()) + "." + f.getForeignKeyName());
-                if (fks != null) {
-                    retval.put(f.getFromAlias() + "." + f.getForeignKeyName(), fks);
-                }
+                retval.put(pkkey, pkcols);
             }
         }
 
@@ -1996,13 +1981,11 @@ public class MainServiceImpl implements MainService {
         List<SqlSelectColumn> cols = new ArrayList<>();
         for (String t : pkMap.keySet()) {
             List<String> pkset = pkMap.get(t);
-
             StringTokenizer st = new StringTokenizer(t, ".");
             String alias = st.nextToken();
             String table = st.nextToken();
 
             int indx = 1;
-            List<SqlSelectColumn> l = new ArrayList<>();
             for (String c : pkset) {
                 SqlSelectColumn scol = new SqlSelectColumn();
                 scol.setColumnName(c);

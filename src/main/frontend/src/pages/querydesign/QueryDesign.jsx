@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
- */
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from "react-bootstrap";
 import Button from "react-bootstrap/Button"
@@ -67,8 +63,7 @@ import { getDatasourceTreeViewData,
         setFromClause,
         setCurrentDocument,
         updateSelectColumns,
-        setTreeViewExpandedIds,
-        schema} = useQueryDesign();
+        setTreeViewExpandedIds} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources, getDatasourceSchema} = useDataHandler();
@@ -134,7 +129,7 @@ import { getDatasourceTreeViewData,
                 createDate: actionTimestamp,
                 lastUpdated: actionTimestamp,
                 datasource: datasource,
-                schema: schema,
+                schema: getDatasourceSchema(datasource),
                 baseTable: baseTable,
                 documentGroupName: group,
                 selectColumns: selectColumns,

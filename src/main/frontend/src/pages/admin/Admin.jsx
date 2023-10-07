@@ -823,11 +823,6 @@ const Admin = () => {
 
         if (ok) {
             showMessage(INFO, replaceTokens(getText("Saving datasource"), [config.dataObject.datasourceName]), getText("Saving"), true);
-            
-            if (!config.dataObject.roles) {
-                config.dataObject.roles = [];
-            }
-            
             let res = await saveDatasource(config.dataObject);
 
             if (isApiSuccess(res)) {
@@ -927,23 +922,6 @@ const Admin = () => {
                 }
             } else {
                 setErrorMessage(config.idPrefix, getText("please complete all required entries"));
-        let ok = checkEntryFields(config);
-
-        if (ok) {
-            setErrorMessage(config.idPrefix, "");
-            showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
-            
-            if (!config.dataObject.roles) {
-                config.dataObject.roles = [];
-            }
-            let res = await saveUser(config.dataObject);
-            if (isApiSuccess(res)) {
-                setErrorMessage(config.idPrefix, "");
-                setAuthData(await loadAuth());
-                setEditModal({show: false});
-                showMessage(SUCCESS, replaceTokens(getText("User saved"), [config.dataObject.userId]));
-            } else {
-                showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
             }
         }
     };

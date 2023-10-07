@@ -92,9 +92,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 
 .query-results-footer {
-    width: calc (100% - 20px);
-    height: 30px;
+    font-size: var(--footer-font-size);
     border: none;
+    white-space: nowrap;
 }
 
 .page-input {
@@ -108,12 +108,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .page-input select {
     margin-left: 10px;
     margin-right: 10px;
+    height: 25px;
 }
 
 .page-input input {
     margin-left: 10px;
     margin-right: 5px;
-    height: 30px;
+    height: 25px;
     text-align: center;
 }
 

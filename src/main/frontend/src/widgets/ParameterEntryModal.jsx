@@ -86,17 +86,13 @@ const ParameterEntryModal = (props) => {
     };
     
     const runQuery = () => {
-        let entryFields = getRequiredEntryFields();
         let params = [];
         for (let i = 0; i < parameters.length; ++i) {
-            params.push({
-                value: parameters[i],
-                dataTypeName: getParameterTypeFromId(entryFields[i].dataType)
-            });
+            params.push(parameters[i]);
         }
         
         config.runQuery(params);
-    }
+    };
     
     const onShow = () => {
         let entryFields = getRequiredEntryFields();

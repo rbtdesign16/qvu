@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
-import org.rbtdesign.qvu.dto.QueryParameter;
 import org.rbtdesign.qvu.dto.SqlFilterColumn;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
@@ -62,6 +61,7 @@ public class DBHelper {
 
     public boolean isDataTypeNumeric(int type) {
         return ((type == java.sql.Types.TINYINT)
+                || (type == java.sql.Types.BIT)
                 || (type == java.sql.Types.SMALLINT)
                 || (type == java.sql.Types.INTEGER)
                 || (type == java.sql.Types.BIGINT)
@@ -70,6 +70,14 @@ public class DBHelper {
                 || (type == java.sql.Types.NUMERIC)
                 || (type == java.sql.Types.DECIMAL));
     }
+    
+    public boolean isDataTypeFloat(int type) {
+        return ((type == java.sql.Types.REAL)
+                || (type == java.sql.Types.DOUBLE)
+                || (type == java.sql.Types.NUMERIC)
+                || (type == java.sql.Types.DECIMAL));
+    }
+
 
     public boolean isDataTypeDateTime(int type) {
         return ((type == java.sql.Types.DATE)
@@ -200,7 +208,9 @@ public class DBHelper {
                     } else {
                         retval.append(" join ");
                     }
-                }
+                } else if (StringUtils.isNotEmpty(c.getFromAlias())){
+                    retval.append(" left outer join ");
+                }   
 
                 retval.append(getFromTableName(dbType, schema, c.getTable()));
                 retval.append(" ");
@@ -471,32 +481,4 @@ public class DBHelper {
         }
     }
 
-    public int getJdbcTypeFromName(String name) {
-        int retval;
-        switch(name) {
-            case QueryParameter.DATE_TYPE:
-                retval = java.sql.Types.DATE;
-                break;
-            case QueryParameter.FLOAT_TYPE:
-                retval = java.sql.Types.DOUBLE;
-               break;
-            case QueryParameter.INTEGER_TYPE:
-                retval = java.sql.Types.INTEGER;
-                break;
-           case QueryParameter.TIME_TYPE:
-                retval = java.sql.Types.TIME;
-                break;
-            case QueryParameter.BOOLEAN_TYPE:
-                retval = java.sql.Types.BOOLEAN;
-                break;
-             case QueryParameter.TIMESTAMP_TYPE:
-                retval = java.sql.Types.TIMESTAMP;
-                break;
-            default:
-                retval = java.sql.Types.VARCHAR;
-                break;
-        }
-        
-        return retval;
-    }
 };

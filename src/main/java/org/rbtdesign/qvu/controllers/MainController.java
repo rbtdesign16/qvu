@@ -3,6 +3,7 @@ package org.rbtdesign.qvu.controllers;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.rbtdesign.qvu.services.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -28,6 +29,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -243,9 +245,9 @@ public class MainController {
     }
 
     @PostMapping("api/v1/query/run/json")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonQuery()");
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonQuery(runWrapper);
+        OperationResult<List<Map<String, Object>>> retval = service.runJsonQuery(runWrapper);
 
         // for api call populate text in message
         if (!retval.isSuccess()) {
@@ -259,12 +261,10 @@ public class MainController {
     }
 
     @PostMapping("api/v1/query/run/json/objectgraph")
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonObjectQuery()");
-   //     throw new UnsupportedOperationException("Not supported yet."); 
-
         
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
+        OperationResult<List<Map<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
 
         // for api call populate text in message
         if (!retval.isSuccess()) {
@@ -301,16 +301,16 @@ public class MainController {
         return service.getDocument(type, group, name);
     }
 
-    @GetMapping("api/v1/auth/config/load")
-    public OperationResult<AuthConfig> getAuthConfig() {
-        LOG.debug("in getAuthConfig()");
-        return service.getAuthConfig();
+    @GetMapping("api/v1/system/settings/load")
+    public OperationResult<SystemSettings> getSystemSettings() {
+        LOG.debug("in getSystemSettings()");
+        return service.getSystemSettings();
     }
 
-    @PostMapping("api/v1/auth/config/save")
-    public OperationResult saveAuthConfig(@RequestBody AuthConfig authConfig) {
+    @PostMapping("api/v1/system/settings/save")
+    public OperationResult saveSystemSettings(@RequestBody SystemSettings systemSettings) {
         LOG.debug("in saveAuthConfig()");
-        return service.saveAuthConfig(authConfig);
+        return service.saveSystemSettings(systemSettings);
     }
 
     @GetMapping("api/v1/help/{lang}")
@@ -354,4 +354,17 @@ public class MainController {
         LOG.debug("in doBackup()");
         return service.doBackup();
     }
+    
+    @GetMapping("api/v1/admin/document/schedules")
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules() {
+        LOG.debug("in getDocumentSchedules()");
+        return service.getDocumentSchedules();
+    }
+    
+    @PostMapping("api/v1/admin/document/schedules/save")
+    public OperationResult saveDocumentSchedules(@RequestBody DocumentSchedulesConfiguration schedules) {
+        LOG.debug("in saveDocumentSchedules()");
+        return service.saveDocumentSchedules(schedules);
+    }
+
 }

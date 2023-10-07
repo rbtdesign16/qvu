@@ -21,6 +21,7 @@ public class SqlSelectColumn implements Serializable {
     private String aggregateFunction;
     private String customSql;
     private String path;
+    private Integer selectPosition;
 
     public String getDatasource() {
         return datasource;
@@ -134,5 +135,12 @@ public class SqlSelectColumn implements Serializable {
         this.sortDirection = sortDirection;
     }
 
+    public Integer getSelectPosition() {
+        return selectPosition;
+    }
+
+    public void setSelectPosition(Integer selectPosition) {
+        this.selectPosition = selectPosition;
+    }
 
 }

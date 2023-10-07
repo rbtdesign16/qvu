@@ -56,7 +56,7 @@ const EntryPanel = (props) => {
     const onMultiSelectChange = (c, dataObject, selections) => {
         c.setSelected(dataObject, selections);
         setToggle(!toggle);
-    }
+    };
 
     const getInputField = (c) => {
         if (c.key && !dataObject.newRecord) {
@@ -170,43 +170,69 @@ const EntryPanel = (props) => {
     const getEntry = (c) => {
         if (c.type === "checkbox") {
             return <div className="display-field">{getInputField(c)}<label htmlFor={idPrefix + c.name} style={{paddingLeft: "3px", cursor: "pointer"}}>{c.label}</label></div>;
-                    } else {
-                        return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
-                    }
-                };
+        } else {
+            return <div className="display-field">{getInputField(c)}{c.entryConfig && getChildEntries(c.entryConfig)}</div>;
+        }
+    };
 
-                const loadEntryFields = () => {
-                    return entryConfig.map(c => {
-                        if (!c.hide || !c.hide()) {
-                            return <div className={getGridClass()}>
-                                { getLabel(c) }
-                                { getEntry(c) }
-                            
-                            </div>;
-                        } else {
-                            return "";
-                        }
-                    });
-                };
+    const loadEntryFields = () => {
+        return entryConfig.map(c => {
+            if (!c.hide || !c.hide()) {
+                return <div className={getGridClass()}>
+                    { getLabel(c) }
+                    { getEntry(c) }
 
-                const haveRequiredFields = () => {
-                    for (let i = 0; i < entryConfig.length; ++i) {
-                        if (entryConfig[i].required) {
-                            return true;
-                        }
-                    }
-                };
+                </div>;
+            } else {
+                return "";
+            }
+        });
+    };
 
-                return (
-                        <div>
-                            { loadEntryFields() }
-                            {haveRequiredFields() && <div><span className="red-f">*</span>{getText("indicates required field")}</div>}
-                            {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
-                        </div>);
-            };
+    const haveRequiredFields = () => {
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].required) {
+                return true;
+            }
+        }
+    };
 
-            EntryPanel.propTypes = {
-                config: PropTypes.object.isRequired
-            };
+    const haveRestartRequired = () => {
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].restartRequired) {
+                return true;
+            }
+        }
+    };
 
-            export default EntryPanel;
+    const getIndicatorFields = () => {
+        let req = haveRequiredFields();
+        let res = haveRestartRequired();
+        if (req && res) {
+            return <div>
+            <span className="red-f">*</span>{getText("indicates required field")}<span style={{marginLeft: "10px"}} className="red-f">{getText("restart required")}</span>
+            </div>;
+        } else if (req) {
+            <div>
+                <span className="red-f">*</span>{getText("indicates required field")}
+            </div>;
+        } else if (res) {
+            return <div className="red-f">{getText("restart required")}</div>;
+        } else {
+            return "";
+        }
+    };
+        
+    return (
+            <div>
+                { loadEntryFields() }
+                { getIndicatorFields()}
+                {buttons ? <div className="btn-bar">{ loadButtons()}</div> : ""}
+            </div>);
+};
+
+EntryPanel.propTypes = {
+    config: PropTypes.object.isRequired
+};
+
+export default EntryPanel;

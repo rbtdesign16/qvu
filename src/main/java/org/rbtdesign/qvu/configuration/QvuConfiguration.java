@@ -4,19 +4,21 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.PostConstruct;
-import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.security.BasicAuthSecurityProvider;
 import org.rbtdesign.qvu.configuration.security.OidcConfiguration;
+import org.rbtdesign.qvu.dto.SSLConfig;
 import org.rbtdesign.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,18 +36,35 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableScheduling
 @PropertySources({
     @PropertySource(value = "classpath:default-application.properties"),
     @PropertySource(value = "file:${repository.folder}/config/application.properties", ignoreResourceNotFound = true)
 })
+
 public class QvuConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(QvuConfiguration.class);
 
     @Autowired
     private ConfigurationHelper config;
 
+    @Value("${server.ssl.enabled:false}")
+    private boolean sslEnabled;
+
     @Value("${server.ssl.key-store:}")
     private String sslKeyStore;
+
+    @Value("${server.ssl.key-store-type:}")
+    private String sslKeyStoreType;
+
+    @Value("${server.ssl.key-alias:}")
+    private String sslKeyAlias;
+    
+    @Value("${server.ssl.key-store-password:}")
+    private String sslKeyStorePassword;
+
+    @Value("${server.ssl.key-password:}")
+    private String sslKeyPassword;
 
     @Value("${server.port}")
     private Integer serverPort;
@@ -61,15 +80,19 @@ public class QvuConfiguration {
 
     @Value("${backup.folder:}")
     private String backupFolder;
-
+    
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
         LOG.info("server.port=" + serverPort);
+        LOG.info("backup.folder=" + backupFolder);
         LOG.info("server.servlet.context-path=" + servletContextPath);
         LOG.info("security.type=" + securityType);
         LOG.info("cors.allowed.origins=" + corsAllowedOrigins);
         config.setBackupFolder(backupFolder);
+        config.setSslConfig(getSslConfig());
+        config.setServerPort(serverPort);
+        config.setCorsAllowedOrigins(corsAllowedOrigins);
     }
 
     @Autowired
@@ -132,9 +155,24 @@ public class QvuConfiguration {
         
         http.cors(c -> c.configurationSource(getCorsConfigurationSource())).csrf(c -> c.disable());
 
-        if (StringUtils.isNotEmpty(sslKeyStore)) {
+        if (sslEnabled) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         }
         return http.build();
     }
+    
+    private SSLConfig getSslConfig() {
+        SSLConfig retval = new SSLConfig();
+        
+        retval.setEnabled(sslEnabled);
+        retval.setSslKeyAlias(sslKeyAlias);
+        retval.setSslKeyPassword(sslKeyPassword);
+        retval.setSslKeyStore(sslKeyStore);
+        retval.setSslKeyStorePassword(sslKeyStorePassword);
+        retval.setSslKeyStoreType(sslKeyStoreType);
+        return retval;
+    }
+    
+    
+         
 }

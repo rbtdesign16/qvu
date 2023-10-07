@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
     <property name="LOG_PATTERN"
               value="%n%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} %logger: %m${LOG_EXCEPTION_CONVERSION_WORD:-%throwable}%n" />
 

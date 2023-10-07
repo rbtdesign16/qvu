@@ -15,6 +15,14 @@ public class DocumentWrapper {
     private QueryDocument queryDocument;
     private ReportDocument reportDocument;
 
+    public boolean isReportDocument() {
+        return (reportDocument != null);
+    }
+    
+    public boolean isQueryDocument() {
+        return (queryDocument != null);
+    }
+    
     public List<String> getQueryParameters() {
         return queryParameters;
     }

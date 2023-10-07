@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
@@ -28,11 +30,14 @@ import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
 import org.rbtdesign.qvu.configuration.database.DataSources;
 import org.rbtdesign.qvu.configuration.database.DataSourcesConfiguration;
 import org.rbtdesign.qvu.configuration.document.DocumentGroupsConfiguration;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.SecurityConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
 import org.rbtdesign.qvu.dto.DocumentGroup;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.SchedulerConfig;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -80,7 +85,7 @@ public class FileHandler {
 
     public List<DocumentGroup> loadDocumentGroups() {
         List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
-        
+
         DocumentGroup g = new DocumentGroup();
         g.setDescription(Constants.DEFAULT_DOCUMENT_GROUP_DESCRIPTION);
         g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
@@ -91,7 +96,7 @@ public class FileHandler {
         }
 
         return retval;
-            
+
     }
 
     public OperationResult saveDatasource(DataSourceConfiguration datasource) {
@@ -139,7 +144,9 @@ public class FileHandler {
                     fos.write(getGson(true).toJson(datasources).getBytes());
                 }
                 config.setDatasourcesConfig(datasources);
-                dbDatasources.reloadDatasource(datasource);
+                if (datasource.isEnabled()) {
+                    dbDatasources.reloadDatasource(datasource);
+                }
                 retval.setResult(config.getDatasourcesConfig().getDatasources());
             }
         } catch (SaveException ex) {
@@ -255,7 +262,7 @@ public class FileHandler {
         try {
             File dfolder = config.getDocumentGroupsFolder(groupName, user);
             File gbackup = new File(config.getBackupFolder() + File.separator + groupName.replace(" ", "_") + "-deleted-" + Helper.TS2.format(new Date()) + ".zip");
-            
+
             if (ZipFolder.doZip(dfolder, gbackup)) {
                 File f = new File(config.getDocumentGroupsConfigurationFileName());
                 try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
@@ -281,7 +288,7 @@ public class FileHandler {
                         retval.setErrorCode(OperationResult.SUCCESS);
                     }
                 }
-                
+
                 FileUtils.deleteDirectory(dfolder);
             } else {
                 Errors.populateError(retval, Errors.BACKUP_FAILED);
@@ -292,7 +299,6 @@ public class FileHandler {
         }
 
         return retval;
-
     }
 
     public OperationResult saveDocumentGroups(DocumentGroupsConfiguration docgroups) {
@@ -576,12 +582,10 @@ public class FileHandler {
                 retval.setErrorCode(Errors.DOCUMENT_NOT_FOUND);
                 retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{type, name}));
             } else {
-                try (FileInputStream fis = new FileInputStream(docfile); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
-                    byte[] bytes = fis.readAllBytes();
-                    QueryDocument doc = gson.fromJson(new String(bytes), QueryDocument.class);
-                    doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
-                    retval.setResult(doc);
-                }
+                byte[] bytes = FileUtils.readFileToByteArray(docfile);
+                QueryDocument doc = gson.fromJson(new String(bytes), QueryDocument.class);
+                doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
+                retval.setResult(doc);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -765,7 +769,7 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult updateApplicationProperties(AuthConfig authConfig) {
+    public OperationResult updateApplicationProperties(SystemSettings systemSettings) {
         OperationResult retval = new OperationResult();
 
         LineNumberReader lnr = null;
@@ -776,11 +780,43 @@ public class FileHandler {
             lnr = new LineNumberReader(new FileReader(config.getApplicationPropertiesFileName()));
             String line;
             while ((line = lnr.readLine()) != null) {
-                if (line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
-                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + authConfig.getSecurityType());
-                } else {
+                if (systemSettings.getAuthConfig().isModified() && line.contains(Constants.SECURITY_TYPE_PROPERTY)) {
+                    lines.add(Constants.SECURITY_TYPE_PROPERTY + "=" + systemSettings.getAuthConfig().getSecurityType());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.SERVER_PORT_PROPERTY)) {
+                    lines.add(Constants.SERVER_PORT_PROPERTY + "=" + systemSettings.getMiscConfig().getServerPort());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.BACKUP_FOLDER_PROPERTY)) {
+                    lines.add(Constants.BACKUP_FOLDER_PROPERTY + "=" + systemSettings.getMiscConfig().getBackupFolder());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.CORS_ALLOWED_ORIGINS_PROPERTY)) {
+                    lines.add(Constants.CORS_ALLOWED_ORIGINS_PROPERTY + "=" + systemSettings.getMiscConfig().getCorsAllowedOrigins());
+                } else if (!isSSLProperty(line)) {
                     lines.add(line);
                 }
+            }
+
+            for (String p : Constants.SSL_PROPERTIES) {
+                String val = "";
+                switch (p) {
+                    case Constants.SSL_ENABLED_PROPERTY:
+                        val = "" + systemSettings.getSslConfig().isEnabled();
+                        break;
+                    case Constants.SSL_KEYSTORE_PROPERTY:
+                        val = getKeystoreFileName(systemSettings.getSslConfig().getSslKeyStore());
+                        break;
+                    case Constants.SSL_KEYSTORE_TYPE_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyStoreType();
+                        break;
+                    case Constants.SSL_KEY_ALIAS_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyAlias();
+                        break;
+                    case Constants.SSL_KEYSTORE_PASSWORD_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyStorePassword();
+                        break;
+                    case Constants.SSL_KEY_PASSWORD_PROPERTY:
+                        val = systemSettings.getSslConfig().getSslKeyPassword();
+                        break;
+                }
+
+                lines.add(p + "=" + val);
             }
 
             lnr.close();
@@ -801,6 +837,131 @@ public class FileHandler {
                 };
             }
 
+            if (pw != null) {
+                try {
+                    pw.close();
+                } catch (Exception ex) {
+                }
+            }
+        }
+
+        return retval;
+    }
+
+    private String getKeystoreFileName(String input) {
+        String retval = input;
+        if (StringUtils.isNotEmpty(input)) {
+            if (!input.startsWith("file:")) {
+                retval = "file:" + input;
+            }
+        }
+
+        return retval;
+    }
+
+    private boolean isSSLProperty(String line) {
+        boolean retval = false;
+        for (String p : Constants.SSL_PROPERTIES) {
+            if (line.contains(p)) {
+                retval = true;
+                break;
+            }
+        }
+
+        return retval;
+    }
+
+    public OperationResult updateSchedulerProperties(SchedulerConfig schedulerConfig) {
+        OperationResult retval = new OperationResult();
+        LineNumberReader lnr = null;
+        PrintWriter pw = null;
+        List<String> lines = new ArrayList<>();
+        Map<String, String> updateValues = new HashMap<>();
+        try {
+            for (String p : Constants.SCHEDULER_PROPERTIES) {
+                String value = "";
+                switch (p) {
+                    case Constants.SCHEDULER_ENABLED_PROPERTY:
+                        value = "" + schedulerConfig.isEnabled();
+                        break;
+                    case Constants.SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY:
+                        value = "" + schedulerConfig.getMaxSchedulerPoolSize();
+                        break;
+                    case Constants.SCHEDULER_EXECUTE_TIMEOUT_PROPERTY:
+                        value = "" + schedulerConfig.getSchedulerExecuteTimeoutSeconds();
+                        break;
+                    case Constants.MAIL_SMTP_AUTH_PROPERTY:
+                        value = "" + schedulerConfig.isSmtpAuth();
+                        break;
+                    case Constants.MAIL_SMTP_STARTTLS_ENABLE_PROPERTY:
+                        value = "" + schedulerConfig.isSmtpStartTlsEnable();
+                        break;
+                    case Constants.MAIL_SMTP_SSL_TRUST_PROPERTY:
+                        value = "" + schedulerConfig.getSmtpSslTrust();
+                        break;
+                    case Constants.MAIL_SMTP_HOST_PROPERTY:
+                        value = schedulerConfig.getSmtpHost();
+                        break;
+                    case Constants.MAIL_SMTP_PORT_PROPERTY:
+                        value = "" + schedulerConfig.getSmtpPort();
+                        break;
+                    case Constants.MAIL_USER_PROPERTY:
+                        value = schedulerConfig.getMailUser();
+                        break;
+                    case Constants.MAIL_PASSWORD_PROPERTY:
+                        value = schedulerConfig.getMailPassword();
+                        break;
+                    case Constants.MAIL_FROM_PROPERTY:
+                        value = schedulerConfig.getMailFrom();
+                        break;
+                    case Constants.MAIL_SUBJECT_PROPERTY:
+                        value = schedulerConfig.getMailSubject();
+                        break;
+                    case Constants.SCHEDULER_FIXED_RATE_SECONDS_PROPERTY:
+                        value = Constants.DEFAULT_SCHEDULER_FIXED_RATE_SECONDS;
+                        break;
+                }
+
+                updateValues.put(p, value);
+            }
+
+            lnr = new LineNumberReader(new FileReader(config.getSchedulerPropertiesFileName()));
+
+            String line;
+            while ((line = lnr.readLine()) != null) {
+                line = line.trim();
+                if (!line.startsWith("#")) {
+                    int pos = line.indexOf("=");
+                    if (pos > -1) {
+                        String key = line.substring(0, pos);
+                        if (updateValues.containsKey(key)) {
+                            lines.add(key + "=" + updateValues.get(key));
+                        } else {
+                            lines.add(line);
+                        }
+                    } else {
+                        lines.add(line);
+                    }
+                } else {
+                    lines.add(line);
+                }
+            }
+
+            lnr.close();
+            lnr = null;
+            pw = new PrintWriter(config.getSchedulerPropertiesFileName());
+            for (String l : lines) {
+                pw.println(l);
+            }
+        } catch (Exception ex) {
+            Errors.populateError(retval, ex);
+        } finally {
+            if (lnr != null) {
+                try {
+                    lnr.close();
+                } catch (Exception ex) {
+                };
+            }
             if (pw != null) {
                 try {
                     pw.close();
@@ -854,6 +1015,50 @@ public class FileHandler {
         }
 
         return retval;
+    }
+
+    public List<DocumentSchedule> loadDocumentSchedules() {
+        List<DocumentSchedule> retval = config.getDocumentSchedulesConfig().getDocumentSchedules();
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Document Schedules: " + gson.toJson(retval, ArrayList.class));
+        }
+
+        return retval;
+
+    }
+
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration docschedules) {
+        OperationResult retval = new OperationResult();
+        try {
+            File f = new File(config.getDocumentSchedulesConfigurationFileName());
+            try (FileInputStream fis = new FileInputStream(f); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
+                byte[] bytes = fis.readAllBytes();
+                DocumentSchedulesConfiguration ds = gson.fromJson(new String(bytes), DocumentSchedulesConfiguration.class);
+
+                if (ds != null) {
+                    if (docschedules.getLastUpdated() > config.getDocumentSchedulesConfig().getLastUpdated()) {
+                        retval.setErrorCode(Errors.RECORD_UPDATED);
+                        retval.setMessage(Errors.getMessage(retval.getErrorCode(), new String[]{"document schedules"}));
+                    }
+                }
+            }
+
+            if (retval.isSuccess()) {
+                docschedules.setLastUpdated(System.currentTimeMillis());
+                try (FileOutputStream fos = new FileOutputStream(f); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
+                    fos.write(getGson(true).toJson(docschedules).getBytes());
+                    config.setDocumentSchedulesConfig(docschedules);
+                    retval.setErrorCode(OperationResult.SUCCESS);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Errors.populateError(retval, ex);
+        }
+
+        return retval;
+
     }
 
 }

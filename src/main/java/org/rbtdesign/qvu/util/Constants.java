@@ -31,11 +31,54 @@ public class Constants {
     
     public static final String DEFAULT_ADMIN_USER = "admin";
     public static final String SECURITY_TYPE_PROPERTY = "security.type";
+    public static final String SERVER_PORT_PROPERTY = "server.port";
+    public static final String BACKUP_FOLDER_PROPERTY = "backup.folder";
+    public static final String CORS_ALLOWED_ORIGINS_PROPERTY = "cors.allowed.origins";
     
-    public static final String OFFLINE = "offline";
-    public static final String ONLINE = "online";
-    public static final String NONE = "none";
+    public static final String SSL_ENABLED_PROPERTY = "server.ssl.enabled";
+    public static final String SSL_KEYSTORE_PROPERTY = "server.ssl.key-store";
+    public static final String SSL_KEYSTORE_TYPE_PROPERTY = "server.ssl.key-store-type";
+    public static final String SSL_KEY_ALIAS_PROPERTY = "server.ssl.key-alias";
+    public static final String SSL_KEYSTORE_PASSWORD_PROPERTY = "server.ssl.key-store-password";
+    public static final String SSL_KEY_PASSWORD_PROPERTY = "server.ssl.key-password";
     
+    public static final String[] SSL_PROPERTIES = {
+        SSL_ENABLED_PROPERTY,
+        SSL_KEYSTORE_PROPERTY,
+        SSL_KEYSTORE_TYPE_PROPERTY,
+        SSL_KEY_ALIAS_PROPERTY,
+        SSL_KEYSTORE_PASSWORD_PROPERTY,
+        SSL_KEY_PASSWORD_PROPERTY};
+    
+    
+    public static final String SCHEDULER_ENABLED_PROPERTY = "scheduler.enabled";
+    public static final String SCHEDULER_FIXED_RATE_SECONDS_PROPERTY = "scheduler.fixed.rate.seconds";
+    public static final String SCHEDULER_MAX_SCHEDULER_POOL_PROPERTY = "max.scheduler.pool.size";
+    public static final String SCHEDULER_EXECUTE_TIMEOUT_PROPERTY = "scheduler.execute.timeout.seconds";
+    public static final String MAIL_SMTP_AUTH_PROPERTY = "mail.smtp.auth";
+    public static final String MAIL_SMTP_STARTTLS_ENABLE_PROPERTY = "mail.smtp.starttls.enable";
+    public static final String MAIL_SMTP_HOST_PROPERTY = "mail.smtp.host";
+    public static final String MAIL_SMTP_PORT_PROPERTY = "mail.smtp.port";
+    public static final String MAIL_SMTP_SSL_TRUST_PROPERTY = "mail.smtp.ssl.trust";
+    public static final String MAIL_USER_PROPERTY = "mail.user";
+    public static final String MAIL_PASSWORD_PROPERTY = "mail.password";
+    public static final String MAIL_FROM_PROPERTY = "mail.from";
+    public static final String MAIL_SUBJECT_PROPERTY = "mail.subject";
+    public static final String DEFAULT_SCHEDULER_FIXED_RATE_SECONDS = "30";
+    
+    public static final String[] SCHEDULER_PROPERTIES = {
+        SCHEDULER_ENABLED_PROPERTY,
+        SCHEDULER_FIXED_RATE_SECONDS_PROPERTY,
+        MAIL_SMTP_AUTH_PROPERTY,
+        MAIL_SMTP_STARTTLS_ENABLE_PROPERTY,
+        MAIL_SMTP_SSL_TRUST_PROPERTY,
+        MAIL_SMTP_HOST_PROPERTY,
+        MAIL_SMTP_PORT_PROPERTY,
+        MAIL_USER_PROPERTY,
+        MAIL_PASSWORD_PROPERTY,
+        MAIL_FROM_PROPERTY,
+        MAIL_SUBJECT_PROPERTY};
+
     public static final String OIDC_REGISTRATION_ID = "qvuoidc";
     public static final String OIDC_REDIRECT_TEMPLATE = "{baseUrl}/login/oauth2/code/{registrationId}";
     public static final int DEFAULT_MAX_EXPORTED_KEY_DEPTH = 4;
@@ -46,6 +89,7 @@ public class Constants {
     public static final String SECURITY_CONFIG_FILE_NAME = "qvu-security.json";
     public static final String DATASOURCES_CONFIG_FILE_NAME = "qvu-datasources.json";
     public static final String DOCUMENT_GROUPS_CONFIG_FILE_NAME = "qvu-document-groups.json";
+    public static final String DOCUMENT_SCHEDULES_CONFIG_FILE_NAME = "qvu-document-schedules.json";
     public static final String LANGUAGE_FILE_NAME = "qvu-language.json";
     public static final String DEFAULT_CERT_FILE_NAME = "qvu-self-signed.p12";
     public static final String DEFAULT_LANGUAGE_KEY = "en-US";
@@ -78,6 +122,9 @@ public class Constants {
     public static final String QUERY_DOCUMENT_CACHE_NAME = "query.document.cache";
     public static final int QUERY_DOCUMENT_CACHE_ENTRIES = 50;
 
+    public static final String REPORT_DOCUMENT_CACHE_NAME = "report.document.cache";
+    public static final int REPORT_DOCUMENT_CACHE_ENTRIES = 50;
+
     public static final String INNER_JOIN = "inner";
     public static final String OUTER_JOIN = "outer";
     
@@ -90,5 +137,13 @@ public class Constants {
     public static final String CUSTOM_FK_DATA_SEPARATOR = "?";
     public static final String COMPARISON_OPERATOR_IN = "in";
     public static final String TABLE_TYPE_VIEW = "VIEW";
+    
+    public static final String RESULT_TYPE_EXCEL = "excel";
+    public static final String RESULT_TYPE_CSV = "csv";
+    public static final String RESULT_TYPE_JSON_FLAT = "jsonflat";
+    public static final String RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
+    
+    public static final String CURRENT_DATE_PLACEHOLDER = "$dt";
+    
     
 }

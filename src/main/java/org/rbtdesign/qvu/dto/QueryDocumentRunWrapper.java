@@ -8,18 +8,20 @@ import java.util.List;
  * @author rbtuc
  */
 public class QueryDocumentRunWrapper {
-    private List<QueryParameter> parameters = new ArrayList<>();
+    private List<String> parameters = new ArrayList<>();
     private QueryDocument document;
  
-    public List<QueryParameter> getParameters() {
-        return parameters;
+    public QueryDocumentRunWrapper() {};
+    public QueryDocumentRunWrapper(QueryDocument document) {
+        this.document = document;
     }
-
-    public void setParameters(List<QueryParameter> parameters) {
+    
+    public QueryDocumentRunWrapper(QueryDocument document, List<String> parameters) {
+        this.document = document;
         this.parameters = parameters;
     }
 
-
+    
     public QueryDocument getDocument() {
         return document;
     }
@@ -27,7 +29,12 @@ public class QueryDocumentRunWrapper {
     public void setDocument(QueryDocument document) {
         this.document = document;
     }
-    
-    
-    
+
+    public List<String> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<String> parameters) {
+        this.parameters = parameters;
+    }
 }

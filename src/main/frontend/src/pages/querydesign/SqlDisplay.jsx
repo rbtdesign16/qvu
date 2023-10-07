@@ -205,7 +205,9 @@ const SqlDisplay = (props) => {
             return fromClause.map((f, indx) => {
                 let joinType = " join ";
 
-                if (f.joinType === "outer") {
+                if (f.joinType && (f.joinType === "inner")) {
+                    joinType = " join ";
+                } else if (f.fromAlias) {
                     joinType = " left outer join ";
                 }
 

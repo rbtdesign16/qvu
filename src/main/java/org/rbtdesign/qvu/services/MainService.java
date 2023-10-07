@@ -1,12 +1,12 @@
 package org.rbtdesign.qvu.services;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
 import org.rbtdesign.qvu.configuration.database.DataSourceConfiguration;
-import org.rbtdesign.qvu.dto.AuthConfig;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.dto.AuthData;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
@@ -18,6 +18,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -80,14 +81,18 @@ public interface MainService {
 
     public OperationResult<DocumentNode> getAvailableDocuments(String documentType);
 
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper);
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper);
     
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper);
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper);
 
-    public OperationResult<AuthConfig> getAuthConfig();
+    public OperationResult<SystemSettings> getSystemSettings();
     
-    public OperationResult saveAuthConfig(AuthConfig authConfig);
+    public OperationResult saveSystemSettings(SystemSettings systemSettings);
     
     public OperationResult<String> doBackup();
+    
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules();
+    
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules);
 
 }

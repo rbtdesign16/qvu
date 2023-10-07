@@ -218,7 +218,7 @@ const CustomForeignKeys = (props) => {
                             {getColumnSelect(indx, "toColumns")}
                         </div>
                         <div className="label"></div><div><input name="imported" type="checkbox" defaultChecked={fk.imported} onChange={(e) => onChange(e, indx)} id={"imp-" + indx}/>
-                            <label className="ck-label" htmlFor={"imp-" + indx}>{getText("Imported Keys")}</label>
+                            <label className="ck-label" htmlFor={"imp-" + indx}>{getText("Imported Key")}</label>
                         </div>
                         <div className="label"></div><div>
                             <div title={getText("Remove entry")} style={{float: "right"}} ><AiFillDelete  className="icon crimson-f" size={SMALL_ICON_SIZE} onClick={(e) => remove(indx)} /></div>

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
-import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,5 +120,4 @@ public class Helper {
         
         return retval;
     }
-    
 }

@@ -50,6 +50,7 @@ export const NODE_TYPE_IMPORTED_FOREIGNKEY = "ifk";
 export const NODE_TYPE_EXPORTED_FOREIGNKEY = "efk";
 
 export const JDBC_TYPE_TINYINT = -6;
+export const JDBC_TYPE_BIT = -7;
 export const JDBC_TYPE_SMALLINT = 5;
 export const JDBC_TYPE_INTEGER = 4;
 export const JDBC_TYPE_BIGINT = -5;
@@ -118,6 +119,11 @@ export const END_KEY = "arrowright";
 export const DEFAULT_EXPORTED_KEY_DEPTH  = 4;
 export const DEFAULT_IMPORTED_KEY_DEPTH  = 2;
 export const CUSTOM_FK_DATA_SEPARATOR = "?";
+
+export const RESULT_TYPE_EXCEL = "excel";
+export const RESULT_TYPE_CSV = "csv";
+export const RESULT_TYPE_JSON_FLAT = "jsonflat";
+export const RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
@@ -351,6 +357,7 @@ export const getAggregateFunctionsByDataType = (dataType) => {
 
 export const isDataTypeNumeric = (type) => {
     return ((type === JDBC_TYPE_TINYINT)
+            || (type === JDBC_TYPE_BIT)
             || (type === JDBC_TYPE_SMALLINT)
             || (type === JDBC_TYPE_INTEGER)
             || (type === JDBC_TYPE_BIGINT)
@@ -619,4 +626,32 @@ export const getParameterTypeFromId = (id) => {
     }
     
     return retval;
+};
+
+export const getCurrentSelectValue = (e) => {
+    return e.target.options[e.target.selectedIndex].value;
+};
+
+
+export const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "Octorber", "November", "December"];
+export const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+export const arraysEqual = (a1, a2, nosort = false) => {
+    if (!a1 && !a2) {
+        return true;
+    } else if (a1 && a2 && (a1.length === a2.length)) {
+        if (!nosort) {
+            a1.sort();
+            a2.sort();
+        }
+        
+        for (let i = 0; i < a1.length; ++i) {
+            if (a1[i] !== a2[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+        
 };

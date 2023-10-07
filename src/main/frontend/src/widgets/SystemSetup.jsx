@@ -17,7 +17,7 @@ INFO,
 } from "../utils/helper";
 
 import {
-        SECURITY_TYPE_BASIC,
+SECURITY_TYPE_BASIC,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
 } from "../utils/authHelper";
@@ -25,12 +25,12 @@ import {
 import {
 isApiError,
         isApiSuccess,
-        getSecurityConfig} from "../utils/apiHelper";
+        getSystemSettings} from "../utils/apiHelper";
 
 const SystemSetup = (props) => {
     const {authData} = useAuth();
     const {config} = props;
-    const [securityConfig, setSecurityConfig] = useState(null);
+    const [systemSettings, setSystemSettings] = useState(null);
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
@@ -43,10 +43,225 @@ const SystemSetup = (props) => {
         config.hide();
     };
 
+    const onBasicChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.authConfig.basicConfiguration = dataObject;
+        ss.authConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+   const onSslChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.sslConfig = dataObject;
+        ss.sslConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onMiscChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.miscConfig = dataObject;
+        ss.miscConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onOidcChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.authConfig.oidcConfiguration = dataObject;
+        ss.authConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const onSchedulerChange = (e, entryConfig, dataObject) => {
+        let ss = {...systemSettings};
+        ss.schedulerConfig = dataObject;
+        ss.schedulerConfig.modified = true;
+        setSystemSettings(ss);
+    };
+
+    const getMiscConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.miscConfig},
+            idPrefix: "misc-",
+            afterChange: onMiscChange,
+            entryConfig: [
+                {
+                    label: getText("Server Port"),
+                    name: "serverPort",
+                    type: "number",
+                    required: true,
+                    restartRequired: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("serverPort-help")
+                },
+                {
+                    label: getText("Backup Folder"),
+                    name: "backupFolder",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("backupFolder-help")
+                },
+                {
+                    label: getText("CORS Allowed Origins"),
+                    name: "corsAllowedOrigins",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("corsAllowedOrigins-help")
+                }
+            ]
+        };
+    };
+
+    const getSchedulerConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.schedulerConfig},
+            idPrefix: "sched-",
+            afterChange: onSchedulerChange,
+            entryConfig: [
+                {
+                    label: getText("SMTP Host"),
+                    name: "smtpHost",
+                    type: "input",
+                    size: 60,
+                    restartRequired: true,
+                    required: true
+                },
+                {
+                    label: getText("SMTP Port"),
+                    name: "smtpPort",
+                    type: "number",
+                    size: 40,
+                    required: true
+                },
+                {
+                    label: getText("SMTP Auth"),
+                    name: "smtpAuth",
+                    type: "checkbox",
+                    showHelp: showHelpMessage,
+                    helpText: getText("smtpAuth-help")
+                },
+                {
+                    label: getText("Start TTLS Enable"),
+                    name: "smtpStartTlsEnable",
+                    type: "checkbox",
+                    showHelp: showHelpMessage,
+                    helpText: getText("smtpStartTlsEnable-help")
+                },
+                {
+                    label: getText("SSL Trust"),
+                    name: "smtpSslTrust",
+                    type: "input",
+                    size: 60,
+                    showHelp: showHelpMessage,
+                    helpText: getText("smtpSslTrust-help")
+                },
+                {
+                    label: getText("Mail User"),
+                    name: "mailUser",
+                    type: "input",
+                    size: 40
+                },
+                {
+                    label: getText("Mail Password"),
+                    name: "mailPassword",
+                    type: "password",
+                    size: 40
+                },
+                {
+                    label: getText("Mail From"),
+                    name: "mailFrom",
+                    type: "input",
+                    required: true,
+                    size: 40
+                },
+                {
+                    label: getText("Mail Subject"),
+                    name: "mailSubject",
+                    type: "input",
+                    required: true,
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("mailSubject-help")
+                },
+                {
+                    label: getText("Enable Scheduler"),
+                    name: "enabled",
+                    type: "checkbox",
+                    size: 40
+                }
+            ]
+        };
+    };
+
+    const getSslConfig = () => {
+        return {
+            gridClass: "entrygrid-225-350",
+            dataObject: {...systemSettings.sslConfig},
+            idPrefix: "ssl-",
+            afterChange: onSslChange,
+            entryConfig: [
+                {
+                    label: getText("SSL Key Store"),
+                    name: "sslKeyStore",
+                    type: "input",
+                    size: 60,
+                    required: true,
+                    restartRequired: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStore-help")
+                },
+                {
+                    label: getText("Keystore Type"),
+                    name: "sslKeyStoreType",
+                    type: "input",
+                    size: 40,
+                    required: true,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStoreType-help")
+                },
+                {
+                    label: getText("Key Alias"),
+                    name: "sslKeyAlias",
+                    type: "input",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyAlias-help")
+                },
+                {
+                    label: getText("Keystore Password"),
+                    name: "sslKeyStorePassword",
+                    type: "password",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyStorePassword-help")
+                },
+                {
+                    label: getText("Key Password"),
+                    name: "sslKeyPassword",
+                    type: "password",
+                    size: 40,
+                    showHelp: showHelpMessage,
+                    helpText: getText("sslKeyPassword-help")
+                },
+                {
+                    label: getText("Enable SSL"),
+                    name: "enabled",
+                    type: "checkbox",
+                    size: 40
+                }
+            ]
+        };
+    };
+
     const getOidcConfig = () => {
         return {
             gridClass: "entrygrid-225-350",
-            dataObject: {...securityConfig.oidcConfiguration},
+            dataObject: {...systemSettings.authConfig.oidcConfiguration},
             idPrefix: "oidc-",
             afterChange: onOidcChange,
             entryConfig: [
@@ -85,7 +300,14 @@ const SystemSetup = (props) => {
                     showHelp: showHelpMessage,
                     helpText: getText("adminRoleMapping-help")
                 },
-
+                {
+                    label: getText("Role Claim Property Name"),
+                    name: "roleClaimPropertyName",
+                    type: "input",
+                    size: 50,
+                    showHelp: showHelpMessage,
+                    helpText: getText("roleClaimPropertyName-help")
+                },
                 {
                     label: getText("Use Email for User Id"),
                     name: "useEmailForUserId",
@@ -98,7 +320,7 @@ const SystemSetup = (props) => {
         return {
             gridClass: "entrygrid-225-350",
             idPrefix: "bas-",
-            dataObject: {...securityConfig.basicConfiguration},
+            dataObject: {...systemSettings.authConfig.basicConfiguration},
             afterChange: onBasicChange,
             entryConfig: [
                 {
@@ -113,39 +335,42 @@ const SystemSetup = (props) => {
     };
 
 
-    const onBasicChange = (e, entryConfig, dataObject) => {
-        let sc = {...securityConfig};
-        sc.basicConfiguration = dataObject;
-        setSecurityConfig(sc);
-    };
-
-    const onOidcChange = (e, entryConfig, dataObject) => {
-        let sc = {...securityConfig};
-        sc.oidcConfiguration = dataObject;
-        setSecurityConfig(sc);
-    };
-    
     const checkData = () => {
-        return checkOidcData();
+        let retval = "";
+        if (systemSettings.authConfig.securityType === SECURITY_TYPE_OIDC) {
+            if (!checkOidcData()) {
+                retval = replaceTokens(getText("complete-required-entries"), ["OIDC"]);
+            }
+        }
+
+        if (systemSettings.schedulerConfig.enabled) {
+            if (!checkSchedulerData()) {
+                retval = replaceTokens(getText("complete-required-entries"), ["scheduler"]);
+            }
+        }
+
+
+        return retval;
     };
 
     const saveSetup = async () => {
-        if (checkData()) {
-            config.save(securityConfig);
+        let err = checkData();
+        if (!err) {
+            config.save(systemSettings);
         } else {
-            showMessage(ERROR, getText("please complete all required entries"));
+            showMessage(ERROR, err);
         }
     };
 
     const checkOidcData = () => {
         let retval = true;
 
-        if (securityConfig.oidcConfiguration && securityConfig.oidcConfiguration.enabled) {
+        if (systemSettings.authConfig.oidcConfiguration) {
             let ok = true;
 
             let entryConfig = getOidcConfig().entryConfig;
             for (let i = 0; i < entryConfig.length; ++i) {
-                if (entryConfig[i].required && !securityConfig.oidcConfiguration[entryConfig[i].name]) {
+                if (entryConfig[i].required && !systemSettings.authConfig.oidcConfiguration[entryConfig[i].name]) {
                     ok = false;
                     break;
                 }
@@ -157,15 +382,24 @@ const SystemSetup = (props) => {
         return retval;
     };
 
-    const canSave = () => {
-        let retval = false;
+    const checkSchedulerData = () => {
+        let retval = true;
 
+        let entryConfig = getSchedulerConfig().entryConfig;
+        for (let i = 0; i < entryConfig.length; ++i) {
+            if (entryConfig[i].required && !systemSettings.schedulerConfig[entryConfig[i].name]) {
+                retval = false;
+                break;
+            }
+        }
+        
         return retval;
     };
 
+
     const getDefaultActiveTabKey = () => {
         let retval = SECURITY_TYPE_BASIC;
-        switch (securityConfig.securityType) {
+        switch (systemSettings.authConfig.securityType) {
             case  SECURITY_TYPE_BASIC:
                 retval = "key-" + SECURITY_TYPE_BASIC;
                 break;
@@ -181,21 +415,21 @@ const SystemSetup = (props) => {
     const onShow = async () => {
         showMessage(INFO, getText("Loading system settings", "..."), null, true);
 
-        let res = await getSecurityConfig();
+        let res = await getSystemSettings();
 
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             res.newRecord = false;
             hideMessage();
-            setSecurityConfig(res.result);
+            setSystemSettings(res.result);
         }
     };
 
     const loadSecurityTypes = () => {
-        if (securityConfig && securityConfig.securityType) {
+        if (systemSettings && systemSettings.authConfig && systemSettings.authConfig.securityType) {
             return SECURITY_TYPES.map(t => {
-                if (t === securityConfig.securityType) {
+                if (t === systemSettings.authConfig.securityType) {
                     return <option value={t} selected>{t}</option>;
                 } else {
                     return <option value={t}>{t}</option>;
@@ -203,18 +437,18 @@ const SystemSetup = (props) => {
             });
         }
     };
-    
+
     const onSecurityTypeChange = (e) => {
-        let sc = {...securityConfig};
+        let ss = {...systemSettings};
         let type = e.target.value;
-        
-        sc.securityType = type;
-        setSecurityConfig(sc);
+
+        ss.authConfig.securityType = type;
+        setSystemSettings(ss);
     };
 
     const getTabPanel = () => {
-        if (securityConfig) {
-            return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t1" className="mb-3">
+        if (systemSettings) {
+            return (<Tabs defaultActiveKey={getDefaultActiveTabKey()} id="t2" className="mb-3">
                 <Tab eventKey={"key-" + SECURITY_TYPE_BASIC} title="Basic">
                     <EntryPanel config={getBasicConfig()}/>
                 </Tab>
@@ -226,11 +460,11 @@ const SystemSetup = (props) => {
             return "";
         }
     };
-    
+
     const getTitle = () => {
         return getText("System Settings");
-    }
-    
+    };
+
 
     return  (<Modal animation={false} 
            size={config.dlgsize ? config.dlgsize : ""}
@@ -243,14 +477,27 @@ const SystemSetup = (props) => {
             <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <div>   
-                <div style={{textAlign: "center"}} className="entrygrid-225-225">
-                    <label className="label">{getText("Default Security Type")}</label>
-                    <select onChange={e => onSecurityTypeChange(e)}> 
-                        {loadSecurityTypes()}
-                    </select>   
-                </div>
-                { getTabPanel() }
+            <div style={{height: "375px"}}>   
+                <Tabs id="t1" className="mb-3">
+                    <Tab eventKey="auth" title={getText("Authentication")}>
+                        <div style={{textAlign: "center"}} className="entrygrid-225-225">
+                            <label className="label">{getText("Default Security Type")}</label>
+                            <select onChange={e => onSecurityTypeChange(e)}> 
+                                {loadSecurityTypes()}
+                            </select>   
+                        </div>
+                        { getTabPanel() }
+                    </Tab>
+                    <Tab eventKey="sched"  title={getText("Scheduler")}>
+                        { systemSettings && <EntryPanel config={getSchedulerConfig()}/> }
+                    </Tab>
+                    <Tab eventKey="ssl"  title={getText("SSL")}>
+                        { systemSettings && <EntryPanel config={getSslConfig()}/> }
+                    </Tab>
+                    <Tab eventKey="misc"  title={getText("Misc")}>
+                        { systemSettings && <EntryPanel config={getMiscConfig()}/> }
+                    </Tab>
+                </Tabs>
             </div>
         </Modal.Body>
         <Modal.Footer>

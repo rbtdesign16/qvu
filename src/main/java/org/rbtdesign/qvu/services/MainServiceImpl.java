@@ -3,7 +3,6 @@ package org.rbtdesign.qvu.services;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -15,6 +14,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import org.apache.commons.codec.binary.Hex;
@@ -62,6 +65,7 @@ import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 import org.rbtdesign.qvu.client.utils.SecurityService;
+import org.rbtdesign.qvu.configuration.document.DocumentSchedulesConfiguration;
 import org.rbtdesign.qvu.configuration.security.BasicConfiguration;
 import org.rbtdesign.qvu.configuration.security.OidcConfiguration;
 import org.rbtdesign.qvu.dto.AuthConfig;
@@ -69,19 +73,24 @@ import org.rbtdesign.qvu.dto.Column;
 import org.rbtdesign.qvu.dto.ColumnSettings;
 import org.rbtdesign.qvu.dto.DocumentGroup;
 import org.rbtdesign.qvu.dto.DocumentNode;
+import org.rbtdesign.qvu.dto.DocumentSchedule;
 import org.rbtdesign.qvu.dto.DocumentWrapper;
+import org.rbtdesign.qvu.dto.SchedulerConfig;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.ForeignKey;
 import org.rbtdesign.qvu.dto.ForeignKeySettings;
+import org.rbtdesign.qvu.dto.MiscConfig;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
-import org.rbtdesign.qvu.dto.QueryParameter;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.ScheduledDocument;
+import org.rbtdesign.qvu.dto.SqlFilterColumn;
 import org.rbtdesign.qvu.dto.SqlFrom;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
+import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
@@ -90,18 +99,25 @@ import org.rbtdesign.qvu.util.ConfigBuilder;
 import org.rbtdesign.qvu.util.DBHelper;
 import org.rbtdesign.qvu.util.DatasourceSettingsHelper;
 import org.rbtdesign.qvu.util.DocumentGroupComparator;
+import org.rbtdesign.qvu.util.DocumentScheduleComparator;
 import org.rbtdesign.qvu.util.Errors;
 import org.rbtdesign.qvu.util.Helper;
 import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
-import org.rbtdesign.qvu.util.ObjectGraphColumnComparator;
+import org.rbtdesign.qvu.util.PkColumnComparator;
+import org.rbtdesign.qvu.util.QueryRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
+@PropertySource(value = "file:${repository.folder}/config/scheduler.properties", ignoreResourceNotFound = true)
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
+    private CacheHelper cacheHelper = new CacheHelper();
     @Autowired
     private DataSources qvuds;
 
@@ -117,13 +133,52 @@ public class MainServiceImpl implements MainService {
     @Autowired
     private DBHelper dbHelper;
 
-    private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
+    @Value("${mail.smtp.auth:false}")
+    private boolean mailSmtpAuth;
 
-    private final CacheHelper cacheHelper = new CacheHelper();
+    @Value("${mail.smtp.ssl.trust:}")
+    private String mailSmtpSslTrust;
+
+    @Value("${mail.smtp.starttls.enable:false}")
+    private boolean mailSmtpStartTls;
+
+    @Value("${mail.from:}")
+    private String mailFrom;
+
+    @Value("${mail.smtp.host:}")
+    private String mailSmtpHost;
+
+    @Value("${mail.smtp.port:}")
+    private String mailSmtpPort;
+
+    @Value("${mail.user:}")
+    private String mailUser;
+
+    @Value("${mail.password:}")
+    private String mailPassword;
+
+    @Value("${mail.subject:}")
+    private String mailSubject;
+
+    @Value("${scheduler.enabled:false}")
+    private boolean schedulerEnabled;
+
+    @Value("${max.scheduler.pool.size:10}")
+    private int maxSchedulerPoolSize;
+
+    @Value("${scheduler.execute.timeout.seconds:120}")
+    private int schedulerExecuteTimeoutSeconds;
+
+    private List<ScheduledDocument> scheduledDocuments = null;
+
+    private final DatasourceSettingsHelper datasourceSettingsHelper = new DatasourceSettingsHelper();
 
     @PostConstruct
     private void init() {
         LOG.info("in MainServiceImpl.init()");
+        LOG.info("scheduler.enabled=" + schedulerEnabled);
+        LOG.info("max.scheduler.pool.size=" + maxSchedulerPoolSize);
+        LOG.info("scheduler.execute.timeout.seconds=" + schedulerExecuteTimeoutSeconds);
         datasourceSettingsHelper.load(config.getDatasourcesConfig());
     }
 
@@ -196,8 +251,7 @@ public class MainServiceImpl implements MainService {
             retval = fileHandler.saveDatasource(datasource);
 
             if (retval.isSuccess()) {
-                cacheHelper.getTableCache().clear();
-                cacheHelper.clearDatasource(datasource.getDatasourceName());
+                cacheHelper.getTableCache().invalidateAll();
                 config.getDatasourcesConfig().setDatasources(retval.getResult());
                 datasourceSettingsHelper.load(config.getDatasourcesConfig());
             }
@@ -377,9 +431,12 @@ public class MainServiceImpl implements MainService {
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-language.json"), new File(config.getLanguageFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-datasource-configuration.json"), new File(config.getDatasourceConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-security-configuration.json"), new File(config.getSecurityConfigurationFileName()));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-document-groups.json"), new File(config.getDocumentGroupsConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-application.properties"), propsFile);
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-document-schedules.json"), new File(config.getDocumentSchedulesConfigurationFileName()));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-help.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-help-en-US.pdf"));
             FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/qvu-gettingstarted.pdf"), new File(config.getHelpFolder() + File.separator + "qvu-gettingstarted-en-US.pdf"));
+            FileUtils.copyInputStreamToFile(getClass().getResourceAsStream("/initial-scheduler.properties"), new File(config.getSchedulerPropertiesFileName()));
 
             // update admin password
             SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);
@@ -495,7 +552,7 @@ public class MainServiceImpl implements MainService {
                 // load up custom foreign keys to apply tp table definitions
                 Map<String, List<ForeignKey>> customForeignKeys = new HashMap<>();
                 for (ForeignKey fk : ds.getCustomForeignKeys()) {
-                   List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
+                    List<ForeignKey> fklist = customForeignKeys.get(fk.getTableName());
                     if (fklist == null) {
                         customForeignKeys.put(fk.getTableName(), fklist = new ArrayList<>());
                     }
@@ -512,7 +569,7 @@ public class MainServiceImpl implements MainService {
                     String tname = res.getString(3);
                     String key = ds.getDatasourceName() + "." + tname;
 
-                    Table t = cacheHelper.getTableCache().get(key);
+                    Table t = cacheHelper.getTableCache().getIfPresent(key);
 
                     if (t == null) {
                         t = new Table();
@@ -728,10 +785,10 @@ public class MainServiceImpl implements MainService {
         if (auth != null) {
             Object o = auth.getPrincipal();
             if (o != null) {
-                if (o instanceof User) {
-                    retval = (User) o;
-                } else if (o instanceof DefaultOAuth2User) {
-                    retval = toUser((DefaultOAuth2User) o);
+                if (o instanceof User user) {
+                    retval = user;
+                } else if (o instanceof DefaultOAuth2User defaultOAuth2User) {
+                    retval = toUser(defaultOAuth2User);
                 }
             }
         }
@@ -1117,7 +1174,7 @@ public class MainServiceImpl implements MainService {
     public OperationResult<DocumentWrapper> saveDocument(@RequestBody DocumentWrapper docWrapper) {
         OperationResult<DocumentWrapper> retval = new OperationResult();
         try {
-            if (docWrapper.getReportDocument() != null) {
+            if (docWrapper.isReportDocument()) {
                 ReportDocument doc = docWrapper.getReportDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
@@ -1132,7 +1189,12 @@ public class MainServiceImpl implements MainService {
                 docWrapper.setReportDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
                 retval.setMessage(opr.getMessage());
-            } else if (docWrapper.getQueryDocument() != null) {
+
+                if (retval.isSuccess()) {
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
+                    cacheHelper.getReportDocumentCache().invalidate(key);
+                }
+            } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
                 if (doc.getCreateDate() == null) {
                     doc.setCreateDate(docWrapper.getActionTimestamp());
@@ -1147,8 +1209,8 @@ public class MainServiceImpl implements MainService {
                 retval.setMessage(opr.getMessage());
 
                 if (retval.isSuccess()) {
-                    String key = docWrapper.getGroup() + "." + doc.getName();
-                    cacheHelper.getQueryDocumentCache().remove(key);
+                    String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
+                    cacheHelper.getQueryDocumentCache().invalidate(key);
                 }
             }
 
@@ -1164,7 +1226,13 @@ public class MainServiceImpl implements MainService {
     @Override
     public OperationResult deleteDocument(String type, String group, String name) {
         User u = getCurrentUser();
-        return fileHandler.deleteDocument(type, group, u.getName(), name);
+        OperationResult retval = fileHandler.deleteDocument(type, group, u.getName(), name);
+        if (retval.isSuccess()) {
+            String key = this.getDocumentCacheKey(type, group, name, u.getName());
+            cacheHelper.getQueryDocumentCache().invalidate(key);
+        }
+
+        return retval;
     }
 
     private QueryResult getQueryResult(ResultSet res) throws SQLException {
@@ -1200,8 +1268,8 @@ public class MainServiceImpl implements MainService {
                     cwidths[i] = cwidths[i] + o.toString().length();
                     // format timestamp
                     if (rmd.getColumnType(i + 1) == java.sql.Types.TIMESTAMP) {
-                        if (o instanceof LocalDateTime) {
-                            o = Timestamp.valueOf((LocalDateTime) o);
+                        if (o instanceof LocalDateTime localDateTime) {
+                            o = Timestamp.valueOf(localDateTime);
                         }
                     }
                 }
@@ -1246,20 +1314,29 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
+    private String getDocumentCacheKey(String type, String group, String name, String user) {
+        String retval = null;
+        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(group)) {
+            retval = type + "." + group + "." + user + "." + name;
+        } else {
+            retval = type + "." + group + "." + name;
+        }
+
+        return retval;
+    }
+
     private OperationResult<QueryDocument> getQueryDocument(String group, String name, String user) {
         OperationResult<QueryDocument> retval = new OperationResult<>();
 
-        String key;
-        if (Constants.DEFAULT_DOCUMENT_GROUP.equals(group)) {
-            key = group + "." + user + "." + name;
-        } else {
-            key = group + "." + name;
-        }
+        String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
 
-        QueryDocument doc = cacheHelper.getQueryDocumentCache().get(key);
+        QueryDocument doc = null; //cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
             retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
+            if (retval.isSuccess()) {
+                cacheHelper.getQueryDocumentCache().put(key, retval.getResult());
+            }
         } else {
             retval.setResult(doc);
         }
@@ -1284,6 +1361,17 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+    private String getDateFromPlaceholder(String ph) {
+        Calendar c = Calendar.getInstance();
+
+        String offset = ph.replace(Constants.CURRENT_DATE_PLACEHOLDER, "").replace(" ", "");
+        if (StringUtils.isNotEmpty(ph)) {
+            c.add(Calendar.DATE, Integer.parseInt(offset));
+        }
+
+        return Constants.DATE_FORMAT.format(c.getTime());
+    }
+
     @Override
     public OperationResult<QueryResult> runQuery(QueryDocumentRunWrapper runWrapper) {
         OperationResult<QueryResult> retval = new OperationResult<>();
@@ -1293,6 +1381,7 @@ public class MainServiceImpl implements MainService {
         ResultSet res = null;
 
         try {
+            long start = System.currentTimeMillis();
             DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(runWrapper.getDocument().getDatasource());
             runWrapper.getDocument().setDatabaseType(ds.getDatabaseType());
             conn = qvuds.getConnection(runWrapper.getDocument().getDatasource());
@@ -1301,9 +1390,28 @@ public class MainServiceImpl implements MainService {
             if ((runWrapper.getParameters() != null) && !runWrapper.getParameters().isEmpty()) {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 stmt = ps;
-                for (int i = 0; i < runWrapper.getParameters().size(); ++i) {
-                    QueryParameter p = runWrapper.getParameters().get(i);
-                    ps.setObject(i + 1, p.getValue(), dbHelper.getJdbcTypeFromName(p.getDataTypeName()));
+                int pindx = 0;
+                for (SqlFilterColumn f : runWrapper.getDocument().getFilterColumns()) {
+                    if (StringUtils.isEmpty(f.getComparisonValue())) {
+                        String p = runWrapper.getParameters().get(pindx);
+                        if ((p != null)
+                                && dbHelper.isDataTypeDateTime(f.getDataType())
+                                && p.contains(Constants.CURRENT_DATE_PLACEHOLDER)) {
+                            p = getDateFromPlaceholder(p);
+                        }
+
+                        if (dbHelper.isDataTypeNumeric(f.getDataType())) {
+                            Double d = Double.valueOf(p);
+                            if (dbHelper.isDataTypeFloat(f.getDataType())) {
+                                ps.setObject(pindx + 1, d, f.getDataType());
+                            } else {
+                                ps.setObject(pindx + 1, d.intValue(), f.getDataType());
+                            }
+                        } else {
+                            ps.setString(pindx + 1, p);
+                        }
+                        pindx++;
+                    }
                 }
                 res = ps.executeQuery();
             } else {
@@ -1312,6 +1420,8 @@ public class MainServiceImpl implements MainService {
             }
 
             retval.setResult(getQueryResult(res));
+
+            retval.getResult().setElapsedTimeSeconds((((double) System.currentTimeMillis() - (double) start) / 1000.0));
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
@@ -1507,7 +1617,7 @@ public class MainServiceImpl implements MainService {
         hs.clear();
         for (DocumentGroup g : userDocGroups) {
             if (!hs.contains(g.getName())) {
-                if ((currentNode == null) 
+                if ((currentNode == null)
                         || !g.getName().equals(currentNode.getMetadata().get("group"))) {
                     currentNode = new DocumentNode(id++);
                     currentNode.setName(g.getName());
@@ -1544,8 +1654,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper) {
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
+    public OperationResult<List<Map<String, Object>>> runJsonQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<Map<String, Object>>> retval = new OperationResult<>();
 
         OperationResult<QueryResult> res = runQuery(runWrapper);
 
@@ -1568,105 +1678,227 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private List<LinkedHashMap<String, Object>> buildResultsObjectGraph(Map<String, List<String>> pkMap, QueryDocument doc, QueryResult res) {
-        List<LinkedHashMap<String, Object>> retval = new ArrayList<>();
-        Map<String, List<LinkedHashMap<String, Object>>> dataMap = new HashMap<>();
+    private Map<String, Boolean> getImportedAliases(QueryDocument doc) {
+        Map<String, Boolean> retval = new HashMap<>();
+        Map<String, String> tmap = new HashMap<>();
 
-        // base table will be the returned list
-        dataMap.put("t0", retval);
-        Set<String> dataKeySet = new HashSet<>();
-
-        // build a list of the table aliaeses
-        Set<String> tableAliases = new HashSet<>();
         for (SqlFrom f : doc.getFromClause()) {
-            tableAliases.add(f.getAlias());
+            tmap.put(f.getAlias(), f.getTable());
         }
 
-        Map<String, List<Integer[]>> aliasColumnPosMap = new HashMap<>();
-        
-        int indx1 = 0;
-        int indx2 = 0;
-        for (SqlSelectColumn c : doc.getSelectColumns()) {
-             if (c.isShowInResults()) {
-                List<Integer[]> l = aliasColumnPosMap.get(c.getTableAlias());
-            
-                if (l == null) {
-                    aliasColumnPosMap.put(c.getTableAlias(), l = new ArrayList<>());
-                }
-                
-                Integer[] pos = {indx1, indx2++};
-                l.add(pos);
-             }
-             indx1++;
-        }
-        
-         for (List<Object> row : res.getData()) {
-            for (String alias : tableAliases) {
-                StringBuilder dataKey = new StringBuilder();
-                dataKey.append(alias);
-                List <Integer[]> cpos = aliasColumnPosMap.get(alias);
-                for (Integer[] pos : cpos) {
-                    SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
-                    List<String> pkl = pkMap.get(c.getTableAlias() + "." + c.getTableName());
-                    if (pkl.contains(c.getColumnName())) {
-                        dataKey.append(".");
-                        // add one becausr first result row value is row number
-                        dataKey.append(row.get(pos[1] + 1));
+        try (Connection conn = qvuds.getConnection(doc.getDatasource());) {
+            DatabaseMetaData dmd = conn.getMetaData();
+            for (SqlFrom f : doc.getFromClause()) {
+                if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
+                    if (StringUtils.isNotEmpty(f.getFromAlias())) {
+                        retval.put(f.getAlias(), isImportedKey(dmd, doc.getDatasource(), tmap.get(f.getFromAlias()), f.getForeignKeyName()));
+                    } else {
+                        retval.put(f.getAlias(), false);
                     }
-                }
-
-                List<LinkedHashMap<String, Object>> l = dataMap.get(alias);
-                if (l == null) {
-                    dataMap.put(alias, l = new ArrayList<>());
-                }
-
-                if (!dataKeySet.contains(dataKey.toString())) {
-                    LinkedHashMap<String, Object> data = new LinkedHashMap<>();
-
-                    for (Integer[] pos : cpos) {
-                        SqlSelectColumn c =  doc.getSelectColumns().get(pos[0]);
-                        // add one becausr first result row value is row number
-                        data.put(c.getColumnName(), row.get(pos[1] + 1));
-                    }
-
-                    l.add(data);
-                    dataKeySet.add(dataKey.toString());
                 }
             }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
         }
 
-        Map<String, ForeignKeySettings> fkSettingsMap = getDocumentTableForeignKeySettings(doc);
-
-        for (LinkedHashMap<String, Object> r : dataMap.get("t0")) {
-            buildObjectGraph(doc, fkSettingsMap, dataMap, "t0", r);
-        }
         return retval;
     }
 
-    private void buildObjectGraph(QueryDocument doc, Map<String, ForeignKeySettings> fkSettingsMap, Map<String, List<LinkedHashMap<String, Object>>> dataMap, String alias, LinkedHashMap<String, Object> parent) {
+    private boolean isImportedKey(DatabaseMetaData dmd, String datasource, String tableName, String foreignKeyName) {
+        boolean retval = false;
+        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(datasource);
+
+        for (ForeignKey fk : ds.getCustomForeignKeys()) {
+            if (fk.getTableName().equals(tableName) && fk.getName().equals(foreignKeyName)) {
+                retval = fk.isImported();
+                break;
+            }
+        }
+
+        if (!retval) {
+            Table t = cacheHelper.getTableCache().getIfPresent(datasource + "." + tableName);
+
+            if (t != null) {
+                for (ForeignKey fk : t.getImportedKeys()) {
+                    if (fk.getName().equals(foreignKeyName)) {
+                        retval = true;
+                        break;
+                    }
+                }
+            } else {
+                try {
+                    t = new Table();
+                    t.setSchema(ds.getSchema());
+                    t.setName(tableName);
+                    List<ForeignKey> fkList = getImportedKeys(datasource, dmd, t);
+                    for (ForeignKey fk : fkList) {
+                        if (fk.getName().equals(foreignKeyName)) {
+                            retval = true;
+                            break;
+                        }
+                    }
+                } catch (Exception ex) {
+                    LOG.error(ex.toString(), ex);
+                }
+            }
+        }
+
+        return retval;
+    }
+
+    private Map<String, List<Integer>> getPrimaryKeyPositions(QueryDocument doc) {
+        Map<String, List<Integer>> retval = new LinkedHashMap<>();
+
+        int indx = 1;
+        for (SqlSelectColumn c : doc.getSelectColumns()) {
+            if (c.isShowInResults()) {
+                if (c.getPkIndex() > 0) {
+                    List<Integer> l = retval.get(c.getTableAlias());
+                    if (l == null) {
+                        retval.put(c.getTableAlias(), l = new ArrayList<>());
+                    }
+
+                    l.add(indx);
+                }
+                indx++;
+            }
+        }
+
+        return retval;
+    }
+
+    private String buildObjectGraphKey(String parentKey, String alias, List<Object> row, Map<String, List<Integer>> primaryKeyPositions) {
+        StringBuilder retval = new StringBuilder();
+
+        if (StringUtils.isNotEmpty(parentKey)) {
+            retval.append(parentKey);
+            retval.append("|");
+        }
+
+        retval.append(alias);
+        retval.append("-");
+        String dot = "";
+
+        for (Integer pos : primaryKeyPositions.get(alias)) {
+            retval.append(dot);
+            retval.append(row.get(pos));
+            dot = ".";
+        }
+
+        return retval.toString();
+    }
+
+    private Map<String, Object> buildObjectGraphRecord(QueryDocument doc, String alias, List<Object> row) {
+        Map<String, Object> retval = new LinkedHashMap<>();
+        if (StringUtils.isNotEmpty(alias)) {
+            for (int i = 0; i < doc.getSelectColumns().size(); ++i) {
+                SqlSelectColumn c = doc.getSelectColumns().get(i);
+                if (c.isShowInResults() && alias.equals(c.getTableAlias())) {
+                    String name = c.getDisplayName();
+                    if (StringUtils.isEmpty(name)) {
+                        name = c.getColumnName();
+                    }
+
+                    retval.put(name, row.get(i + 1));
+                }
+            }
+        }
+
+        return retval;
+    }
+
+    private void loadObjectGraph(QueryDocument doc,
+            List<Object> row,
+            String parentAlias,
+            String parentKey,
+            Map<String, Map<String, Object>> objMap,
+            Map<String, Boolean> importedForeignAliases,
+            Map<String, List<Integer>> primaryKeyPositions,
+            Map<String, String> foreignKeyFieldNames) {
+
         for (SqlFrom f : doc.getFromClause()) {
-            if (alias.equals(f.getFromAlias())) {
-                List<LinkedHashMap<String, Object>> l = dataMap.get(f.getAlias());
-                if ((l != null) && !l.isEmpty()) {
-                    ForeignKeySettings fks = fkSettingsMap.get(f.getFromAlias() + "." + f.getForeignKeyName());
-                    
-                    String fieldName = f.getForeignKeyName();
-                    if ((fks != null) && StringUtils.isNotEmpty(fks.getFieldName())) {
-                        fieldName = fks.getFieldName();
-                    }
-                    
-                    if (f.isImportedForeignKey()) {
-                        parent.put(fieldName, l.get(0));
-                    } else {
-                        parent.put(fieldName, l);
-                    }
-                    
-                    for (LinkedHashMap<String, Object> r : l) {
-                        buildObjectGraph(doc, fkSettingsMap, dataMap, f.getAlias(), r);
+            if (StringUtils.isNotEmpty(f.getFromAlias())) {
+                if (f.getFromAlias().equals(parentAlias)) {
+                    String key = buildObjectGraphKey(parentKey, f.getAlias(), row, primaryKeyPositions);
+
+                    Map<String, Object> parentObject = objMap.get(parentKey);
+
+                    if (parentObject != null) {
+                        if (!objMap.containsKey(key)) {
+                            Map<String, Object> rec = buildObjectGraphRecord(doc, f.getAlias(), row);
+                            String fieldName = foreignKeyFieldNames.get(f.getAlias());
+                            if (importedForeignAliases.get(f.getAlias())) {
+                                parentObject.put(fieldName, rec);
+                            } else {
+                                List<Object> l = (List<Object>) parentObject.get(fieldName);
+                                if (l == null) {
+                                    parentObject.put(fieldName, l = new ArrayList<>());
+                                }
+
+                                l.add(rec);
+                            }
+
+                            objMap.put(key, rec);
+                            loadObjectGraph(doc, row, f.getAlias(), key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private Map<String, String> getForeignKeyFieldNames(QueryDocument doc) {
+        Map<String, String> retval = new HashMap<>();
+
+        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
+
+        Set<String> hs = new HashSet<>();
+        Map<String, List<ForeignKeySettings>> tmap = new HashMap<>();
+        if (ds.getDatasourceTableSettings() != null) {
+            for (TableSettings ts : ds.getDatasourceTableSettings()) {
+                if (hs.contains(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
+                    tmap.put(ts.getTableName(), ts.getForeignKeySettings());
+                }
+            }
+        }
+
+        for (SqlFrom f : doc.getFromClause()) {
+            List<ForeignKeySettings> l = tmap.get(f.getTable());
+            if (l != null) {
+                for (ForeignKeySettings fks : l) {
+                    if (StringUtils.isNotEmpty(fks.getFieldName())) {
+                        retval.put(f.getAlias(), fks.getFieldName());
+                    } else {
+                        retval.put(f.getAlias(), fks.getForeignKeyName());
+                    }
+                }
+            } else {
+                retval.put(f.getAlias(), f.getForeignKeyName());
+            }
+        }
+
+        return retval;
+    }
+
+    private List<Map<String, Object>> buildResultsObjectGraph(QueryDocument doc, QueryResult res) {
+        List<Map<String, Object>> retval = new ArrayList<>();
+        Map<String, Boolean> importedForeignAliases = getImportedAliases(doc);
+        Map<String, List<Integer>> primaryKeyPositions = getPrimaryKeyPositions(doc);
+        Map<String, String> foreignKeyFieldNames = getForeignKeyFieldNames(doc);
+
+        Map<String, Map<String, Object>> objMap = new HashMap<>();
+        for (List<Object> row : res.getData()) {
+            String key = buildObjectGraphKey(null, "t0", row, primaryKeyPositions);
+            if (!objMap.containsKey(key)) {
+                Map<String, Object> rec = buildObjectGraphRecord(doc, "t0", row);
+                retval.add(rec);
+                objMap.put(key, rec);
+            }
+            
+            loadObjectGraph(doc, row, "t0", key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
+        }
+
+        return retval;
     }
 
     private List<String> getPrimaryKeyColumnNames(Table t) {
@@ -1712,92 +1944,65 @@ public class MainServiceImpl implements MainService {
         // we will need to ensure that these are selected
         // for an object graph query;
         for (SqlFrom f : doc.getFromClause()) {
-            if (!retval.containsKey(f.getTable())) {
+            String pkkey = f.getAlias() + "." + f.getTable();
+            if (!retval.containsKey(pkkey)) {
                 String key = doc.getDatasource() + "." + f.getTable();
-                Table t = cacheHelper.getTableCache().get(key);
+                Table t = cacheHelper.getTableCache().getIfPresent(key);
 
+                List<String> pkcols = null;
                 if (t != null) {
-                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(t));
+                    pkcols = getPrimaryKeyColumnNames(t);
                 } else {
-                    retval.put(f.getAlias() + "." + f.getTable(), getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable()));
+                    pkcols = getPrimaryKeyColumnNames(doc.getDatasource(), doc.getSchema(), f.getTable());
                 }
+
+                retval.put(pkkey, pkcols);
             }
         }
 
         return retval;
     }
-    
-    private Map<String, ForeignKeySettings> getDocumentTableForeignKeySettings(QueryDocument doc) {
-        Map<String, ForeignKeySettings> retval = new HashMap<>();
 
-        DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
-
-        Map <String, ForeignKeySettings> tfkMap = new HashMap<>();
-        
-        for (TableSettings ts : ds.getDatasourceTableSettings()) {
-            for (ForeignKeySettings fks : ts.getForeignKeySettings()) {
-                String key = ts.getTableName() + "." + fks.getForeignKeyName();
-                tfkMap.put(key, fks);
-            }
-        }
-        
-        Map<String, String> aliasMap = new HashMap<>();
-        for (SqlFrom f  : doc.getFromClause()) {
-            aliasMap.put(f.getAlias(), f.getTable());
-        }
-         
-        for (SqlFrom f  : doc.getFromClause()) {
-            if (StringUtils.isNotEmpty(f.getForeignKeyName())) {
-                ForeignKeySettings fks = tfkMap.get(aliasMap.get(f.getFromAlias()) + "." + f.getForeignKeyName());
-                if (fks != null) {
-                    retval.put(f.getFromAlias() + "." + f.getForeignKeyName(), fks);
-                }
-            }
-        }
-        
-        return retval;
-    }
-
-
-    private QueryDocument toObjectGraphQueryDoc(Map<String, List<String>> pkMap, QueryDocument doc) {
+    private QueryDocument toObjectGraphQueryDoc(QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);
-        Map<String, Set<String>> cMap = new HashMap<>();
+        Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
 
-        for (SqlSelectColumn c : doc.getSelectColumns()) {
-            Set<String> hs = cMap.get(c.getTableName());
-            if (hs == null) {
-                cMap.put(c.getTableAlias() + "." + c.getTableName(), hs = new HashSet<>());
+        // need to ensure all primary keys are included in select so we will 
+        // update the incoming doc to ensure all pks columns are included, first
+        // remove ant current keys
+        Iterator<SqlSelectColumn> it = retval.getSelectColumns().iterator();
+        while (it.hasNext()) {
+            SqlSelectColumn c = it.next();
+            if (c.getPkIndex() > 0) {
+                it.remove();
             }
-
-            hs.add(c.getTableAlias() + "." + c.getColumnName());
         }
 
+        // now add in all pk columns
+        List<SqlSelectColumn> cols = new ArrayList<>();
         for (String t : pkMap.keySet()) {
             List<String> pkset = pkMap.get(t);
-            Set<String> cset = cMap.get(t);
-
             StringTokenizer st = new StringTokenizer(t, ".");
             String alias = st.nextToken();
             String table = st.nextToken();
 
             int indx = 1;
             for (String c : pkset) {
-                // add any pk columns that are not in original select
-                if (!cset.contains(alias + "." + c)) {
-                    SqlSelectColumn scol = new SqlSelectColumn();
-                    scol.setColumnName(c);
-                    scol.setDatasource(doc.getDatasource());
-                    scol.setTableName(table);
-                    scol.setTableAlias(alias);
-                    scol.setShowInResults(true);
-                    scol.setPkIndex(indx++);
-                    retval.getSelectColumns().add(scol);
-                }
+                SqlSelectColumn scol = new SqlSelectColumn();
+                scol.setColumnName(c);
+                scol.setDatasource(doc.getDatasource());
+                scol.setTableName(table);
+                scol.setTableAlias(alias);
+                scol.setShowInResults(true);
+                scol.setPkIndex(indx++);
+                cols.add(scol);
             }
-        }
 
-        Collections.sort(retval.getSelectColumns(), new ObjectGraphColumnComparator()); 
-        
+        }
+        Collections.sort(cols, new PkColumnComparator());
+        cols.addAll(retval.getSelectColumns());
+        retval.setSelectColumns(cols);
+
         return retval;
     }
 
@@ -1815,8 +2020,8 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<List<LinkedHashMap<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
-        OperationResult<List<LinkedHashMap<String, Object>>> retval = new OperationResult<>();
+    public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(QueryRunWrapper runWrapper) {
+        OperationResult<List<Map<String, Object>>> retval = new OperationResult<>();
 
         OperationResult<QueryDocument> res = getQueryDocument(runWrapper.getGroupName(), runWrapper.getDocumentName(), runWrapper.getUser());
 
@@ -1828,18 +2033,12 @@ public class MainServiceImpl implements MainService {
                 QueryDocument doc = res.getResult();
                 QueryDocumentRunWrapper wrapper = new QueryDocumentRunWrapper();
 
-                Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
-
-                // need to ensure all primary keys are included in select
-                // so we will update the incoming doc if required
-                QueryDocument ogdoc = toObjectGraphQueryDoc(pkMap, doc);
-
-                wrapper.setDocument(ogdoc);
+                wrapper.setDocument(toObjectGraphQueryDoc(doc));
                 wrapper.setParameters(runWrapper.getParameters());
                 OperationResult<QueryResult> qres = runQuery(wrapper);
 
                 if (qres.isSuccess()) {
-                    retval.setResult(buildResultsObjectGraph(pkMap, ogdoc, qres.getResult()));
+                    retval.setResult(buildResultsObjectGraph(wrapper.getDocument(), qres.getResult()));
                 } else {
                     retval.setErrorCode(res.getErrorCode());
                     retval.setMessage(res.getMessage());
@@ -1858,73 +2057,221 @@ public class MainServiceImpl implements MainService {
     }
 
     @Override
-    public OperationResult<AuthConfig> getAuthConfig() {
-        OperationResult<AuthConfig> retval = new OperationResult<>();
+    public OperationResult<SystemSettings> getSystemSettings() {
+        OperationResult<SystemSettings> retval = new OperationResult<>();
 
         SecurityConfiguration scfg = config.getSecurityConfig();
         AuthConfig result = new AuthConfig();
-
         result.setBasicConfiguration(scfg.getBasicConfiguration());
         result.setOidcConfiguration(scfg.getOidcConfiguration());
         result.setSecurityType(config.getSecurityType());
+        SystemSettings systemSettings = new SystemSettings();
+        systemSettings.setAuthConfig(result);
+        systemSettings.setSchedulerConfig(getSchedulerConfig());
+        systemSettings.setSslConfig(config.getSslConfig());
+        systemSettings.setMiscConfig(getMiscConfig());
+        retval.setResult(systemSettings);
 
-        retval.setResult(result);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("AuthConfig: " + fileHandler.getGson(true).toJson(result));
+            LOG.trace("SystemSettings: " + fileHandler.getGson(true).toJson(systemSettings));
         }
+
+        return retval;
+    }
+
+    public MiscConfig getMiscConfig() {
+        MiscConfig retval = new MiscConfig();
+
+        retval.setCorsAllowedOrigins(config.getCorsAllowedOrigins());
+        retval.setBackupFolder(config.getBackupFolder());
+        retval.setServerPort(config.getServerPort());
+
+        return retval;
+    }
+
+    public SchedulerConfig getSchedulerConfig() {
+        SchedulerConfig retval = new SchedulerConfig();
+
+        retval.setMailFrom(mailFrom);
+        retval.setMailPassword(mailPassword);
+        retval.setMailUser(mailUser);
+        retval.setSmtpHost(mailSmtpHost);
+        retval.setSmtpPort(mailSmtpPort);
+        retval.setSmtpStartTlsEnable(mailSmtpStartTls);
+        retval.setSmtpSslTrust(mailSmtpSslTrust);
+        retval.setSmtpAuth(mailSmtpAuth);
+        retval.setMailSubject(mailSubject);
+        retval.setMaxSchedulerPoolSize(maxSchedulerPoolSize);
+        retval.setEnabled(schedulerEnabled);
+        retval.setSchedulerExecuteTimeoutSeconds(schedulerExecuteTimeoutSeconds);
 
         return retval;
     }
 
     @Override
-    public OperationResult saveAuthConfig(AuthConfig authConfig) {
-        OperationResult<AuthConfig> retval = new OperationResult<>();
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
+    public OperationResult saveSystemSettings(SystemSettings systemSettings) {
+        OperationResult retval = new OperationResult<>();
         try {
-            SecurityConfiguration scfg = config.getSecurityConfig();
+            if (systemSettings.getAuthConfig().isModified()) {
+                SecurityConfiguration scfg = config.getSecurityConfig();
 
-            scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
-            scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
-            config.setSecurityType(authConfig.getSecurityType());
+                AuthConfig authConfig = systemSettings.getAuthConfig();
+                scfg.setBasicConfiguration(authConfig.getBasicConfiguration());
+                scfg.setOidcConfiguration(authConfig.getOidcConfiguration());
+                config.setSecurityType(authConfig.getSecurityType());
 
-            fileHandler.saveSecurityConfig(scfg);
-            fileHandler.updateApplicationProperties(authConfig);
+                retval = fileHandler.saveSecurityConfig(scfg);
+            }
+
+            if (retval.isSuccess() && systemSettings.getSchedulerConfig().isModified()) {
+                retval = fileHandler.updateSchedulerProperties(systemSettings.getSchedulerConfig());
+            }
+
+            if (retval.isSuccess()
+                    && (systemSettings.getMiscConfig().isModified()
+                    || systemSettings.getAuthConfig().isModified()
+                    || systemSettings.getSslConfig().isModified())) {
+                retval = fileHandler.updateApplicationProperties(systemSettings);
+            }
 
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (Exception ex) {
-                };
-            }
-
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (Exception ex) {
-                };
-            }
         }
 
         return retval;
     }
-    
+
     @Override
     public OperationResult<String> doBackup() {
         OperationResult<String> retval = new OperationResult();
         File f = new File(config.getBackupFolder() + File.separator + "qvu-backup-" + Helper.TS2.format(new Date()) + ".zip");
-        boolean res = ZipFolder.doZip(new File(config.getRepositoryFolder()), f); 
-        
+        boolean res = ZipFolder.doZip(new File(config.getRepositoryFolder()), f);
+
         if (res) {
             retval.setResult(f.getAbsolutePath());
         } else {
             Errors.populateError(retval, Errors.BACKUP_FAILED);
         }
-        
+
         return retval;
-            
+
     }
+
+    @Override
+    public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules() {
+        OperationResult<DocumentSchedulesConfiguration> retval = new OperationResult<>();
+        retval.setResult(config.getDocumentSchedulesConfig());
+
+        return retval;
+    }
+
+    private boolean isLoadScheduledDocumentsRequired() {
+        boolean retval = false;
+
+        if (scheduledDocuments == null) {
+            Calendar c = Calendar.getInstance();
+
+            int min = c.get(Calendar.MINUTE);
+
+            retval = ((min > 54) && (min <= 59));
+        }
+
+        return retval;
+    }
+
+    private boolean isExecuteScheduledDocumentsRequired() {
+        boolean retval = false;
+
+        if (scheduledDocuments != null) {
+            Calendar c = Calendar.getInstance();
+            retval = ((c.get(Calendar.MINUTE) >= 0) && (c.get(Calendar.MINUTE) < 3));
+        }
+
+        return retval;
+    }
+
+    @Scheduled(fixedRateString = "${scheduler.fixed.rate.seconds:#{30}}", timeUnit = TimeUnit.SECONDS, initialDelay = 60)
+    public void runScheduledJobs() throws InterruptedException {
+        if (schedulerEnabled) {
+            if (isLoadScheduledDocumentsRequired()) {
+                loadScheduledDocuments();
+            }
+
+            if (isExecuteScheduledDocumentsRequired()) {
+                LOG.debug("executing " + scheduledDocuments.size() + " scheduled documents");
+                List<ScheduledDocument> docs = new ArrayList(scheduledDocuments);
+                scheduledDocuments = null;
+                ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
+                for (ScheduledDocument docinfo : docs) {
+                    OperationResult<QueryDocument> dres = getQueryDocument(docinfo.getGroup(), docinfo.getDocument(), Constants.DEFAULT_ADMIN_USER);
+                    if (dres.isSuccess()) {
+                        executor.execute(new QueryRunner(this, getSchedulerConfig(), docinfo));
+                    }
+                }
+
+                executor.shutdown();
+                try {
+                    if (!executor.awaitTermination(schedulerExecuteTimeoutSeconds, TimeUnit.SECONDS)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
+                }
+            }
+        }
+    }
+
+    private void loadScheduledDocuments() {
+        List<DocumentSchedule> schedules = config.getDocumentSchedulesConfig().getDocumentSchedules();
+        List<ScheduledDocument> docs = new ArrayList<>();
+        if ((schedules != null) && !schedules.isEmpty()) {
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.HOUR_OF_DAY, 1);
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            for (DocumentSchedule ds : schedules) {
+                if (ds.getMonths().isEmpty()
+                        || ds.getMonths().contains(c.get(Calendar.MONTH))) {
+                    if (ds.getDaysOfMonth().isEmpty()
+                            || ds.getDaysOfMonth().contains(c.get(Calendar.DAY_OF_MONTH))) {
+                        if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
+                            if (ds.getHoursOfDay().contains(hour)) {
+                                ScheduledDocument doc = new ScheduledDocument();
+                                doc.setDocument(ds.getDocumentName());
+                                doc.setGroup(ds.getDocumentGroup());
+                                doc.setEmailAddresses(ds.getEmailAddresses());
+                                doc.setResultType(ds.getAttachmentType());
+                                doc.setParameters(ds.getParameters());
+                                docs.add(doc);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!docs.isEmpty()) {
+                scheduledDocuments = new ArrayList(docs);
+            }
+        }
+
+        if (scheduledDocuments != null) {
+            LOG.debug("in loadScheduledDocuments() - loaded " + scheduledDocuments.size() + " documents");
+        } else {
+            LOG.debug("in loadScheduledDocuments() no documents found");
+        }
+
+    }
+
+    @Override
+    public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules) {
+        Collections.sort(schedules.getDocumentSchedules(), new DocumentScheduleComparator());
+        schedules.setModified(false);
+        OperationResult retval = fileHandler.saveDocumentSchedules(schedules);
+        if (retval.isSuccess()) {
+            config.setDocumentSchedulesConfig(schedules);
+        }
+
+        return retval;
+    }
+
 }

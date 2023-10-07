@@ -296,7 +296,7 @@ img {
 }
 
 .repository-setup {
-border: 1px solid var(--default-border-color);
+    border: 1px solid var(--default-border-color);
     border-radius: 3px;
     left: 100px;
     top: 100px;
@@ -359,10 +359,42 @@ select {
     min-width: 550px;
 }
 
+.schedule-entry {
+    left: 5%;
+    top: 10%;
+    min-width: 550px;
+}
 .custom-foreign-keys {
     left: 5%;
     top: 5%;
     min-width: 550px;
+}
+
+.schedule-modal {
+    left: 5px;
+    top: 5px;
+    min-width: 95%;
+    overflow-x: auto;
+    overflow-y: hidden
+}
+
+
+
+.schedule-table-cont {
+    height: 300px;
+    width: 100%;
+    overflow: auto;
+    border: var(--query-results-table-border);
+}
+
+.schedule-table {
+    display: grid;
+    grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 100px 150px 250px;
+}
+
+.schedule-table > div {
+    outline: var(--query-results-table-border);
+    background-color: var(--default-background-color);
 }
 
 .p-splitter-panel {
@@ -591,4 +623,11 @@ textarea {
 .small-msg {
     font-size: var(--small-font-size);
     color: var(--info-message-text-color);
+}
+
+.schedule-entries {
+    height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: var(--query-results-table-border);
 }

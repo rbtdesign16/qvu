@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
- */
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from "react-bootstrap";
 import Button from "react-bootstrap/Button"
@@ -67,8 +63,7 @@ import { getDatasourceTreeViewData,
         setFromClause,
         setCurrentDocument,
         updateSelectColumns,
-        setTreeViewExpandedIds,
-        schema} = useQueryDesign();
+        setTreeViewExpandedIds} = useQueryDesign();
     const {getText} = useLang();
     const {showMessage, hideMessage} = useMessage();
     const {datasources, setDatasources, getDatasourceSchema} = useDataHandler();
@@ -84,7 +79,7 @@ import { getDatasourceTreeViewData,
         if (datasources) {
             return datasources.map(d => {
                 // handle acces by role if required
-                if (hasRoleAccess(d.roles, authData.currentUser.roles)) {
+                if (d.enabled && hasRoleAccess(d.roles, authData.currentUser.roles)) {
                     if (treeViewData && datasource && (d.datasourceName === datasource)) {
                         return <option value={d.datasourceName} selected>{getDatasourceDisplayName(d)}</option>;
                     } else {
@@ -134,14 +129,15 @@ import { getDatasourceTreeViewData,
                 createDate: actionTimestamp,
                 lastUpdated: actionTimestamp,
                 datasource: datasource,
-                schema: schema,
+                schema: getDatasourceSchema(datasource),
                 baseTable: baseTable,
                 documentGroupName: group,
                 selectColumns: selectColumns,
                 filterColumns: filterColumns,
                 fromClause: fromClause
             }
-        };
+            
+         };
 
         let res = await saveDocument(docWrapper);
         if (isApiError(res)) {

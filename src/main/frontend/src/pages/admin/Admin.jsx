@@ -4,10 +4,11 @@ import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import useMessage from "../../context/MessageContext";
 import useHelp from "../../context/HelpContext";
-import {FcServices, FcDataBackup} from "react-icons/fc";
+import {FcServices, FcDataBackup, FcPlanner} from "react-icons/fc";
 import EditableDataList from "../../widgets/EditableDataList"
 import EditObjectModal from "../../widgets/EditObjectModal";
 import TableSettings from "./TableSettings";
+import DocumentScheduleTable from "./DocumentScheduleTable";
 import SystemSetup from "../../widgets/SystemSetup";
 import CustomForeignKeys from "./CustomForeignKeys";
 import {
@@ -15,10 +16,6 @@ import {
     WARN,
     ERROR,
     SUCCESS,
-    DEFAULT_SUCCESS_TITLE,
-    DEFAULT_ERROR_TITLE,
-    ERROR_TEXT_COLOR,
-    INFO_TEXT_COLOR,
     confirm,
     isEmpty,
     setFieldError,
@@ -51,8 +48,9 @@ import {
     loadTableSettings,
     loadDatasourceTableNames,
     getSecurityConfig,
-    saveSecurityConfig,
-    backupRepository} from "../../utils/apiHelper";
+    saveSystemSettings,
+    backupRepository,
+    saveDocumentSchedules} from "../../utils/apiHelper";
 import {
     isAdministrator,
     isQueryDesigner,
@@ -81,6 +79,7 @@ const Admin = () => {
     const [tableSettings, setTableSettings] = useState({show: false});
     const [customForeignKeys, setCustomForeignKeys] = useState({show: false});
     const [showSystemSettings, setShowSystemSettings] = useState({show: false});
+    const [showScheduleTable, setShowScheduleTable] = useState({show: false});
 
     const handleOnClick = async (message, okFunc) => {
         if (await confirm(message)) {
@@ -114,11 +113,13 @@ const Admin = () => {
                 label: getText("JDBC Url:"),
                 name: "url",
                 type: "input",
+                size: 40,
                 required: true
             },
             {
                 label: getText("JDBC Driver:"),
                 name: "driver",
+                size: 40,
                 type: "input",
                 required: true
             },
@@ -141,7 +142,7 @@ const Admin = () => {
                 required: true
             },
             {
-                label: getText("Max Imported Key Depth:"),
+                label: getText("Imported Key Depth:"),
                 name: "maxImportedKeyDepth",
                 defaultValue: DEFAULT_IMPORTED_KEY_DEPTH,
                 type: "number",
@@ -150,7 +151,7 @@ const Admin = () => {
                 helpText: getText("datasourceMaxImportedKey-help")
             },
             {
-                label: getText("Max Exported Key Depth:"),
+                label: getText("Exported Key Depth:"),
                 name: "maxExportedKeyDepth",
                 defaultValue: DEFAULT_EXPORTED_KEY_DEPTH,
                 type: "number",
@@ -161,16 +162,6 @@ const Admin = () => {
             {
                 label: getText("Connection Timeout:"),
                 name: "connectionTimeout",
-                type: "number"
-            },
-            {
-                label: getText("Idle Timeout:"),
-                name: "idleTimeout",
-                type: "number"
-            },
-            {
-                label: getText("Max Life Time:"),
-                name: "maxLifeTime",
                 type: "number"
             },
             {
@@ -188,7 +179,13 @@ const Admin = () => {
                 valueRenderer: rolesValueRenderer,
                 showHelp: showHelpMessage,
                 helpText: getText("datasourceRoles-help")
-            }];
+            },
+            {
+                label: getText("Enabled:"),
+                name: "enabled",
+                type: "checkbox"
+            }
+        ];
     };
 
     const getDocumentGroupEntryConfig = () => {
@@ -269,6 +266,7 @@ const Admin = () => {
 
         if (isnew) {
             retval.splice(1, 0, {label: getText("Password:"), name: "password", type: "password", required: true, validator: {type: "password"}});
+            retval.splice(2, 0, {label: getText("Repeat Password:"), name: "repeatPassword", type: "password", required: true, validator: {type: "password"}});
         }
 
         return retval;
@@ -511,7 +509,7 @@ const Admin = () => {
             save: saveModifiedDatasource,
             delete: deleteSelectedDatasource,
             dataObject: dataObject,
-            gridClass: "entrygrid-225-425",
+            gridClass: "entrygrid-210-425",
             dlgsize: "ds-admin",
             entryConfig: getDatasourceEntryConfig(),
             afterChange: afterDatasourceChange,
@@ -709,6 +707,10 @@ const Admin = () => {
             {
                 label: getText("Description:"),
                 field: "description"
+            },
+            {
+                label: getText("Enabled:"),
+                field: "enabled"
             }
         ]
     };
@@ -870,7 +872,6 @@ const Admin = () => {
             if (!config.dataObject.roles) {
                 config.dataObject.roles = [];
             }
- 
             let res = await saveDocumentGroup(config.dataObject);
             if (isApiSuccess(res)) {
                 setErrorMessage(config.idPrefix, "");
@@ -886,6 +887,46 @@ const Admin = () => {
     };
 
     const saveModifiedUser = async (config) => {
+        let ok = true;
+        if (config.dataObject.newRecord) {
+            if (config.dataObject.password !== config.dataObject.repeatPassword) {
+                setErrorMessage(config.idPrefix, getText("Passwords do not match"));
+                ok = false;
+            }
+        }
+        
+       if (ok) {
+            setErrorMessage(config.idPrefix, "");
+           
+       //     config.dataObject.repeatPassword = "";
+            ok = checkEntryFields(config);
+            if (ok) {
+                setErrorMessage(config.idPrefix, "");
+                showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
+                config.dataObject.repeatPassword = "";
+                
+                let user = {...config.dataObject};
+                
+                // get rid of the repeat password field
+                if (user.newRecord) {
+                    delete user.repeatPassword;
+                }
+                
+                if (!user.roles) {
+                    user.roles = [];
+                }
+
+                let res = await saveUser(user);
+                if (isApiSuccess(res)) {
+                    setErrorMessage(config.idPrefix, "");
+                    setAuthData(await loadAuth());
+                    setEditModal({show: false});
+                    showMessage(SUCCESS, replaceTokens(getText("User saved"), [config.dataObject.userId]));
+                } else {
+                    showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
+                }
+            } else {
+                setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         let ok = checkEntryFields(config);
 
         if (ok) {
@@ -904,8 +945,6 @@ const Admin = () => {
             } else {
                 showMessage(ERROR, formatErrorResponse(res, getText("Failed to save user:", " ") + config.dataObject.userId));
             }
-        } else {
-            setErrorMessage(config.idPrefix, getText("please complete all required entries"));
         }
     };
 
@@ -913,10 +952,10 @@ const Admin = () => {
         setShowSystemSettings({show: false});
     };
 
-    const saveSystemSettings = async (settings) => {
+    const updateSystemSettings = async (settings) => {
         hideSystemSettings();
-        showMessage(INFO, getText("Saving security settings", "..."), null, true);
-        let res = await saveSecurityConfig(settings);
+        showMessage(INFO, getText("Saving systems settings", "..."), null, true);
+        let res = await saveSystemSettings(settings);
 
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
@@ -937,21 +976,51 @@ const Admin = () => {
             
     };
     
+    const hideScheduleTable = () => {
+        setShowScheduleTable({show: false});
+    };
+    
+    const saveSchedules = async (schedules) => {
+        try {
+            hideScheduleTable();
+            showMessage(INFO, getText("Saving schedules..."), null, true);
+            let res = await saveDocumentSchedules(schedules);
+            if (isApiError(res)) {
+                showMessage(ERROR, res.message);
+            } else {
+                showMessage(SUCCESS, getText("Schedules saved"));
+            }
+        }
+        
+        catch (e) {
+            showMessage(ERROR, e);
+        }
+                
+        
+    }
+    
+    const onShowScheduleTable = () => {
+        setShowScheduleTable({show: true, hide: hideScheduleTable, save: saveSchedules});
+    };
+    
     const onBackup = async() => {
         handleOnClick(getText("Backup repository?"), runBackup);
     };
     
     const onSystemSettings = async () => {
-        setShowSystemSettings({show: true, hide: hideSystemSettings, save: saveSystemSettings, dlgsize: "lg"});
+        setShowSystemSettings({show: true, hide: hideSystemSettings, save: updateSystemSettings, dlgsize: "lg"});
     };
+    
     return (
             <div className="admin-tab">
                 <EditObjectModal config={editModal}/>
                 <TableSettings config={tableSettings}/>
                 <SystemSetup config={showSystemSettings}/>
+                <DocumentScheduleTable config={showScheduleTable}/>
                 <CustomForeignKeys config={customForeignKeys}/>
                 <div>
                     <span style={{cursor: "pointer"}} onClick={e => onSystemSettings()}><FcServices className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("System Settings")}</span>
+                    <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onShowScheduleTable()}><FcPlanner className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Scheduling")}</span>
                     <span style={{cursor: "pointer", marginLeft: "15px"}} onClick={e => onBackup()}><FcDataBackup className="icon" size={SMALL_ICON_SIZE} />&nbsp;{getText("Repository Backup")}</span>
                 </div>
                 <EditableDataList listConfig={datasourcesConfig}/>

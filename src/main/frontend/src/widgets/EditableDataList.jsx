@@ -19,8 +19,16 @@ const EditableDataList = (props) => {
     
     const getFieldValue = (rec, field, useLang) => {
         if (field) {
-            if (typeof field === "function") {
+             if (typeof field === "function") {
                 return field(rec);
+            } else if (typeof rec[field] === "boolean") {
+                if (rec[field]) {
+                    return getText("true");
+                } else {
+                    return getText("false");
+                }
+            } else if (typeof rec[field] === "number") {
+                return rec[field];
             } else {
                 return useLang ? getText(rec[field]) : rec[field];
             }
@@ -85,7 +93,7 @@ const EditableDataList = (props) => {
      };
 
     const loadPanels = () => {
-        if (listConfig.data) {
+        if (listConfig && listConfig.data) {
             return listConfig.data.map((rec, indx) => {
                 return <div>
                     { getDisplay(listConfig.displayConfig, rec) }

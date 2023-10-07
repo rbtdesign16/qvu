@@ -16,6 +16,7 @@
         "adminPassword-help": "If you are using file based security for authentication you will need to enter an admin password",
         "Allow Custom Service Save": "Allow Custom Service Save",
         "All": "All",
+        "all": "all",
         "allowServiceSave-help": "If a custom security service is configured then checking this will allow the service to save and delete users and roles",
         "Apr": "Apr",    
         "April": "April",    

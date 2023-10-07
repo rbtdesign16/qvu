@@ -34,12 +34,20 @@ const DataTable = (props) => {
 
 
             if (c.fieldName) {
-                if (c.formatForDisplay) {
-                    return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
-                } else if (Array.isArray(row[c.fieldName])) {
-                    return <div style={myStyle}>{row[c.fieldName].join(", ")}</div>;
+                if (!row[c.fieldName] || (Array.isArray(row[c.fieldName]) && row[c.fieldName].length === 0)) {
+                    if (c.defaultValue) {
+                        return <div style={myStyle}>{c.defaultValue}</div>;
+                    } else {
+                        return <div style={myStyle}></div>;
+                    }
                 } else {
-                    return <div style={myStyle}>{row[c.fieldName]}</div>;
+                    if (c.formatForDisplay) {
+                        return <div style={myStyle}>{c.formatForDisplay(row[c.fieldName])}</div>;
+                    } else if (Array.isArray(row[c.fieldName])) {
+                        return <div style={myStyle}>{row[c.fieldName].join(", ")}</div>;
+                    } else {
+                        return <div style={myStyle}>{row[c.fieldName]}</div>;
+                    }
                 }
             } else if (c.render) {
                 return <div style={myStyle}>{c.render(rownum, row)}</div>;

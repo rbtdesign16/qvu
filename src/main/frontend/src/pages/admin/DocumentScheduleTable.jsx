@@ -56,6 +56,7 @@ const DocumentScheduleTable = (props) => {
         {
             title: getText("Months"),
             fieldName: "months",
+            defaultValue: getText("all"),
             formatForDisplay: (val) => {
                 let retval = "";
                 if (val) {
@@ -75,7 +76,7 @@ const DocumentScheduleTable = (props) => {
         },
         {
             title: getText("Days of Week"),
-            fieldName: "daysOfWeek",
+            defaultValue: getText("all"),
             formatForDisplay: (val) => {
                 let retval = "";
                 if (val) {

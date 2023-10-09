@@ -245,6 +245,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>qvu-0.1.2</finalName>
+        <finalName>qvu-0.1.3</finalName>
     </build>
 </project>

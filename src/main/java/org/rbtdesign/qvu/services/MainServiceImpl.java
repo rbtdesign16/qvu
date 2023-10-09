@@ -118,8 +118,12 @@ public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
     private CacheHelper cacheHelper = new CacheHelper();
+    
     @Autowired
     private DataSources qvuds;
+
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     private ConfigurationHelper config;
@@ -1922,11 +1926,11 @@ public class MainServiceImpl implements MainService {
             conn = qvuds.getConnection(datasource);
 
             DatabaseMetaData dmd = conn.getMetaData();
-
             res = dmd.getPrimaryKeys(null, schema, table);
 
             while (res.next()) {
-                retval.add(res.getString(4));
+                String col = res.getString(4);
+                retval.add(col);
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -1966,7 +1970,7 @@ public class MainServiceImpl implements MainService {
     private QueryDocument toObjectGraphQueryDoc(QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);
         Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
-
+        
         // need to ensure all primary keys are included in select so we will 
         // update the incoming doc to ensure all pks columns are included, first
         // remove ant current keys
@@ -2206,7 +2210,7 @@ public class MainServiceImpl implements MainService {
                 for (ScheduledDocument docinfo : docs) {
                     OperationResult<QueryDocument> dres = getQueryDocument(docinfo.getGroup(), docinfo.getDocument(), Constants.DEFAULT_ADMIN_USER);
                     if (dres.isSuccess()) {
-                        executor.execute(new QueryRunner(this, getSchedulerConfig(), docinfo));
+                        executor.execute(new QueryRunner(this, mailService, getSchedulerConfig(), docinfo));
                     }
                 }
 

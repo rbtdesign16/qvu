@@ -3,31 +3,15 @@ package org.rbtdesign.qvu.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.opencsv.CSVWriter;
-import jakarta.activation.DataHandler;
-import jakarta.activation.DataSource;
-import jakarta.mail.Authenticator;
-import jakarta.mail.BodyPart;
-import jakarta.mail.Message;
-import jakarta.mail.Multipart;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeBodyPart;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.mail.internet.MimeMultipart;
-import jakarta.mail.util.ByteArrayDataSource;
 import java.io.StringWriter;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.dto.ExcelExportWrapper;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SchedulerConfig;
+import org.rbtdesign.qvu.services.MailService;
 import org.rbtdesign.qvu.services.MainService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +25,14 @@ public class QueryRunner implements Runnable {
     private final SchedulerConfig schedulerConfig;
     private final ScheduledDocument docinfo;
     private final MainService mainService;
+    private final MailService mailService;
     private final Gson prettyJson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").disableHtmlEscaping().create();
 
-    public QueryRunner(MainService mainService, SchedulerConfig schedulerConfig, ScheduledDocument docinfo) {
+    public QueryRunner(MainService mainService, MailService mailService, SchedulerConfig schedulerConfig, ScheduledDocument docinfo) {
         this.docinfo = docinfo;
         this.schedulerConfig = schedulerConfig;
         this.mainService = mainService;
+        this.mailService = mailService;
     }
 
     @Override
@@ -69,7 +55,7 @@ public class QueryRunner implements Runnable {
 
             if (qres != null) {
                 if (qres.isSuccess()) {
-                    sendEmail(docinfo, qres.getResult());
+                    mailService.sendEmail(docinfo, schedulerConfig, getAttachment(docinfo.getResultType(), qres.getResult()));
                 } else {
                     LOG.error(qres.getMessage());
                 }
@@ -78,96 +64,6 @@ public class QueryRunner implements Runnable {
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
-    }
-
-    private void sendEmail(ScheduledDocument docinfo, Object result) {
-        try {
-            byte[] attachment = getAttachment(docinfo.getResultType(), result);
-            if (attachment != null) {
-                Properties props = new Properties();
-                props.put("mail.smtp.auth", "" + schedulerConfig.isSmtpAuth());
-                props.put("mail.smtp.starttls.enable", "" + schedulerConfig.isSmtpStartTlsEnable());
-                props.put("mail.smtp.host", schedulerConfig.getSmtpHost());
-                props.put("mail.smtp.port", "" + schedulerConfig.getSmtpPort());
-                
-                if (StringUtils.isNotEmpty(schedulerConfig.getSmtpSslTrust())) {
-                    props.put("mail.smtp.ssl.trust", schedulerConfig.getSmtpSslTrust());
-                }
-                
-                Session session = Session.getInstance(props, new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(schedulerConfig.getMailUser(), schedulerConfig.getMailPassword());
-                    }
-                });
-
-                session.setDebug(LOG.isDebugEnabled());
-
-                // Now use your ByteArrayDataSource as
-                DataSource fds = new ByteArrayDataSource(attachment, getMimeType(docinfo));
-
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(schedulerConfig.getMailFrom()));
-
-                InternetAddress[] addresses = new InternetAddress[docinfo.getEmailAddresses().size()];
-
-                for (int i = 0; i < addresses.length; ++i) {
-                    addresses[i] = new InternetAddress(docinfo.getEmailAddresses().get(i));
-                }
-
-                message.setRecipients(Message.RecipientType.TO, addresses);
-                message.setSubject(schedulerConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
-      
-                BodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText("Mail Body");
-
-                MimeBodyPart attachmentPart = new MimeBodyPart();
-                attachmentPart.setDataHandler(new DataHandler(fds));
-                attachmentPart.setFileName(getEmailAttachmentFileName(docinfo));
-                Multipart multipart = new MimeMultipart();
-                multipart.addBodyPart(messageBodyPart);
-                multipart.addBodyPart(attachmentPart);
-                message.setContent(multipart);
-                Transport.send(message);
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
-        }
-    }
-
-    private String getEmailAttachmentFileName(ScheduledDocument docinfo) {
-        String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = docinfo.getDocument().replace(".json", "") + ".csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                break;
-        }
-
-        return retval;
-    }
-
-    private String getMimeType(ScheduledDocument docinfo) {
-        String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = "application/vnd.ms-excel";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = "text/csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                retval = "application/json";
-                break;
-        }
-
-        return retval;
     }
 
     private byte[] getAttachment(String resultType, Object queryResult) throws Exception {

@@ -1,7 +1,9 @@
 package org.rbtdesign.qvu.util;
 
+import com.opencsv.CSVWriter;
 import jakarta.xml.bind.DatatypeConverter;
 import java.io.FileInputStream;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.rbtdesign.qvu.dto.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,4 +123,40 @@ public class Helper {
         
         return retval;
     }
+    
+    public static byte[] toCsv(QueryResult queryResult) {
+        byte[] retval = null;
+        try (StringWriter strwriter = new StringWriter(); CSVWriter writer = new CSVWriter(strwriter);) {
+
+            String[] row = new String[queryResult.getHeader().size()];
+            writer.writeNext(queryResult.getHeader().toArray(row));
+
+            // add data to csv
+            for (List<Object> l : queryResult.getData()) {
+                writer.writeNext(toStringArray(l));
+            }
+
+            retval = strwriter.toString().getBytes();
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+
+        return retval;
+    }
+
+    public static String[] toStringArray(List<Object> in) {
+        String[] retval = new String[in.size()];
+
+        for (int i = 0; i < retval.length; ++i) {
+            Object o = in.get(i);
+            if (o == null) {
+                retval[i] = null;
+            } else {
+                retval[i] = o.toString();
+            }
+        }
+
+        return retval;
+    }
+
 }

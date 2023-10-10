@@ -73,7 +73,7 @@ public class QueryRunner implements Runnable {
                 retval = mainService.exportToExcel(getExcelWrapper((QueryResult) queryResult));
                 break;
             case Constants.RESULT_TYPE_CSV:
-                retval = toCsv((QueryResult) queryResult);
+                retval = Helper.toCsv((QueryResult) queryResult);
                 break;
             case Constants.RESULT_TYPE_JSON_FLAT:
             case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
@@ -84,25 +84,6 @@ public class QueryRunner implements Runnable {
         return retval;
     }
 
-    private byte[] toCsv(QueryResult queryResult) {
-        byte[] retval = null;
-        try (StringWriter strwriter = new StringWriter(); CSVWriter writer = new CSVWriter(strwriter);) {
-
-            String[] row = new String[queryResult.getHeader().size()];
-            writer.writeNext(queryResult.getHeader().toArray(row));
-
-            // add data to csv
-            for (List<Object> l : queryResult.getData()) {
-                writer.writeNext(toStringArray(l));
-            }
-
-            retval = strwriter.toString().getBytes();
-        } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
-        }
-
-        return retval;
-    }
 
     private ExcelExportWrapper getExcelWrapper(QueryResult queryResult) {
         ExcelExportWrapper retval = new ExcelExportWrapper();
@@ -120,18 +101,4 @@ public class QueryRunner implements Runnable {
         return retval;
     }
 
-    private String[] toStringArray(List<Object> in) {
-        String[] retval = new String[in.size()];
-
-        for (int i = 0; i < retval.length; ++i) {
-            Object o = in.get(i);
-            if (o == null) {
-                retval[i] = null;
-            } else {
-                retval[i] = o.toString();
-            }
-        }
-
-        return retval;
-    }
 }

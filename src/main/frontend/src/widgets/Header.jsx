@@ -1,38 +1,51 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useAuth from "../context/AuthContext";
-import { MdHelpOutline } from 'react-icons/md';
+import { MdHelpOutline } from "react-icons/md";
+import {GiCarKey} from "react-icons/gi";
 import useLang from "../context/LangContext";
-import {SMALL_ICON_SIZE, showDocumentFromBlob} from "../utils/helper"
-import {loadHelpDocument, loadGettingStartedDocument} from "../utils/apiHelper";
+import useMessage from "../context/MessageContext";
+import {
+    SUCCESS,
+    ERROR,
+    SMALL_ICON_SIZE, 
+    showDocumentFromBlob, 
+    BASIC_SECURITY_TYPE} from "../utils/helper"
+import {loadHelpDocument, 
+    loadGettingStartedDocument, 
+    updateUserPassword,
+    isApiError} from "../utils/apiHelper";
 import logo from "../images/logo.png";
+import UpdatePasswordModal from "./UpdatePasswordModal";
 
 const Header = (props) => {
     const {getText} = useLang();
     const {version} = props;
+    const {showMessage} = useMessage();
     const [showMenu, setShowMenu] = useState(false);
+    const [showUpdatePassword, setShowUpdatePassword] = useState({show: false});
     const {authData} = useAuth();
 
     const onMenuItem = (key, data) => {
-        switch(key) {
+        switch (key) {
             case "doch":
                 showHelp();
                 break;
             case "docgs":
                 showGettingStarted();
                 break;
-         }
+        }
     };
-    
+
     const showGettingStarted = async () => {
         setShowMenu(false);
-         let res = await loadGettingStartedDocument();
-         
-         let blob = new Blob([res], {
-         type: "application/pdf"
-         });
-         
-         showDocumentFromBlob(blob);
+        let res = await loadGettingStartedDocument();
+
+        let blob = new Blob([res], {
+            type: "application/pdf"
+        });
+
+        showDocumentFromBlob(blob);
     };
 
     const showHelp = async () => {
@@ -51,29 +64,58 @@ const Header = (props) => {
             <div  onClick={e => onMenuItem("docgs")} >{getText("Getting started")}</div>
             <div  onClick={e => onMenuItem("doch")} style={{borderBottom: "solid 1px darkslategray"}}>{getText("Help documentation")}</div>
             <a target="_blank" href="mailto:qvu@rbtdesign.org?subject=Qvu%20issue">{getText("Report an Issue")}</a>
-        </div>
+        </div>;
+    };
+
+    const isBasicAuth = () => {
+        return (authData && !authData.initializingApplication && (authData.securityType === BASIC_SECURITY_TYPE));
     };
 
     const isHelpVisible = () => {
         return authData && !authData.initializingApplication;
     };
+
+    const hideUpdatePassword = () => {
+        setShowUpdatePassword({show: false});
+    };
     
+    const updatePassword = async (newPassword) => {
+        let res = await updateUserPassword(newPassword);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            hideUpdatePassword();
+            showMessage(SUCCESS, getText("password-update-msg"));
+        }
+    };
+    
+    const onUpdatePassword = () => {
+        setShowUpdatePassword({show: true, hide: hideUpdatePassword, updatePassword: updatePassword});
+    };
+
     return (
             <div className="header">
+                <UpdatePasswordModal config={showUpdatePassword}/>
                 <div className="logo">
                     <img height="28" src={logo} />
                     <span>{"Qvu " + version}</span>
-                    {isHelpVisible() && 
-                    <span className="help-control" onClick={(e) => setShowMenu(!showMenu)}>
-                        <MdHelpOutline className="icon yellow-f" size={SMALL_ICON_SIZE}/>
-                        <span>{getText("Help")}</span>
-                        {showMenu && popupMenu()}
-                    </span>}
+                    <span className="header-menu">
+                        {isBasicAuth() &&
+                            <span onClick={(e) => onUpdatePassword()}>
+                                <GiCarKey className="icon yellow-f" size={SMALL_ICON_SIZE}/>
+                                <span>{getText("Update Password")}</span>
+                            </span>}
+                        {isHelpVisible() &&
+                            <span onClick={(e) => setShowMenu(!showMenu)}>
+                                <MdHelpOutline className="icon yellow-f" size={SMALL_ICON_SIZE}/>
+                                <span>{getText("Help")}</span>
+                                {showMenu && popupMenu()}
+                            </span>}
+                    </span>
                 </div>
             </div>
             );
 };
-
 Header.propTypes = {
     version: PropTypes.string.isRequired
 };

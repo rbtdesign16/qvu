@@ -94,5 +94,6 @@ public interface MainService {
     public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules();
     
     public OperationResult saveDocumentSchedules(DocumentSchedulesConfiguration schedules);
-
+    
+    public OperationResult updateUserPassword(String pass);
 }

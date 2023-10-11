@@ -459,6 +459,10 @@ public class FileHandler {
     }
 
     public OperationResult saveUser(User user) {
+        return saveUser(user, false);
+    }
+    
+    public OperationResult saveUser(User user, boolean passUpdate) {
         OperationResult retval = new OperationResult();
         SecurityConfiguration securityConfig = null;
         try {
@@ -474,14 +478,16 @@ public class FileHandler {
                             retval.setErrorCode(OperationResult.RECORD_EXISTS);
                             retval.setMessage("user " + user.getUserId() + " already exists");
                             throw new SaveException(retval);
-                        } else {
+                        } else if (!passUpdate) {
                             //  need to add password back since we do not send to client
                             user.setPassword(curuser.getPassword());
                             BeanUtils.copyProperties(user, curuser, "password");
+                        } else {
+                            curuser.setPassword(AuthHelper.toMd5Hash(user.getPassword()));
                         }
                     } else {
                         if (StringUtils.isNotEmpty(user.getPassword())) {
-                            user.setPassword(Helper.toMd5Hash(user.getPassword()));
+                            user.setPassword(AuthHelper.toMd5Hash(user.getPassword()));
                         }
                         securityConfig.getUsers().add(user);
                     }

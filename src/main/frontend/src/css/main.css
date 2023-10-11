@@ -580,16 +580,15 @@ textarea {
     min-width: 600px;
 }
 
-.help-control {
+.header-menu {
     float: right;
-    width: 200px;
-    margin-right: 20px;
-    cursor: pointer;
+    margin-right: 40px;
 }
 
-.help-control span {
+.header-menu span {
     color: var(--default-background-color) !important;
     font-weight: var(--default-font-weight) !important;
+    cursor: pointer;
 }
 
 .popup-menu {

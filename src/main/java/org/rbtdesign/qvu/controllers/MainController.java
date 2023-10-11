@@ -1,7 +1,6 @@
 package org.rbtdesign.qvu.controllers;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -367,4 +366,9 @@ public class MainController {
         return service.saveDocumentSchedules(schedules);
     }
 
+    @PostMapping("api/v1/admin/user/up")
+    public OperationResult updatePassword(@RequestBody String pass) {
+        LOG.debug("in updatePassword()");
+        return service.updateUserPassword(pass);
+    }
 }

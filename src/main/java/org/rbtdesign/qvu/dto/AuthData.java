@@ -14,6 +14,7 @@ public class AuthData implements Serializable {
     private List<Role> allRoles = new ArrayList<>();
     private List<User> allUsers = new ArrayList<>();
     private User currentUser;
+    private String securityType;
     private boolean allowUserAdd;
     private boolean allowUserDelete;
     private boolean initializingApplication;
@@ -64,6 +65,14 @@ public class AuthData implements Serializable {
 
     public void setInitializingApplication(boolean initializingApplication) {
         this.initializingApplication = initializingApplication;
+    }
+
+    public String getSecurityType() {
+        return securityType;
+    }
+
+    public void setSecurityType(String securityType) {
+        this.securityType = securityType;
     }
     
     

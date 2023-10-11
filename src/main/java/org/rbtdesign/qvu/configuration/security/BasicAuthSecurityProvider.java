@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.client.utils.Role;
 import org.rbtdesign.qvu.client.utils.User;
-import org.rbtdesign.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.rbtdesign.qvu.client.utils.SecurityService;
+import org.rbtdesign.qvu.util.AuthHelper;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.UserComparator;
 
@@ -114,7 +114,7 @@ public class BasicAuthSecurityProvider implements AuthenticationProvider {
             String storedPassword = uinfo.getPassword();
             if (StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(storedPassword)) {
                 // passwords are stored as md5 hashed strings
-                String hashedPassword = Helper.toMd5Hash(password);
+                String hashedPassword = AuthHelper.toMd5Hash(password);
                 if (storedPassword.equals(hashedPassword)) {
                     retval = new UsernamePasswordAuthenticationToken(uinfo, password, toGrantedAuthority(uinfo.getRoles()));
                 }

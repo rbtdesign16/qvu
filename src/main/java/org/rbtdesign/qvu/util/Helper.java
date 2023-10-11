@@ -62,12 +62,6 @@ public class Helper {
         return retval.toString();
     }
 
-    public static String toMd5Hash(String input) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(input.getBytes("UTF-8"));
-        return DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
-    }
-
     public static String getDate(Object input) {
         String retval = null;
         if (input != null) {

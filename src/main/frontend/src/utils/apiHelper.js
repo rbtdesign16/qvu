@@ -478,3 +478,15 @@ export const saveDocumentSchedules = async (schedules) => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
+
+export const updateUserPassword = async (pass) => {
+    try {
+        let res = await axios.post(getApiURL() + "/admin/user/up", pass, hconfig2);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};

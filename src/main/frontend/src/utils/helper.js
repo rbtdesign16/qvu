@@ -24,6 +24,8 @@ export const DEFAULT_NEW_DOCUMENT_NAME = "default document name";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 
+export const BASIC_SECURITY_TYPE = "basic";
+
 export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING"];
 
 export const ERROR_BACKGROUND_COLOR = "pink";

@@ -94,6 +94,7 @@ import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
+import org.rbtdesign.qvu.util.AuthHelper;
 import org.rbtdesign.qvu.util.CacheHelper;
 import org.rbtdesign.qvu.util.ConfigBuilder;
 import org.rbtdesign.qvu.util.DBHelper;
@@ -107,6 +108,7 @@ import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.PkColumnComparator;
 import org.rbtdesign.qvu.util.QueryRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -117,8 +119,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class MainServiceImpl implements MainService {
     private static final Logger LOG = LoggerFactory.getLogger(MainServiceImpl.class);
 
-    private CacheHelper cacheHelper = new CacheHelper();
-    
+    private final CacheHelper cacheHelper = new CacheHelper();
+
     @Autowired
     private DataSources qvuds;
 
@@ -196,13 +198,14 @@ public class MainServiceImpl implements MainService {
             LOG.trace("local=" + request.getLocale().toLanguageTag());
             LOG.trace("authetication=" + auth);
         }
-        
+
         if ((auth != null) && StringUtils.isNotEmpty(auth.getName())) {
             retval.setCurrentUser(getCurrentUser());
             boolean localUser = isLocalUser();
             retval.setAllowUserAdd(localUser);
 
             SecurityConfiguration scfg = config.getSecurityConfig();
+            retval.setSecurityType(config.getSecurityType());
             retval.setInitializingApplication(config.isInitializingApplication());
 
             BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
@@ -357,6 +360,10 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public OperationResult saveUser(User user) {
+        return saveUser(user, false);
+    }
+
+    private OperationResult saveUser(User user, boolean passUpdate) {
         OperationResult retval = new OperationResult();
         BasicConfiguration basicConfig = config.getSecurityConfig().getBasicConfiguration();
 
@@ -365,10 +372,11 @@ public class MainServiceImpl implements MainService {
                 user.setNewRecord(false);
                 retval = basicConfig.getSecurityService().saveUser(user);
             } catch (Exception ex) {
+                user.setNewRecord(false);
                 Errors.populateError(retval, ex);
             }
         } else {
-            retval = fileHandler.saveUser(user);
+            retval = fileHandler.saveUser(user, passUpdate);
         }
 
         return retval;
@@ -445,7 +453,7 @@ public class MainServiceImpl implements MainService {
             // update admin password
             SecurityConfiguration securityConfig = ConfigBuilder.build(config.getSecurityConfigurationFileName(), SecurityConfiguration.class);
             User u = securityConfig.findUser("admin");
-            u.setPassword(Helper.toMd5Hash(adminPassword));
+            u.setPassword(AuthHelper.toMd5Hash(adminPassword));
             fileHandler.saveSecurityConfig(securityConfig);
 
             String s = FileUtils.readFileToString(propsFile, "UTF-8");
@@ -1898,7 +1906,7 @@ public class MainServiceImpl implements MainService {
                 retval.add(rec);
                 objMap.put(key, rec);
             }
-            
+
             loadObjectGraph(doc, row, "t0", key, objMap, importedForeignAliases, primaryKeyPositions, foreignKeyFieldNames);
         }
 
@@ -1970,7 +1978,7 @@ public class MainServiceImpl implements MainService {
     private QueryDocument toObjectGraphQueryDoc(QueryDocument doc) {
         QueryDocument retval = SerializationUtils.clone(doc);
         Map<String, List<String>> pkMap = getDocumentTablePKColumnNames(doc);
-        
+
         // need to ensure all primary keys are included in select so we will 
         // update the incoming doc to ensure all pks columns are included, first
         // remove ant current keys
@@ -2275,6 +2283,28 @@ public class MainServiceImpl implements MainService {
             config.setDocumentSchedulesConfig(schedules);
         }
 
+        return retval;
+    }
+
+    @Override
+    public OperationResult updateUserPassword(String pass) {
+        OperationResult retval = new OperationResult();
+        try {
+            User u = this.getCurrentUser();
+            if (u != null) {
+                User tmpUser = new User();
+                // clone the current user then add in new password
+                BeanUtils.copyProperties(u, tmpUser, "password");
+                tmpUser.setPassword(pass);
+                retval = this.saveUser(tmpUser, true);
+            } else {
+                retval.setErrorCode(OperationResult.RECORD_NOT_FOUND);
+                retval.setMessage(Errors.getMessage(OperationResult.RECORD_NOT_FOUND));
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Errors.populateError(retval, ex);
+        }
         return retval;
     }
 

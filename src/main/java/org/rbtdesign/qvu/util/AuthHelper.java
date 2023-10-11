@@ -1,5 +1,7 @@
 package org.rbtdesign.qvu.util;
 
+import jakarta.xml.bind.DatatypeConverter;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import org.rbtdesign.qvu.client.utils.User;
@@ -31,4 +33,9 @@ public class AuthHelper {
         auth.setAllUsers(users);
     }
 
+    public static String toMd5Hash(String input) throws Exception {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(input.getBytes("UTF-8"));
+        return DatatypeConverter.printHexBinary(md.digest(input.getBytes())).toUpperCase();
+    }
 }

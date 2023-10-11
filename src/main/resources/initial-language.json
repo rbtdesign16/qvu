@@ -237,7 +237,7 @@
         "November": "November",
         "Page Size:": "Page Size:",
         "Parameters": "Parameters",
-        "password-update-msg": "Password update - please logout and log back in",
+        "password-update-msg": "Password updated - please log out and log back in",
         "password-validation-msg": "8 characters minimum, mixed case, at least 1 special character",
         "Password:": "Password:",
         "Passwords do not match": "Passwords do not match",

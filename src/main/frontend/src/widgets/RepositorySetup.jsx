@@ -16,13 +16,12 @@ INFO,
         SMALL_ICON_SIZE,
         isValidPassword
         } from "../utils/helper";
-
-
 import {
 verifyInitialRepositoryFolder,
         initializeRepository,
         isApiError,
         isApiSuccess} from "../utils/apiHelper";
+import appinfo from "../appinfo.json";
 
 const RepositorySetup = () => {
     const {authData} = useAuth();
@@ -65,7 +64,7 @@ const RepositorySetup = () => {
     }
 
     if (initComplete) {
-        return <Splash title={getText("Initialization Complete")} premessage={replaceTokens(getText("repositoryInitializationSuccess-msg"), [repositoryFolder])}/>;
+        return <Splash title={getText("Initialization Complete")} premessage={replaceTokens(getText("repositoryInitializationSuccess-msg"), [repositoryFolder, appinfo.version])}/>;
     } else {
         return (
                 <div className="repository-setup">

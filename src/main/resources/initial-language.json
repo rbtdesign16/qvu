@@ -255,7 +255,7 @@
         "repository-backup-success": "Repository backed up to file $1",
         "Repository Folder": "Repository Folder",
         "repository-help": "The root folder location where Qvu configuration files and document artifacts will be stored",
-        "repositoryInitializationSuccess-msg": "Qvu repository has been created. Please re-start the Qvu application\nand pass the repository location as a system parameters like this:\n\njava -jar -Drepository.folder=$1 /path/to/qvu.jar",
+        "repositoryInitializationSuccess-msg": "Qvu repository has been created. Please re-start the Qvu application\nand pass the repository location as a system parameters like this:\n\njava -jar -Drepository.folder=$1 /path/to/qvu-$2.jar",
         "repositorySetup-help": "Enter the server side folder that will contain the Qvu repository. The Qvu repository will hold all configuration files and created documents. The entered folder must exist and be empty.",
         "report designer": "report designer",
         "Report an Issue": "Report an Issue",

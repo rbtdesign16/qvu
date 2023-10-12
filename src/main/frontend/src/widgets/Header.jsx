@@ -82,8 +82,7 @@ const Header = (props) => {
     };
     
     const onLogout = async () => {
-        logout(authData.securityType === BASIC_SECURITY_TYPE);
-        setAuthData(null);
+        await logout(authData.securityType);
     };
     
     const updatePassword = async (newPassword) => {

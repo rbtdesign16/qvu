@@ -1,4 +1,5 @@
 import axios from "axios";
+import {BASIC_SECURITY_TYPE} from "../utils/helper"
 
 export const SUCCESS_CODE = 0;
 export const RECORD_EXISTS_CODE = 1;
@@ -490,13 +491,13 @@ export const updateUserPassword = async (pass) => {
     }
 };
 
-export const logout = async (isbasic) => {
+export const logout = async (securityType) => {
     try {
         await axios.get(getServerURL() + "/logout");
-        if (isbasic) {
-            window.location = getProtocol() + "://xxx:yyy@" +  getServer() + ":" + getPort() + "/qvu";
+     } catch (e) {
+         if (securityType === BASIC_SECURITY_TYPE) {
+            location.href = getServerURL();
         }
-    } catch (e) {
         console.log("logout: " + e);
     }
 };

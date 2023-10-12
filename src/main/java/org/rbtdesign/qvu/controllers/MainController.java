@@ -1,10 +1,7 @@
 package org.rbtdesign.qvu.controllers;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -43,8 +40,9 @@ import org.rbtdesign.qvu.util.FileHandler;
 import org.rbtdesign.qvu.util.Helper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -379,7 +377,13 @@ public class MainController {
         return service.updateUserPassword(pass);
     }
 
-    @GetMapping(value="login")
-    public void login(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value="/login", method = RequestMethod.GET)
+    public ResponseEntity login() {
+        Map<String, String> headers = new HashMap<>();
+        if (Constants.BASIC_SECURITY_TYPE.equals(config.getSecurityType())) {
+            headers.put(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=qvu");
+        } 
+        
+        return new ResponseEntity<>(headers, HttpStatus.UNAUTHORIZED);
     }
-}
+ }

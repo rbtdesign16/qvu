@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useAuth from "../context/AuthContext";
 import { MdHelpOutline } from "react-icons/md";
+import { AiOutlineLogout } from "react-icons/ai";
 import {GiCarKey} from "react-icons/gi";
 import useLang from "../context/LangContext";
 import useMessage from "../context/MessageContext";
@@ -14,7 +15,8 @@ import {
 import {loadHelpDocument, 
     loadGettingStartedDocument, 
     updateUserPassword,
-    isApiError} from "../utils/apiHelper";
+    isApiError, 
+    logout} from "../utils/apiHelper";
 import logo from "../images/logo.png";
 import UpdatePasswordModal from "./UpdatePasswordModal";
 
@@ -24,7 +26,7 @@ const Header = (props) => {
     const {showMessage} = useMessage();
     const [showMenu, setShowMenu] = useState(false);
     const [showUpdatePassword, setShowUpdatePassword] = useState({show: false});
-    const {authData} = useAuth();
+    const {authData, setAuthData} = useAuth();
 
     const onMenuItem = (key, data) => {
         switch (key) {
@@ -79,6 +81,11 @@ const Header = (props) => {
         setShowUpdatePassword({show: false});
     };
     
+    const onLogout = async () => {
+        logout(authData.securityType === BASIC_SECURITY_TYPE);
+        setAuthData(null);
+    };
+    
     const updatePassword = async (newPassword) => {
         let res = await updateUserPassword(newPassword);
         if (isApiError(res)) {
@@ -100,22 +107,28 @@ const Header = (props) => {
                     <img height="28" src={logo} />
                     <span>{"Qvu " + version}</span>
                     <span className="header-menu">
-                        {isBasicAuth() &&
-                            <span onClick={(e) => onUpdatePassword()}>
-                                <GiCarKey className="icon yellow-f" size={SMALL_ICON_SIZE}/>
-                                <span>{getText("Update Password")}</span>
-                            </span>}
                         {isHelpVisible() &&
                             <span onClick={(e) => setShowMenu(!showMenu)}>
                                 <MdHelpOutline className="icon yellow-f" size={SMALL_ICON_SIZE}/>
                                 <span>{getText("Help")}</span>
                                 {showMenu && popupMenu()}
                             </span>}
+                        {isBasicAuth() &&
+                            <span onClick={(e) => onUpdatePassword()}>
+                                <GiCarKey className="icon yellow-f" size={SMALL_ICON_SIZE}/>
+                                <span>{getText("Update Password")}</span>
+                            </span>}
+                            
+                            <span onClick={(e) => onLogout()}>
+                                <AiOutlineLogout className="icon yellow-f" size={SMALL_ICON_SIZE}/>
+                                <span>{getText("Logout")}</span>
+                            </span>
                     </span>
                 </div>
             </div>
             );
 };
+
 Header.propTypes = {
     version: PropTypes.string.isRequired
 };

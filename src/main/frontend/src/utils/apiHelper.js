@@ -40,7 +40,6 @@ export const getApiURL = () => {
     return getServerURL() + "/api/v1"; // Add the base API path
 };
 
-
 export const loadAuth = async() => {
     try {
         let res = await axios.get(getApiURL() + "/auth/data/load");
@@ -488,5 +487,16 @@ export const updateUserPassword = async (pass) => {
         }
     } catch (e) {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+    }
+};
+
+export const logout = async (isbasic) => {
+    try {
+        await axios.get(getServerURL() + "/logout");
+        if (isbasic) {
+            window.location = getProtocol() + "://xxx:yyy@" +  getServer() + ":" + getPort() + "/qvu";
+        }
+    } catch (e) {
+        console.log("logout: " + e);
     }
 };

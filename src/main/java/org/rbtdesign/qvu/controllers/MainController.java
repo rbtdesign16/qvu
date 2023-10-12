@@ -1,5 +1,9 @@
 package org.rbtdesign.qvu.controllers;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +44,13 @@ import org.rbtdesign.qvu.util.Helper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * The type Main controller.
@@ -262,7 +269,7 @@ public class MainController {
     @PostMapping("api/v1/query/run/json/objectgraph")
     public OperationResult<List<Map<String, Object>>> runJsonObjectGraphQuery(@RequestBody QueryRunWrapper runWrapper) {
         LOG.debug("in runJsonObjectQuery()");
-        
+
         OperationResult<List<Map<String, Object>>> retval = service.runJsonObjectGraphQuery(runWrapper);
 
         // for api call populate text in message
@@ -272,7 +279,7 @@ public class MainController {
             replaceList.add(runWrapper.getDocumentName());
             retval.setMessage(Helper.replaceTokens(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, retval.getMessage()), replaceList));
         }
-        
+
         return retval;
 
     }
@@ -347,19 +354,19 @@ public class MainController {
 
         return retval;
     }
-    
+
     @GetMapping("api/v1/admin/util/backup")
     public OperationResult<String> doBackup() {
         LOG.debug("in doBackup()");
         return service.doBackup();
     }
-    
+
     @GetMapping("api/v1/admin/document/schedules")
     public OperationResult<DocumentSchedulesConfiguration> getDocumentSchedules() {
         LOG.debug("in getDocumentSchedules()");
         return service.getDocumentSchedules();
     }
-    
+
     @PostMapping("api/v1/admin/document/schedules/save")
     public OperationResult saveDocumentSchedules(@RequestBody DocumentSchedulesConfiguration schedules) {
         LOG.debug("in saveDocumentSchedules()");
@@ -370,5 +377,9 @@ public class MainController {
     public OperationResult updatePassword(@RequestBody String pass) {
         LOG.debug("in updatePassword()");
         return service.updateUserPassword(pass);
+    }
+
+    @GetMapping(value="login")
+    public void login(HttpServletRequest request, HttpServletResponse response) {
     }
 }

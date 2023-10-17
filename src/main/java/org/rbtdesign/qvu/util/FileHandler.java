@@ -84,13 +84,15 @@ public class FileHandler {
     }
 
     public List<DocumentGroup> loadDocumentGroups() {
-        List<DocumentGroup> retval = config.getDocumentGroupsConfig().getDocumentGroups();
+        List<DocumentGroup> groups = config.getDocumentGroupsConfig().getDocumentGroups();
 
+        List<DocumentGroup> retval = new ArrayList<>();
         DocumentGroup g = new DocumentGroup();
         g.setDescription(Constants.DEFAULT_DOCUMENT_GROUP_DESCRIPTION);
         g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
         g.setDefaultGroup(true);
         retval.add(0, g);
+        retval.addAll(groups);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Document Groups: " + gson.toJson(retval, ArrayList.class));
         }

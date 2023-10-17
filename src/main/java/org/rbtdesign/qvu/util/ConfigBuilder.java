@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.nimbusds.jose.util.IOUtils;
 import java.io.File;
 import java.io.InputStream;
-import static java.lang.System.in;
 import org.apache.commons.io.FileUtils;
 
 /**

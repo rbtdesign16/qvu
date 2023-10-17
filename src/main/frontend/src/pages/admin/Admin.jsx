@@ -404,7 +404,7 @@ const Admin = () => {
     const saveTableSettings = (dataObject, datasource) => {
         let utables = [];
 
-        datasource.datasourceTableSettings.map(t => {
+        datasource.datasourceTables.map(t => {
             // only save rec with settings
             if (t.displayName
                     || t.hide
@@ -414,6 +414,7 @@ const Admin = () => {
                 utables.push(t);
             }
         });
+        
         dataObject.datasourceTableSettings = utables;
 
         hideTableSettings();

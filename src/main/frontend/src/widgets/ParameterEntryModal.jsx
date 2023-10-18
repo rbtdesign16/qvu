@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/reactjs.jsx to edit this template
- */
 import React, { useState } from 'react';
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"

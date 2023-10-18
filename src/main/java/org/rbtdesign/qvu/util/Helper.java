@@ -1,10 +1,8 @@
 package org.rbtdesign.qvu.util;
 
 import com.opencsv.CSVWriter;
-import jakarta.xml.bind.DatatypeConverter;
 import java.io.FileInputStream;
 import java.io.StringWriter;
-import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;

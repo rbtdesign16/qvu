@@ -14,7 +14,9 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.util.ByteArrayDataSource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +79,9 @@ public class MailServiceImpl implements MailService {
                 message.setSubject(schedulerConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
 
                 BodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText("Mail Body");
+                List <String> l = new ArrayList();
+                l.add(docinfo.getDocument());
+                messageBodyPart.setText("Attached you will firn the query results for query document " + docinfo.getDocument());
 
                 MimeBodyPart attachmentPart = new MimeBodyPart();
                 attachmentPart.setDataHandler(new DataHandler(fds));

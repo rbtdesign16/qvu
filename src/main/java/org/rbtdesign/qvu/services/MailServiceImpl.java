@@ -77,7 +77,7 @@ public class MailServiceImpl implements MailService {
                 message.setSubject(schedulerConfig.getMailSubject().replace("$g", docinfo.getGroup()).replace("$d", docinfo.getDocument()).replace("$ts", Helper.TS.format(new Date())));
 
                 BodyPart messageBodyPart = new MimeBodyPart();
-                messageBodyPart.setText("Mail Body");
+                messageBodyPart.setText(docinfo.getGroup() + ": " + docinfo.getDocument());
 
                 MimeBodyPart attachmentPart = new MimeBodyPart();
                 attachmentPart.setDataHandler(new DataHandler(fds));

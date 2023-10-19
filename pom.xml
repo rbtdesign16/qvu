@@ -8,7 +8,7 @@
         <version>3.1.0</version>
         <relativePath/>
     </parent>
-    <groupId>org.rbt</groupId>
+    <groupId>org.rbtdesign</groupId>
     <artifactId>qvu</artifactId>
     <version>0.1.5</version>
     <name>qvu</name>

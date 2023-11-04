@@ -21,6 +21,7 @@ export const DEFAULT_WARN_TITLE = "Warning";
 
 export const DEFAULT_DOCUMENT_GROUP = "user";
 export const DEFAULT_NEW_DOCUMENT_NAME = "default document name";
+export const DEFAULT_NEW_REPORT_NAME = "default report name";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { Tabs, Tab }from "react-bootstrap";
 
 const ReportDesign = () => {
     return (
@@ -7,6 +6,6 @@ const ReportDesign = () => {
                 report design
             </div>
             );
-}
+};
 
 export default ReportDesign;

@@ -80,6 +80,7 @@
         "Default admin user not found": "Default admin user not found",
         "Default Security Type": "Default Security Type",
         "default document name": "new-query-doc",
+        "default report name": "new-report-doc",
         "delete datasource prompt": "delete datasource $1?",
         "Delete datasource": "Delete datasource",
         "Delete group": "Delete group",

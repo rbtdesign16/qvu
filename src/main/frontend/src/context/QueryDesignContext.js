@@ -555,7 +555,7 @@ const useQueryDesign = () => {
     const context = useContext(QueryDesignContext);
 
     if (context === undefined) {
-        throw new Error("useHelp must be used within an HelpProvider");
+        throw new Error("useQueryDesign must be used within an QueryDesignProvider");
     }
     return context;
 };

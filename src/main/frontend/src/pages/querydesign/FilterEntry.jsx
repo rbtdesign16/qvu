@@ -199,11 +199,4 @@ const FilterEntry = (props) => {
     </div>
 };
 
-FilterEntry.propTypes = {
-    filterData: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired
-
-};
-
-
 export default FilterEntry;

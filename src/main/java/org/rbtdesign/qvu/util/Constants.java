@@ -2,8 +2,10 @@ package org.rbtdesign.qvu.util;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.rbtdesign.qvu.client.utils.Role;
 
@@ -145,5 +147,93 @@ public class Constants {
     
     public static final String CURRENT_DATE_PLACEHOLDER = "$dt";
     
+    public static final String PAGE_ORIENTATION_LANDSCAPE = "landscape";
+    public static final String PAGE_ORIENTATION_PORTRAIT = "portrait";
     
+    public static final String[] PAGE_SIZE_NAMES = {
+        "Letter", 
+        "Legal", 
+        "Tabloid",
+        "4A0",
+        "2A0",
+        "A0",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "B0",
+        "B1",
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B9",
+        "B10",
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7"};
+    
+    public static final String DEFAULT_PAGE_SIZE = "Letter";
+    public static final Map<String, double[]> PAGE_SIZE_MAP = new HashMap<>();
+    
+    static {
+        PAGE_SIZE_MAP.put("Letter", new double[] {215.9, 279.4, 8.5, 11});
+        PAGE_SIZE_MAP.put("Legal", new double[] {215.9, 355.6, 8.5, 14});
+        PAGE_SIZE_MAP.put("Tabloid", new double[] {279.4, 431.8, 11, 17});
+        PAGE_SIZE_MAP.put("4A0", new double[] {1582, 2378,66.22, 93.62});
+        PAGE_SIZE_MAP.put("2A0", new double[] {1189 , 168, 46.81, 66.22});
+        PAGE_SIZE_MAP.put("A0", new double[] {841, 1189, 33, 46.81});
+        PAGE_SIZE_MAP.put("A1", new double[] {594, 841, 23.39, 33});
+        PAGE_SIZE_MAP.put("A2", new double[] {420, 594, 16.54, 23.36});
+        PAGE_SIZE_MAP.put("A3", new double[] {297, 420, 11.69, 16.54});
+        PAGE_SIZE_MAP.put("A4", new double[] {210, 297, 8.27, 11.69});
+        PAGE_SIZE_MAP.put("A5", new double[] {148, 210, 5.83, 8.27});
+        PAGE_SIZE_MAP.put("A6", new double[] {105, 148, 4.13, 5.83});
+        PAGE_SIZE_MAP.put("A7", new double[] {74 , 105, 2.91, 4.13});
+        PAGE_SIZE_MAP.put("A8", new double[] {52, 74, 2.05, 2.91});
+        PAGE_SIZE_MAP.put("A9", new double[] {37, 52, 1.46, 2.05});
+        PAGE_SIZE_MAP.put("A10", new double[] {26, 37, 1.02, 1.46});
+        PAGE_SIZE_MAP.put("B0", new double[] {1000, 1414, 33.37, 55.67});
+        PAGE_SIZE_MAP.put("B1", new double[] {707, 1000, 27.84, 39.37});
+        PAGE_SIZE_MAP.put("B2", new double[] {500, 707,	19.69, 27.84});
+        PAGE_SIZE_MAP.put("B3", new double[] {353, 500, 13.9, 19.69});
+        PAGE_SIZE_MAP.put("B4", new double[] {250, 352, 9.84, 13.9});
+        PAGE_SIZE_MAP.put("B5", new double[] {176, 250, 6.93, 9.84});
+        PAGE_SIZE_MAP.put("B6", new double[] {125, 176, 4.92, 6.93});
+        PAGE_SIZE_MAP.put("B7", new double[] {88, 125, 3.47, 4.92});
+        PAGE_SIZE_MAP.put("B8", new double[] {62, 88, 2.44, 3.47});
+        PAGE_SIZE_MAP.put("B9", new double[] {44, 62, 1.73, 2.44});
+        PAGE_SIZE_MAP.put("B10", new double[] {31, 44, 1.22, 1.73});
+        PAGE_SIZE_MAP.put("C0", new double[] {917, 1297, 36.12, 51.6});
+        PAGE_SIZE_MAP.put("C1", new double[] {648, 917, 25.50, 36.12});
+        PAGE_SIZE_MAP.put("C2", new double[] {458, 648, 18, 25.50});
+        PAGE_SIZE_MAP.put("C3", new double[] {324, 458, 12.75, 18});
+        PAGE_SIZE_MAP.put("C4", new double[] {229, 324, 9, 12.75});
+        PAGE_SIZE_MAP.put("C5", new double[] {162, 229, 6.38, 9});
+        PAGE_SIZE_MAP.put("C6", new double[] {114, 162, 4.5, 6.38});
+        PAGE_SIZE_MAP.put("C7", new double[] {81, 114, 3.19, 4.5});
+        PAGE_SIZE_MAP.put("DL", new double[] {110, 220, 4.32, 8.69});
+    }
+    
+    public static final String[] PAGE_UNITS = {"inch", "mm"};
+    public static final String DEFAULT_PAGE_UNITS = "inch";
+    public static final int REPORT_LOCATION_HEADER = 0;
+    public static final int REPORT_LOCATION_BODY = 1;
+    public static final int REPORT_LOCATION_FOOTER = 2;
+    
+    public static final int REPORT_OBJECT_TYPE_TEXT = 0;
 }

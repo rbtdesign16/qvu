@@ -1,6 +1,9 @@
 package org.rbtdesign.qvu.dto;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import org.rbtdesign.qvu.util.Constants;
 
 /**
  *
@@ -16,7 +19,11 @@ public class ReportDocument {
     private String savedDocumentGroupName;
     private String documentGroupName;
     private boolean newRecord;
-
+    private String pageOrientation = Constants.PAGE_ORIENTATION_LANDSCAPE;
+    private String pageSize = Constants.DEFAULT_PAGE_SIZE;
+    private String pageUnits = Constants.DEFAULT_PAGE_UNITS;
+    private List<ReportObject> reportObjects = new ArrayList<>();
+    
     public String getName() {
         return name;
     }
@@ -87,6 +94,38 @@ public class ReportDocument {
 
     public void setNewRecord(boolean newRecord) {
         this.newRecord = newRecord;
+    }
+
+    public String getPageOrientation() {
+        return pageOrientation;
+    }
+
+    public void setPageOrientation(String pageOrientation) {
+        this.pageOrientation = pageOrientation;
+    }
+
+    public String getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(String pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public String getPageUnits() {
+        return pageUnits;
+    }
+
+    public void setPageUnits(String pageUnits) {
+        this.pageUnits = pageUnits;
+    }
+
+    public List<ReportObject> getReportObjects() {
+        return reportObjects;
+    }
+
+    public void setReportObjects(List<ReportObject> reportObjects) {
+        this.reportObjects = reportObjects;
     }
     
     

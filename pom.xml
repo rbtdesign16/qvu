@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.rbtdesign</groupId>
     <artifactId>qvu</artifactId>
-    <version>0.1.5</version>
+    <version>0.2.0</version>
     <name>qvu</name>
     <description>Qvu Data Service</description>
     <properties>

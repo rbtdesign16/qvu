@@ -236,4 +236,24 @@ public class Constants {
     public static final int REPORT_LOCATION_FOOTER = 2;
     
     public static final int REPORT_OBJECT_TYPE_TEXT = 0;
+    public static final int REPORT_OBJECT_TYPE_IMAGE = 1;
+    public static final int REPORT_OBJECT_TYPE_URL = 2;
+    public static final int REPORT_OBJECT_TYPE_PAGE_NUMBER = 3;
+    public static final int REPORT_OBJECT_TYPE_CURRENT_DATE = 4;
+    public static final int REPORT_OBJECT_TYPE_DATA_GRID = 5;
+    public static final int REPORT_OBJECT_TYPE_DATA_RECORD = 6;
+    public static final int REPORT_OBJECT_TYPE_GRAPH = 7;
+    public static final int REPORT_OBJECT_TYPE_SUBREPORT = 8;
+    
+    public static final int[] REPORT_OBJECT_TYPES = {
+        REPORT_OBJECT_TYPE_TEXT,
+        REPORT_OBJECT_TYPE_IMAGE,
+        REPORT_OBJECT_TYPE_URL,
+        REPORT_OBJECT_TYPE_PAGE_NUMBER,
+        REPORT_OBJECT_TYPE_CURRENT_DATE,
+        REPORT_OBJECT_TYPE_DATA_GRID,
+        REPORT_OBJECT_TYPE_GRAPH,
+        REPORT_OBJECT_TYPE_SUBREPORT
+    };
+        
 }

@@ -22,6 +22,8 @@ public class ReportDocument {
     private String pageOrientation = Constants.PAGE_ORIENTATION_LANDSCAPE;
     private String pageSize = Constants.DEFAULT_PAGE_SIZE;
     private String pageUnits = Constants.DEFAULT_PAGE_UNITS;
+    private String queryDocumentGroup;
+    private String queryDocument;
     private List<ReportObject> reportObjects = new ArrayList<>();
     
     public String getName() {
@@ -127,6 +129,20 @@ public class ReportDocument {
     public void setReportObjects(List<ReportObject> reportObjects) {
         this.reportObjects = reportObjects;
     }
-    
-    
- }
+
+    public String getQueryDocumentGroup() {
+        return queryDocumentGroup;
+    }
+
+    public void setQueryDocumentGroup(String queryDocumentGroup) {
+        this.queryDocumentGroup = queryDocumentGroup;
+    }
+
+    public String getQueryDocument() {
+        return queryDocument;
+    }
+
+    public void setQueryDocument(String queryDocument) {
+        this.queryDocument = queryDocument;
+    }
+  }

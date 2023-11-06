@@ -1,4 +1,5 @@
 import React from "react";
+import ReportRuler from "./ReportRuler";
 
 const ReportDesign = () => {
     return (

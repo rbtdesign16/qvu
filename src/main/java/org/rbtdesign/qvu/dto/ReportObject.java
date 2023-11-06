@@ -8,24 +8,17 @@ import org.rbtdesign.qvu.util.Constants;
  */
 public class ReportObject {
     private Rect position = new Rect();
-    private int location = Constants.REPORT_LOCATION_BODY;
-    private int REPORT_OBJECT_TYPE = Constants.REPORT_OBJECT_TYPE_TEXT;
+    private String location = Constants.REPORT_LOCATION_BODY;
+    private String type = Constants.REPORT_OBJECT_TYPE_TEXT;
 
-    public int getLocation() {
+    public String getLocation() {
         return location;
     }
 
-    public void setLocation(int location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 
-    public int getREPORT_OBJECT_TYPE() {
-        return REPORT_OBJECT_TYPE;
-    }
-
-    public void setREPORT_OBJECT_TYPE(int REPORT_OBJECT_TYPE) {
-        this.REPORT_OBJECT_TYPE = REPORT_OBJECT_TYPE;
-    }
 
     public Rect getPosition() {
         return position;
@@ -34,6 +27,15 @@ public class ReportObject {
     public void setPosition(Rect position) {
         this.position = position;
     }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    
     
     
 }

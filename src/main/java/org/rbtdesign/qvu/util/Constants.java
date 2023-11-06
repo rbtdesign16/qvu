@@ -190,6 +190,7 @@ public class Constants {
     public static final String DEFAULT_PAGE_SIZE = "Letter";
     public static final Map<String, double[]> PAGE_SIZE_MAP = new HashMap<>();
     
+    // page size mm-width, mm-height, inch-width, inch.height
     static {
         PAGE_SIZE_MAP.put("Letter", new double[] {215.9, 279.4, 8.5, 11});
         PAGE_SIZE_MAP.put("Legal", new double[] {215.9, 355.6, 8.5, 14});
@@ -231,27 +232,36 @@ public class Constants {
     
     public static final String[] PAGE_UNITS = {"inch", "mm"};
     public static final String DEFAULT_PAGE_UNITS = "inch";
-    public static final int REPORT_LOCATION_HEADER = 0;
-    public static final int REPORT_LOCATION_BODY = 1;
-    public static final int REPORT_LOCATION_FOOTER = 2;
+    public static final String REPORT_LOCATION_HEADER = "header";
+    public static final String REPORT_LOCATION_BODY = "body";
+    public static final String REPORT_LOCATION_FOOTER = "footer";
     
-    public static final int REPORT_OBJECT_TYPE_TEXT = 0;
-    public static final int REPORT_OBJECT_TYPE_IMAGE = 1;
-    public static final int REPORT_OBJECT_TYPE_URL = 2;
-    public static final int REPORT_OBJECT_TYPE_PAGE_NUMBER = 3;
-    public static final int REPORT_OBJECT_TYPE_CURRENT_DATE = 4;
-    public static final int REPORT_OBJECT_TYPE_DATA_GRID = 5;
-    public static final int REPORT_OBJECT_TYPE_DATA_RECORD = 6;
-    public static final int REPORT_OBJECT_TYPE_GRAPH = 7;
-    public static final int REPORT_OBJECT_TYPE_SUBREPORT = 8;
+    public static final String[] REPORT_LOCATIONS = {
+        REPORT_LOCATION_HEADER,
+        REPORT_LOCATION_BODY,
+        REPORT_LOCATION_FOOTER
+    };
     
-    public static final int[] REPORT_OBJECT_TYPES = {
+    public static final String REPORT_OBJECT_TYPE_TEXT = "text";
+    public static final String REPORT_OBJECT_TYPE_IMAGE = "image";
+    public static final String REPORT_OBJECT_TYPE_HYPERLINK = "hyperlink";
+    public static final String REPORT_OBJECT_TYPE_PAGE_NUMBER = "page number";
+    public static final String REPORT_OBJECT_TYPE_CURRENT_DATE = "current date";
+    public static final String REPORT_OBJECT_TYPE_DATA_GRID = "data grid";
+    public static final String REPORT_OBJECT_TYPE_DATA_FIELD = "data field";
+    public static final String REPORT_OBJECT_TYPE_DATA_RECORD = "data record";
+    public static final String REPORT_OBJECT_TYPE_GRAPH = "graph";
+    public static final String REPORT_OBJECT_TYPE_SUBREPORT = "subreport";
+    
+    public static final String[] REPORT_OBJECT_TYPES = {
         REPORT_OBJECT_TYPE_TEXT,
         REPORT_OBJECT_TYPE_IMAGE,
-        REPORT_OBJECT_TYPE_URL,
+        REPORT_OBJECT_TYPE_HYPERLINK,
         REPORT_OBJECT_TYPE_PAGE_NUMBER,
         REPORT_OBJECT_TYPE_CURRENT_DATE,
+        REPORT_OBJECT_TYPE_DATA_FIELD,
         REPORT_OBJECT_TYPE_DATA_GRID,
+        REPORT_OBJECT_TYPE_DATA_RECORD,
         REPORT_OBJECT_TYPE_GRAPH,
         REPORT_OBJECT_TYPE_SUBREPORT
     };

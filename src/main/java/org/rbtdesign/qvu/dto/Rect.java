@@ -10,6 +10,16 @@ public class Rect {
     private double width;
     private double height;
 
+    public Rect() {
+    }
+
+    public Rect(double left, double top, double width, double height) {
+        this.left = left;
+        this.height = height;
+        this.top = top;
+        this.width = width;
+    }
+    
     public double getLeft() {
         return left;
     }

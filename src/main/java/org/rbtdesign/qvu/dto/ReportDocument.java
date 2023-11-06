@@ -24,6 +24,11 @@ public class ReportDocument {
     private String pageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String queryDocumentGroup;
     private String queryDocument;
+    private Rect documentRect = new Rect(Constants.DEFAULT_REPORT_BORDER_WIDTH, 
+        Constants.DEFAULT_REPORT_BORDER_WIDTH, 
+        Constants.PAGE_SIZE_MAP.get(Constants.DEFAULT_PAGE_SIZE)[2] - (2 * Constants.DEFAULT_REPORT_BORDER_WIDTH), 
+        Constants.PAGE_SIZE_MAP.get(Constants.DEFAULT_PAGE_SIZE)[2] - (2 * Constants.DEFAULT_REPORT_BORDER_WIDTH));
+
     private List<ReportObject> reportObjects = new ArrayList<>();
     
     public String getName() {
@@ -144,5 +149,13 @@ public class ReportDocument {
 
     public void setQueryDocument(String queryDocument) {
         this.queryDocument = queryDocument;
+    }
+
+    public Rect getDocumentRect() {
+        return documentRect;
+    }
+
+    public void setDocumentRect(Rect documentRect) {
+        this.documentRect = documentRect;
     }
   }

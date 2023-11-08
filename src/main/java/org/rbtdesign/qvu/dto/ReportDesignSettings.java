@@ -2,6 +2,7 @@ package org.rbtdesign.qvu.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.rbtdesign.qvu.util.Constants;
 
 /**
@@ -16,7 +17,8 @@ public class ReportDesignSettings {
     private List<String> pageOrientations = new ArrayList<>();
     private List<String> pageUnits = new ArrayList<>();
     private List<String> reportObjectTypes = new ArrayList<>();
-
+    private Map<String, double[]> pageSizeSettings;
+    
     public String getDefaultPageUnits() {
         return defaultPageUnits;
     }
@@ -72,4 +74,14 @@ public class ReportDesignSettings {
     public void setReportObjectTypes(List<String> reportObjectTypes) {
         this.reportObjectTypes = reportObjectTypes;
     }
+
+    public Map<String, double[]> getPageSizeSettings() {
+        return pageSizeSettings;
+    }
+
+    public void setPageSizeSettings(Map<String, double[]> pageSizeSettings) {
+        this.pageSizeSettings = pageSizeSettings;
+    }
+    
+    
 }

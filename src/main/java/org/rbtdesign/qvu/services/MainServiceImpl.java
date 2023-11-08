@@ -2342,6 +2342,7 @@ public class MainServiceImpl implements MainService {
         result.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
         result.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));
         result.setReportObjectTypes(Arrays.asList(Constants.REPORT_OBJECT_TYPES));
+        result.setPageSizeSettings(Constants.PAGE_SIZE_MAP);
         retval.setResult(result);
 
         return retval;

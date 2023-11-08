@@ -841,6 +841,12 @@ public class FileHandler {
             for (String s : lines) {
                 pw.println(s);
             }
+            
+            if (systemSettings.getMiscConfig().isModified()) {
+                config.setDefaultPageSize(systemSettings.getMiscConfig().getDefaultPageSize());
+                config.setDefaultPageOrientation(systemSettings.getMiscConfig().getDefaultPageOrientation());
+                config.setDefaultPageUnits(systemSettings.getMiscConfig().getDefaultPageUnits());
+            }
         } catch (Exception ex) {
             Errors.populateError(retval, ex);
         } finally {

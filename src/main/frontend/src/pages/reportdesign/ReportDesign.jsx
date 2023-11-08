@@ -11,7 +11,15 @@ import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
-import {SUCCESS, WARN, INFO, ERROR, REPORT_DOCUMENT_TYPE} from "../../utils/helper";
+import {
+    SUCCESS, 
+    WARN, 
+    INFO, 
+    ERROR, 
+    REPORT_DOCUMENT_TYPE,
+    HORIZONTAL_KEY,
+    VERTICAL_KEY
+    } from "../../utils/helper";
 import {getReportSettings, isApiError} from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 
@@ -124,8 +132,8 @@ const ReportDesign = () => {
                     <Button size="sm"  title={getText("New Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewReport()}>{getText("New")}</Button>
                     {getReportInfo()}
                     <div>
-                        <ReportRuler type="hor" report={currentReport}/>
-                        <ReportRuler type="ver" report={currentReport}/>
+                        <ReportRuler type={HORIZONTAL_KEY} report={currentReport} reportSettings={reportSettings}/>
+                        <ReportRuler type={VERTICAL_KEY} report={currentReport}  reportSettings={reportSettings}/>
                         report design
                     </div>
                 </div>

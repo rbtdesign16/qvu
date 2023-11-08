@@ -112,15 +112,15 @@ export const NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "
 export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 export const RESULT_SET_PAGE_SIZES = [100, 200, 300, 400, 500, 600, 800, 1000];
-export const DEFAULT_PAGE_SIZE  = 200;
+export const DEFAULT_PAGE_SIZE = 200;
 
 export const ARROW_UP_KEY = "arrowup";
 export const ARROW_DOWN_KEY = "arrowdown";
 export const HOME_KEY = "arrowleft";
 export const END_KEY = "arrowright";
 
-export const DEFAULT_EXPORTED_KEY_DEPTH  = 4;
-export const DEFAULT_IMPORTED_KEY_DEPTH  = 2;
+export const DEFAULT_EXPORTED_KEY_DEPTH = 4;
+export const DEFAULT_IMPORTED_KEY_DEPTH = 2;
 export const CUSTOM_FK_DATA_SEPARATOR = "?";
 
 export const RESULT_TYPE_EXCEL = "excel";
@@ -186,7 +186,7 @@ export const checkColorString = (input) => {
             retval = input + input.substring(1);
         }
     }
-    
+
     return retval;
 }
 
@@ -588,12 +588,12 @@ export const doSortCompare = (dataType, val1, val2) => {
 
 export const getParameterTypeFromId = (id) => {
     let retval;
-    switch(id) {
+    switch (id) {
         case JDBC_TYPE_CHAR:
         case JDBC_TYPE_VARCHAR:
         case JDBC_TYPE_LONGVARCHAR:
         case JDBC_TYPE_NCHAR:
-       case JDBC_TYPE_NVARCHAR:
+        case JDBC_TYPE_NVARCHAR:
         case JDBC_TYPE_LONGNVARCHAR:
             retval = TYPE_STRING;
             break;
@@ -627,7 +627,7 @@ export const getParameterTypeFromId = (id) => {
             retval = TYPE_STRING;
             break;
     }
-    
+
     return retval;
 };
 
@@ -647,14 +647,72 @@ export const arraysEqual = (a1, a2, nosort = false) => {
             a1.sort();
             a2.sort();
         }
-        
+
         for (let i = 0; i < a1.length; ++i) {
             if (a1[i] !== a2[i]) {
                 return false;
             }
         }
-        
+
         return true;
     }
-        
+};
+
+const getPPI = () => {
+    const el = document.createElement('div');
+    el.style = "width: 1in;";
+    document.body.appendChild(el);
+    let retval = el.offsetWidth;
+    document.body.removeChild(el);
+    return retval;
+};
+
+
+export const PIXELS_PER_INCH = getPPI();
+export const PIXELS_PER_MM = PIXELS_PER_INCH / 25.4;
+export const PIXELS_PER_POINT = 1.3333;
+
+export const REPORT_ORIENTATION_LANDSCAPE = "landscape";
+export const REPORT_ORIENTATION_PORTRAIT = "portrait";
+export const REPORT_UNITS_INCH = "inch";
+export const REPORT_UNITS_MM = "mm";
+
+export const HORIZONTAL_KEY = "hor";
+export const VERTICAL_KEY = "ver";
+
+export const getReportWidth = (report, reportSettings) => {
+    let size = reportSettings.pageSizeSettings[report.pageSize];
+    let units = report.pageUnits;
+    if (report.orientation === REPORT_ORIENTATION_LANDSCAPE) {
+        if (units === REPORT_UNITS_MM) {
+            return size[1] * PIXELS_PER_MM;
+        } else {
+            return size[3] * PIXELS_PER_INCH;
+        }
+    } else {
+        if (units === REPORT_UNITS_MM) {
+            return size[0] * PIXELS_PER_MM;
+        } else {
+            return size[2] * PIXELS_PER_INCH;
+        }
+    }
+};
+
+export const getReportHeight = (report, reportSettings) => {
+    let size = reportSettings.pageSizeSettings[report.pageSize];
+    let units = report.pageUnits;
+
+    if (report.orientation === REPORT_ORIENTATION_LANDSCAPE) {
+        if (units === REPORT_UNITS_MM) {
+            return size[0] * PIXELS_PER_MM;
+        } else {
+            return size[2] * PIXELS_PER_INCH;
+        }
+    } else {
+        if (units === REPORT_UNITS_MM) {
+            return size[1] * PIXELS_PER_MM;
+        } else {
+            return size[3] * PIXELS_PER_INCH;
+        }
+    }
 };

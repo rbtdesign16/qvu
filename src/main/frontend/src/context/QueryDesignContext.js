@@ -36,7 +36,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [currentDocument, setCurrentDocument] = useState({
         name: getText(DEFAULT_NEW_DOCUMENT_NAME),
         group: DEFAULT_DOCUMENT_GROUP,
-        newdoc: true
+        newRecord: true
     });
     
     const EMPTY_FILTER_VALUE = getText("empty-filter-value");

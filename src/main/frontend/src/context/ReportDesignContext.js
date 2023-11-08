@@ -1,8 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import {
-    isDataTypeString,
-    isDataTypeNumeric,
-    isDataTypeDateTime,
     isEmpty,
     DEFAULT_NEW_REPORT_NAME,
     DEFAULT_DOCUMENT_GROUP,
@@ -14,24 +11,28 @@ export const ReportDesignContext = createContext();
 
 export const ReportDesignProvider = ({ children }) => {
     const {getText} = useLang();
-    const [currentDocument, setCurrentDocument] = useState({
-        name: getText(DEFAULT_NEW_REPORT_NAME),
-        group: DEFAULT_DOCUMENT_GROUP,
-        newdoc: true
-    });
+    const [reportSettings, setReportSettings] = useState(null);
+    const [currentReport, setCurrentReport] = useState(null);
     
-    const clearData = () => {
+    const initializeReportSettings = async (settings) => {
+        setReportSettings(settings);
+        setNewReport(settings);
     };
-
-    const setNewReport = () => {
-        setCurrentDocument({name: getText(DEFAULT_NEW_REPORT_NAME),
-            group: DEFAULT_DOCUMENT_GROUP, newdoc: true});
-        clearData();
+    
+    const setNewReport = (settings) => {
+        setCurrentReport({
+            name: getText(DEFAULT_NEW_REPORT_NAME),
+            group: DEFAULT_DOCUMENT_GROUP, 
+            newRecord: true,
+            pageSize: settings ? settings.defaultPageSize : reportSettings.defaultPageSize,
+            orientation: settings ? settings.defaultPageOrientation :  reportSettings.defaultPageOrientation,
+            pageUnits: settings ? settings.defaultPageUnits : reportSettings.defaultPageUnits
+        });
     };
 
     return (
             <ReportDesignContext.Provider
-                value={{currentDocument}}>
+                value={{currentReport, setCurrentReport, reportSettings, initializeReportSettings, setNewReport}}>
                 {children}
             </ReportDesignContext.Provider>
             );

@@ -8,58 +8,14 @@ import org.rbtdesign.qvu.util.Constants;
  *
  * @author rbtuc
  */
-public class MiscConfig {
-    private String backupFolder;
-    private int serverPort;
-    private String corsAllowedOrigins;
+public class ReportDesignSettings {
     private String defaultPageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String defaultPageOrientation = Constants.PAGE_ORIENTATION_PORTRAIT;
     private String defaultPageSize = Constants.PAGE_SIZE_NAMES[0];
-    private boolean modified;
-    private boolean enabled;
     private List<String> pageSizes = new ArrayList<>();
     private List<String> pageOrientations = new ArrayList<>();
     private List<String> pageUnits = new ArrayList<>();
-
-    public String getBackupFolder() {
-        return backupFolder;
-    }
-
-    public void setBackupFolder(String backupFolder) {
-        this.backupFolder = backupFolder;
-    }
-
-    public int getServerPort() {
-        return serverPort;
-    }
-
-    public void setServerPort(int serverPort) {
-        this.serverPort = serverPort;
-    }
-
-    public String getCorsAllowedOrigins() {
-        return corsAllowedOrigins;
-    }
-
-    public void setCorsAllowedOrigins(String corsAllowedOrigins) {
-        this.corsAllowedOrigins = corsAllowedOrigins;
-    }
-
-    public boolean isModified() {
-        return modified;
-    }
-
-    public void setModified(boolean modified) {
-        this.modified = modified;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+    private List<String> reportObjectTypes = new ArrayList<>();
 
     public String getDefaultPageUnits() {
         return defaultPageUnits;
@@ -93,14 +49,6 @@ public class MiscConfig {
         this.pageSizes = pageSizes;
     }
 
-    public List<String> getPageUnits() {
-        return pageUnits;
-    }
-
-    public void setPageUnits(List<String> pageUnits) {
-        this.pageUnits = pageUnits;
-    }
-
     public List<String> getPageOrientations() {
         return pageOrientations;
     }
@@ -109,5 +57,19 @@ public class MiscConfig {
         this.pageOrientations = pageOrientations;
     }
 
-    
+    public List<String> getPageUnits() {
+        return pageUnits;
+    }
+
+    public void setPageUnits(List<String> pageUnits) {
+        this.pageUnits = pageUnits;
+    }
+
+    public List<String> getReportObjectTypes() {
+        return reportObjectTypes;
+    }
+
+    public void setReportObjectTypes(List<String> reportObjectTypes) {
+        this.reportObjectTypes = reportObjectTypes;
+    }
 }

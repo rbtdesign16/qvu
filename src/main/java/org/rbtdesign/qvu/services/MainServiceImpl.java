@@ -86,6 +86,7 @@ import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.ReportDesignSettings;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SqlFilterColumn;
@@ -1621,6 +1622,21 @@ public class MainServiceImpl implements MainService {
             }
         }
 
+        boolean haveUserGroup = false;
+        
+        for (DocumentGroup g : userDocGroups) {
+            if (Constants.DEFAULT_DOCUMENT_GROUP.equals(g.getName())) {
+                haveUserGroup = true;
+                break;
+            }
+        }
+        
+        if (!haveUserGroup) {
+            DocumentGroup g = new DocumentGroup();
+            g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
+            userDocGroups.add(g);
+        }
+        
         Collections.sort(userDocGroups, new DocumentGroupComparator());
 
         int id = 0;
@@ -1638,7 +1654,6 @@ public class MainServiceImpl implements MainService {
                 }
 
                 List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
-
                 for (String fname : fileNames) {
                     DocumentNode n = new DocumentNode(id++);
                     n.getMetadata().put("group", g.getName());
@@ -2313,6 +2328,22 @@ public class MainServiceImpl implements MainService {
             LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
         }
+        return retval;
+    }
+    
+    @Override
+    public OperationResult<ReportDesignSettings> getReportDesignSettings() {
+        OperationResult<ReportDesignSettings> retval = new OperationResult<>();
+        ReportDesignSettings result = new ReportDesignSettings();
+        result.setDefaultPageOrientation(config.getDefaultPageOrientation());
+        result.setDefaultPageSize(config.getDefaultPageSize());
+        result.setDefaultPageUnits(config.getDefaultPageUnits());
+        result.setPageOrientations(Arrays.asList(Constants.PAGE_ORIENTATIONS));
+        result.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
+        result.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));
+        result.setReportObjectTypes(Arrays.asList(Constants.REPORT_OBJECT_TYPES));
+        retval.setResult(result);
+
         return retval;
     }
 }

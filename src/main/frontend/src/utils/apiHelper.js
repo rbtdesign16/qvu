@@ -501,3 +501,16 @@ export const logout = async (securityType) => {
         console.log("logout: " + e);
     }
 };
+
+export const getReportSettings = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/report/settings", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        console.log("------>e=" + e);
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e};
+    }
+};

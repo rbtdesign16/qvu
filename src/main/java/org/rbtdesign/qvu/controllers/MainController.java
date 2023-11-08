@@ -29,6 +29,7 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.ReportDesignSettings;
 import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
@@ -386,4 +387,10 @@ public class MainController {
         
         return new ResponseEntity<>(headers, HttpStatus.UNAUTHORIZED);
     }
- }
+
+    @RequestMapping(value="/api/v1/report/settings", method = RequestMethod.GET)
+    public OperationResult<ReportDesignSettings> getReportDesignSettings() {
+        LOG.debug("in getReportDesignSettings()");
+        return service.getReportDesignSettings();
+    }
+}

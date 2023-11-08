@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from "react";
+import React, {useContext, useState} from "react";
 import useAuth from "../../context/AuthContext";
 import useLang from "../../context/LangContext";
 import useDataHandler from "../../context/DataHandlerContext";

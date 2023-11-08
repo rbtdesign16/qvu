@@ -111,7 +111,7 @@ import { getDatasourceTreeViewData,
     };
 
     const onSaveDocument = () => {
-        setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave});
+        setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave, currentDocument: currentDocument});
     };
 
     const saveQueryDocument = async (name, group) => {
@@ -295,7 +295,7 @@ import { getDatasourceTreeViewData,
                 setCurrentDocument({
                     name: doc.name,
                     group: doc.documentGroupName,
-                    newdoc: false
+                    newRecord: false
                 });
 
                 hideMessage();
@@ -313,6 +313,7 @@ import { getDatasourceTreeViewData,
 
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 
+console.log("----------->" + JSON.stringify(res.result));
         hideMessage();
 
         if (isApiSuccess(res)) {

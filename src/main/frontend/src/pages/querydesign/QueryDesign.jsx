@@ -313,7 +313,6 @@ import { getDatasourceTreeViewData,
 
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 
-console.log("----------->" + JSON.stringify(res.result));
         hideMessage();
 
         if (isApiSuccess(res)) {

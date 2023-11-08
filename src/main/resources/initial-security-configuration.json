@@ -21,18 +21,23 @@
             "roles": [
                 "user",
                 "administrator",
-                "query designer"
+                "query designer",
+                "report designer",
             ]
         }
     ],
     "roles": [
         {
             "name": "administrator",
-            "description": "adminsitrator role"
+            "description": "administrator role"
         },
         {
             "name": "query designer",
             "description": "query designer role"
+        },
+        {
+            "name": "report designer",
+            "description": "report designer role"
         }
     ]
 }

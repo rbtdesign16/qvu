@@ -18,23 +18,23 @@ import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 const ReportDesign = () => {
     const [report, setReport] = useState(null);
     const {getText} = useLang();
-    const [showSaveReport, setShowSaveReport] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
-    const [showReportSelect, setShowReportSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
+    const [showSaveDocument, setShowSaveDocumnt] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
+    const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const {authData, setAuthData} = useAuth();
     const {showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
     const {
-        reportSettings, 
-        currentReport, 
-        setCurrentReport, 
-        setNewReport, 
+        reportSettings,
+        currentReport,
+        setCurrentReport,
+        setNewReport,
         initializeReportSettings} = useReportDesign();
 
-    const hideReportSelect = () => {
-        setShowReportSelect({show: false});
+    const hideDocumentSelect = () => {
+        setShowDocumentSelect({show: false});
     };
 
-    const onShowReportSelect = async () => {
+    const onShowDocumentSelect = async () => {
         showMessage(INFO, getText("Loading available reports", "..."), null, true);
 
         let res = await getAvailableDocuments(REPORT_DOCUMENT_TYPE);
@@ -42,11 +42,23 @@ const ReportDesign = () => {
         hideMessage();
 
         if (isApiSuccess(res)) {
-            setShowReportSelect({show: true, type: REPORT_DOCUMENT_TYPE, hide: hideReportSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
+            setShowDocumentSelect({show: true, type: REPORT_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
         } else {
             showMessage(ERROR, res.message);
         }
     };
+
+    const hideShowSave = () => {
+        setShowSaveDocument({show: false, type: REPORT_DOCUMENT_TYPE});
+    };
+
+    const saveReportDocument = async (name, group) => {
+    };
+
+    const onSaveDocument = async () => {
+        setShowSaveDocument({show: true, type: REPORT_DOCUMENT_TYPE, saveDocument: saveReportDocument, hide: hideShowSave, currentDocument: currentDocument});
+    };
+
 
     const onNewReport = () => {
         setNewReport();
@@ -58,16 +70,16 @@ const ReportDesign = () => {
     };
 
     const populateDocument = async (group, name) => {
-        hideReportSelect();
+        hideDocumentSelect();
         showMessage(INFO, getText("Loading report", " " + name + "..."), null, true);
-        
+
         let res = await getDocument(REPORT_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             setNewReport();
             let doc = res.result;
- 
+
             setCurrentReport({
                 name: doc.name,
                 group: doc.documentGroupName,
@@ -76,7 +88,7 @@ const ReportDesign = () => {
 
             hideMessage();
         }
-     };
+    };
 
     const getReportInfo = () => {
         return  <span style={{marginLeft: "10px"}} className="cobaltBlue-f">
@@ -84,19 +96,18 @@ const ReportDesign = () => {
             {currentReport.group} 
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Report", ":  ")}</span>
             {currentReport.name}
-            </span>;
+        </span>;
     };
 
     const loadReportSettings = async () => {
         let res = await getReportSettings();
-        console.log("----------->" + JSON.stringify(res));
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             initializeReportSettings(res.result);
         }
     };
-    
+
     useEffect(() => {
         if (!reportSettings) {
             loadReportSettings();
@@ -106,17 +117,17 @@ const ReportDesign = () => {
     if (reportSettings && currentReport) {
         return (
                 <div>
-                <SaveDocumentModal config={showSaveReport}/>
-                <DocumentSelectModal config={showReportSelect}/>
-                {getReportInfo()}
-                <Button size="sm"  title={getText("Load Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowReportSelect()}>{getText("Load")}</Button>
-                {isReportDesigner(authData) && <Button size="sm"  title={getText("Save Report")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveReport()}>{getText("Save")}</Button>}
-                <Button size="sm"  title={getText("New Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewReport()}>{getText("New")}</Button>
-                <div>
-                    <ReportRuler type="hor" report={currentReport}/>
-                    <ReportRuler type="ver" report={currentReport}/>
-                    report design
-                </div>
+                    <SaveDocumentModal config={showSaveDocument}/>
+                    <DocumentSelectModal config={showDocumentSelect}/>
+                    <Button size="sm"  title={getText("Load Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
+                    {isReportDesigner(authData) && <Button size="sm"  title={getText("Save Report")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
+                    <Button size="sm"  title={getText("New Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewReport()}>{getText("New")}</Button>
+                    {getReportInfo()}
+                    <div>
+                        <ReportRuler type="hor" report={currentReport}/>
+                        <ReportRuler type="ver" report={currentReport}/>
+                        report design
+                    </div>
                 </div>
                 );
     } else {

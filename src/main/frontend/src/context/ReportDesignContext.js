@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import {
     isEmpty,
-    DEFAULT_NEW_REPORT_NAME,
+    DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
@@ -19,15 +19,18 @@ export const ReportDesignProvider = ({ children }) => {
         setNewReport(settings);
     };
     
-    const setNewReport = (settings) => {
-        setCurrentReport({
-            name: getText(DEFAULT_NEW_REPORT_NAME),
+    const getNewDocument = (settings) => {
+        return {
+            name: getText(DEFAULT_NEW_DOCUMENT_NAME),
             group: DEFAULT_DOCUMENT_GROUP, 
             newRecord: true,
             pageSize: settings ? settings.defaultPageSize : reportSettings.defaultPageSize,
             orientation: settings ? settings.defaultPageOrientation :  reportSettings.defaultPageOrientation,
             pageUnits: settings ? settings.defaultPageUnits : reportSettings.defaultPageUnits
-        });
+        };
+    }
+    const setNewReport = (settings) => {
+        setCurrentReport(getNewDocument(settings));
     };
 
     return (

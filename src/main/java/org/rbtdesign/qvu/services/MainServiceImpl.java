@@ -1620,6 +1620,21 @@ public class MainServiceImpl implements MainService {
             }
         }
 
+        boolean haveUserGroup = false;
+        
+        for (DocumentGroup g : userDocGroups) {
+            if (Constants.DEFAULT_DOCUMENT_GROUP.equals(g.getName())) {
+                haveUserGroup = true;
+                break;
+            }
+        }
+        
+        if (!haveUserGroup) {
+            DocumentGroup g = new DocumentGroup();
+            g.setName(Constants.DEFAULT_DOCUMENT_GROUP);
+            userDocGroups.add(g);
+        }
+        
         Collections.sort(userDocGroups, new DocumentGroupComparator());
 
         int id = 0;
@@ -1637,7 +1652,6 @@ public class MainServiceImpl implements MainService {
                 }
 
                 List<String> fileNames = fileHandler.getGroupDocumentNames(documentType, g.getName(), u.getName());
-
                 for (String fname : fileNames) {
                     DocumentNode n = new DocumentNode(id++);
                     n.getMetadata().put("group", g.getName());

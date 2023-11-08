@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -2097,6 +2098,13 @@ public class MainServiceImpl implements MainService {
         retval.setCorsAllowedOrigins(config.getCorsAllowedOrigins());
         retval.setBackupFolder(config.getBackupFolder());
         retval.setServerPort(config.getServerPort());
+        retval.setDefaultPageOrientation(config.getDefaultPageOrientation());
+        retval.setDefaultPageSize(config.getDefaultPageSize());
+        retval.setDefaultPageUnits(config.getDefaultPageUnits());
+        
+        retval.setPageOrientations(Arrays.asList(Constants.PAGE_ORIENTATIONS));
+        retval.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
+        retval.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));
 
         return retval;
     }

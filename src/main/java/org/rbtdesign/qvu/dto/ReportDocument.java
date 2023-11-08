@@ -159,6 +159,4 @@ public class ReportDocument {
     public void setQueryDocumentName(String queryDocumentName) {
         this.queryDocumentName = queryDocumentName;
     }
-    
-    
-}
+ }

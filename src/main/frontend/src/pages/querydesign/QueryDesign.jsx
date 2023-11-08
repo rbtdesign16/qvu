@@ -181,13 +181,13 @@ import { getDatasourceTreeViewData,
     const getForeignTableFromPathPart = (part) => {
         let pos = part.indexOf("{");
         return part.substring(0, pos);
-    }
+    };
     
     const getForeignKeyNameFromPathPart = (part) => {
         let pos = part.indexOf("{");
         let pos2 = part.indexOf("@");
         return part.substring(pos + 1, pos2);
-    }
+    };
 
     const findNodeId = (parent, path) => {
         let retval;

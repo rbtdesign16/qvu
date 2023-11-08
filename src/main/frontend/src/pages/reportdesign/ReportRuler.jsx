@@ -2,10 +2,19 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const ReportRuler = (props) => {
-    const {report, position} = props;
+    const {report, type} = props;
     
     const buildRuler = () => {
-        return <div>ruler</div>;
+        let myStyle = {};
+        
+        if (type === "hor") {
+            myStyle.height = "30px";
+            myStyle.top = "0";
+        } else {
+            myStyle.width = "30px";
+            myStyle.top = "30px";
+        }
+        return <canvas style={myStyle} className="ruler">ruler</canvas>;
     };
     
     return buildRuler();
@@ -14,7 +23,7 @@ const ReportRuler = (props) => {
 
 ReportRuler.propTypes = {
     report: PropTypes.object.isRequired,
-    position: PropTypes.string.isRequired
+    type: PropTypes.string.isRequired
 };
 
 export default ReportRuler;

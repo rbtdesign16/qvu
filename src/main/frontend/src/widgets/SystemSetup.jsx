@@ -14,13 +14,13 @@ INFO,
         ERROR,
         replaceTokens,
         MODAL_TITLE_SIZE
-} from "../utils/helper";
+        } from "../utils/helper";
 
 import {
 SECURITY_TYPE_BASIC,
         SECURITY_TYPE_OIDC,
         SECURITY_TYPES
-} from "../utils/authHelper";
+        } from "../utils/authHelper";
 
 import {
 isApiError,
@@ -50,7 +50,7 @@ const SystemSetup = (props) => {
         setSystemSettings(ss);
     };
 
-   const onSslChange = (e, entryConfig, dataObject) => {
+    const onSslChange = (e, entryConfig, dataObject) => {
         let ss = {...systemSettings};
         ss.sslConfig = dataObject;
         ss.sslConfig.modified = true;
@@ -111,6 +111,24 @@ const SystemSetup = (props) => {
                     required: true,
                     showHelp: showHelpMessage,
                     helpText: getText("corsAllowedOrigins-help")
+                },
+                {
+                    label: getText("Default Report Units"),
+                    name: "defaultPageUnits",
+                    type: "select",
+                    options: systemSettings.miscConfig.pageUnits
+                },
+                {
+                    label: getText("Default Report Orientation"),
+                    name: "defaultPageOrientation",
+                    type: "select",
+                    options: systemSettings.miscConfig.pageOrientations
+                },
+                {
+                    label: getText("Default Report Size"),
+                    name: "defaultPageSize",
+                    type: "select",
+                    options: systemSettings.miscConfig.pageSizes
                 }
             ]
         };
@@ -392,7 +410,7 @@ const SystemSetup = (props) => {
                 break;
             }
         }
-        
+
         return retval;
     };
 

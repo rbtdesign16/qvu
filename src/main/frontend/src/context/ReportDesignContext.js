@@ -31,7 +31,7 @@ export const ReportDesignProvider = ({ children }) => {
 
     return (
             <ReportDesignContext.Provider
-                value={{}}>
+                value={{currentDocument}}>
                 {children}
             </ReportDesignContext.Provider>
             );

@@ -79,6 +79,16 @@ public class QvuConfiguration {
 
     @Value("${backup.folder:}")
     private String backupFolder;
+
+    @Value("${default.page.size:letter}")
+    private String defaultPageSize;
+
+    @Value("${default.page.orientation:portrait}")
+    private String defaultPageOrientation;
+
+    @Value("${default.page.units:inch}")
+    private String defaultPageUnits;
+
     
     @PostConstruct
     private void init() {
@@ -92,6 +102,9 @@ public class QvuConfiguration {
         config.setSslConfig(getSslConfig());
         config.setServerPort(serverPort);
         config.setCorsAllowedOrigins(corsAllowedOrigins);
+        config.setDefaultPageOrientation(defaultPageOrientation);
+        config.setDefaultPageSize(defaultPageSize);
+        config.setDefaultPageUnits(defaultPageUnits);
     }
 
     @Autowired

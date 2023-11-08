@@ -36,6 +36,10 @@ public class Constants {
     public static final String SERVER_PORT_PROPERTY = "server.port";
     public static final String BACKUP_FOLDER_PROPERTY = "backup.folder";
     public static final String CORS_ALLOWED_ORIGINS_PROPERTY = "cors.allowed.origins";
+
+    public static final String DEFAULT_PAGE_SIZE_PROPERTY = "default.page.size";
+    public static final String DEFAULT_PAGE_ORIENTATION_PROPERTY = "default.page.orientation";
+    public static final String DEFAULT_PAGE_UNITS_PROPERTY = "default.page.units";
     
     public static final String SSL_ENABLED_PROPERTY = "server.ssl.enabled";
     public static final String SSL_KEYSTORE_PROPERTY = "server.ssl.key-store";
@@ -150,10 +154,15 @@ public class Constants {
     public static final String PAGE_ORIENTATION_LANDSCAPE = "landscape";
     public static final String PAGE_ORIENTATION_PORTRAIT = "portrait";
     
+    public static final String[] PAGE_ORIENTATIONS = {
+        PAGE_ORIENTATION_PORTRAIT,
+        PAGE_ORIENTATION_LANDSCAPE
+    };
+    
     public static final String[] PAGE_SIZE_NAMES = {
-        "Letter", 
-        "Legal", 
-        "Tabloid",
+        "letter", 
+        "legal", 
+        "tabloid",
         "4A0",
         "2A0",
         "A0",
@@ -187,14 +196,13 @@ public class Constants {
         "C6",
         "C7"};
     
-    public static final String DEFAULT_PAGE_SIZE = "Letter";
     public static final Map<String, double[]> PAGE_SIZE_MAP = new HashMap<>();
     
     // page size mm-width, mm-height, inch-width, inch.height
     static {
-        PAGE_SIZE_MAP.put("Letter", new double[] {215.9, 279.4, 8.5, 11});
-        PAGE_SIZE_MAP.put("Legal", new double[] {215.9, 355.6, 8.5, 14});
-        PAGE_SIZE_MAP.put("Tabloid", new double[] {279.4, 431.8, 11, 17});
+        PAGE_SIZE_MAP.put("letter", new double[] {215.9, 279.4, 8.5, 11});
+        PAGE_SIZE_MAP.put("legal", new double[] {215.9, 355.6, 8.5, 14});
+        PAGE_SIZE_MAP.put("tabloid", new double[] {279.4, 431.8, 11, 17});
         PAGE_SIZE_MAP.put("4A0", new double[] {1582, 2378,66.22, 93.62});
         PAGE_SIZE_MAP.put("2A0", new double[] {1189 , 168, 46.81, 66.22});
         PAGE_SIZE_MAP.put("A0", new double[] {841, 1189, 33, 46.81});
@@ -230,6 +238,8 @@ public class Constants {
         PAGE_SIZE_MAP.put("DL", new double[] {110, 220, 4.32, 8.69});
     }
     
+    public static final String DEFAULT_PAGE_SIZE = "letter";
+
     public static final String[] PAGE_UNITS = {"inch", "mm"};
     public static final String DEFAULT_PAGE_UNITS = "inch";
     public static final String REPORT_LOCATION_HEADER = "header";

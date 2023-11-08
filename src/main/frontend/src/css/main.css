@@ -630,3 +630,10 @@ textarea {
     overflow-x: hidden;
     border: var(--query-results-table-border);
 }
+
+.ruler {
+    border: var(--query-results-table-border);
+    background-color: var(--footer-background-color);
+    color: var(--default-font-color);
+}
+

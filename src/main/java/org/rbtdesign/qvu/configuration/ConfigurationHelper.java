@@ -35,6 +35,9 @@ public class ConfigurationHelper {
     private SSLConfig sslConfig;
     private int serverPort;
     private String corsAllowedOrigins;
+    private String defaultPageOrientation;
+    private String defaultPageSize;
+    private String defaultPageUnits;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -272,6 +275,30 @@ public class ConfigurationHelper {
     
     public void setCorsAllowedOrigins(String corsAllowedOrigins) {
         this.corsAllowedOrigins = corsAllowedOrigins;
+    }
+
+    public String getDefaultPageOrientation() {
+        return defaultPageOrientation;
+    }
+
+    public void setDefaultPageOrientation(String defaultPageOrientation) {
+        this.defaultPageOrientation = defaultPageOrientation;
+    }
+
+    public String getDefaultPageSize() {
+        return defaultPageSize;
+    }
+
+    public void setDefaultPageSize(String defaultPageSize) {
+        this.defaultPageSize = defaultPageSize;
+    }
+
+    public String getDefaultPageUnits() {
+        return defaultPageUnits;
+    }
+
+    public void setDefaultPageUnits(String defaultPageUnits) {
+        this.defaultPageUnits = defaultPageUnits;
     }
     
     

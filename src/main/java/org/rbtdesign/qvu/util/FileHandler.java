@@ -796,6 +796,12 @@ public class FileHandler {
                     lines.add(Constants.BACKUP_FOLDER_PROPERTY + "=" + systemSettings.getMiscConfig().getBackupFolder());
                 } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.CORS_ALLOWED_ORIGINS_PROPERTY)) {
                     lines.add(Constants.CORS_ALLOWED_ORIGINS_PROPERTY + "=" + systemSettings.getMiscConfig().getCorsAllowedOrigins());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.DEFAULT_PAGE_SIZE_PROPERTY)) {
+                    lines.add(Constants.DEFAULT_PAGE_SIZE_PROPERTY + "=" + systemSettings.getMiscConfig().getDefaultPageSize());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.DEFAULT_PAGE_ORIENTATION_PROPERTY)) {
+                    lines.add(Constants.DEFAULT_PAGE_ORIENTATION_PROPERTY + "=" + systemSettings.getMiscConfig().getDefaultPageOrientation());
+                } else if (systemSettings.getMiscConfig().isModified() && line.contains(Constants.DEFAULT_PAGE_UNITS_PROPERTY)) {
+                    lines.add(Constants.DEFAULT_PAGE_UNITS_PROPERTY + "=" + systemSettings.getMiscConfig().getDefaultPageUnits());
                 } else if (!isSSLProperty(line)) {
                     lines.add(line);
                 }

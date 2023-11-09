@@ -1,6 +1,7 @@
 import React, { useState, useEffect }from "react";
 import ReportRuler from "./ReportRuler";
 import Button from "react-bootstrap/Button"
+import { slide as Menu } from "react-burger-menu";
 import useMessage from "../../context/MessageContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
@@ -20,7 +21,8 @@ import {
     HORIZONTAL_KEY,
     VERTICAL_KEY,
     getReportWidth,
-    getReportHeight
+    getReportHeight,
+    SMALL_ICON_SIZE
 } from "../../utils/helper";
 import {
     getReportSettings, 
@@ -29,9 +31,11 @@ import {
     isApiSuccess
 } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
+import { LiaFileInvoiceSolid, LiaFileMedicalSolid, LiaFileUploadSolid } from "react-icons/lia";
 
 const ReportDesign = () => {
     const [report, setReport] = useState(null);
+    const [menuOpen, setMenuOpen] = useState(false);
     const {getText} = useLang();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
@@ -45,11 +49,33 @@ const ReportDesign = () => {
         setNewReport,
         initializeReportSettings} = useReportDesign();
 
+    const handleStateChange = (state) => {
+        setMenuOpen(state.isOpen);  
+    };
+  
+    const closeMenu = () => {
+        setMenuOpen(false);
+    };
+    
+    const canSave = () => {
+        return isReportDesigner(authData);
+    };
+    
+    const getMenu = () => {
+        return <Menu isOpen={menuOpen} 
+            onStateChange={(state) => handleStateChange(state)}>
+            <div onClick={onShowDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
+            <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
+            {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
+      </Menu>;
+    };
+  
     const hideDocumentSelect = () => {
         setShowDocumentSelect({show: false});
     };
 
     const onShowDocumentSelect = async () => {
+        closeMenu();
         showMessage(INFO, getText("Loading available reports", "..."), null, true);
 
         let res = await getAvailableDocuments(REPORT_DOCUMENT_TYPE);
@@ -68,10 +94,12 @@ const ReportDesign = () => {
     };
 
     const saveReportDocument = async (name, group) => {
+        closeMenu();
     };
 
     const onSaveDocument = async () => {
-        setShowSaveDocument({show: true, type: REPORT_DOCUMENT_TYPE, saveDocument: saveReportDocument, hide: hideShowSave, currentDocument: currentDocument});
+        closeMenu();
+        setShowSaveDocument({show: true, type: REPORT_DOCUMENT_TYPE, saveDocument: saveReportDocument, hide: hideShowSave, currentDocument: currentReport});
     };
 
 
@@ -125,7 +153,7 @@ const ReportDesign = () => {
     
     const isSaveEnabled = () => {
         return true;
-    }
+    };
 
     useEffect(() => {
         if (!reportSettings) {
@@ -145,15 +173,12 @@ const ReportDesign = () => {
         };
 
         return (
-                <div className="report-design-tab">
+                <div style={{top: "40px"}} className="report-design-tab">
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>
-                    <Button size="sm"  title={getText("Load Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
-                    {isReportDesigner(authData) && <Button size="sm"  title={getText("Save Report")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
-                    <Button size="sm"  title={getText("New Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewReport()}>{getText("New")}</Button>
                     {getReportInfo()}
                     <div style={myStyle}>
-                    <div className="ruler"></div>
+                    <div className="bm-container">{getMenu()}</div>
                     <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={30} width={width}/>
                     <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={height} width={30}/>
                     <div>report design</div>

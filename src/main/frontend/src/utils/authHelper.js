@@ -26,7 +26,7 @@ export const isQueryDesigner = (authData) => {
 };
 
 export const isReportDesigner = (authData) => {
-    return false; //userHasRole(authData, DEFAULT_REPORT_DESIGNER_ROLE);
+    return userHasRole(authData, REPORT_DESIGNER_ROLE);
 };
 
 export const isUser = (authData) => {

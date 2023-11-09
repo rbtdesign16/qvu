@@ -18,15 +18,22 @@ import {
     ERROR, 
     REPORT_DOCUMENT_TYPE,
     HORIZONTAL_KEY,
-    VERTICAL_KEY
-    } from "../../utils/helper";
-import {getReportSettings, isApiError} from "../../utils/apiHelper";
+    VERTICAL_KEY,
+    getReportWidth,
+    getReportHeight
+} from "../../utils/helper";
+import {
+    getReportSettings, 
+    getAvailableDocuments,
+    isApiError,
+    isApiSuccess
+} from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 
 const ReportDesign = () => {
     const [report, setReport] = useState(null);
     const {getText} = useLang();
-    const [showSaveDocument, setShowSaveDocumnt] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
+    const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const {authData, setAuthData} = useAuth();
     const {showMessage, hideMessage} = useMessage();
@@ -115,6 +122,10 @@ const ReportDesign = () => {
             initializeReportSettings(res.result);
         }
     };
+    
+    const isSaveEnabled = () => {
+        return true;
+    }
 
     useEffect(() => {
         if (!reportSettings) {
@@ -123,18 +134,29 @@ const ReportDesign = () => {
     });
 
     if (reportSettings && currentReport) {
+        let height = getReportHeight(currentReport, reportSettings);
+        let width = getReportWidth(currentReport, reportSettings);
+        
+        let myStyle =  {
+            display: "grid",
+            gridTemplateColumns: "30px " + width + "px",
+            margin: "5px",
+            gridRowGap: 0
+        };
+
         return (
-                <div>
+                <div className="report-design-tab">
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>
                     <Button size="sm"  title={getText("Load Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onShowDocumentSelect()}>{getText("Load")}</Button>
                     {isReportDesigner(authData) && <Button size="sm"  title={getText("Save Report")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
                     <Button size="sm"  title={getText("New Report")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewReport()}>{getText("New")}</Button>
                     {getReportInfo()}
-                    <div>
-                        <ReportRuler type={HORIZONTAL_KEY} report={currentReport} reportSettings={reportSettings}/>
-                        <ReportRuler type={VERTICAL_KEY} report={currentReport}  reportSettings={reportSettings}/>
-                        report design
+                    <div style={myStyle}>
+                    <div className="ruler"></div>
+                    <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={30} width={width}/>
+                    <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={height} width={30}/>
+                    <div>report design</div>
                     </div>
                 </div>
                 );

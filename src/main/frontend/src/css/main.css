@@ -192,6 +192,12 @@ img {
     width: 100%;
 }
 
+.report-design-tab {
+    position: absolute; 
+    height: 100%; 
+    width: 100%;
+}
+
 .editable-data-list {
     overflow: hidden;
     height: calc(100% - 20px) !important;

@@ -188,8 +188,7 @@ export const checkColorString = (input) => {
     }
 
     return retval;
-}
-
+};
 
 export const getHexColor = (colorStr) => {
     var a = document.createElement('div');
@@ -716,3 +715,9 @@ export const getReportHeight = (report, reportSettings) => {
         }
     }
 };
+
+export const LEFT = "left";
+export const RIGHT = "right";
+export const TOP = "top";
+export const BOTTOM = "bottom";
+export const CENTER = "center";

@@ -22,7 +22,12 @@ import {
     VERTICAL_KEY,
     getReportWidth,
     getReportHeight,
-    SMALL_ICON_SIZE
+    SMALL_ICON_SIZE,
+    LEFT,
+    TOP,
+    RIGHT,
+    CENTER,
+    BOTTOM
 } from "../../utils/helper";
 import {
     getReportSettings, 
@@ -31,10 +36,23 @@ import {
     isApiSuccess
 } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
-import { LiaFileInvoiceSolid, LiaFileMedicalSolid, LiaFileUploadSolid } from "react-icons/lia";
+import {AiOutlineFontSize, 
+    AiOutlineBarChart,
+    AiOutlineVerticalAlignBottom,
+    AiOutlineVerticalAlignTop,
+    
+}  from "react-icons/ai";
+import { LiaFileInvoiceSolid, 
+    LiaFileMedicalSolid, 
+    LiaFileUploadSolid,
+    LiaThListSolid,
+    LiaAlignCenterSolid,
+    LiaAlignLeftSolid,
+    LiaAlignRightSolid} from "react-icons/lia";
 
 const ReportDesign = () => {
     const [report, setReport] = useState(null);
+    const [selectedComponents, setSelectComponent] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
     const {getText} = useLang();
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
@@ -61,13 +79,52 @@ const ReportDesign = () => {
         return isReportDesigner(authData);
     };
     
+    const onAddComponent = () => {
+        closeMenu();
+    };
+    
+    const onTextAlign = (align) => {
+    };
+    
+    const haveSelected = () => {
+        return (selectedComponents && (selectedComponents.length > 0));
+    };
+    
+    const onSetFont = () => {
+        closeMenu();
+    };
+    
+    const onAddChart = () => {
+        closeMenu();
+    };
+    
+    const onComponentAlign = (align) => {
+        closeMenu();
+    };
+    
     const getMenu = () => {
-        return <Menu isOpen={menuOpen} 
+        let sel = haveSelected();
+        return <Menu width={ 230 } 
+            isOpen={menuOpen} 
             onStateChange={(state) => handleStateChange(state)}>
             <div onClick={onShowDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
             <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
             {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
-      </Menu>;
+            <hr />
+            <div onClick={onAddComponent}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
+            <div onClick={onAddChart}><AiOutlineBarChart size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Chart")}</div>
+            {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
+            {sel && <hr />}
+            {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
+            {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
+            {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
+            {sel && <hr />}
+            {sel && <div onClick={e => onComponentAlign(LEFT)}><AiOutlineVerticalAlignBottom style={{transform: 'rotate(90deg)' }} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
+            {sel && <div onClick={e => onComponentAlign(TOP)}><AiOutlineVerticalAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
+            {sel && <div onClick={e => onComponentAlign(RIGHT)}><AiOutlineVerticalAlignTop style={{transform: 'rotate(90deg)' }} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
+            {sel && <div onClick={e => onComponentAlign(BOTTOM)}><AiOutlineVerticalAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
+
+        </Menu>;
     };
   
     const hideDocumentSelect = () => {

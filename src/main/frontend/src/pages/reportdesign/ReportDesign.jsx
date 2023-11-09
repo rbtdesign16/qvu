@@ -86,7 +86,7 @@ const ReportDesign = () => {
     const onTextAlign = (align) => {
     };
     
-    const haveSelected = () => {
+    const haveSelectedComponents = () => {
         return (selectedComponents && (selectedComponents.length > 0));
     };
     
@@ -103,22 +103,23 @@ const ReportDesign = () => {
     };
     
     const getMenu = () => {
-        let sel = haveSelected();
+        let sel = haveSelectedComponents();
+        
         return <Menu width={ 230 } 
             isOpen={menuOpen} 
             onStateChange={(state) => handleStateChange(state)}>
             <div onClick={onShowDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
             <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
             {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
-            <hr />
+            <hr  style={{cursor: "none"}} />
             <div onClick={onAddComponent}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
             <div onClick={onAddChart}><AiOutlineBarChart size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Chart")}</div>
             {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
-            {sel && <hr />}
+            {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
             {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
             {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
-            {sel && <hr />}
+            {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={e => onComponentAlign(LEFT)}><AiOutlineVerticalAlignBottom style={{transform: 'rotate(90deg)' }} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
             {sel && <div onClick={e => onComponentAlign(TOP)}><AiOutlineVerticalAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
             {sel && <div onClick={e => onComponentAlign(RIGHT)}><AiOutlineVerticalAlignTop style={{transform: 'rotate(90deg)' }} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}

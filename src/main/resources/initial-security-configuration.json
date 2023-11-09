@@ -14,7 +14,8 @@
         "incomingAdminRoles": "",
         "useEmailForUserId": false
     },
-    "users": [{
+    "users": [
+        {
             "userId": "admin",
             "password": "F6FDFFE48C908DEB0F4C3BD36C032E72",
             "attributes": [],
@@ -22,9 +23,8 @@
                 "user",
                 "administrator",
                 "query designer",
-                "report designer",
-            ]
-        }
+                "report designer"
+            ]}
     ],
     "roles": [
         {

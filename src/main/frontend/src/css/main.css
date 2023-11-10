@@ -644,6 +644,21 @@ textarea {
     z-index: 5;
 }
 
+.hrule-unit {
+    position: absolute;
+    background-color: var(--default-font-color);
+    width: 2px;
+    bottom: 0;
+}
+
+.vrule-unit {
+    position: absolute;
+    background-color: var(--default-font-color);
+    height: 2px;
+    right: 0;
+}
+
+
 .bm-container {
     border: var(--query-results-table-border);
     background-color: var(--footer-background-color);
@@ -726,5 +741,6 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .report-content {
     position: relative; 
     left: 30px; 
-    border: var(--query-results-table-border);
+    border-bottom: var(--query-results-table-border);
+    border-right: var(--query-results-table-border);
 }

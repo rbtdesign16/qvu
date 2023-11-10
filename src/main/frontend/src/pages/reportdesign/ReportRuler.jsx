@@ -1,36 +1,78 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect} from "react";
 import PropTypes from "prop-types";
 import {
-HORIZONTAL_KEY,
-        VERTICAL_KEY,
-        REPORT_UNITS_MM,
-        PIXELS_PER_MM,
-        PIXELS_PER_INCH
-        } from "../../utils/helper";
+    HORIZONTAL_KEY,
+    VERTICAL_KEY,
+    REPORT_UNITS_MM,
+    PIXELS_PER_MM,
+    PIXELS_PER_INCH,
+    PIXELS_PER_POINT,
+    RULER_WIDTH,
+    RULER_FONT_SIZE,
+    getDigits
+} from "../../utils/helper";
 
 const ReportRuler = (props) => {
     const {report, height, width, type} = props;
 
+    const getNumberOffset = (num) => {
+        let retval = 0;
+        if (type === VERTICAL_KEY) {
+            retval = (PIXELS_PER_POINT * RULER_FONT_SIZE) / 2;
+        } else {
+            let digits = getDigits(num);
+            retval = (digits / 2) * (PIXELS_PER_POINT * (RULER_FONT_SIZE / 2));
+        }
+        
+        return Math.floor(retval);
+    };
+
+    const getUnitNumber = (pos, len, num) => {
+        let numOffset = getNumberOffset(num);
+        let digits = getDigits(num);
+        let fontHeight = PIXELS_PER_POINT * RULER_FONT_SIZE;
+        if (type === HORIZONTAL_KEY) {
+            let myStyle = {
+                position: "absolute",
+                height: fontHeight + "px", 
+                width: numOffset + "px", 
+                left: (pos - numOffset) + "px", 
+                top: 0
+            };
+            return <div style={myStyle}>{num}</div>;
+         } else {
+             let myStyle = {
+                position: "absolute",
+                width: (digits * ((RULER_FONT_SIZE * PIXELS_PER_POINT) / 2)) + "px", 
+                height: fontHeight + "px", 
+                left: "2px", 
+                top: (pos - (numOffset + 2)) + "px" 
+            };
+
+            return <div style={myStyle}>{num}</div>;
+        }
+    };
 
     const drawRuler = () => {
         let retval = [];
+        let pos = [];
         let unitLength;
         let className;
         if (report.pageUnits === REPORT_UNITS_MM) {
             let inc = PIXELS_PER_MM * 5;
             let curpos = inc;
-            unitLength = ["15px", "5px"];
+            unitLength = [Math.floor(((RULER_WIDTH / 2) - 1)) + "px", (RULER_WIDTH / 5) + "px"];
 
             if (type === HORIZONTAL_KEY) {
                 do {
-                    retval.push(curpos + "px");
+                    pos.push(curpos);
                     curpos += inc;
                 } while (curpos < width);
 
                 className = "hrule-unit";
             } else {
                 do {
-                    retval.push(curpos + "px");
+                    pos.push(curpos);
                     curpos += inc;
                 } while (curpos < height);
 
@@ -38,44 +80,41 @@ const ReportRuler = (props) => {
             }
         } else {
             let inc = Number(PIXELS_PER_INCH / 4);
-            unitLength = ["15px", "5px", "10px", "5px"];
+            unitLength = [Math.floor(((RULER_WIDTH / 2) - 1)) + "px", (RULER_WIDTH / 5) + "px", (RULER_WIDTH / 3) + "px", (RULER_WIDTH / 5) + "px"];
             let curpos = inc;
 
             if (type === HORIZONTAL_KEY) {
                 do {
-                    retval.push(curpos + "px");
+                    pos.push(curpos);
                     curpos += inc;
                 } while (curpos < width);
 
                 className = "hrule-unit";
             } else {
                 do {
-                    retval.push(curpos + "px");
+                    pos.push(curpos);
                     curpos += inc;
                 } while (curpos < height);
+                
                 className = "vrule-unit";
             }
         }
 
-        if (retval.length > 0) {
+        if (pos.length > 0) {
             let num = 1;
-            return retval.map((p, indx) => {
-                let lpos = ((indx + 1) % unitLength.length);
-
+            for (let i = 0; i < pos.length; ++i) {
+                let lpos = ((i+ 1) % unitLength.length);
                 if (lpos === 0) {
-                    if (type === HORIZONTAL_KEY) {
-                        return <div className={className} style={{left: p, height: unitLength[lpos]}}></div>;
-                    } else {
-                        return <div className={className} style={{top: p, width: unitLength[lpos]}}></div>;
-                    }
+                    retval.push(getUnitNumber(pos[i], unitLength[lpos], num++));
+                }   
+                if (type === HORIZONTAL_KEY) {
+                    retval.push(<div className={className} style={{left: pos[i], height: unitLength[lpos]}}></div>);
                 } else {
-                    if (type === HORIZONTAL_KEY) {
-                        return <div className={className} style={{left: p, height: unitLength[lpos]}}></div>;
-                    } else {
-                        return <div className={className} style={{top: p, width: unitLength[lpos]}}></div>;
-                    }
+                    retval.push(<div className={className} style={{top: pos[i], width: unitLength[lpos]}}></div>);
                 }
-            });
+            }
+            
+            return retval.map(c => c);
         } else {
             return "";
         }

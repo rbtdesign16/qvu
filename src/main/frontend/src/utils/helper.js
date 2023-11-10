@@ -721,3 +721,10 @@ export const RIGHT = "right";
 export const TOP = "top";
 export const BOTTOM = "bottom";
 export const CENTER = "center";
+
+export const RULER_WIDTH = 30;
+export const RULER_FONT_SIZE = 8;
+export const getDigits = (num) => {
+    let s = num + "";
+    return s.length;
+};

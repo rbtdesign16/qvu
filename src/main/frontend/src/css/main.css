@@ -642,22 +642,22 @@ textarea {
     color: var(--default-font-color);
     position: sticky;
     z-index: 5;
+    font-size: var(--small-font-size);
 }
 
 .hrule-unit {
     position: absolute;
     background-color: var(--default-font-color);
-    width: 2px;
+    width: 1px;
     bottom: 0;
 }
 
 .vrule-unit {
     position: absolute;
     background-color: var(--default-font-color);
-    height: 2px;
+    height: 1px;
     right: 0;
 }
-
 
 .bm-container {
     border: var(--query-results-table-border);

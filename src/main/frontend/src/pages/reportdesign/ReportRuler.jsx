@@ -62,22 +62,19 @@ const ReportRuler = (props) => {
             return retval.map((p, indx) => {
                 let lpos = ((indx + 1) % unitLength.length);
 
-/*
                 if (lpos === 0) {
-                    if (type === HORIZONTAL_KEY) {
-                        return <div className={className} style={{left: p, height: unitLength[lpos]}}></div>;
-                    } else {
-                        return <div className={className} style={{left: p, width: unitLength[lpos]}}></div>;
-                    }
-                } else {
-                 * */
- 
                     if (type === HORIZONTAL_KEY) {
                         return <div className={className} style={{left: p, height: unitLength[lpos]}}></div>;
                     } else {
                         return <div className={className} style={{top: p, width: unitLength[lpos]}}></div>;
                     }
-              //  }
+                } else {
+                    if (type === HORIZONTAL_KEY) {
+                        return <div className={className} style={{left: p, height: unitLength[lpos]}}></div>;
+                    } else {
+                        return <div className={className} style={{top: p, width: unitLength[lpos]}}></div>;
+                    }
+                }
             });
         } else {
             return "";

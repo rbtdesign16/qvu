@@ -47,7 +47,8 @@ import { LiaFileInvoiceSolid,
         LiaThListSolid,
         LiaAlignCenterSolid,
         LiaAlignLeftSolid,
-        LiaAlignRightSolid} from "react-icons/lia";
+        LiaAlignRightSolid,
+        LiaWindowRestoreSolid} from "react-icons/lia";
 
 const ReportDesign = () => {
     const [report, setReport] = useState(null);
@@ -101,6 +102,10 @@ const ReportDesign = () => {
         closeMenu();
     };
 
+    const onReportSettings = () => {
+        closeMenu();
+    };
+
     const getMenu = () => {
         let sel = haveSelectedComponents();
 
@@ -110,6 +115,8 @@ const ReportDesign = () => {
     <div onClick={onShowDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
     <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
     {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
+    <hr  style={{cursor: "none"}} />
+    <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Report Settings")}</div>
     <hr  style={{cursor: "none"}} />
     <div onClick={onAddComponent}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
     <div onClick={onAddChart}><AiOutlineBarChart size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Chart")}</div>

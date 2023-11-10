@@ -640,13 +640,20 @@ textarea {
     border: var(--query-results-table-border);
     background-color: var(--footer-background-color);
     color: var(--default-font-color);
+    position: sticky;
+    z-index: 5;
 }
 
 .bm-container {
     border: var(--query-results-table-border);
     background-color: var(--footer-background-color);
+    display: inline-block;
     vertical-align: middle;
     text-align: center;
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    z-index: 10;
 }
 
 /* Position and sizing of burger button */
@@ -714,4 +721,10 @@ Note: Beware of modifying this element as it can break the animations - you shou
 /* Styling of overlay */
 .bm-overlay {
   background: rgba(0, 0, 0, 0.3);
+}
+
+.report-content {
+    position: relative; 
+    left: 30px; 
+    border: var(--query-results-table-border);
 }

@@ -2338,6 +2338,7 @@ public class MainServiceImpl implements MainService {
         result.setDefaultPageOrientation(config.getDefaultPageOrientation());
         result.setDefaultPageSize(config.getDefaultPageSize());
         result.setDefaultPageUnits(config.getDefaultPageUnits());
+        result.setDefaultPageBorder(config.getDefaultPageBorder());
         result.setPageOrientations(Arrays.asList(Constants.PAGE_ORIENTATIONS));
         result.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
         result.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));

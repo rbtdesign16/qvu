@@ -13,6 +13,7 @@ public class ReportDesignSettings {
     private String defaultPageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String defaultPageOrientation = Constants.PAGE_ORIENTATION_PORTRAIT;
     private String defaultPageSize = Constants.PAGE_SIZE_NAMES[0];
+    private List<Double> defaultPageBorder = new ArrayList<>();
     private List<String> pageSizes = new ArrayList<>();
     private List<String> pageOrientations = new ArrayList<>();
     private List<String> pageUnits = new ArrayList<>();
@@ -82,6 +83,12 @@ public class ReportDesignSettings {
     public void setPageSizeSettings(Map<String, double[]> pageSizeSettings) {
         this.pageSizeSettings = pageSizeSettings;
     }
-    
-    
+
+    public List<Double> getDefaultPageBorder() {
+        return defaultPageBorder;
+    }
+
+    public void setDefaultPageBorder(List<Double> defaultPageBorder) {
+        this.defaultPageBorder = defaultPageBorder;
+    }
 }

@@ -3,6 +3,7 @@ package org.rbtdesign.qvu.configuration;
 import org.rbtdesign.qvu.util.ConfigBuilder;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ public class ConfigurationHelper {
     private String defaultPageOrientation;
     private String defaultPageSize;
     private String defaultPageUnits;
+    private List<Double> defaultPageBorder;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -299,6 +301,14 @@ public class ConfigurationHelper {
 
     public void setDefaultPageUnits(String defaultPageUnits) {
         this.defaultPageUnits = defaultPageUnits;
+    }
+
+    public List<Double> getDefaultPageBorder() {
+        return defaultPageBorder;
+    }
+
+    public void setDefaultPageBorder(List<Double> defaultPageBorder) {
+        this.defaultPageBorder = defaultPageBorder;
     }
     
     

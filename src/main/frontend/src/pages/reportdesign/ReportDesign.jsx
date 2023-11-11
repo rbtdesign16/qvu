@@ -9,6 +9,7 @@ import useAuth from "../../context/AuthContext";
 import useReportDesign from "../../context/ReportDesignContext";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
+import ReportSettingsModal from "./ReportSettingsModal";
 import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
@@ -55,6 +56,7 @@ const ReportDesign = () => {
     const [selectedComponents, setSelectComponent] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
     const {getText} = useLang();
+    const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const {authData, setAuthData} = useAuth();
@@ -102,8 +104,24 @@ const ReportDesign = () => {
         closeMenu();
     };
 
+    const hideReportSettings = () => {
+        setShowReportSettings({show: false});
+    };
+    
+    const saveReportSettings = (settings) => {
+        let cr = {...currentReport};
+        cr.pageSize = settings.pageSize;
+        cr.pageOrientation = settings.pageOrientation;
+        cr.pageUnits = settings.pageUnits;
+        cr.pageBorder = [settings.borderLeft, settings.borderTop, settings.borderRight, settings.borderBottom];
+        console.log("--------->" + JSON.stringify(cr));
+        setCurrentReport(cr);
+        setShowReportSettings({show: false});
+    };
+
     const onReportSettings = () => {
         closeMenu();
+        setShowReportSettings({show: true, report: currentReport, reportSettings: reportSettings, hide: hideReportSettings, saveSettings: saveReportSettings});
     };
 
     const getMenu = () => {
@@ -231,6 +249,7 @@ const ReportDesign = () => {
 
         return (
                 <div style={{top: "40px", width: "100%"}} className="report-design-tab">
+                    <ReportSettingsModal config={showReportSettings}/>
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>
                     {getReportInfo()}

@@ -9,9 +9,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     grid-row-gap: 6px;
 }
 
+.entrygrid-125-100 {
+    display: grid;
+    grid-template-columns: 125px 100px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+
 .entrygrid-175-100 {
     display: grid;
-    grid-template-columns: 150px 100px;
+    grid-template-columns: 175px 100px;
     margin: 5px;
     grid-row-gap: 6px;
 }

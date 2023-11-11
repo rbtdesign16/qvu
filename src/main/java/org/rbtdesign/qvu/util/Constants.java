@@ -246,6 +246,7 @@ public class Constants {
     public static final String REPORT_LOCATION_BODY = "body";
     public static final String REPORT_LOCATION_FOOTER = "footer";
     public static final double DEFAULT_REPORT_BORDER_WIDTH = 0.5;
+    public static final Double[] DEFAULT_PAGE_BORDER = {0.5, 0.5, 0.5, 0.5};
     
     public static final String[] REPORT_LOCATIONS = {
         REPORT_LOCATION_HEADER,

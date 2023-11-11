@@ -2,6 +2,7 @@ package org.rbtdesign.qvu.dto;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.rbtdesign.qvu.util.Constants;
 
@@ -24,12 +25,7 @@ public class ReportDocument {
     private String pageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String queryDocumentGroup;
     private String queryDocumentName;
-    private Rect documentRect = new Rect(
-    Constants.DEFAULT_REPORT_BORDER_WIDTH,
-     Constants.DEFAULT_REPORT_BORDER_WIDTH,
-        Constants.PAGE_SIZE_MAP.get(Constants.DEFAULT_PAGE_SIZE)[2] - (2 * Constants.DEFAULT_REPORT_BORDER_WIDTH),
-        Constants.PAGE_SIZE_MAP.get(Constants.DEFAULT_PAGE_SIZE)[2] - (2 * Constants.DEFAULT_REPORT_BORDER_WIDTH));
-
+    private List<Double> pageBorder = Arrays.asList(Constants.DEFAULT_PAGE_BORDER );
     private List<ReportObject> reportObjects = new ArrayList<>();
 
     public String getName() {
@@ -142,14 +138,6 @@ public class ReportDocument {
 
     public void setQueryDocumentGroup(String queryDocumentGroup) {
         this.queryDocumentGroup = queryDocumentGroup;
-    }
-
-    public Rect getDocumentRect() {
-        return documentRect;
-    }
-
-    public void setDocumentRect(Rect documentRect) {
-        this.documentRect = documentRect;
     }
 
     public String getQueryDocumentName() {

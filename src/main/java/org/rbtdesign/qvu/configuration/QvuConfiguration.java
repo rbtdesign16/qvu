@@ -2,6 +2,7 @@ package org.rbtdesign.qvu.configuration;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.rbtdesign.qvu.configuration.security.BasicAuthSecurityProvider;
@@ -89,6 +90,9 @@ public class QvuConfiguration {
     @Value("${default.page.units:inch}")
     private String defaultPageUnits;
 
+    @Value("#{'${default.page.border:0.5,0.5,0.5,0.5}'.split(',')}")
+    private List<Double> defaultPageBorder;
+
     
     @PostConstruct
     private void init() {
@@ -105,6 +109,7 @@ public class QvuConfiguration {
         config.setDefaultPageOrientation(defaultPageOrientation);
         config.setDefaultPageSize(defaultPageSize);
         config.setDefaultPageUnits(defaultPageUnits);
+        config.setDefaultPageBorder(defaultPageBorder);
     }
 
     @Autowired

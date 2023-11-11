@@ -25,8 +25,10 @@ export const ReportDesignProvider = ({ children }) => {
             group: DEFAULT_DOCUMENT_GROUP, 
             newRecord: true,
             pageSize: settings ? settings.defaultPageSize : reportSettings.defaultPageSize,
-            orientation: settings ? settings.defaultPageOrientation :  reportSettings.defaultPageOrientation,
-            pageUnits: settings ? settings.defaultPageUnits : reportSettings.defaultPageUnits
+            pageOrientation: settings ? settings.defaultPageOrientation :  reportSettings.defaultPageOrientation,
+            pageUnits: settings ? settings.defaultPageUnits : reportSettings.defaultPageUnits,
+            pageBorder: settings ? settings.defaultPageBorder : reportSettings.defaultPageBorder,
+            reportObjects: []
         };
     }
     const setNewReport = (settings) => {

@@ -370,7 +370,14 @@ select {
     top: 10%;
     min-width: 550px;
 }
-.custom-foreign-keys {
+
+.report-settings-entry {
+    left: 5%;
+    top: 10%;
+    min-width: 300px;
+}
+
+om-foreign-keys {
     left: 5%;
     top: 5%;
     min-width: 550px;

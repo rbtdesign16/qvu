@@ -12,7 +12,7 @@ const ReportSettingsModal = (props) => {
     const [pageSettings, setPageSettings] = useState({});
     
     const getTitle = () => {
-        return getText("Report Settings");
+        return getText("Page Settings");
     };
     
     const onHide = () => {
@@ -101,9 +101,9 @@ const ReportSettingsModal = (props) => {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="entrygrid-125-100">
-                            <div className="label">{getText("Page Size:")}</div><div><select name="pageSize" onChange={e => onPageSettings(e)}>{loadPageSizes()}</select></div>
-                            <div className="label">{getText("Page Orientation:")}</div><div><select name="pageOrientation" onChange={e => onPageSettings(e)}>{loadPageOrientations()}</select></div>
-                            <div className="label">{getText("Page Units:")}</div><div><select name="pageUnits" onChange={e => onPageSettings(e)}>{loadPageUnits()}</select></div>
+                            <div className="label">{getText("Size:")}</div><div><select name="pageSize" onChange={e => onPageSettings(e)}>{loadPageSizes()}</select></div>
+                            <div className="label">{getText("Orientation:")}</div><div><select name="pageOrientation" onChange={e => onPageSettings(e)}>{loadPageOrientations()}</select></div>
+                            <div className="label">{getText("Units:")}</div><div><select name="pageUnits" onChange={e => onPageSettings(e)}>{loadPageUnits()}</select></div>
                             <div className="label">{getText("Border Left:")}</div><div><NumberEntry id="bl" name="borderLeft" defaultValue={pageSettings.borderLeft} min={0} onChange={e => onPageSettings(e)} /></div>
                             <div className="label">{getText("Border Top:")}</div><div><NumberEntry id="bl" name="borderTop" defaultValue={pageSettings.borderTop} min={0} onChange={e => onPageSettings(e)} /></div>
                             <div className="label">{getText("Border Right:")}</div><div><NumberEntry id="br" name="borderRight" defaultValue={pageSettings.borderRight} min={0} onChange={e => onPageSettings(e)} /></div>

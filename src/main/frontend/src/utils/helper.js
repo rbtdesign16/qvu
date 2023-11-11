@@ -682,7 +682,7 @@ export const VERTICAL_KEY = "ver";
 export const getReportWidthInPixels = (report, reportSettings) => {
     let size = reportSettings.pageSizeSettings[report.pageSize];
     let units = report.pageUnits;
-    if (report.orientation === REPORT_ORIENTATION_LANDSCAPE) {
+    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
         if (units === REPORT_UNITS_MM) {
             return size[1] * PIXELS_PER_MM;
         } else {
@@ -701,7 +701,7 @@ export const getReportHeightInPixels = (report, reportSettings) => {
     let size = reportSettings.pageSizeSettings[report.pageSize];
     let units = report.pageUnits;
 
-    if (report.orientation === REPORT_ORIENTATION_LANDSCAPE) {
+    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
         if (units === REPORT_UNITS_MM) {
             return size[0] * PIXELS_PER_MM;
         } else {

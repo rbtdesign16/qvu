@@ -115,7 +115,6 @@ const ReportDesign = () => {
         cr.pageOrientation = settings.pageOrientation;
         cr.pageUnits = settings.pageUnits;
         cr.pageBorder = [settings.borderLeft, settings.borderTop, settings.borderRight, settings.borderBottom];
-        console.log("--------->" + JSON.stringify(cr));
         setCurrentReport(cr);
         setShowReportSettings({show: false});
     };
@@ -135,7 +134,7 @@ const ReportDesign = () => {
             <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
             {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
             <hr  style={{cursor: "none"}} />
-            <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Report Settings")}</div>
+            <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
             <hr  style={{cursor: "none"}} />
             <div onClick={onAddComponent}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
             <div onClick={onAddChart}><AiOutlineBarChart size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Chart")}</div>

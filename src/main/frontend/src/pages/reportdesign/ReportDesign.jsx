@@ -10,6 +10,7 @@ import useReportDesign from "../../context/ReportDesignContext";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import ReportSettingsModal from "./ReportSettingsModal";
+import ReportContent from "./ReportContent";
 import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
@@ -21,8 +22,8 @@ SUCCESS,
         REPORT_DOCUMENT_TYPE,
         HORIZONTAL_KEY,
         VERTICAL_KEY,
-        getReportWidth,
-        getReportHeight,
+        getReportWidthInPixels,
+        getReportHeightInPixels,
         SMALL_ICON_SIZE,
         LEFT,
         TOP,
@@ -244,9 +245,6 @@ const ReportDesign = () => {
     });
 
     if (reportSettings && currentReport) {
-        let height = getReportHeight(currentReport, reportSettings);
-        let width = getReportWidth(currentReport, reportSettings);
-
         return (
                 <div style={{top: "40px", width: "100%"}} className="report-design-tab">
                     <ReportSettingsModal config={showReportSettings}/>
@@ -255,10 +253,9 @@ const ReportDesign = () => {
                     {getReportInfo()}
                     <div style={{width: "100%", height: "calc(100% - 60px)", overflow: "auto"}} >
                         <div className="bm-container">{getMenu()}</div>
-                        <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={RULER_WIDTH} width={width}/>
-                        <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={height} width={RULER_WIDTH}/>
-                        <div style={{top: -height + "px", width: width + "px", height: height + "px"}} className="report-content">
-                        </div>
+                        <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={RULER_WIDTH} width={getReportWidthInPixels(currentReport, reportSettings)}/>
+                        <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={getReportHeightInPixels(currentReport, reportSettings)} width={RULER_WIDTH}/>
+                        <ReportContent report={currentReport} reportSettings={reportSettings}/>
                     </div>
                 </div>
                 );

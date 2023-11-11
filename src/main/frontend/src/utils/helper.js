@@ -679,7 +679,7 @@ export const REPORT_UNITS_MM = "mm";
 export const HORIZONTAL_KEY = "hor";
 export const VERTICAL_KEY = "ver";
 
-export const getReportWidth = (report, reportSettings) => {
+export const getReportWidthInPixels = (report, reportSettings) => {
     let size = reportSettings.pageSizeSettings[report.pageSize];
     let units = report.pageUnits;
     if (report.orientation === REPORT_ORIENTATION_LANDSCAPE) {
@@ -697,7 +697,7 @@ export const getReportWidth = (report, reportSettings) => {
     }
 };
 
-export const getReportHeight = (report, reportSettings) => {
+export const getReportHeightInPixels = (report, reportSettings) => {
     let size = reportSettings.pageSizeSettings[report.pageSize];
     let units = report.pageUnits;
 

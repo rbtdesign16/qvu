@@ -46,8 +46,7 @@ const ReportContent = (props) => {
 
     return <div style={getStyle()} className="report-content">
         <Splitter style={{border: "none", width: "100%", height: "100%"}} 
-            layout="vertical" stateKey={"report"} 
-            stateStorage={"local"} 
+            layout="vertical"
             gutterSize={SPLITTER_GUTTER_SIZE / 2}>
             <SplitterPanel size={10}>
                 <div>header</div>

@@ -222,6 +222,8 @@ const ReportDesign = () => {
             {currentReport.group} 
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Report", ":  ")}</span>
             {currentReport.name}
+            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Page Size", ":  ")}</span>
+            {currentReport.pageSize}
         </span>;
     };
 

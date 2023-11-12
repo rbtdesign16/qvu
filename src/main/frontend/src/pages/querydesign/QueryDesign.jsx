@@ -350,7 +350,7 @@ import { getDatasourceTreeViewData,
                 <Button size="sm"  title={getText("New Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewDocument()}>{getText("New")}</Button>
                 {getDocumentInfo()}
                 <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
-                    <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
+                    <SplitterPanel minSize={0} size={splitter1Sizes[0]}>
                         <label className="ck-label">{getText("Datasource")}</label>
                         <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                             <option value="" selected={!datasource}></option>                           

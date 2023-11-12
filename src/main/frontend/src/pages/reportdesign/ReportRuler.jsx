@@ -9,7 +9,7 @@ import {
     PIXELS_PER_POINT,
     RULER_WIDTH,
     RULER_FONT_SIZE,
-    getDigits
+    getDigitsCount
 } from "../../utils/helper";
 
 const ReportRuler = (props) => {
@@ -20,7 +20,7 @@ const ReportRuler = (props) => {
         if (type === VERTICAL_KEY) {
             retval = (PIXELS_PER_POINT * RULER_FONT_SIZE) / 2;
         } else {
-            let digits = getDigits(num);
+            let digits = getDigitsCount(num);
             retval = (digits / 2) * (PIXELS_PER_POINT * (RULER_FONT_SIZE / 2));
         }
         
@@ -29,7 +29,7 @@ const ReportRuler = (props) => {
 
     const getUnitNumber = (pos, len, num) => {
         let numOffset = getNumberOffset(num);
-        let digits = getDigits(num);
+        let digits = getDigitsCount(num);
         let fontHeight = PIXELS_PER_POINT * RULER_FONT_SIZE;
         if (type === HORIZONTAL_KEY) {
             let myStyle = {

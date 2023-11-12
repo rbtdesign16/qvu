@@ -44,23 +44,23 @@ const ReportContent = (props) => {
 
     const getHeaderHeightPercent = () => {
         let h = reportUnitsToPixels(report.pageUnits, report.headerHeight);
-        return (100.0 * (h / reportHeightPixels));
+        return Math.max((100.0 * (h / reportHeightPixels)));
     };
 
     const getBodyHeightPercent = () => {
         let h = reportUnitsToPixels(report.pageUnits, reportHeight - (report.headerHeight + report.footerHeight));
-        return (100.0 * (h / reportHeightPixels));
+        return Math.min(100, (100.0 * (h / reportHeightPixels)));
     };
 
     const getFooterHeightPercent = () => {
         let h = reportUnitsToPixels(report.pageUnits, report.footerHeight);
-        return (100.0 * (h / reportHeightPixels));
+        return Math.max(0, (100.0 * (h / reportHeightPixels)));
     };
 
     const onResize = (e) => {
         let r = {...report};
-        r.headerHeight = pixelsToReportUnits(r.pageUnits, e.sizes[0]);
-        r.footerHeight = pixelsToReportUnits(r.pageUnits, e.sizes[2]);
+        r.headerHeight = Math.max(0, pixelsToReportUnits(r.pageUnits, e.sizes[0]));
+        r.footerHeight = Math.max(0, pixelsToReportUnits(r.pageUnits, e.sizes[2]));
         updateReport(r);
     };
 
@@ -72,13 +72,13 @@ const ReportContent = (props) => {
             layout="vertical"
             gutterSize={SPLITTER_GUTTER_SIZE / 2}
             onResizeEnd={e => onResize(e)}>
-            <SplitterPanel size={getHeaderHeightPercent()} >
+            <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
                 <div>header</div>
             </SplitterPanel>
-            <SplitterPanel size={getBodyHeightPercent()}>
+            <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
                 <div>body</div>
             </SplitterPanel>
-            <SplitterPanel size={getFooterHeightPercent()}>
+            <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
                 <div>footer</div>
             </SplitterPanel>
         </Splitter></div>;

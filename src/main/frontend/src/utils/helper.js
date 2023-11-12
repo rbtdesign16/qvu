@@ -769,7 +769,8 @@ export const CENTER = "center";
 
 export const RULER_WIDTH = 30;
 export const RULER_FONT_SIZE = 8;
-export const getDigits = (num) => {
+
+export const getDigitsCount = (num) => {
     let s = num + "";
     return s.length;
 };

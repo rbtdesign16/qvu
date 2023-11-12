@@ -283,4 +283,10 @@ public class Constants {
     public static final String DEFAULT_FONT = "Arial";
     public static final int DEFAULT_FONT_SIZE = 12;
     public static final String DEFAULT_FONT_COLOR = "black";
+    
+    public static final double DEFAULT_COMPONENT_LEFT = 0.5;
+    public static final double DEFAULT_COMPONENT_TOP = 0.5;
+    public static final double DEFAULT_COMPONENT_WIDTH = 1.0;
+    public static final double DEFAULT_COMPONENT_HEIGHT = 0.5;
+
 }

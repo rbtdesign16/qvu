@@ -16,6 +16,10 @@ public class ReportComponent {
     private boolean fontBold = false;
     private boolean fontItalix = false;
     private boolean fontUnderline = false;
+    private double left = Constants.DEFAULT_COMPONENT_LEFT;
+    private double top = Constants.DEFAULT_COMPONENT_TOP;
+    private double width = Constants.DEFAULT_COMPONENT_WIDTH;
+    private double height = Constants.DEFAULT_COMPONENT_HEIGHT;
 
     public String getLocation() {
         return location;
@@ -89,6 +93,4 @@ public class ReportComponent {
     public void setFontColor(String fontColor) {
         this.fontColor = fontColor;
     }
-    
-    
-}
+ }

@@ -1,25 +1,26 @@
 import React from "react";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import useReportDesign from "../../context/ReportDesignContext";
+import ReportComponent from "./ReportComponent";
 import PropTypes from "prop-types";
 import {
-REPORT_SECTION_HEADER,
-        REPORT_SECTION_BODY,
-        REPORT_SECTION_FOOTER,
-        REPORT_UNITS_INCH,
-        REPORT_UNITS_MM,
-        REPORT_SECTION_BORDER,
-        reportUnitsToPixels,
-        pixelsToReportUnits,
-        getReportWidth,
-        getReportHeight
+    REPORT_SECTION_HEADER,
+    REPORT_SECTION_BODY,
+    REPORT_SECTION_FOOTER,
+    REPORT_UNITS_INCH,
+    REPORT_UNITS_MM,
+    REPORT_SECTION_BORDER,
+    reportUnitsToPixels,
+    pixelsToReportUnits,
+    getReportWidth,
+    getReportHeight
 } from "../../utils/helper";
 
 const ReportSection = (props) => {
     const {
         reportSettings,
         currentReport,
-        setCurrentReport,
+        setCurrentReport
     } = useReportDesign();
     
     const {section} = props;
@@ -85,19 +86,19 @@ const ReportSection = (props) => {
     const loadComponents = () => {
         if (currentReport.reportObjects && (currentReport.reportObjects.length > 0)) {
             return currentReport.reportObjects.map(o => {
-                return <div>xxx</div>;
+                return <ReportComponent component={o}/>;
             });
         } else {
             return "";
         }
-    }
+    };
 
     return <div style={getStyle()}>{loadComponents()}</div>;
 };
 
 
 ReportSection.propTypes = {
-    section: PropTypes.string.isRequired,
+    section: PropTypes.string.isRequired
 };
 
 

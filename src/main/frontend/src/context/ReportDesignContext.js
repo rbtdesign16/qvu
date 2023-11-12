@@ -28,6 +28,8 @@ export const ReportDesignProvider = ({ children }) => {
             pageOrientation: settings ? settings.defaultPageOrientation :  reportSettings.defaultPageOrientation,
             pageUnits: settings ? settings.defaultPageUnits : reportSettings.defaultPageUnits,
             pageBorder: settings ? settings.defaultPageBorder : reportSettings.defaultPageBorder,
+            headerHeight: settings ? settings.defaultHeaderHeight : reportSettings.defaultHeaderHeight,
+            footerHeight: settings ? settings.defaultFooterHeight : reportSettings.defaultFooterHeight,
             reportObjects: []
         };
     }

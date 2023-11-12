@@ -13,6 +13,8 @@ public class ReportDesignSettings {
     private String defaultPageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String defaultPageOrientation = Constants.PAGE_ORIENTATION_PORTRAIT;
     private String defaultPageSize = Constants.PAGE_SIZE_NAMES[0];
+    private Double defaultHeaderHeight = Constants.DEFAULT_HEADER_HEIGHT;
+    private Double defaultFooterHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private List<Double> defaultPageBorder = new ArrayList<>();
     private List<String> pageSizes = new ArrayList<>();
     private List<String> pageOrientations = new ArrayList<>();
@@ -91,4 +93,22 @@ public class ReportDesignSettings {
     public void setDefaultPageBorder(List<Double> defaultPageBorder) {
         this.defaultPageBorder = defaultPageBorder;
     }
+
+    public Double getDefaultHeaderHeight() {
+        return defaultHeaderHeight;
+    }
+
+    public void setDefaultHeaderHeight(Double defaultHeaderHeight) {
+        this.defaultHeaderHeight = defaultHeaderHeight;
+    }
+
+    public Double getDefaultFooterHeight() {
+        return defaultFooterHeight;
+    }
+
+    public void setDefaultFooterHeight(Double defaultFooterHeight) {
+        this.defaultFooterHeight = defaultFooterHeight;
+    }
+    
+    
 }

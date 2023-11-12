@@ -93,6 +93,12 @@ public class QvuConfiguration {
     @Value("#{'${default.page.border:0.5,0.5,0.5,0.5}'.split(',')}")
     private List<Double> defaultPageBorder;
 
+    @Value("${default.header.height:1}")
+    private Double defaultHeaderHeight;
+
+    @Value("${default.footer.height:1}")
+    private Double defaultFooterHeight;
+
     
     @PostConstruct
     private void init() {
@@ -110,6 +116,8 @@ public class QvuConfiguration {
         config.setDefaultPageSize(defaultPageSize);
         config.setDefaultPageUnits(defaultPageUnits);
         config.setDefaultPageBorder(defaultPageBorder);
+        config.setDefaultHeaderHeight(defaultHeaderHeight);
+        config.setDefaultFooterHeight(defaultFooterHeight);
     }
 
     @Autowired

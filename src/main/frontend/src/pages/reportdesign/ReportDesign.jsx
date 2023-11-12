@@ -15,34 +15,35 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
 import {
-SUCCESS,
-        WARN,
-        INFO,
-        ERROR,
-        REPORT_DOCUMENT_TYPE,
-        HORIZONTAL_KEY,
-        VERTICAL_KEY,
-        getReportWidthInPixels,
-        getReportHeightInPixels,
-        SMALL_ICON_SIZE,
-        LEFT,
-        TOP,
-        RIGHT,
-        CENTER,
-        BOTTOM,
-        RULER_WIDTH
+    SUCCESS,
+    WARN,
+    INFO,
+    ERROR,
+    REPORT_DOCUMENT_TYPE,
+    HORIZONTAL_KEY,
+    VERTICAL_KEY,
+    getReportWidthInPixels,
+    getReportHeightInPixels,
+    SMALL_ICON_SIZE,
+    LEFT,
+    TOP,
+    RIGHT,
+    CENTER,
+    BOTTOM,
+    RULER_WIDTH
 } from "../../utils/helper";
 import {
-getReportSettings,
-        getAvailableDocuments,
-        isApiError,
-        isApiSuccess
+    getReportSettings,
+    getAvailableDocuments,
+    isApiError,
+    isApiSuccess
 } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
-import {AiOutlineFontSize,
-        AiOutlineBarChart,
-        AiOutlineVerticalAlignBottom,
-        AiOutlineVerticalAlignTop,
+import {
+    AiOutlineFontSize,
+    AiOutlineBarChart,
+    AiOutlineVerticalAlignBottom,
+    AiOutlineVerticalAlignTop,
 }  from "react-icons/ai";
 import { LiaFileInvoiceSolid,
         LiaFileMedicalSolid,
@@ -254,7 +255,7 @@ const ReportDesign = () => {
                         <div className="bm-container">{getMenu()}</div>
                         <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={RULER_WIDTH} width={getReportWidthInPixels(currentReport, reportSettings)}/>
                         <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={getReportHeightInPixels(currentReport, reportSettings)} width={RULER_WIDTH}/>
-                        <ReportContent report={currentReport} reportSettings={reportSettings}/>
+                        <ReportContent report={currentReport} reportSettings={reportSettings} updateReport={setCurrentReport}/>
                     </div>
                 </div>
                 );

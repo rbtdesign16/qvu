@@ -697,6 +697,32 @@ export const getReportWidthInPixels = (report, reportSettings) => {
     }
 };
 
+export const getReportWidth = (report, reportSettings) => {
+    let size = reportSettings.pageSizeSettings[report.pageSize];
+    let units = report.pageUnits;
+    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
+        if (units === REPORT_UNITS_MM) {
+            return size[1];
+        } else {
+            return size[3];
+        }
+    } else {
+        if (units === REPORT_UNITS_MM) {
+            return size[0];
+        } else {
+            return size[2];
+        }
+    }
+};
+
+export const reportUnitsToPixels = (type, size) => {
+    if (type === REPORT_UNITS_MM) {
+        return PIXELS_PER_MM * size;
+    } else {
+        return PIXELS_PER_INCH * size;
+    }
+};
+    
 export const getReportHeightInPixels = (report, reportSettings) => {
     let size = reportSettings.pageSizeSettings[report.pageSize];
     let units = report.pageUnits;
@@ -716,6 +742,25 @@ export const getReportHeightInPixels = (report, reportSettings) => {
     }
 };
 
+export const getReportHeight = (report, reportSettings) => {
+    let size = reportSettings.pageSizeSettings[report.pageSize];
+    let units = report.pageUnits;
+
+    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
+        if (units === REPORT_UNITS_MM) {
+            return size[0];
+        } else {
+            return size[2];
+        }
+    } else {
+        if (units === REPORT_UNITS_MM) {
+            return size[1];
+        } else {
+            return size[3];
+        }
+    }
+};
+
 export const LEFT = "left";
 export const RIGHT = "right";
 export const TOP = "top";
@@ -727,4 +772,12 @@ export const RULER_FONT_SIZE = 8;
 export const getDigits = (num) => {
     let s = num + "";
     return s.length;
+};
+
+export const pixelsToReportUnits = (type, pixels) => {
+    if (type === REPORT_UNITS_MM) {
+        return pixels / PIXELS_PER_MM;
+    } else {
+        return pixels / PIXELS_PER_INCH;
+    }
 };

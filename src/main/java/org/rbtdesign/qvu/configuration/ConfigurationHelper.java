@@ -40,6 +40,8 @@ public class ConfigurationHelper {
     private String defaultPageSize;
     private String defaultPageUnits;
     private List<Double> defaultPageBorder;
+    private Double defaultHeaderHeight;
+    private Double defaultFooterHeight;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -310,6 +312,20 @@ public class ConfigurationHelper {
     public void setDefaultPageBorder(List<Double> defaultPageBorder) {
         this.defaultPageBorder = defaultPageBorder;
     }
-    
-    
-}
+
+    public Double getDefaultHeaderHeight() {
+        return defaultHeaderHeight;
+    }
+
+    public void setDefaultHeaderHeight(Double defaultHeaderHeight) {
+        this.defaultHeaderHeight = defaultHeaderHeight;
+    }
+
+    public Double getDefaultFooterHeight() {
+        return defaultFooterHeight;
+    }
+
+    public void setDefaultFooterHeight(Double defaultFooterHeight) {
+        this.defaultFooterHeight = defaultFooterHeight;
+    }
+ }

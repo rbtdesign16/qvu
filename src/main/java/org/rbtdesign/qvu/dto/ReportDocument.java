@@ -25,6 +25,8 @@ public class ReportDocument {
     private String pageUnits = Constants.DEFAULT_PAGE_UNITS;
     private String queryDocumentGroup;
     private String queryDocumentName;
+    private Double headerHeight = Constants.DEFAULT_HEADER_HEIGHT;
+    private Double footerHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private List<Double> pageBorder = Arrays.asList(Constants.DEFAULT_PAGE_BORDER );
     private List<ReportObject> reportObjects = new ArrayList<>();
 

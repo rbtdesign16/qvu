@@ -6,34 +6,31 @@ REPORT_ORIENTATION_LANDSCAPE,
         REPORT_ORIENTATION_PORTRAIT,
         REPORT_UNITS_INCH,
         REPORT_UNITS_MM,
-        SPLITTER_GUTTER_SIZE
-} from "../../utils/helper";
+        SPLITTER_GUTTER_SIZE,
+        getReportHeightInPixels,
+        getReportWidthInPixels,
+        getReportHeight,
+        getReportWidth,
+        reportUnitsToPixels,
+        pixelsToReportUnits
+        } from "../../utils/helper";
 
 const ReportContent = (props) => {
-    const {report, reportSettings} = props;
+    const {report, reportSettings, updateReport} = props;
+    const reportWidthPixels = getReportWidthInPixels(report, reportSettings);
+    const reportHeightPixels = getReportHeightInPixels(report, reportSettings);
+    const reportWidth = getReportWidth(report, reportSettings);
+    const reportHeight = getReportHeight(report, reportSettings);
 
     const getStyle = () => {
-        let height;
         let width;
-
-        let size = reportSettings.pageSizeSettings[report.pageSize];
-
-        if (report.pageOrientation === REPORT_ORIENTATION_PORTRAIT) {
-            if (report.pageUnits === REPORT_UNITS_INCH) {
-                width = size[2] + "in";
-                height = size[3] + "in";
-            } else {
-                width = size[0] + "mm";
-                height = size[1] + "mm";
-            }
+        let height;
+        if (report.pageUnits === REPORT_UNITS_INCH) {
+            width = reportWidth + "in";
+            height = reportHeight + "in";
         } else {
-            if (report.pageUnits === REPORT_UNITS_INCH) {
-                width = size[3] + "in";
-                height = size[2] + "in";
-            } else {
-                width = size[1] + "mm";
-                height = size[0] + "mm";
-            }
+            width = reportWidth + "mm";
+            height = reportHeight + "mm";
         }
 
 
@@ -44,17 +41,44 @@ const ReportContent = (props) => {
         };
     };
 
+
+    const getHeaderHeightPercent = () => {
+        let h = reportUnitsToPixels(report.pageUnits, report.headerHeight);
+        return (100.0 * (h / reportHeightPixels));
+    };
+
+    const getBodyHeightPercent = () => {
+        let h = reportUnitsToPixels(report.pageUnits, reportHeight - (report.headerHeight + report.footerHeight));
+        return (100.0 * (h / reportHeightPixels));
+    };
+
+    const getFooterHeightPercent = () => {
+        let h = reportUnitsToPixels(report.pageUnits, report.footerHeight);
+        return (100.0 * (h / reportHeightPixels));
+    };
+
+    const onResize = (e) => {
+        let r = {...report};
+        r.headerHeight = pixelsToReportUnits(r.pageUnits, e.sizes[0]);
+        r.footerHeight = pixelsToReportUnits(r.pageUnits, e.sizes[2]);
+        updateReport(r);
+    };
+
+
     return <div style={getStyle()} className="report-content">
-        <Splitter style={{border: "none", width: "100%", height: "100%"}} 
+        <Splitter style={{border: "none", 
+            width: (reportWidthPixels - 1) + "px", 
+            height: (reportHeightPixels - 1) + "px"}} 
             layout="vertical"
-            gutterSize={SPLITTER_GUTTER_SIZE / 2}>
-            <SplitterPanel size={10}>
+            gutterSize={SPLITTER_GUTTER_SIZE / 2}
+            onResizeEnd={e => onResize(e)}>
+            <SplitterPanel size={getHeaderHeightPercent()} >
                 <div>header</div>
             </SplitterPanel>
-            <SplitterPanel size={80} >
+            <SplitterPanel size={getBodyHeightPercent()}>
                 <div>body</div>
             </SplitterPanel>
-            <SplitterPanel size={10} >
+            <SplitterPanel size={getFooterHeightPercent()}>
                 <div>footer</div>
             </SplitterPanel>
         </Splitter></div>;

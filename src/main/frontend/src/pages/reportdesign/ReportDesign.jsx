@@ -115,7 +115,7 @@ const ReportDesign = () => {
         cr.pageSize = settings.pageSize;
         cr.pageOrientation = settings.pageOrientation;
         cr.pageUnits = settings.pageUnits;
-        cr.pageBorder = [settings.borderLeft, settings.borderTop, settings.borderRight, settings.borderBottom];
+        cr.pageBorder = [Number(settings.borderLeft), Number(settings.borderTop), Number(settings.borderRight), Number(settings.borderBottom)];
         setCurrentReport(cr);
         setShowReportSettings({show: false});
     };

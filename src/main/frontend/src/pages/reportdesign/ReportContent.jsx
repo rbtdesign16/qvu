@@ -1,5 +1,6 @@
 import React from "react";
-import { Splitter, SplitterPanel } from 'primereact/splitter';
+import { Splitter, SplitterPanel } from "primereact/splitter";
+import ReportSection from "./ReportSection";
 import PropTypes from "prop-types";
 import {
 REPORT_ORIENTATION_LANDSCAPE,
@@ -7,6 +8,9 @@ REPORT_ORIENTATION_LANDSCAPE,
         REPORT_UNITS_INCH,
         REPORT_UNITS_MM,
         SPLITTER_GUTTER_SIZE,
+        REPORT_SECTION_HEADER,
+        REPORT_SECTION_BODY,
+        REPORT_SECTION_FOOTER,
         getReportHeightInPixels,
         getReportWidthInPixels,
         getReportHeight,
@@ -73,13 +77,13 @@ const ReportContent = (props) => {
             gutterSize={SPLITTER_GUTTER_SIZE / 2}
             onResizeEnd={e => onResize(e)}>
             <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
-                <div>header</div>
+                <ReportSection section={REPORT_SECTION_HEADER} report={report} width={reportWidth} height={report.headerHeight}/>
             </SplitterPanel>
             <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
-                <div>body</div>
+                <ReportSection section={REPORT_SECTION_BODY} report={report} width={reportWidth} height={reportHeight - (report.headerHeight + report.footerHeight)}/>
             </SplitterPanel>
             <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
-                <div>footer</div>
+                <ReportSection section={REPORT_SECTION_FOOTER} report={report} width={reportWidth} height={report.footerHeight}/>
             </SplitterPanel>
         </Splitter></div>;
 };

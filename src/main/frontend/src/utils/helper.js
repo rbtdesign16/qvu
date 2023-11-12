@@ -782,3 +782,8 @@ export const pixelsToReportUnits = (type, pixels) => {
         return pixels / PIXELS_PER_INCH;
     }
 };
+
+export const REPORT_SECTION_HEADER = "header";
+export const REPORT_SECTION_BODY = "body";
+export const REPORT_SECTION_FOOTER = "footer";
+export const REPORT_SECTION_BORDER = "solid 1px blue";

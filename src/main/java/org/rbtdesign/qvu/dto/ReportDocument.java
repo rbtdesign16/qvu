@@ -28,7 +28,7 @@ public class ReportDocument {
     private Double headerHeight = Constants.DEFAULT_HEADER_HEIGHT;
     private Double footerHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private List<Double> pageBorder = Arrays.asList(Constants.DEFAULT_PAGE_BORDER );
-    private List<ReportObject> reportObjects = new ArrayList<>();
+    private List<ReportComponent> reportObjects = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -126,11 +126,11 @@ public class ReportDocument {
         this.pageUnits = pageUnits;
     }
 
-    public List<ReportObject> getReportObjects() {
+    public List<ReportComponent> getReportObjects() {
         return reportObjects;
     }
 
-    public void setReportObjects(List<ReportObject> reportObjects) {
+    public void setReportObjects(List<ReportComponent> reportObjects) {
         this.reportObjects = reportObjects;
     }
 

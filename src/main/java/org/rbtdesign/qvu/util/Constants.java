@@ -280,4 +280,7 @@ public class Constants {
         REPORT_OBJECT_TYPE_SUBREPORT
     };
         
+    public static final String DEFAULT_FONT = "Arial";
+    public static final int DEFAULT_FONT_SIZE = 12;
+    public static final String DEFAULT_FONT_COLOR = "black";
 }

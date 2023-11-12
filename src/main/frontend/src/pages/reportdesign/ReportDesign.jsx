@@ -257,7 +257,7 @@ const ReportDesign = () => {
                         <div className="bm-container">{getMenu()}</div>
                         <ReportRuler type={HORIZONTAL_KEY} report={currentReport} height={RULER_WIDTH} width={getReportWidthInPixels(currentReport, reportSettings)}/>
                         <ReportRuler type={VERTICAL_KEY} report={currentReport}  height={getReportHeightInPixels(currentReport, reportSettings)} width={RULER_WIDTH}/>
-                        <ReportContent report={currentReport} reportSettings={reportSettings} updateReport={setCurrentReport}/>
+                        <ReportContent />
                     </div>
                 </div>
                 );

@@ -1,7 +1,7 @@
 import React from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
-import PropTypes from "prop-types";
+import useReportDesign from "../../context/ReportDesignContext";
 import {
 REPORT_ORIENTATION_LANDSCAPE,
         REPORT_ORIENTATION_PORTRAIT,
@@ -20,16 +20,20 @@ REPORT_ORIENTATION_LANDSCAPE,
         } from "../../utils/helper";
 
 const ReportContent = (props) => {
-    const {report, reportSettings, updateReport} = props;
-    const reportWidthPixels = getReportWidthInPixels(report, reportSettings);
-    const reportHeightPixels = getReportHeightInPixels(report, reportSettings);
-    const reportWidth = getReportWidth(report, reportSettings);
-    const reportHeight = getReportHeight(report, reportSettings);
+    const {
+        reportSettings,
+        currentReport,
+        setCurrentReport,
+        } = useReportDesign();
+    const reportWidth = getReportWidth(currentReport, reportSettings);
+    const reportHeight = getReportHeight(currentReport, reportSettings);
+    const reportWidthPixels = getReportWidthInPixels(currentReport, reportSettings);
+    const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
 
     const getStyle = () => {
         let width;
         let height;
-        if (report.pageUnits === REPORT_UNITS_INCH) {
+        if (currentReport.pageUnits === REPORT_UNITS_INCH) {
             width = reportWidth + "in";
             height = reportHeight + "in";
         } else {
@@ -47,25 +51,25 @@ const ReportContent = (props) => {
 
 
     const getHeaderHeightPercent = () => {
-        let h = reportUnitsToPixels(report.pageUnits, report.headerHeight);
+        let h = reportUnitsToPixels(currentReport.pageUnits, currentReport.headerHeight);
         return Math.max((100.0 * (h / reportHeightPixels)));
     };
 
     const getBodyHeightPercent = () => {
-        let h = reportUnitsToPixels(report.pageUnits, reportHeight - (report.headerHeight + report.footerHeight));
+        let h = reportUnitsToPixels(currentReport.pageUnits, reportHeight - (currentReport.headerHeight + currentReport.footerHeight));
         return Math.min(100, (100.0 * (h / reportHeightPixels)));
     };
 
     const getFooterHeightPercent = () => {
-        let h = reportUnitsToPixels(report.pageUnits, report.footerHeight);
+        let h = reportUnitsToPixels(currentReport.pageUnits, currentReport.footerHeight);
         return Math.max(0, (100.0 * (h / reportHeightPixels)));
     };
 
     const onResize = (e) => {
-        let r = {...report};
-        r.headerHeight = Math.max(0, pixelsToReportUnits(r.pageUnits, e.sizes[0]));
-        r.footerHeight = Math.max(0, pixelsToReportUnits(r.pageUnits, e.sizes[2]));
-        updateReport(r);
+        let r = {...currentReport};
+        r.headerHeight = reportHeight * (e.sizes[0]/100);
+        r.footerHeight = reportHeight * (e.sizes[2]/100);
+        setCurrentReport(r);
     };
 
 
@@ -77,22 +81,15 @@ const ReportContent = (props) => {
             gutterSize={SPLITTER_GUTTER_SIZE / 2}
             onResizeEnd={e => onResize(e)}>
             <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
-                <ReportSection section={REPORT_SECTION_HEADER} report={report} width={reportWidth} height={report.headerHeight}/>
+                <ReportSection section={REPORT_SECTION_HEADER}/>
             </SplitterPanel>
             <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
-                <ReportSection section={REPORT_SECTION_BODY} report={report} width={reportWidth} height={reportHeight - (report.headerHeight + report.footerHeight)}/>
+                <ReportSection section={REPORT_SECTION_BODY}/>
             </SplitterPanel>
             <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
-                <ReportSection section={REPORT_SECTION_FOOTER} report={report} width={reportWidth} height={report.footerHeight}/>
+                <ReportSection section={REPORT_SECTION_FOOTER}/>
             </SplitterPanel>
         </Splitter></div>;
 };
-
-
-ReportContent.propTypes = {
-    report: PropTypes.object.isRequired,
-    reportSettings: PropTypes.object.isRequired
-};
-
 
 export default ReportContent;

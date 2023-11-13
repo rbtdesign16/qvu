@@ -19,6 +19,29 @@ export const ReportDesignProvider = ({ children }) => {
         setNewReport(settings);
     };
     
+    const getNewComponent = (section, type, value) => {
+        return {
+            type: type,
+            align: "center",
+            foregroundColor: reportSettings.defaultForegroundColor,
+            backgroundColor: reportSettings.defaultBackgroundColor,
+            fontSettings: {
+                font: reportSettings.defaultFont,
+                size: reportSettings.defaultFontSize,
+                bold: false,
+                italic: false,
+                underline: false
+            },
+            value: value,
+            left: 0.5,
+            top: 0.5,
+            width: 1.0,
+            height: 0.5,
+            section: section,
+            selected: false
+        };
+    };
+        
     const getNewDocument = (settings) => {
         return {
             name: getText(DEFAULT_NEW_DOCUMENT_NAME),
@@ -30,8 +53,8 @@ export const ReportDesignProvider = ({ children }) => {
             pageBorder: settings ? settings.defaultPageBorder : reportSettings.defaultPageBorder,
             headerHeight: settings ? settings.defaultHeaderHeight : reportSettings.defaultHeaderHeight,
             footerHeight: settings ? settings.defaultFooterHeight : reportSettings.defaultFooterHeight,
-            reportObjects: []
-        };
+            reportComponents: []
+         };
     }
     const setNewReport = (settings) => {
         setCurrentReport(getNewDocument(settings));
@@ -39,7 +62,13 @@ export const ReportDesignProvider = ({ children }) => {
 
     return (
             <ReportDesignContext.Provider
-                value={{currentReport, setCurrentReport, reportSettings, initializeReportSettings, setNewReport}}>
+                value={{
+                    currentReport, 
+                    setCurrentReport, 
+                    reportSettings, 
+                    initializeReportSettings, 
+                    setNewReport,
+                    getNewComponent}}>
                 {children}
             </ReportDesignContext.Provider>
             );

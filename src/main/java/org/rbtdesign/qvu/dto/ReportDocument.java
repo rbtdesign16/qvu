@@ -28,7 +28,7 @@ public class ReportDocument {
     private Double headerHeight = Constants.DEFAULT_HEADER_HEIGHT;
     private Double footerHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private List<Double> pageBorder = Arrays.asList(Constants.DEFAULT_PAGE_BORDER );
-    private List<ReportComponent> reportObjects = new ArrayList<>();
+    private List<ReportComponent> reportComponents = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -126,14 +126,6 @@ public class ReportDocument {
         this.pageUnits = pageUnits;
     }
 
-    public List<ReportComponent> getReportObjects() {
-        return reportObjects;
-    }
-
-    public void setReportObjects(List<ReportComponent> reportObjects) {
-        this.reportObjects = reportObjects;
-    }
-
     public String getQueryDocumentGroup() {
         return queryDocumentGroup;
     }
@@ -149,4 +141,38 @@ public class ReportDocument {
     public void setQueryDocumentName(String queryDocumentName) {
         this.queryDocumentName = queryDocumentName;
     }
+
+    public Double getHeaderHeight() {
+        return headerHeight;
+    }
+
+    public void setHeaderHeight(Double headerHeight) {
+        this.headerHeight = headerHeight;
+    }
+
+    public Double getFooterHeight() {
+        return footerHeight;
+    }
+
+    public void setFooterHeight(Double footerHeight) {
+        this.footerHeight = footerHeight;
+    }
+
+    public List<Double> getPageBorder() {
+        return pageBorder;
+    }
+
+    public void setPageBorder(List<Double> pageBorder) {
+        this.pageBorder = pageBorder;
+    }
+
+    public List<ReportComponent> getReportComponents() {
+        return reportComponents;
+    }
+
+    public void setReportComponents(List<ReportComponent> reportComponents) {
+        this.reportComponents = reportComponents;
+    }
+    
+    
  }

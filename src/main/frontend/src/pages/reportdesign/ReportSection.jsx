@@ -47,12 +47,8 @@ const ReportSection = (props) => {
             overflow: "hidden"
         };
 
-        let units = "in";
+        let units = currentReport.pageUnits.substring(0, 2);
         let height = getSectionHeight();
-
-        if (currentReport.pageUnits === REPORT_UNITS_MM) {
-            units = "mm";
-        }
 
         switch (section) {
             case REPORT_SECTION_HEADER:
@@ -83,11 +79,35 @@ const ReportSection = (props) => {
         return retval;
     };
 
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+    
+    const handleDrop = (e) => {
+        e.preventDefault();
+        let cinfo = JSON.parse( e.dataTransfer.getData("cinfo"));
+        
+        let cr = {...currentReport};
+        let c = cr.reportComponents[cinfo.index];
+        
+        let rect = e.target.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        c.section = section;
+        c.left = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), x - cinfo.left);
+        c.top = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), y - cinfo.top);
+       
+        setCurrentReport(cr);
+     };
+
+
     const loadComponents = () => {
-        if (currentReport.reportObjects && (currentReport.reportObjects.length > 0)) {
-            return currentReport.reportObjects.map(o => {
+        if (currentReport.reportComponents && (currentReport.reportComponents.length > 0)) {
+            return currentReport.reportComponents.map((o, indx) => {
                 if (o.section === section) {
-                    return <ReportComponent component={o}/>;
+                    return <ReportComponent component={o} componentIndex={indx}/>;
                 } else {
                     return "";
                 }
@@ -97,7 +117,10 @@ const ReportSection = (props) => {
         }
     };
 
-    return <div style={getStyle()}>{loadComponents()}</div>;
+    return <div id={section} 
+        onDrop={e => handleDrop(e)} 
+        onDragOver={e => handleDragOver(e)}
+        style={getStyle()}>{loadComponents()}</div>;
 };
 
 

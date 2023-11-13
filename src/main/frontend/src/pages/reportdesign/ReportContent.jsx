@@ -24,6 +24,7 @@ const ReportContent = (props) => {
         reportSettings,
         currentReport,
         setCurrentReport,
+        getNewComponent
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -31,28 +32,8 @@ const ReportContent = (props) => {
     const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
 
     const getStyle = () => {
-        if (currentReport.reportObjects.length === 0) {
-            let test = {
-                type: "text",
-                align: "center",
-                foregroundColor: reportSettings.defaultForegroundColor,
-                backgroundColor: reportSettings.defaultBackgroundColor,
-                fontSettings: {
-                    font: "Arial",
-                    size: 16,
-                    bold: false,
-                    italic: false,
-                    underline: false
-                },
-                value: "this is a test",
-                left: 0.5,
-                top: 0.5,
-                width: 1.0,
-                height: 0.5,
-                section: "body"
-            };
-
-            currentReport.reportObjects.push(test);
+        if (currentReport.reportComponents.length === 0) {
+            currentReport.reportComponents.push(getNewComponent("body", "text", "this is a test"));
         }
 
         let width;

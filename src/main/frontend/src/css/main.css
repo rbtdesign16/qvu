@@ -761,5 +761,5 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .report-component-sel {
     position: relative;
     overflow: hidden;
-    outline: var(--report-component-outlines-selected);
+    outline: var(--report-component-outline-selected);
 }

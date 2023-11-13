@@ -15,6 +15,8 @@ public class ReportDesignSettings {
     private String defaultPageSize = Constants.PAGE_SIZE_NAMES[0];
     private Double defaultHeaderHeight = Constants.DEFAULT_HEADER_HEIGHT;
     private Double defaultFooterHeight = Constants.DEFAULT_FOOTER_HEIGHT;
+    private String defaultFont = Constants.DEFAULT_REPORT_FONT;
+    private int defaultFontSize = Constants.DEFAULT_REPORT_FONT_SIZE;
     private String defaultForegroundColor = Constants.DEFAULT_REPORT_COMPONENT_FOREGROUND_COLOR;
     private String defaultBackgroundColor = Constants.DEFAULT_REPORT_COMPONENT_BACKGROUND_COLOR;
     private List<Double> defaultPageBorder = new ArrayList<>();
@@ -154,6 +156,20 @@ public class ReportDesignSettings {
     public void setReportShapes(List<String> reportShapes) {
         this.reportShapes = reportShapes;
     }
-    
-    
+
+    public String getDefaultFont() {
+        return defaultFont;
+    }
+
+    public void setDefaultFont(String defaultFont) {
+        this.defaultFont = defaultFont;
+    }
+
+    public int getDefaultFontSize() {
+        return defaultFontSize;
+    }
+
+    public void setDefaultFontSize(int defaultFontSize) {
+        this.defaultFontSize = defaultFontSize;
+    }
 }

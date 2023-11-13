@@ -3,48 +3,54 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import useReportDesign from "../../context/ReportDesignContext";
 import {
-    REPORT_UNITS_INCH,
-    REPORT_UNITS_MM,
-    REPORT_SECTION_HEADER,
-    REPORT_SECTION_BODY,
-    REPORT_SECTION_FOOTER,
-    reportUnitsToPixels,
-    pixelsToReportUnits,
-    REPORT_COMPONENT_TYPE_TEXT,
-    REPORT_COMPONENT_TYPE_IMAGE,
-    REPORT_COMPONENT_TYPE_HYPERLINK,
-    REPORT_COMPONENT_TYPE_PAGE_NUMBER,
-    REPORT_COMPONENT_TYPE_CURRENT_DATE,
-    REPORT_COMPONENT_TYPE_DATA_GRID,
-    REPORT_COMPONENT_TYPE_DATA_FIELD,
-    REPORT_COMPONENT_TYPE_DATA_RECORD,
-    REPORT_COMPONENT_TYPE_GRAPH,
-    REPORT_COMPONENT_TYPE_SUBREPORT,
-    REPORT_COMPONENT_CONTAINER_BORDER,
-    REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
+REPORT_UNITS_INCH,
+        REPORT_UNITS_MM,
+        REPORT_SECTION_HEADER,
+        REPORT_SECTION_BODY,
+        REPORT_SECTION_FOOTER,
+        reportUnitsToPixels,
+        pixelsToReportUnits,
+        REPORT_COMPONENT_TYPE_TEXT,
+        REPORT_COMPONENT_TYPE_IMAGE,
+        REPORT_COMPONENT_TYPE_HYPERLINK,
+        REPORT_COMPONENT_TYPE_PAGE_NUMBER,
+        REPORT_COMPONENT_TYPE_CURRENT_DATE,
+        REPORT_COMPONENT_TYPE_DATA_GRID,
+        REPORT_COMPONENT_TYPE_DATA_FIELD,
+        REPORT_COMPONENT_TYPE_DATA_RECORD,
+        REPORT_COMPONENT_TYPE_GRAPH,
+        REPORT_COMPONENT_TYPE_SUBREPORT,
+        REPORT_COMPONENT_CONTAINER_BORDER,
+        REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
 
-    } from "../../utils/helper";
+} from "../../utils/helper";
 
 const ReportComponent = (props) => {
-    const {component} = props;
-    
+    const {component, componentIndex} = props;
+
     const {
         reportSettings,
         currentReport,
         setCurrentReport
-        } = useReportDesign();
-        
+    } = useReportDesign();
+
     const onContextMenu = (e) => {
-        alert("-------->xxx");
+    };
+
+    const onClick = (e) => {
+         if (e.ctrlKey) { 
+             let c = {...component};
+             let cr = {...currentReport}
+             c.selected = !c.selected;
+             cr.reportComponents[componentIndex] = c;
+             setCurrentReport(cr);
+         }
     };
 
     const getStyle = () => {
-        let unit = "in";
-        if (currentReport.pageUnits === REPORT_UNITS_MM) {
-            unit = "mm";
-        }
+        let unit = currentReport.pageUnits.substring(0, 2);;
 
-        let retval =  {
+        let retval = {
             width: component.width + unit,
             height: component.height + unit,
             top: component.top + unit,
@@ -53,30 +59,30 @@ const ReportComponent = (props) => {
             color: component.foregroundColor,
             backgroundColor: component.backgroundColor
         };
-        
+
         if (component.fontSettings) {
             let fs = component.fontSettings;
             retval.font = fs.font;
             retval.fontSize = fs.size;
-            
+
             if (fs.italic) {
                 retval.fontStyle = "italic";
             }
-            
+
             if (fs.bold) {
                 retval.fontWeight = 700;
             }
-            
+
             if (fs.underline) {
                 retval.textDecoration = "underline";
             }
         }
-        
+
         return retval;
     };
 
     const getComponentValue = () => {
-        switch(component.type) {
+        switch (component.type) {
             case REPORT_COMPONENT_TYPE_TEXT:
                 return component.value;
             case REPORT_COMPONENT_TYPE_IMAGE:
@@ -88,21 +94,36 @@ const ReportComponent = (props) => {
             case REPORT_COMPONENT_TYPE_DATA_RECORD:
             case REPORT_COMPONENT_TYPE_GRAPH:
             case REPORT_COMPONENT_TYPE_SUBREPORT:
-               return component.value;
-       }
+                return component.value;
+        }
     };
-    
+
     const getClassName = () => {
         if (component.selected) {
             return "report-component-sel";
         } else {
             return "report-component";
         }
-    }
-    
-    return <div style={getStyle()} 
-        onClick={e => onClick(e)} className={getClassName()}
-        onContextMenu={(e) => onContextMenu(e)}>{getComponentValue()}</div>;
+    };
+
+    const handleDragStart = (e) => {
+        let rect = e.target.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        e.dataTransfer.setData("cinfo", JSON.stringify({index: componentIndex, left: x, top: y}));
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+
+    return <div 
+         className={getClassName()}
+         draggable={true} 
+         style={getStyle()}
+         onContextMenu={(e) => onContextMenu(e)}        
+         onClick={e => onClick(e)} 
+         onDragStart={e => handleDragStart(e)}>
+        {getComponentValue()}
+    </div>;
 };
 
 export default ReportComponent;

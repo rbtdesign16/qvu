@@ -39,6 +39,8 @@ public class ConfigurationHelper {
     private String defaultPageOrientation;
     private String defaultPageSize;
     private String defaultPageUnits;
+    private String defaultComponentBackgroundColor;
+    private String defaultComponentForegroundColor;
     private List<Double> defaultPageBorder;
     private Double defaultHeaderHeight;
     private Double defaultFooterHeight;
@@ -345,6 +347,22 @@ public class ConfigurationHelper {
 
     public void setDefaultFonts(List<String> defaultFonts) {
         this.defaultFonts = defaultFonts;
+    }
+
+    public String getDefaultComponentBackgroundColor() {
+        return defaultComponentBackgroundColor;
+    }
+
+    public void setDefaultComponentBackgroundColor(String defaultComponentBackgroundColor) {
+        this.defaultComponentBackgroundColor = defaultComponentBackgroundColor;
+    }
+
+    public String getDefaultComponentForegroundColor() {
+        return defaultComponentForegroundColor;
+    }
+
+    public void setDefaultComponentForegroundColor(String defaultComponentForegroundColor) {
+        this.defaultComponentForegroundColor = defaultComponentForegroundColor;
     }
     
     

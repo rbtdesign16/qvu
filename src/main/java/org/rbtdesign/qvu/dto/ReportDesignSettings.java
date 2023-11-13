@@ -15,6 +15,8 @@ public class ReportDesignSettings {
     private String defaultPageSize = Constants.PAGE_SIZE_NAMES[0];
     private Double defaultHeaderHeight = Constants.DEFAULT_HEADER_HEIGHT;
     private Double defaultFooterHeight = Constants.DEFAULT_FOOTER_HEIGHT;
+    private String defaultForegroundColor = Constants.DEFAULT_REPORT_COMPONENT_FOREGROUND_COLOR;
+    private String defaultBackgroundColor = Constants.DEFAULT_REPORT_COMPONENT_BACKGROUND_COLOR;
     private List<Double> defaultPageBorder = new ArrayList<>();
     private List<String> pageSizes = new ArrayList<>();
     private List<String> pageOrientations = new ArrayList<>();
@@ -22,6 +24,7 @@ public class ReportDesignSettings {
     private List<String> reportObjectTypes = new ArrayList<>();
     private List<String> defaultFonts = new ArrayList<>();
     private List<Integer> defaultFontSizes = new ArrayList<>();
+    private List<String> reportShapes = new ArrayList<>();
     private Map<String, double[]> pageSizeSettings;
     
     public String getDefaultPageUnits() {
@@ -126,6 +129,30 @@ public class ReportDesignSettings {
 
     public void setDefaultFontSizes(List<Integer> defaultFontSizes) {
         this.defaultFontSizes = defaultFontSizes;
+    }
+
+    public String getDefaultForegroundColor() {
+        return defaultForegroundColor;
+    }
+
+    public void setDefaultForegroundColor(String defaultForegroundColor) {
+        this.defaultForegroundColor = defaultForegroundColor;
+    }
+
+    public String getDefaultBackgroundColor() {
+        return defaultBackgroundColor;
+    }
+
+    public void setDefaultBackgroundColor(String defaultBackgroundColor) {
+        this.defaultBackgroundColor = defaultBackgroundColor;
+    }
+
+    public List<String> getReportShapes() {
+        return reportShapes;
+    }
+
+    public void setReportShapes(List<String> reportShapes) {
+        this.reportShapes = reportShapes;
     }
     
     

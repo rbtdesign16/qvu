@@ -104,7 +104,13 @@ public class QvuConfiguration {
 
     @Value("#{'${default.fonts:Arial,Courier New,Georgia,Lucida Sans Unicode,Tahoma,Times New Roman,Trebuchet MS,Verdana}'.split(',')}")
     private List<String> defaultFonts;
+
+    @Value("${default.component.background.color:white}")
+    private String defaultCompoenetBackgroundColor;
     
+    @Value("${default.component.foreground.color:black}")
+    private String defaultCompoenetForegroundColor;
+
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
@@ -125,6 +131,8 @@ public class QvuConfiguration {
         config.setDefaultFooterHeight(defaultFooterHeight);
         config.setDefaultFontSizes(defaultFontSizes);
         config.setDefaultFonts(defaultFonts);
+        config.setDefaultComponentBackgroundColor(defaultCompoenetBackgroundColor);
+        config.setDefaultComponentForegroundColor(defaultCompoenetForegroundColor);
     }
 
     @Autowired

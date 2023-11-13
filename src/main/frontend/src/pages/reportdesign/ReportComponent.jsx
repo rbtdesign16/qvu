@@ -45,14 +45,11 @@ const ReportComponent = (props) => {
         }
 
         let retval =  {
-            position: "relative",
             width: component.width + unit,
             height: component.height + unit,
             top: component.top + unit,
             left: component.left + unit,
-            outline: REPORT_COMPONENT_CONTAINER_BORDER,
             textAlign: component.align,
-            overflow: "hidden",
             color: component.foregroundColor,
             backgroundColor: component.backgroundColor
         };
@@ -95,8 +92,16 @@ const ReportComponent = (props) => {
        }
     };
     
+    const getClassName = () => {
+        if (component.selected) {
+            return "report-component-sel";
+        } else {
+            return "report-component";
+        }
+    }
+    
     return <div style={getStyle()} 
-        onClick={e => onClick(e)} className="report-component"
+        onClick={e => onClick(e)} className={getClassName()}
         onContextMenu={(e) => onContextMenu(e)}>{getComponentValue()}</div>;
 };
 

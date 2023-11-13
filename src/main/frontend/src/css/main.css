@@ -751,3 +751,15 @@ Note: Beware of modifying this element as it can break the animations - you shou
     border-bottom: var(--query-results-table-border);
     border-right: var(--query-results-table-border);
 }
+
+.report-component {
+    position: relative;
+    overflow: hidden;
+    outline: var(--report-component-outline);
+}
+
+.report-component-sel {
+    position: relative;
+    overflow: hidden;
+    outline: var(--report-component-outlines-selected);
+}

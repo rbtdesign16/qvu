@@ -788,8 +788,6 @@ export const REPORT_SECTION_BODY = "body";
 export const REPORT_SECTION_FOOTER = "footer";
 export const REPORT_SECTION_BORDER = "solid 1px blue";
 
-export const REPORT_COMPONENT_CONTAINER_BORDER = "dashed 1px blue";
-export const REPORT_COMPONENT_CONTAINER_BORDER_SELECTED = "dashed 1px red";
 export const REPORT_COMPONENT_TYPE_TEXT = "text";
 export const REPORT_COMPONENT_TYPE_IMAGE = "image";
 export const REPORT_COMPONENT_TYPE_SHAPE = "shape";

@@ -35,8 +35,8 @@ const ReportContent = (props) => {
             let test = {
                 type: "text",
                 align: "center",
-                foregroundColor: "yellow",
-                backgroundColor: "silver",
+                foregroundColor: reportSettings.defaultForegroundColor,
+                backgroundColor: reportSettings.defaultBackgroundColor,
                 fontSettings: {
                     font: "Arial",
                     size: 16,

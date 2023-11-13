@@ -293,5 +293,13 @@ public class Constants {
     public static final double DEFAULT_REPORT_COMPONENT_HEIGHT = 0.5;
     public static final String DEFAULT_REPORT_COMPONENT_ALIGN = "center";
     public static final String DEFAULT_REPORT_SECTION = REPORT_SECTION_BODY;
-
+    
+    public static final String REPORT_SHAPE_ELLIPSE = "ellipse";
+    public static final String REPORT_SHAPE_RECTANGLE = "rectangle";
+    public static final String REPORT_SHAPE_ROUNDED_RECTANGLE = "roundedrectangle";
+    
+    public static final String[] REPORT_SHAPES = {
+        REPORT_SHAPE_ELLIPSE,
+        REPORT_SHAPE_RECTANGLE,
+        REPORT_SHAPE_ROUNDED_RECTANGLE};   
 }

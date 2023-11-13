@@ -17,20 +17,43 @@ REPORT_ORIENTATION_LANDSCAPE,
         getReportWidth,
         reportUnitsToPixels,
         pixelsToReportUnits
-        } from "../../utils/helper";
+} from "../../utils/helper";
 
 const ReportContent = (props) => {
     const {
         reportSettings,
         currentReport,
         setCurrentReport,
-        } = useReportDesign();
+    } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
     const reportWidthPixels = getReportWidthInPixels(currentReport, reportSettings);
     const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
 
     const getStyle = () => {
+        if (currentReport.reportObjects.length === 0) {
+            let test = {
+                type: "text",
+                align: "center",
+                fontSettings: {
+                    font: "Arial",
+                    color: "green",
+                    size: 16,
+                    bold: false,
+                    italic: false,
+                    underline: false
+                },
+                value: "this is a test",
+                left: 0.5,
+                top: 0.5,
+                width: 1.0,
+                height: 0.5,
+                section: "body"
+            };
+
+            currentReport.reportObjects.push(test);
+        }
+
         let width;
         let height;
         if (currentReport.pageUnits === REPORT_UNITS_INCH) {
@@ -67,19 +90,19 @@ const ReportContent = (props) => {
 
     const onResize = (e) => {
         let r = {...currentReport};
-        r.headerHeight = reportHeight * (e.sizes[0]/100);
-        r.footerHeight = reportHeight * (e.sizes[2]/100);
+        r.headerHeight = reportHeight * (e.sizes[0] / 100);
+        r.footerHeight = reportHeight * (e.sizes[2] / 100);
         setCurrentReport(r);
     };
 
 
     return <div style={getStyle()} className="report-content">
-        <Splitter style={{border: "none", 
-            width: (reportWidthPixels - 1) + "px", 
-            height: (reportHeightPixels - 1) + "px"}} 
-            layout="vertical"
-            gutterSize={SPLITTER_GUTTER_SIZE / 2}
-            onResizeEnd={e => onResize(e)}>
+        <Splitter style={{border: "none",
+                    width: (reportWidthPixels - 1) + "px",
+                    height: (reportHeightPixels - 1) + "px"}} 
+                  layout="vertical"
+                  gutterSize={SPLITTER_GUTTER_SIZE / 2}
+                  onResizeEnd={e => onResize(e)}>
             <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
                 <ReportSection section={REPORT_SECTION_HEADER}/>
             </SplitterPanel>
@@ -89,7 +112,8 @@ const ReportContent = (props) => {
             <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
                 <ReportSection section={REPORT_SECTION_FOOTER}/>
             </SplitterPanel>
-        </Splitter></div>;
+        </Splitter>
+    </div>;
 };
 
 export default ReportContent;

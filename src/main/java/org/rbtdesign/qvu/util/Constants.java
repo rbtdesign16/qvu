@@ -242,51 +242,55 @@ public class Constants {
 
     public static final String[] PAGE_UNITS = {"inch", "mm"};
     public static final String DEFAULT_PAGE_UNITS = "inch";
-    public static final String REPORT_LOCATION_HEADER = "header";
-    public static final String REPORT_LOCATION_BODY = "body";
-    public static final String REPORT_LOCATION_FOOTER = "footer";
+    public static final String REPORT_SECTION_HEADER = "header";
+    public static final String REPORT_SECTION_BODY = "body";
+    public static final String REPORT_SECTION_FOOTER = "footer";
     public static final double DEFAULT_REPORT_BORDER_WIDTH = 0.5;
     public static final Double DEFAULT_HEADER_HEIGHT = 1.0;
     public static final Double DEFAULT_FOOTER_HEIGHT = 1.0;
     public static final Double[] DEFAULT_PAGE_BORDER = {0.5, 0.5, 0.5, 0.5};
     
-    public static final String[] REPORT_LOCATIONS = {
-        REPORT_LOCATION_HEADER,
-        REPORT_LOCATION_BODY,
-        REPORT_LOCATION_FOOTER
+    public static final String[] REPORT_SECTIONS = {
+        REPORT_SECTION_HEADER,
+        REPORT_SECTION_BODY,
+        REPORT_SECTION_FOOTER
     };
     
-    public static final String REPORT_OBJECT_TYPE_TEXT = "text";
-    public static final String REPORT_OBJECT_TYPE_IMAGE = "image";
-    public static final String REPORT_OBJECT_TYPE_HYPERLINK = "hyperlink";
-    public static final String REPORT_OBJECT_TYPE_PAGE_NUMBER = "page number";
-    public static final String REPORT_OBJECT_TYPE_CURRENT_DATE = "current date";
-    public static final String REPORT_OBJECT_TYPE_DATA_GRID = "data grid";
-    public static final String REPORT_OBJECT_TYPE_DATA_FIELD = "data field";
-    public static final String REPORT_OBJECT_TYPE_DATA_RECORD = "data record";
-    public static final String REPORT_OBJECT_TYPE_GRAPH = "graph";
-    public static final String REPORT_OBJECT_TYPE_SUBREPORT = "subreport";
+    public static final String REPORT_COMPONENT_TYPE_TEXT = "text";
+    public static final String REPORT_COMPONENT_TYPE_IMAGE = "image";
+    public static final String REPORT_COMPONENT_TYPE_SHAPE = "shape";
+    public static final String REPORT_COMPONENT_TYPE_HYPERLINK = "hyperlink";
+    public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER = "page number";
+    public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE = "current date";
+    public static final String REPORT_COMPONENT_TYPE_DATA_GRID = "data grid";
+    public static final String REPORT_COMPONENT_TYPE_DATA_FIELD = "data field";
+    public static final String REPORT_COMPONENT_TYPE_DATA_RECORD = "data record";
+    public static final String REPORT_COMPONENT_TYPE_GRAPH = "graph";
+    public static final String REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
     
     public static final String[] REPORT_OBJECT_TYPES = {
-        REPORT_OBJECT_TYPE_TEXT,
-        REPORT_OBJECT_TYPE_IMAGE,
-        REPORT_OBJECT_TYPE_HYPERLINK,
-        REPORT_OBJECT_TYPE_PAGE_NUMBER,
-        REPORT_OBJECT_TYPE_CURRENT_DATE,
-        REPORT_OBJECT_TYPE_DATA_FIELD,
-        REPORT_OBJECT_TYPE_DATA_GRID,
-        REPORT_OBJECT_TYPE_DATA_RECORD,
-        REPORT_OBJECT_TYPE_GRAPH,
-        REPORT_OBJECT_TYPE_SUBREPORT
+        REPORT_COMPONENT_TYPE_TEXT,
+        REPORT_COMPONENT_TYPE_IMAGE,
+        REPORT_COMPONENT_TYPE_SHAPE,
+        REPORT_COMPONENT_TYPE_HYPERLINK,
+        REPORT_COMPONENT_TYPE_PAGE_NUMBER,
+        REPORT_COMPONENT_TYPE_CURRENT_DATE,
+        REPORT_COMPONENT_TYPE_DATA_FIELD,
+        REPORT_COMPONENT_TYPE_DATA_GRID,
+        REPORT_COMPONENT_TYPE_DATA_RECORD,
+        REPORT_COMPONENT_TYPE_GRAPH,
+        REPORT_COMPONENT_TYPE_SUBREPORT
     };
         
-    public static final String DEFAULT_FONT = "Arial";
-    public static final int DEFAULT_FONT_SIZE = 12;
-    public static final String DEFAULT_FONT_COLOR = "black";
+    public static final String DEFAULT_REPORT_FONT = "Arial";
+    public static final int DEFAULT_REPORT_FONT_SIZE = 12;
+    public static final String DEFAULT_REPORT_FONT_COLOR = "black";
     
-    public static final double DEFAULT_COMPONENT_LEFT = 0.5;
-    public static final double DEFAULT_COMPONENT_TOP = 0.5;
-    public static final double DEFAULT_COMPONENT_WIDTH = 1.0;
-    public static final double DEFAULT_COMPONENT_HEIGHT = 0.5;
+    public static final double DEFAULT_REPORT_COMPONENT_LEFT = 0.5;
+    public static final double DEFAULT_REPORT_COMPONENT_TOP = 0.5;
+    public static final double DEFAULT_REPORT_COMPONENT_WIDTH = 1.0;
+    public static final double DEFAULT_REPORT_COMPONENT_HEIGHT = 0.5;
+    public static final String DEFAULT_REPORT_COMPONENT_ALIGN = "center";
+    public static final String DEFAULT_REPORT_SECTION = REPORT_SECTION_BODY;
 
 }

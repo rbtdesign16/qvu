@@ -7,37 +7,16 @@ import org.rbtdesign.qvu.util.Constants;
  * @author rbtuc
  */
 public class ReportComponent {
-    private Rect position = new Rect();
-    private String location = Constants.REPORT_LOCATION_BODY;
-    private String type = Constants.REPORT_OBJECT_TYPE_TEXT;
-    private String font = Constants.DEFAULT_FONT;
-    private String fontColor = Constants.DEFAULT_FONT_COLOR;
-    private int fontSize = Constants.DEFAULT_FONT_SIZE;
-    private boolean fontBold = false;
-    private boolean fontItalix = false;
-    private boolean fontUnderline = false;
-    private double left = Constants.DEFAULT_COMPONENT_LEFT;
-    private double top = Constants.DEFAULT_COMPONENT_TOP;
-    private double width = Constants.DEFAULT_COMPONENT_WIDTH;
-    private double height = Constants.DEFAULT_COMPONENT_HEIGHT;
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-
-    public Rect getPosition() {
-        return position;
-    }
-
-    public void setPosition(Rect position) {
-        this.position = position;
-    }
-
+    private String type = Constants.REPORT_COMPONENT_TYPE_TEXT;
+    private double left = Constants.DEFAULT_REPORT_COMPONENT_LEFT;
+    private double top = Constants.DEFAULT_REPORT_COMPONENT_TOP;
+    private double width = Constants.DEFAULT_REPORT_COMPONENT_WIDTH;
+    private double height = Constants.DEFAULT_REPORT_COMPONENT_HEIGHT;
+    private String section = Constants.DEFAULT_REPORT_SECTION;
+    private String align = Constants.DEFAULT_REPORT_COMPONENT_ALIGN;
+    private FontSettings fontSettings;
+    private Object value;
+    private int zindex = 0;
     public String getType() {
         return type;
     }
@@ -46,51 +25,75 @@ public class ReportComponent {
         this.type = type;
     }
 
-    public String getFont() {
-        return font;
+    public double getLeft() {
+        return left;
     }
 
-    public void setFont(String font) {
-        this.font = font;
+    public void setLeft(double left) {
+        this.left = left;
     }
 
-    public int getFontSize() {
-        return fontSize;
+    public double getTop() {
+        return top;
     }
 
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
+    public void setTop(double top) {
+        this.top = top;
     }
 
-    public boolean isFontBold() {
-        return fontBold;
+    public double getWidth() {
+        return width;
     }
 
-    public void setFontBold(boolean fontBold) {
-        this.fontBold = fontBold;
+    public void setWidth(double width) {
+        this.width = width;
     }
 
-    public boolean isFontItalix() {
-        return fontItalix;
+    public double getHeight() {
+        return height;
     }
 
-    public void setFontItalix(boolean fontItalix) {
-        this.fontItalix = fontItalix;
+    public void setHeight(double height) {
+        this.height = height;
     }
 
-    public boolean isFontUnderline() {
-        return fontUnderline;
+    public String getSection() {
+        return section;
     }
 
-    public void setFontUnderline(boolean fontUnderline) {
-        this.fontUnderline = fontUnderline;
+    public void setSection(String section) {
+        this.section = section;
     }
 
-    public String getFontColor() {
-        return fontColor;
+    public FontSettings getFontSettings() {
+        return fontSettings;
     }
 
-    public void setFontColor(String fontColor) {
-        this.fontColor = fontColor;
+    public void setFontSettings(FontSettings fontSettings) {
+        this.fontSettings = fontSettings;
+    }
+
+    public String getAlign() {
+        return align;
+    }
+
+    public void setAlign(String align) {
+        this.align = align;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public int getZindex() {
+        return zindex;
+    }
+
+    public void setZindex(int zindex) {
+        this.zindex = zindex;
     }
  }

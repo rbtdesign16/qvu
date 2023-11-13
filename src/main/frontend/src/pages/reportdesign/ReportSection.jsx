@@ -26,7 +26,7 @@ const ReportSection = (props) => {
     const {section} = props;
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
-     
+    
     const getSectionHeight = () => {
         switch(section) {
             case REPORT_SECTION_HEADER:
@@ -86,7 +86,11 @@ const ReportSection = (props) => {
     const loadComponents = () => {
         if (currentReport.reportObjects && (currentReport.reportObjects.length > 0)) {
             return currentReport.reportObjects.map(o => {
-                return <ReportComponent component={o}/>;
+                if (o.section === section) {
+                    return <ReportComponent component={o}/>;
+                } else {
+                    return "";
+                }
             });
         } else {
             return "";

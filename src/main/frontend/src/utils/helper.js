@@ -788,41 +788,6 @@ export const REPORT_SECTION_BODY = "body";
 export const REPORT_SECTION_FOOTER = "footer";
 export const REPORT_SECTION_BORDER = "solid 1px blue";
 
-export const AVAILABLE_FONTS = [
-    "Arial",
-    "Courier New",
-    "Georgia",
-    "Lucida Sans Unicode",
-    "Tahoma",
-    "Times New Roman",
-    "Trebuchet MS",
-    "Verdana"];
-
-export const FONT_SIZES = [
-    8,
-    9,
-    10,
-    11,
-    12,
-    14,
-    16,
-    18,
-    20,
-    22,
-    24,
-    26,
-    28,
-    36,
-    48,
-    72,
-    84,
-    96,
-    108,
-    144,
-    192,
-    216,
-    244];
-
 export const REPORT_COMPONENT_CONTAINER_BORDER = "dashed 1px blue";
 export const REPORT_COMPONENT_CONTAINER_BORDER_SELECTED = "dashed 1px red";
 export const REPORT_COMPONENT_TYPE_TEXT = "text";
@@ -836,3 +801,5 @@ export const REPORT_COMPONENT_TYPE_DATA_FIELD = "data field";
 export const REPORT_COMPONENT_TYPE_DATA_RECORD = "data record";
 export const REPORT_COMPONENT_TYPE_GRAPH = "graph";
 export const REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
+
+

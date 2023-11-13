@@ -8,7 +8,6 @@ import org.rbtdesign.qvu.util.Constants;
  */
 public class FontSettings {
     private String font = Constants.DEFAULT_REPORT_FONT;
-    private String color = Constants.DEFAULT_REPORT_FONT_COLOR;
     private int size = Constants.DEFAULT_REPORT_FONT_SIZE;
     private boolean bold = false;
     private boolean italic = false;
@@ -22,19 +21,12 @@ public class FontSettings {
         this.font = font;
     }
 
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
 
     public int getSize() {
         return size;
     }
 
-    public void setSize(int cize) {
+    public void setSize(int size) {
         this.size = size;
     }
 

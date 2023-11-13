@@ -15,6 +15,8 @@ public class ReportComponent {
     private String section = Constants.DEFAULT_REPORT_SECTION;
     private String align = Constants.DEFAULT_REPORT_COMPONENT_ALIGN;
     private FontSettings fontSettings;
+    private String foregroundColor = Constants.DEFAULT_REPORT_COMPONENT_FOREGROUND_COLOR;
+    private String backgroundColor = Constants.DEFAULT_REPORT_COMPONENT_BACKGROUND_COLOR;
     private Object value;
     private int zindex = 0;
     public String getType() {
@@ -96,4 +98,22 @@ public class ReportComponent {
     public void setZindex(int zindex) {
         this.zindex = zindex;
     }
+
+    public String getForegroundColor() {
+        return foregroundColor;
+    }
+
+    public void setForegroundColor(String foregroundColor) {
+        this.foregroundColor = foregroundColor;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+    
+    
  }

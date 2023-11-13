@@ -27,7 +27,7 @@ const FontSelectModal = (props) => {
     
     const getFonts = () => {
         let fs = defaultStyle.getPropertyValue('--default-title-font-size');
-        AVAILABLE_FONTS.map(f => {
+            config.reportSettings.defaultFonts.map(f => {
             if (config.component.font === f) {
                 return <option style={{font: f, fontSize: fs}} value={f} selected>{f}</option>;
             } else {
@@ -37,8 +37,8 @@ const FontSelectModal = (props) => {
     };
     
     const getFontSizes = () => {
-        return FONT_SIZES.map(fs => {
-            if (config.component.font === f) {
+        return config.reportSettings.defaultFontSizes.map(fs => {
+            if (config.component.fontSize === fs) {
                 return <option value={fs} selected>{fs}</option>;
             } else {
                 return <option value={fs}>{fs}</option>;
@@ -56,7 +56,8 @@ const FontSelectModal = (props) => {
         }
     };
     
-    return (
+    if (config && config.reportSettings) {
+        return (
             <div className="static-modal">
                 <Modal 
                     animation={false} 
@@ -73,7 +74,6 @@ const FontSelectModal = (props) => {
                         <div className="entrygrid-100-150">
                             <div className="label">{getText("Font:")}</div><div><select name="font" onChange={e => onChange(e)}>{getFonts()}</select></div>
                             <div className="label">{getText("Size:")}</div><div><select name="size" onChange={e => onChange(e)}>{getFontSizes()}</select></div>
-                            <div className="label">{getText("Color:")}</div><div><input name="color" type="color" onChange={e => onChange(e)} /></div>
                             <div></div><div><input name="bold" type="checkbox" onChange={e => onChange(e)} /><label className="ck-label" htmlFor="bold">{getText("Bold")}</label></div>
                             <div></div><div><input name="italic" type="checkbox" onChange={e => onChange(e)} /><label className="ck-label" htmlFor="italic">{getText("Italic")}</label></div>
                             <div></div><div><input name="underline" type="checkbox" onChange={e => onChange(e)} /><label className="ck-label" htmlFor="underline">{getText("Underline")}</label></div>
@@ -86,6 +86,9 @@ const FontSelectModal = (props) => {
                 </Modal>
             </div>
             );
+    } else {
+        return "";
+    }
 };
 
 FontSelectModal.propTypes = {

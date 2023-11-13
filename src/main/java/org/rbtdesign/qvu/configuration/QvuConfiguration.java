@@ -99,6 +99,11 @@ public class QvuConfiguration {
     @Value("${default.footer.height:1}")
     private Double defaultFooterHeight;
 
+    @Value("#{'${default.font.sizes:8,9,10,11,12,14,16,18,20,22}'.split(',')}")
+    private List<Integer> defaultFontSizes;
+
+    @Value("#{'${default.fonts:Arial,Courier New,Georgia,Lucida Sans Unicode,Tahoma,Times New Roman,Trebuchet MS,Verdana}'.split(',')}")
+    private List<String> defaultFonts;
     
     @PostConstruct
     private void init() {
@@ -118,6 +123,8 @@ public class QvuConfiguration {
         config.setDefaultPageBorder(defaultPageBorder);
         config.setDefaultHeaderHeight(defaultHeaderHeight);
         config.setDefaultFooterHeight(defaultFooterHeight);
+        config.setDefaultFontSizes(defaultFontSizes);
+        config.setDefaultFonts(defaultFonts);
     }
 
     @Autowired

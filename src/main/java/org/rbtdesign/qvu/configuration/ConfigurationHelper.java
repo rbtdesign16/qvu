@@ -42,6 +42,8 @@ public class ConfigurationHelper {
     private List<Double> defaultPageBorder;
     private Double defaultHeaderHeight;
     private Double defaultFooterHeight;
+    private List<Integer> defaultFontSizes;
+    private List<String> defaultFonts;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -328,4 +330,22 @@ public class ConfigurationHelper {
     public void setDefaultFooterHeight(Double defaultFooterHeight) {
         this.defaultFooterHeight = defaultFooterHeight;
     }
+
+    public List<Integer> getDefaultFontSizes() {
+        return defaultFontSizes;
+    }
+
+    public void setDefaultFontSizes(List<Integer> defaultFontSizes) {
+        this.defaultFontSizes = defaultFontSizes;
+    }
+
+    public List<String> getDefaultFonts() {
+        return defaultFonts;
+    }
+
+    public void setDefaultFonts(List<String> defaultFonts) {
+        this.defaultFonts = defaultFonts;
+    }
+    
+    
  }

@@ -284,7 +284,8 @@ public class Constants {
         
     public static final String DEFAULT_REPORT_FONT = "Arial";
     public static final int DEFAULT_REPORT_FONT_SIZE = 12;
-    public static final String DEFAULT_REPORT_FONT_COLOR = "black";
+    public static final String DEFAULT_REPORT_COMPONENT_FOREGROUND_COLOR = "black";
+    public static final String DEFAULT_REPORT_COMPONENT_BACKGROUND_COLOR = "white";
     
     public static final double DEFAULT_REPORT_COMPONENT_LEFT = 0.5;
     public static final double DEFAULT_REPORT_COMPONENT_TOP = 0.5;

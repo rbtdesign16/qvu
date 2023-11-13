@@ -20,6 +20,8 @@ public class ReportDesignSettings {
     private List<String> pageOrientations = new ArrayList<>();
     private List<String> pageUnits = new ArrayList<>();
     private List<String> reportObjectTypes = new ArrayList<>();
+    private List<String> defaultFonts = new ArrayList<>();
+    private List<Integer> defaultFontSizes = new ArrayList<>();
     private Map<String, double[]> pageSizeSettings;
     
     public String getDefaultPageUnits() {
@@ -108,6 +110,22 @@ public class ReportDesignSettings {
 
     public void setDefaultFooterHeight(Double defaultFooterHeight) {
         this.defaultFooterHeight = defaultFooterHeight;
+    }
+
+    public List<String> getDefaultFonts() {
+        return defaultFonts;
+    }
+
+    public void setDefaultFonts(List<String> defaultFonts) {
+        this.defaultFonts = defaultFonts;
+    }
+
+    public List<Integer> getDefaultFontSizes() {
+        return defaultFontSizes;
+    }
+
+    public void setDefaultFontSizes(List<Integer> defaultFontSizes) {
+        this.defaultFontSizes = defaultFontSizes;
     }
     
     

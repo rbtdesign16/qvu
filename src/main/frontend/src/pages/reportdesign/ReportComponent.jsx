@@ -50,16 +50,17 @@ const ReportComponent = (props) => {
             height: component.height + unit,
             top: component.top + unit,
             left: component.left + unit,
-            border: REPORT_COMPONENT_CONTAINER_BORDER,
+            outline: REPORT_COMPONENT_CONTAINER_BORDER,
             textAlign: component.align,
-            overflow: "hidden"
+            overflow: "hidden",
+            color: component.foregroundColor,
+            backgroundColor: component.backgroundColor
         };
         
         if (component.fontSettings) {
             let fs = component.fontSettings;
             retval.font = fs.font;
             retval.fontSize = fs.size;
-            retval.color = fs.color;
             
             if (fs.italic) {
                 retval.fontStyle = "italic";

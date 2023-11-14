@@ -1,21 +1,19 @@
-import React, {useState} from "react";
+import React, {useEffect}from "react";
+import useMenu from "../context/MenuContext";
 
-//define a functional component for the right-click context menu 
 const ContextMenu = (props) => {
-    //state variables
-    const {config} = props;
-
+    const {menuConfig} = useMenu();
     const getMenuItems = () => {
-        return config.menuItems.map(m => {
-            return <div className="context-menu-element" onClick={() => config.handleContextMenu(m.action, config.id)}>
+        return menuConfig.menuItems.map(m => {
+            return <div className="context-menu-element" onClick={() => menuConfig.handleContextMenu(m.action, menuConfig.id)}>
                 {m.text}
             </div>;
         });
     };
-
-    if (config.show) {
-        return <div style={{top: config.y, left: config.x}} 
-            className="context-menu">
+    
+    if (menuConfig.show) {
+        return <div style={{top: menuConfig.y, left: menuConfig.x}} 
+             className="context-menu">
             {getMenuItems()}
         </div>;
     } else {

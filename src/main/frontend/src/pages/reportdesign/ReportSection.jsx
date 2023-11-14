@@ -21,7 +21,7 @@ const ReportSection = (props) => {
         setCurrentReport
     } = useReportDesign();
 
-    const {section, onContextMenu, hideContextMenu} = props;
+    const {section, onContextMenu} = props;
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
 
@@ -106,9 +106,8 @@ const ReportSection = (props) => {
                 if (o.section === section) {
                     return <ReportComponent 
                         component={o} 
-                        componentIndex={indx}  
-                        onContextMenu={onContextMenu}
-                        hideContextMenu={hideContextMenu} />;
+                        componentIndex={indx}
+                        onContextMenu={onContextMenu}/>;
                 } else {
                     return "";
                 }

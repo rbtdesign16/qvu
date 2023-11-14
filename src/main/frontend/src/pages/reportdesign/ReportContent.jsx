@@ -2,24 +2,26 @@ import React, {useState} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import useReportDesign from "../../context/ReportDesignContext";
+import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu"
 import useLang from "../../context/LangContext";
 import {
-    REPORT_ORIENTATION_LANDSCAPE,
-    REPORT_ORIENTATION_PORTRAIT,
-    REPORT_UNITS_INCH,
-    REPORT_UNITS_MM,
-    SPLITTER_GUTTER_SIZE,
-    REPORT_SECTION_HEADER,
-    REPORT_SECTION_BODY,
-    REPORT_SECTION_FOOTER,
-    getReportHeightInPixels,
-    getReportWidthInPixels,
-    getReportHeight,
-    getReportWidth,
-    reportUnitsToPixels,
-    pixelsToReportUnits
-} from "../../utils/helper";
+REPORT_ORIENTATION_LANDSCAPE,
+        REPORT_ORIENTATION_PORTRAIT,
+        REPORT_UNITS_INCH,
+        REPORT_UNITS_MM,
+        SPLITTER_GUTTER_SIZE,
+        REPORT_SECTION_HEADER,
+        REPORT_SECTION_BODY,
+        REPORT_SECTION_FOOTER,
+        getReportHeightInPixels,
+        getReportWidthInPixels,
+        getReportHeight,
+        getReportWidth,
+        reportUnitsToPixels,
+        pixelsToReportUnits,
+        ESCAPE_KEY
+    } from "../../utils/helper";
 
 const ReportContent = (props) => {
     const {
@@ -28,11 +30,11 @@ const ReportContent = (props) => {
         setCurrentReport,
         getNewComponent
     } = useReportDesign();
-    const [componentMenuConfig, setComponentMenuConfig] = useState({show: false});
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
     const reportWidthPixels = getReportWidthInPixels(currentReport, reportSettings);
     const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
+    const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
 
     const contextMenuItems = [
@@ -53,49 +55,41 @@ const ReportContent = (props) => {
             action: "tofrom"
         }
     ];
-    
-    const hideContextMenu = (e) => {
-        if (componentMenuConfig.show) {
-            if (e) {
-                e.preventDefault();
-            }
-            setComponentMenuConfig({show: false});
-        }
-    };
-    
+
     const onContextMenu = (e, componentIndex) => {
-        if (!componentMenuConfig.show) {
+        if (!menuConfig.show) {
             e.preventDefault();
             let menuItems = [...contextMenuItems];
             if (!currentReport.reportComponents[componentIndex].selected) {
-                menuItems.push({ text: getText("Select Component"),
-                action: "select"});
+                menuItems.push({text: getText("Select Component"),
+                    action: "select"});
             } else {
-                menuItems.push({ text: getText("Deselect Component"),
-                action: "deselect"});
+                menuItems.push({text: getText("Deselect Component"),
+                    action: "deselect"});
             }
 
-            setComponentMenuConfig({ 
+            showMenu({
                 show: true,
-                x: e.pageX, 
-                y: e.pageY, 
-                id: componentIndex, 
-                menuItems: menuItems, 
+                x: e.pageX,
+                y: e.pageY,
+                id: componentIndex,
+                menuItems: menuItems,
                 handleContextMenu: handleContextMenu});
         } else {
-            hideContextMenu(e);
+            hideMenu(e);
         }
-   };
+    };
 
     const setComponentSelected = (componentIndex, select) => {
         let cr = {...currentReport};
         cr.reportComponents[componentIndex].selected = select;
         setCurrentReport(cr);
     };
+    
     const handleContextMenu = (action, id) => {
-        hideContextMenu();
-        
-        switch(action) {
+        hideMenu();
+
+        switch (action) {
             case "edit":
                 break;
             case "delete":
@@ -111,8 +105,8 @@ const ReportContent = (props) => {
             case "toback":
                 break;
         }
-     };
-    
+    };
+
     const getStyle = () => {
         if (currentReport.reportComponents.length === 0) {
             currentReport.reportComponents.push(getNewComponent("body", "text", "this is a test"));
@@ -159,30 +153,30 @@ const ReportContent = (props) => {
     };
 
     const onClick = (e) => {
-        hideContextMenu(e);    
+        hideMenu(e);
     };
-
+    
     return <div style={getStyle()} 
-        className="report-content"
-        onClick={e => onClick(e)}>
-        <ContextMenu config={componentMenuConfig}/>
-        <Splitter style={{border: "none",
-            width: (reportWidthPixels - 1) + "px",
-            height: (reportHeightPixels - 1) + "px"}} 
-            layout="vertical"
-            gutterSize={SPLITTER_GUTTER_SIZE / 2}
-            onResizeEnd={e => onResize(e)}>
-            <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
-                <ReportSection section={REPORT_SECTION_HEADER} onContextMenu={onContextMenu}  hideContextMenu={hideContextMenu}/>
-            </SplitterPanel>
-            <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
-                <ReportSection section={REPORT_SECTION_BODY} onContextMenu={onContextMenu} hideContextMenu={hideContextMenu}/>
-            </SplitterPanel>
-            <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
-                <ReportSection section={REPORT_SECTION_FOOTER} onContextMenu={onContextMenu}  hideContextMenu={hideContextMenu}/>
-            </SplitterPanel>
-        </Splitter>
-    </div>;
+     className="report-content"
+     onClick={e => onClick(e)}>
+    <ContextMenu />
+    <Splitter style={{border: "none",
+        width: (reportWidthPixels - 1) + "px",
+        height: (reportHeightPixels - 1) + "px"}} 
+        layout="vertical"
+        gutterSize={SPLITTER_GUTTER_SIZE / 2}
+        onResizeEnd={e => onResize(e)}>
+        <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
+            <ReportSection section={REPORT_SECTION_HEADER} onContextMenu={onContextMenu} />
+        </SplitterPanel>
+        <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
+            <ReportSection section={REPORT_SECTION_BODY} onContextMenu={onContextMenu} />
+        </SplitterPanel>
+        <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
+            <ReportSection section={REPORT_SECTION_FOOTER} onContextMenu={onContextMenu}/>
+        </SplitterPanel>
+    </Splitter>
+</div>;
 };
 
 export default ReportContent;

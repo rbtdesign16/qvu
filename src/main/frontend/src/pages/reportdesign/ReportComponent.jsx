@@ -1,36 +1,38 @@
 import React, {useState} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
+import useMenu from "../../context/MenuContext";
 import useReportDesign from "../../context/ReportDesignContext";
 import {
-REPORT_UNITS_INCH,
-        REPORT_UNITS_MM,
-        REPORT_SECTION_HEADER,
-        REPORT_SECTION_BODY,
-        REPORT_SECTION_FOOTER,
-        REPORT_COMPONENT_TYPE_TEXT,
-        REPORT_COMPONENT_TYPE_IMAGE,
-        REPORT_COMPONENT_TYPE_HYPERLINK,
-        REPORT_COMPONENT_TYPE_PAGE_NUMBER,
-        REPORT_COMPONENT_TYPE_CURRENT_DATE,
-        REPORT_COMPONENT_TYPE_DATA_GRID,
-        REPORT_COMPONENT_TYPE_DATA_FIELD,
-        REPORT_COMPONENT_TYPE_DATA_RECORD,
-        REPORT_COMPONENT_TYPE_GRAPH,
-        REPORT_COMPONENT_TYPE_SUBREPORT,
-        REPORT_COMPONENT_CONTAINER_BORDER,
-        REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
-        }
+    REPORT_UNITS_INCH,
+    REPORT_UNITS_MM,
+    REPORT_SECTION_HEADER,
+    REPORT_SECTION_BODY,
+    REPORT_SECTION_FOOTER,
+    REPORT_COMPONENT_TYPE_TEXT,
+    REPORT_COMPONENT_TYPE_IMAGE,
+    REPORT_COMPONENT_TYPE_HYPERLINK,
+    REPORT_COMPONENT_TYPE_PAGE_NUMBER,
+    REPORT_COMPONENT_TYPE_CURRENT_DATE,
+    REPORT_COMPONENT_TYPE_DATA_GRID,
+    REPORT_COMPONENT_TYPE_DATA_FIELD,
+    REPORT_COMPONENT_TYPE_DATA_RECORD,
+    REPORT_COMPONENT_TYPE_GRAPH,
+    REPORT_COMPONENT_TYPE_SUBREPORT,
+    REPORT_COMPONENT_CONTAINER_BORDER,
+    REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
+    }
 from "../../utils/helper";
 
 const ReportComponent = (props) => {
-    const {component, componentIndex, onContextMenu, hideContextMenu} = props;
+    const {component, componentIndex, onContextMenu} = props;
     const {
         reportSettings,
         currentReport,
         setCurrentReport
     } = useReportDesign();
     
+    const {menuConfig} = useMenu();
     const onClick = (e) => {
         if (e.ctrlKey) {
             e.preventDefault();

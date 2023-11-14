@@ -800,4 +800,5 @@ export const REPORT_COMPONENT_TYPE_DATA_RECORD = "data record";
 export const REPORT_COMPONENT_TYPE_GRAPH = "graph";
 export const REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
 
+export const ESCAPE_KEY_CODE = 27;
 

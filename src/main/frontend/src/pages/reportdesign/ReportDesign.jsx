@@ -9,6 +9,7 @@ import useAuth from "../../context/AuthContext";
 import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu";
 import useReportDesign from "../../context/ReportDesignContext";
+import FontSelectModal from "../../widgets/FontSelectModal";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import ReportSettingsModal from "./ReportSettingsModal";
@@ -60,6 +61,7 @@ const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
+    const [showFontSelect, setShowFontSelect] = useState({show: false});
     const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
@@ -72,7 +74,8 @@ const ReportDesign = () => {
         setCurrentReport,
         setNewReport,
         initializeReportSettings,
-        haveSelectedComponents} = useReportDesign();
+        haveSelectedComponents,
+        getNewFontSettings} = useReportDesign();
 
     const getComponentSelectMenu = () => {
         let retval = [];
@@ -132,9 +135,34 @@ const ReportDesign = () => {
         closeMenu();
         setCurrentReport(cr);
     };
+    
+    const hideFontSettings = () => {
+        setShowFontSelect({show: false});
+    };
+
+    const saveFontSettings = (fs) => {
+        hideFontSettings();
+        console.log("------>" + JSON.stringify(fs));
+        let cr = {...currentReport};
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (cr.reportComponents[i].selected) {
+                cr.reportComponents[i].fontSettings = {...fs};
+            }
+        }
+        
+        setCurrentReport(cr);
+    }
 
     const onSetFont = () => {
         closeMenu();
+        setShowFontSelect({
+            show: true,
+            hide: hideFontSettings,
+            save: saveFontSettings,
+            reportSettings: reportSettings,
+            fontSettings: getNewFontSettings()
+        });
     };
 
     const onComponentAlign = (align) => {
@@ -286,6 +314,7 @@ const ReportDesign = () => {
         return (
                 <div style={{top: "40px", width: "100%"}} className="report-design-tab">
                     <ContextMenu />
+                    <FontSelectModal config={showFontSelect}/>
                     <ReportSettingsModal config={showReportSettings}/>
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>

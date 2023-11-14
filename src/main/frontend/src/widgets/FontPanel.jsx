@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 
 const FontPanel = (props) => {
     const {reportSettings, fontSettings} = props;
+    const [toggle, setToggle] = useState(false);
     const {getText} = useLang();
     const defaultStyle = getComputedStyle(document.documentElement);
 
@@ -21,15 +22,17 @@ const FontPanel = (props) => {
                 fontSettings[e.target.name] = e.target.checked;
                 break;
         }
+        
+        setToggle(!toggle);
     };
     
     const getFonts = () => {
         let fs = defaultStyle.getPropertyValue('--default-title-font-size');
-            reportSettings.defaultFonts.map(f => {
+        return reportSettings.defaultFonts.map(f => {
             if (fontSettings.font === f) {
-                return <option style={{font: f, fontSize: fs}} value={f} selected>{f}</option>;
+                return <option style={{fontFamily: f}} value={f} selected>{f}</option>;
             } else {
-                return <option style={{font: f, fontSize: fs}} value={f}>{f}</option>;
+                return <option style={{fontFamily: f}} value={f}>{f}</option>;
             }  
         });
     };
@@ -44,6 +47,15 @@ const FontPanel = (props) => {
         });
     };
 
+    const getExampleStyle = () => {
+        return {
+            fontFamily: fontSettings.font, 
+            fontSize: fontSettings.size + "pt",
+            fontWeight: fontSettings.bold ? 700 : 500,
+            fontStyle: fontSettings.italic ? "italic" : "none",
+            textDecoration: fontSettings.underline ? "underline" : "none"
+        };
+    }
     
     if (fontSettings && reportSettings) {
         return (<div className="entrygrid-100-150">
@@ -52,6 +64,7 @@ const FontPanel = (props) => {
                 <div></div><div><input name="bold" type="checkbox" defaultChecked={fontSettings.bold} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="bold">{getText("Bold")}</label></div>
                 <div></div><div><input name="italic" type="checkbox" defaultChecked={fontSettings.italic} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="italic">{getText("Italic")}</label></div>
                 <div></div><div><input name="underline" type="checkbox" defaultChecked={fontSettings.underline} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="underline">{getText("Underline")}</label></div>
+                <div className="label">{getText("Example:")}</div><div style={getExampleStyle()}>Abc</div>
             </div>
              );
     } else {

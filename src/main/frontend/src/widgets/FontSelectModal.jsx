@@ -40,7 +40,7 @@ const FontSelectModal = (props) => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" disabled={!canSave()}  type="submit" onClick={() => config.saveFont(fontSettings)}>{getText("Save")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config.fontSettings)}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>

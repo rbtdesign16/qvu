@@ -28,19 +28,24 @@ export const ReportDesignProvider = ({ children }) => {
             }
         }
     };
+    
+    const getNewFontSettings = () => {
+        return {
+            font: reportSettings.defaultFont,
+            size: reportSettings.defaultFontSize,
+            bold: false,
+            italic: false,
+            underline: false
+        };
+    };
+    
     const getNewComponent = (section, type, value) => {
         return {
             type: type,
             align: "center",
             foregroundColor: reportSettings.defaultForegroundColor,
             backgroundColor: reportSettings.defaultBackgroundColor,
-            fontSettings: {
-                font: reportSettings.defaultFont,
-                size: reportSettings.defaultFontSize,
-                bold: false,
-                italic: false,
-                underline: false
-            },
+            fontSettings: getNewFontSettings(),
             value: value,
             left: 0.5,
             top: 0.5,
@@ -78,7 +83,8 @@ export const ReportDesignProvider = ({ children }) => {
                     initializeReportSettings, 
                     setNewReport,
                     getNewComponent,
-                    haveSelectedComponents}}>
+                    haveSelectedComponents,
+                    getNewFontSettings}}>
                 {children}
             </ReportDesignContext.Provider>
             );

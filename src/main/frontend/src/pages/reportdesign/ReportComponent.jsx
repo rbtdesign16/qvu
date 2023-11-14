@@ -58,8 +58,8 @@ const ReportComponent = (props) => {
         };
         if (component.fontSettings) {
             let fs = component.fontSettings;
-            retval.font = fs.font;
-            retval.fontSize = fs.size;
+            retval.fontFamilty = fs.font;
+            retval.fontSize = fs.size + "pt";
             if (fs.italic) {
                 retval.fontStyle = "italic";
             }

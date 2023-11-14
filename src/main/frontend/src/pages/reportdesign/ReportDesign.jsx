@@ -1,4 +1,4 @@
-import React, { useState, useEffect }from "react";
+import React, { useState, useEffect } from "react";
 import ReportRuler from "./ReportRuler";
 import Button from "react-bootstrap/Button"
 import { slide as Menu } from "react-burger-menu";
@@ -6,6 +6,8 @@ import useMessage from "../../context/MessageContext";
 import useLang from "../../context/LangContext";
 import useHelp from "../../context/HelpContext";
 import useAuth from "../../context/AuthContext";
+import useMenu from "../../context/MenuContext";
+import ContextMenu from "../../widgets/ContextMenu";
 import useReportDesign from "../../context/ReportDesignContext";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
@@ -15,36 +17,36 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
 import {
-    SUCCESS,
-    WARN,
-    INFO,
-    ERROR,
-    REPORT_DOCUMENT_TYPE,
-    HORIZONTAL_KEY,
-    VERTICAL_KEY,
-    getReportWidthInPixels,
-    getReportHeightInPixels,
-    SMALL_ICON_SIZE,
-    LEFT,
-    TOP,
-    RIGHT,
-    CENTER,
-    BOTTOM,
-    RULER_WIDTH
-} from "../../utils/helper";
+SUCCESS,
+        WARN,
+        INFO,
+        ERROR,
+        REPORT_DOCUMENT_TYPE,
+        HORIZONTAL_KEY,
+        VERTICAL_KEY,
+        getReportWidthInPixels,
+        getReportHeightInPixels,
+        SMALL_ICON_SIZE,
+        LEFT,
+        TOP,
+        RIGHT,
+        CENTER,
+        BOTTOM,
+        RULER_WIDTH
+        } from "../../utils/helper";
 import {
-    getReportSettings,
-    getAvailableDocuments,
-    isApiError,
-    isApiSuccess
-} from "../../utils/apiHelper";
+getReportSettings,
+        getAvailableDocuments,
+        isApiError,
+        isApiSuccess
+        } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import {
-    AiOutlineFontSize,
-    AiOutlineBarChart,
-    AiOutlineVerticalAlignBottom,
-    AiOutlineVerticalAlignTop,
-}  from "react-icons/ai";
+AiOutlineFontSize,
+        AiOutlineBarChart,
+        AiOutlineVerticalAlignBottom,
+        AiOutlineVerticalAlignTop,
+        }  from "react-icons/ai";
 import { LiaFileInvoiceSolid,
         LiaFileMedicalSolid,
         LiaFileUploadSolid,
@@ -57,6 +59,7 @@ import { LiaFileInvoiceSolid,
 const ReportDesign = () => {
     const [selectedComponents, setSelectComponent] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
+    const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
     const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
@@ -71,6 +74,22 @@ const ReportDesign = () => {
         setNewReport,
         initializeReportSettings} = useReportDesign();
 
+    const getComponentSelectMenu = () => {
+        let retval = [];
+
+        for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
+            retval.push({
+                text: getText(reportSettings.reportObjectTypes[i]),
+                action: reportSettings.reportObjectTypes[i]
+            });
+        }
+        return retval;
+    };
+
+    const handleAddComponent = (type) => {
+        alert("----->" + type);
+    };
+
     const handleStateChange = (state) => {
         setMenuOpen(state.isOpen);
     };
@@ -83,8 +102,22 @@ const ReportDesign = () => {
         return isReportDesigner(authData);
     };
 
-    const onAddComponent = () => {
+    const onAddComponent = (e) => {
         closeMenu();
+        if (!menuConfig.show) {
+            e.preventDefault();
+
+            const items = getComponentSelectMenu();
+            showMenu({
+                show: true,
+                x: e.pageX,
+                y: 150,
+                menuItems: items,
+                handleContextMenu: handleAddComponent});
+        } else {
+            hideMenu(e);
+        }
+
     };
 
     const onTextAlign = (align) => {
@@ -109,7 +142,7 @@ const ReportDesign = () => {
     const hideReportSettings = () => {
         setShowReportSettings({show: false});
     };
-    
+
     const saveReportSettings = (settings) => {
         let cr = {...currentReport};
         cr.pageSize = settings.pageSize;
@@ -137,8 +170,8 @@ const ReportDesign = () => {
             <hr  style={{cursor: "none"}} />
             <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
             <hr  style={{cursor: "none"}} />
-            <div onClick={onAddComponent}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
-            <div onClick={onAddChart}><AiOutlineBarChart size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Chart")}</div>
+            <div onClick={e => onAddComponent(e)}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
+            {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
             {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
@@ -249,6 +282,7 @@ const ReportDesign = () => {
     if (reportSettings && currentReport) {
         return (
                 <div style={{top: "40px", width: "100%"}} className="report-design-tab">
+                    <ContextMenu />
                     <ReportSettingsModal config={showReportSettings}/>
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>

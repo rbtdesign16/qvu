@@ -13,12 +13,21 @@ export const ReportDesignProvider = ({ children }) => {
     const {getText} = useLang();
     const [reportSettings, setReportSettings] = useState(null);
     const [currentReport, setCurrentReport] = useState(null);
-    
+
     const initializeReportSettings = async (settings) => {
         setReportSettings(settings);
         setNewReport(settings);
     };
     
+    const haveSelectedComponents = () => {
+        if (currentReport && currentReport.reportComponents) {
+            for (let i = 0; i <  currentReport.reportComponents.length; ++i) {
+                if (currentReport.reportComponents[i].selected) {
+                    return true;
+                }
+            }
+        }
+    };
     const getNewComponent = (section, type, value) => {
         return {
             type: type,
@@ -68,7 +77,8 @@ export const ReportDesignProvider = ({ children }) => {
                     reportSettings, 
                     initializeReportSettings, 
                     setNewReport,
-                    getNewComponent}}>
+                    getNewComponent,
+                    haveSelectedComponents}}>
                 {children}
             </ReportDesignContext.Provider>
             );

@@ -25,7 +25,7 @@ import {
 from "../../utils/helper";
 
 const ReportComponent = (props) => {
-    const {component, componentIndex, onContextMenu} = props;
+    const {component, componentIndex, onContextMenu, selectedComponents, setSelectedComponents} = props;
     const {
         reportSettings,
         currentReport,

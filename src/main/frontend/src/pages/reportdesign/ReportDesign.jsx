@@ -57,7 +57,6 @@ import { LiaFileInvoiceSolid,
         LiaWindowRestoreSolid} from "react-icons/lia";
 
 const ReportDesign = () => {
-    const [selectedComponents, setSelectComponent] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
@@ -72,7 +71,8 @@ const ReportDesign = () => {
         currentReport,
         setCurrentReport,
         setNewReport,
-        initializeReportSettings} = useReportDesign();
+        initializeReportSettings,
+        haveSelectedComponents} = useReportDesign();
 
     const getComponentSelectMenu = () => {
         let retval = [];
@@ -121,17 +121,19 @@ const ReportDesign = () => {
     };
 
     const onTextAlign = (align) => {
-    };
-
-    const haveSelectedComponents = () => {
-        return (selectedComponents && (selectedComponents.length > 0));
+        let cr = {...currentReport};
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (cr.reportComponents[i].selected) {
+                cr.reportComponents[i].align = align;
+            }
+        }
+        
+        closeMenu();
+        setCurrentReport(cr);
     };
 
     const onSetFont = () => {
-        closeMenu();
-    };
-
-    const onAddChart = () => {
         closeMenu();
     };
 
@@ -242,7 +244,8 @@ const ReportDesign = () => {
             setCurrentReport({
                 name: doc.name,
                 group: doc.documentGroupName,
-                newRecord: false
+                newRecord: false,
+                reportComponents: []
             });
 
             hideMessage();

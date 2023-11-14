@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import useReportDesign from "../../context/ReportDesignContext";
@@ -8,8 +8,6 @@ REPORT_UNITS_INCH,
         REPORT_SECTION_HEADER,
         REPORT_SECTION_BODY,
         REPORT_SECTION_FOOTER,
-        reportUnitsToPixels,
-        pixelsToReportUnits,
         REPORT_COMPONENT_TYPE_TEXT,
         REPORT_COMPONENT_TYPE_IMAGE,
         REPORT_COMPONENT_TYPE_HYPERLINK,
@@ -22,34 +20,31 @@ REPORT_UNITS_INCH,
         REPORT_COMPONENT_TYPE_SUBREPORT,
         REPORT_COMPONENT_CONTAINER_BORDER,
         REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
-
-} from "../../utils/helper";
+        }
+from "../../utils/helper";
 
 const ReportComponent = (props) => {
-    const {component, componentIndex} = props;
-
+    const {component, componentIndex, onContextMenu, hideContextMenu} = props;
     const {
         reportSettings,
         currentReport,
         setCurrentReport
     } = useReportDesign();
-
-    const onContextMenu = (e) => {
-    };
-
+    
     const onClick = (e) => {
-         if (e.ctrlKey) { 
-             let c = {...component};
-             let cr = {...currentReport}
-             c.selected = !c.selected;
-             cr.reportComponents[componentIndex] = c;
-             setCurrentReport(cr);
-         }
+        if (e.ctrlKey) {
+            e.preventDefault();
+            let c = {...component};
+            let cr = {...currentReport};
+            c.selected = !c.selected;
+            cr.reportComponents[componentIndex] = c;
+            setCurrentReport(cr);
+        } 
     };
 
     const getStyle = () => {
-        let unit = currentReport.pageUnits.substring(0, 2);;
-
+        let unit = currentReport.pageUnits.substring(0, 2);
+        ;
         let retval = {
             width: component.width + unit,
             height: component.height + unit,
@@ -59,12 +54,10 @@ const ReportComponent = (props) => {
             color: component.foregroundColor,
             backgroundColor: component.backgroundColor
         };
-
         if (component.fontSettings) {
             let fs = component.fontSettings;
             retval.font = fs.font;
             retval.fontSize = fs.size;
-
             if (fs.italic) {
                 retval.fontStyle = "italic";
             }
@@ -114,14 +107,13 @@ const ReportComponent = (props) => {
         e.dataTransfer.effectAllowed = "move";
     };
 
-
-    return <div 
-         className={getClassName()}
-         draggable={true} 
-         style={getStyle()}
-         onContextMenu={(e) => onContextMenu(e)}        
-         onClick={e => onClick(e)} 
-         onDragStart={e => handleDragStart(e)}>
+     return <div 
+        className={getClassName()}
+        draggable={true} 
+        style={getStyle()}
+        onContextMenu={e => onContextMenu(e, componentIndex)} 
+        onClick={e => onClick(e)} 
+        onDragStart={e => handleDragStart(e)}>
         {getComponentValue()}
     </div>;
 };

@@ -8,7 +8,6 @@ import {LangProvider} from "./context/LangContext";
 import {HelpProvider} from "./context/HelpContext";
 import Home from "./pages/Home";
 import appinfo from "./appinfo.json";
-
 import "./css/main.css";
 
 

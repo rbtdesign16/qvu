@@ -7,13 +7,11 @@ import {
     REPORT_SECTION_HEADER,
     REPORT_SECTION_BODY,
     REPORT_SECTION_FOOTER,
-    REPORT_UNITS_INCH,
-    REPORT_UNITS_MM,
     REPORT_SECTION_BORDER,
-    reportUnitsToPixels,
     pixelsToReportUnits,
     getReportWidth,
-    getReportHeight
+    getReportHeight,
+    isNotEmpty
 } from "../../utils/helper";
 
 const ReportSection = (props) => {
@@ -22,13 +20,13 @@ const ReportSection = (props) => {
         currentReport,
         setCurrentReport
     } = useReportDesign();
-    
-    const {section} = props;
+
+    const {section, onContextMenu, hideContextMenu} = props;
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
-    
+
     const getSectionHeight = () => {
-        switch(section) {
+        switch (section) {
             case REPORT_SECTION_HEADER:
                 return currentReport.headerHeight;
                 break;
@@ -40,7 +38,7 @@ const ReportSection = (props) => {
                 break;
         }
     };
-    
+
     const getStyle = () => {
         let retval = {
             position: "relative",
@@ -83,14 +81,14 @@ const ReportSection = (props) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
     };
-    
+
     const handleDrop = (e) => {
         e.preventDefault();
-        let cinfo = JSON.parse( e.dataTransfer.getData("cinfo"));
-        
+        let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
+
         let cr = {...currentReport};
         let c = cr.reportComponents[cinfo.index];
-        
+
         let rect = e.target.getBoundingClientRect();
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
@@ -98,16 +96,19 @@ const ReportSection = (props) => {
         c.section = section;
         c.left = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), x - cinfo.left);
         c.top = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), y - cinfo.top);
-       
-        setCurrentReport(cr);
-     };
 
+        setCurrentReport(cr);
+    };
 
     const loadComponents = () => {
         if (currentReport.reportComponents && (currentReport.reportComponents.length > 0)) {
             return currentReport.reportComponents.map((o, indx) => {
                 if (o.section === section) {
-                    return <ReportComponent component={o} componentIndex={indx}/>;
+                    return <ReportComponent 
+                        component={o} 
+                        componentIndex={indx}  
+                        onContextMenu={onContextMenu}
+                        hideContextMenu={hideContextMenu} />;
                 } else {
                     return "";
                 }
@@ -117,12 +118,12 @@ const ReportSection = (props) => {
         }
     };
 
-    return <div id={section} 
-        onDrop={e => handleDrop(e)} 
-        onDragOver={e => handleDragOver(e)}
-        style={getStyle()}>{loadComponents()}</div>;
-};
 
+    return <div id={section} 
+         onDrop={e => handleDrop(e)} 
+         onDragOver={e => handleDragOver(e)}
+         style={getStyle()}>{loadComponents()}</div>;
+};
 
 ReportSection.propTypes = {
     section: PropTypes.string.isRequired

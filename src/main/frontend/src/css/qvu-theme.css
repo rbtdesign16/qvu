@@ -66,4 +66,11 @@
    
    --report-component-outline: dashed 1px gainsboro;
    --report-component-outline-selected: dashed 1px crimson;
+   
+   --context-menu-background-color: #F5F5F5;
+   --context-menu-background-hover-color: #3f4847;
+   --context-menu-font-hover-color: white;
+   --context-menu-font-size: 14px;
+   --context-menu-font-color: black;
+
 }

@@ -57,7 +57,8 @@ const ReportComponent = (props) => {
             left: component.left + unit,
             textAlign: component.align,
             color: component.foregroundColor,
-            backgroundColor: component.backgroundColor
+            backgroundColor: component.backgroundColor,
+            zIndex: component.zindex
         };
         
         if (component.fontSettings) {

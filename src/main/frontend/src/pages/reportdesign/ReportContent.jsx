@@ -28,7 +28,9 @@ const ReportContent = (props) => {
         reportSettings,
         currentReport,
         setCurrentReport,
-        getNewComponent
+        getNewComponent,
+        lastSelectedIndex,
+        setLastSelectedIndex
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -52,7 +54,7 @@ const ReportContent = (props) => {
         },
         {
             text: getText("Move to Front"),
-            action: "tofrom"
+            action: "tofront"
         }
     ];
 
@@ -86,13 +88,84 @@ const ReportContent = (props) => {
         setCurrentReport(cr);
     };
     
+    const getMaxZindex = () => {
+        let retval = 0;
+        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+            if (currentReport.reportComponents[i].zindex) {
+                let z = Number(currentReport.reportComponents[i].zindex);
+                if (retval < z) {
+                    retval = z;
+                }
+            }
+        }
+    
+        if (retval === 0) {
+            retval = 1;
+        }
+        
+        return retval;
+    };
+    
+    const getMinZindex = () => {
+        let retval = 100;
+        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+            if (currentReport.reportComponents[i].zindex) {
+                let z = Number(currentReport.reportComponents[i].zindex);
+                if (retval > z) {
+                    retval = z;
+                }
+            } 
+        }
+    
+        if (retval === 100) {
+            retval = 1;
+        }
+        
+        return retval;
+    };
+    
+    const moveComponentToBack = (componentIndex) => {
+        let minz = getMinZindex();
+        let cr = {...currentReport};
+        cr.reportComponents[componentIndex].zindex = minz - 1;
+        setCurrentReport(cr);
+    };
+    
+    const moveComponentToFront = (componentIndex) => {
+        let maxz = getMaxZindex();
+        let cr = {...currentReport};
+        cr.reportComponents[componentIndex].zindex = maxz + 1;
+        setCurrentReport(cr);
+    };
+
+    const deleteComponent = (componentIndex) => {
+        let cr = {...currentReport};
+        c = [];
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (i !== componentIndex) {
+                c.push(cr.reportComponents);
+            }
+        }
+        cr.reportComponents = c;
+        if (lastSelectedIndex === componentIndex) {
+            setLastSelectedIndex(-1);
+        }
+        
+        setCurrentReport(cr);
+    };
+
+    const onEditComponent = (componentIndex) => {
+    };
+    
     const handleContextMenu = (action, id) => {
         hideMenu();
 
         switch (action) {
             case "edit":
+                onEditComponent(id);
                 break;
             case "delete":
+                deleteComponent(id);
                 break;
             case "select":
                 setComponentSelected(id, true);
@@ -101,8 +174,10 @@ const ReportContent = (props) => {
                 setComponentSelected(id, false);
                 break;
             case "tofront":
+                moveComponentToFront(id);
                 break;
             case "toback":
+                moveComponentToBack(id);
                 break;
         }
     };

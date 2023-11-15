@@ -66,7 +66,8 @@ export const ReportDesignProvider = ({ children }) => {
             width: 1.0,
             height: 0.5,
             section: section,
-            selected: false
+            selected: false,
+            zindex: 1
         };
     };
         

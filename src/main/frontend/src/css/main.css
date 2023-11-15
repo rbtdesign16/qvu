@@ -783,6 +783,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
   cursor: pointer;
   padding: 7px;
 }
+
 .context-menu-element:hover {
   color: var(--context-menu-font-hover-color);
   background: var(--context-menu-background-hover-color);
@@ -790,7 +791,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
 
 .h-separator {
     cursor: none;
-    background-color: var(--default-border-color);
+    background-color: var(--separator-color);
     padding: 1px;
     margin: 5px;
 }

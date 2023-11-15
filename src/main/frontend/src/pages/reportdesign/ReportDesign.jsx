@@ -226,34 +226,40 @@ const ReportDesign = () => {
         }
         
         setCurrentReport(cr);
-    }
+    };
 
     const onComponentAlign = (align) => {
         closeMenu();
-        let cr = {...currentReport};
-        let basecr = cr.reportComponents[lastSelectedIndex];
         
-        for (let i = 0; i < cr.reportComponents.length; ++i) {
-            if ((i !== lastSelectedIndex) 
-                 && (basecr.section === cr.reportComponents[i].section)) {
-                switch (align) {
-                    case LEFT:
-                        cr.reportComponents[i].left = basecr.left;
-                        break;
-                    case TOP:
-                        cr.reportComponents[i].top = basecr.top;
-                        break;
-                    case RIGHT:
-                        cr.reportComponents[i].left = cr.reportComponents[i].left = (basecr.left + basecr.width) - cr.reportComponents[i].width; 
-                        break;
-                    case BOTTOM:
-                        cr.reportComponents[i].top = cr.reportComponents[i].top = (basecr.top + basecr.height) - cr.reportComponents[i].height; 
-                        break;
+        if (currentReport.reportComponents 
+            && (lastSelectedIndex >= 0) 
+            && (lastSelectedIndex < currentReport.reportComponents.length)) {
+            let cr = {...currentReport};
+
+            let basecr = cr.reportComponents[lastSelectedIndex];
+
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                if ((i !== lastSelectedIndex) 
+                     && (basecr.section === cr.reportComponents[i].section)) {
+                    switch (align) {
+                        case LEFT:
+                            cr.reportComponents[i].left = basecr.left;
+                            break;
+                        case TOP:
+                            cr.reportComponents[i].top = basecr.top;
+                            break;
+                        case RIGHT:
+                            cr.reportComponents[i].left = cr.reportComponents[i].left = (basecr.left + basecr.width) - cr.reportComponents[i].width; 
+                            break;
+                        case BOTTOM:
+                            cr.reportComponents[i].top = cr.reportComponents[i].top = (basecr.top + basecr.height) - cr.reportComponents[i].height; 
+                            break;
+                    }
                 }
             }
+
+            setCurrentReport(cr);
         }
-            
-        setCurrentReport(cr);
     };
 
     const hideReportSettings = () => {

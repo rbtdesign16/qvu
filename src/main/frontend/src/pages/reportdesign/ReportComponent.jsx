@@ -25,7 +25,9 @@ import {
 from "../../utils/helper";
 
 const ReportComponent = (props) => {
-    const {component, componentIndex, onContextMenu, selectedComponents, setSelectedComponents} = props;
+    const {component, 
+        componentIndex, 
+        onContextMenu} = props;
     const {
         reportSettings,
         currentReport,
@@ -40,10 +42,19 @@ const ReportComponent = (props) => {
             e.preventDefault();
             let c = {...component};
             let cr = {...currentReport};
+            let sindx = componentIndex;
+            
+            // if this was the last selected index and we are deselecting
+            // set lastSelectedIndex to -1
+            if (c.selected 
+                && (componentIndex === lastSelectedIndex)) {
+                sindx = -1;
+            }
+            
             c.selected = !c.selected;
             cr.reportComponents[componentIndex] = c;
             setCurrentReport(cr);
-            setLastSelectedIndex(componentIndex);
+            setLastSelectedIndex(sindx);
         } 
     };
 

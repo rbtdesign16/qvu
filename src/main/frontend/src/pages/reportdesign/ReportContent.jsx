@@ -85,6 +85,11 @@ const ReportContent = (props) => {
     const setComponentSelected = (componentIndex, select) => {
         let cr = {...currentReport};
         cr.reportComponents[componentIndex].selected = select;
+        if (select) {
+            setLastSelectedIndex(componentIndex);
+        } else if (lastSelectedIndex === componentIndex) {
+            setLastSelectedIndex(-1);
+        }
         setCurrentReport(cr);
     };
     
@@ -154,7 +159,7 @@ const ReportContent = (props) => {
         setCurrentReport(cr);
     };
 
-    const onEditComponent = (componentIndex) => {
+    const editComponent = (componentIndex) => {
     };
     
     const handleContextMenu = (action, id) => {
@@ -162,7 +167,7 @@ const ReportContent = (props) => {
 
         switch (action) {
             case "edit":
-                onEditComponent(id);
+                editComponent(id);
                 break;
             case "delete":
                 deleteComponent(id);

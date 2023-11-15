@@ -13,6 +13,7 @@ export const ReportDesignProvider = ({ children }) => {
     const {getText} = useLang();
     const [reportSettings, setReportSettings] = useState(null);
     const [currentReport, setCurrentReport] = useState(null);
+    const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
 
     const initializeReportSettings = async (settings) => {
         setReportSettings(settings);
@@ -98,7 +99,9 @@ export const ReportDesignProvider = ({ children }) => {
                     getNewComponent,
                     haveSelectedComponents,
                     getNewFontSettings,
-                    getNewBorderSettings}}>
+                    getNewBorderSettings,
+                    lastSelectedIndex, 
+                    setLastSelectedIndex}}>
                 {children}
             </ReportDesignContext.Provider>
             );

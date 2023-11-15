@@ -110,6 +110,11 @@ const ReportContent = (props) => {
     const getStyle = () => {
         if (currentReport.reportComponents.length === 0) {
             currentReport.reportComponents.push(getNewComponent("body", "text", "this is a test"));
+            let c = getNewComponent("body", "datagrid", "this is a test");
+            c.left = 3;
+            c.top = 3;
+            
+            currentReport.reportComponents.push(c);
         }
 
         let width;

@@ -82,6 +82,12 @@ const ReportSection = (props) => {
         e.dataTransfer.dropEffect = "move";
     };
 
+    const isDropTargetSection = (tid) => {
+        return ((tid === REPORT_SECTION_BODY)
+        || (tid === REPORT_SECTION_HEADER)
+        || (tid === REPORT_SECTION_FOOTER));
+    };
+    
     const handleDrop = (e) => {
         e.preventDefault();
         let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
@@ -89,10 +95,16 @@ const ReportSection = (props) => {
         let cr = {...currentReport};
         let c = cr.reportComponents[cinfo.index];
 
-        let rect = e.target.getBoundingClientRect();
+        let rect;
+        // if we are dropping on a section
+        if (isDropTargetSection(e.target.id)) {
+            rect = e.target.getBoundingClientRect();
+        } else { // else dropping on a component
+            rect = e.target.parentElement.getBoundingClientRect();
+        }
+
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
-
         c.section = section;
         c.left = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), x - cinfo.left);
         c.top = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), y - cinfo.top);
@@ -117,7 +129,6 @@ const ReportSection = (props) => {
         }
     };
 
-
     return <div id={section} 
          onDrop={e => handleDrop(e)} 
          onDragOver={e => handleDragOver(e)}
@@ -127,6 +138,5 @@ const ReportSection = (props) => {
 ReportSection.propTypes = {
     section: PropTypes.string.isRequired
 };
-
 
 export default ReportSection;

@@ -82,7 +82,9 @@ const ReportDesign = () => {
         initializeReportSettings,
         haveSelectedComponents,
         getNewFontSettings,
-        getNewBorderSettings} = useReportDesign();
+        getNewBorderSettings,
+        lastSelectedIndex,
+        setLastSelectedIndex} = useReportDesign();
 
     const isQueryRequiredForType = (type) => {
         return (type.includes("data") || type.includes("chart"));
@@ -217,11 +219,41 @@ const ReportDesign = () => {
             cr.reportComponents[i].selected = sel;
         }
         
+        if (!sel) {
+            setLastSelectedIndex(-1);
+        } else {
+            setLastSelectedIndex(cr.reportComponents.length - 1);
+        }
+        
         setCurrentReport(cr);
     }
 
     const onComponentAlign = (align) => {
         closeMenu();
+        let cr = {...currentReport};
+        let basecr = cr.reportComponents[lastSelectedIndex];
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if ((i !== lastSelectedIndex) 
+                 && (basecr.section === cr.reportComponents[i].section)) {
+                switch (align) {
+                    case LEFT:
+                        cr.reportComponents[i].left = basecr.left;
+                        break;
+                    case TOP:
+                        cr.reportComponents[i].top = basecr.top;
+                        break;
+                    case RIGHT:
+                        cr.reportComponents[i].left = cr.reportComponents[i].left = (basecr.left + basecr.width) - cr.reportComponents[i].width; 
+                        break;
+                    case BOTTOM:
+                        cr.reportComponents[i].top = cr.reportComponents[i].top = (basecr.top + basecr.height) - cr.reportComponents[i].height; 
+                        break;
+                }
+            }
+        }
+            
+        setCurrentReport(cr);
     };
 
     const hideReportSettings = () => {
@@ -248,7 +280,25 @@ const ReportDesign = () => {
          let cr = {...currentReport};
          cr.queryDocumentGroup = group;
          cr.queryDocumentName = name;
-         setCurrentReport(cr);
+         
+         
+         if (cr.reportComponents && (cr.reportComponents.length > 0)) {
+             // if we have changed query document then clear any
+             // query-related components from report
+            if ((group !== cr.getQueryDocuentGroup) || (name !== cr.queryDocumentName)) {
+                let c = [];
+
+                for (let i = 0; i < cr.reportComponents.length; ++i) {
+                    if (!isQueryRequiredForType(cr.reportComponents[i].type)) {
+                        c.push(cr.reportComponents[i]);
+                    }
+                }
+                
+                cr.reportComponents = c;
+            }
+        }
+         
+        setCurrentReport(cr);
      };
 
     const onShowQueryDocumentSelect = async (e) => {

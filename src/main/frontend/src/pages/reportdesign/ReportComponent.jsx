@@ -29,7 +29,9 @@ const ReportComponent = (props) => {
     const {
         reportSettings,
         currentReport,
-        setCurrentReport
+        setCurrentReport,
+        lastSelectedIndex, 
+        setLastSelectedIndex
     } = useReportDesign();
     
     const {menuConfig} = useMenu();
@@ -41,12 +43,13 @@ const ReportComponent = (props) => {
             c.selected = !c.selected;
             cr.reportComponents[componentIndex] = c;
             setCurrentReport(cr);
+            setLastSelectedIndex(componentIndex);
         } 
     };
 
     const getStyle = () => {
         let unit = currentReport.pageUnits.substring(0, 2);
-        ;
+ 
         let retval = {
             width: component.width + unit,
             height: component.height + unit,
@@ -56,6 +59,7 @@ const ReportComponent = (props) => {
             color: component.foregroundColor,
             backgroundColor: component.backgroundColor
         };
+        
         if (component.fontSettings) {
             let fs = component.fontSettings;
             retval.fontFamilty = fs.font;
@@ -147,6 +151,11 @@ const ReportComponent = (props) => {
         e.dataTransfer.setData("cinfo", JSON.stringify({index: componentIndex, left: x, top: y}));
         e.dataTransfer.effectAllowed = "move";
     };
+    
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
 
      return <div 
         className={getClassName()}
@@ -154,6 +163,7 @@ const ReportComponent = (props) => {
         style={getStyle()}
         onContextMenu={e => onContextMenu(e, componentIndex)} 
         onClick={e => onClick(e)} 
+        onDragOver={e => handleDragOver(e)}
         onDragStart={e => handleDragStart(e)}>
         {getComponentValue()}
     </div>;

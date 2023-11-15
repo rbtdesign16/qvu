@@ -313,11 +313,13 @@ export const updateJsonArray = (fieldName, newRec, data) => {
 export const replaceTokens = (msg, tokens) => {
     if (!tokens) {
         return msg;
-    } else {
+    } else if (Array.isArray(tokens)){
         for (let i = 0; i < tokens.length; ++i) {
             msg = msg.replace("$" + (i + 1), tokens[i]);
         }
-    }
+    } else {
+        msg = msg.replace("$1", tokens);
+    }   
 
     return msg;
 };

@@ -10,18 +10,19 @@ import { flattenTree } from "react-accessible-treeview";
 import {FcDocument} from "react-icons/fc";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import {
-        INFO,
-        ERROR,
-        MODAL_TITLE_SIZE,
-        QUERY_DOCUMENT_TYPE,
-        SMALL_ICON_SIZE,
-        RESULT_TYPE_EXCEL,
-        RESULT_TYPE_CSV,
-        RESULT_TYPE_JSON_FLAT,
-        RESULT_TYPE_JSON_OBJECTGRAPH,
-        MONTHS,
-        DAYS_OF_WEEK,
-        getCurrentSelectValue} from "../../utils/helper";
+    INFO,
+    ERROR,
+    MODAL_TITLE_SIZE,
+    QUERY_DOCUMENT_TYPE,
+    SMALL_ICON_SIZE,
+    RESULT_TYPE_EXCEL,
+    RESULT_TYPE_CSV,
+    RESULT_TYPE_JSON_FLAT,
+    RESULT_TYPE_JSON_OBJECTGRAPH,
+    MONTHS,
+    DAYS_OF_WEEK,
+    getCurrentSelectValue,
+    replaceTokens} from "../../utils/helper";
 
 import { getAvailableDocuments, isApiSuccess } from "../../utils/apiHelper";
 
@@ -273,7 +274,7 @@ const ScheduleEntryModal = (props) => {
     };
 
     const onShowDocumentSelect = async () => {
-        showMessage(INFO, getText("Loading available documents", "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), QUERY_DOCUMENT_TYPE), null, true);
 
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 

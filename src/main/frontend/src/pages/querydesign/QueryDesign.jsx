@@ -309,7 +309,7 @@ import { getDatasourceTreeViewData,
     };
 
     const onShowDocumentSelect = async () => {
-        showMessage(INFO, getText("Loading available documents", "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), QUERY_DOCUMENT_TYPE), null, true);
 
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 

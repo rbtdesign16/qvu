@@ -19,45 +19,48 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
 import {
-SUCCESS,
-        WARN,
-        INFO,
-        ERROR,
-        REPORT_DOCUMENT_TYPE,
-        HORIZONTAL_KEY,
-        VERTICAL_KEY,
-        getReportWidthInPixels,
-        getReportHeightInPixels,
-        SMALL_ICON_SIZE,
-        LEFT,
-        TOP,
-        RIGHT,
-        CENTER,
-        BOTTOM,
-        RULER_WIDTH
-        } from "../../utils/helper";
+    SUCCESS,
+    WARN,
+    INFO,
+    ERROR,
+    REPORT_DOCUMENT_TYPE,
+    QUERY_DOCUMENT_TYPE,
+    HORIZONTAL_KEY,
+    VERTICAL_KEY,
+    getReportWidthInPixels,
+    getReportHeightInPixels,
+    SMALL_ICON_SIZE,
+    LEFT,
+    TOP,
+    RIGHT,
+    CENTER,
+    BOTTOM,
+    RULER_WIDTH,
+    replaceTokens
+} from "../../utils/helper";
 import {
-getReportSettings,
-        getAvailableDocuments,
-        isApiError,
-        isApiSuccess
-        } from "../../utils/apiHelper";
+    getReportSettings,
+    getAvailableDocuments,
+    isApiError,
+    isApiSuccess
+    } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
+import { BiWindowOpen, BiWindowClose  } from "react-icons/bi";
+import { RxAlignLeft, RxAlignTop, RxAlignBottom, RxAlignRight} from "react-icons/rx";
 import {
-        AiOutlineFontSize,
-        AiOutlineBarChart,
-        AiOutlineBorder,
-        AiOutlineVerticalAlignBottom,
-        AiOutlineVerticalAlignTop,
-        }  from "react-icons/ai";
+    AiOutlineFontSize,
+    AiOutlineBarChart,
+    AiOutlineBorder
+    }  from "react-icons/ai";
 import { LiaFileInvoiceSolid,
-        LiaFileMedicalSolid,
-        LiaFileUploadSolid,
-        LiaThListSolid,
-        LiaAlignCenterSolid,
-        LiaAlignLeftSolid,
-        LiaAlignRightSolid,
-        LiaWindowRestoreSolid} from "react-icons/lia";
+    LiaFileMedicalSolid,
+    LiaFileUploadSolid,
+    LiaThListSolid,
+    LiaAlignCenterSolid,
+    LiaAlignLeftSolid,
+    LiaAlignRightSolid,
+    LiaWindowRestoreSolid,
+    LiaCoinsSolid } from "react-icons/lia";
 
 const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -67,7 +70,7 @@ const ReportDesign = () => {
     const [showBorderSelect, setShowBorderSelect] = useState({show: false});
     const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
-    const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
+    const [showDocumentSelect, setShowDocumentSelect] = useState({show: false});
     const {authData, setAuthData} = useAuth();
     const {showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
@@ -81,14 +84,21 @@ const ReportDesign = () => {
         getNewFontSettings,
         getNewBorderSettings} = useReportDesign();
 
+    const isQueryRequiredForType = (type) => {
+        return (type.includes("data") || type.includes("chart"));
+    };
+    
     const getComponentSelectMenu = () => {
         let retval = [];
 
         for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
-            retval.push({
-                text: getText(reportSettings.reportObjectTypes[i]),
-                action: reportSettings.reportObjectTypes[i]
-            });
+            // only include data types if query doc set
+            if (currentReport.queryDocumentName || !isQueryRequiredForType(reportSettings.reportObjectTypes[i])) {
+                retval.push({
+                    text: getText(reportSettings.reportObjectTypes[i]),
+                    action: reportSettings.reportObjectTypes[i]
+                });
+            }
         }
         return retval;
     };
@@ -174,8 +184,7 @@ const ReportDesign = () => {
         }
         
         setCurrentReport(cr);
-    }
-
+    };
 
     const onSetFont = () => {
         closeMenu();
@@ -199,6 +208,17 @@ const ReportDesign = () => {
         });
     };
 
+    const onSelectAll = (sel) => {
+        closeMenu();
+        
+        let cr = {...currentReport};
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            cr.reportComponents[i].selected = sel;
+        }
+        
+        setCurrentReport(cr);
+    }
 
     const onComponentAlign = (align) => {
         closeMenu();
@@ -223,31 +243,58 @@ const ReportDesign = () => {
         setShowReportSettings({show: true, report: currentReport, reportSettings: reportSettings, hide: hideReportSettings, saveSettings: saveReportSettings});
     };
 
+     const setQueryDocument = (group, name) => {
+         hideDocumentSelect();
+         let cr = {...currentReport};
+         cr.queryDocumentGroup = group;
+         cr.queryDocumentName = name;
+         setCurrentReport(cr);
+     };
+
+    const onShowQueryDocumentSelect = async (e) => {
+        closeMenu();
+
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), getText(QUERY_DOCUMENT_TYPE)), null, true);
+
+        let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
+
+        hideMessage();
+        if (isApiSuccess(res)) {
+            setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: setQueryDocument, treeRoot: flattenTree(res.result)});
+        } else {
+            showMessage(ERROR, res.message);
+        }
+    };
+
     const getMenu = () => {
         let sel = haveSelectedComponents();
 
         return <Menu width={ 230 } 
               isOpen={menuOpen} 
               onStateChange={(state) => handleStateChange(state)}>
-            <div onClick={onShowDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
+            <div onClick={onShowReportDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
             <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
             {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
-            <hr  style={{cursor: "none"}} />
+            <div onClick={e => onShowQueryDocumentSelect(e)}><LiaCoinsSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Query Document")}</div>
+            <hr  className="h-separator" />
             <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
-            <hr  style={{cursor: "none"}} />
+            <hr className="h-separator" />
             <div onClick={e => onAddComponent(e)}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
-            {sel && <hr  style={{cursor: "none"}} />}
+            <hr className="h-separator" />
+            <div onClick={e => onSelectAll(true)}><BiWindowOpen size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Select All")}</div>
+            <div onClick={e => onSelectAll(false)}><BiWindowClose size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Deselect All")}</div>
+            {sel && <hr  className="h-separator" />}
             {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
             {sel && <div onClick={onSetBorder}><AiOutlineBorder size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Border")}</div>}
-            {sel && <hr  style={{cursor: "none"}} />}
+            {sel && <hr  className="h-separator" />}
             {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
             {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
             {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
-            {sel && <hr  style={{cursor: "none"}} />}
-            {sel && <div onClick={e => onComponentAlign(LEFT)}><AiOutlineVerticalAlignBottom style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
-            {sel && <div onClick={e => onComponentAlign(TOP)}><AiOutlineVerticalAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
-            {sel && <div onClick={e => onComponentAlign(RIGHT)}><AiOutlineVerticalAlignTop style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
-            {sel && <div onClick={e => onComponentAlign(BOTTOM)}><AiOutlineVerticalAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
+            {sel && <hr  className="h-separator" />}
+            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
+            {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
+            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
+            {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
         
         </Menu>;
     };
@@ -256,9 +303,9 @@ const ReportDesign = () => {
         setShowDocumentSelect({show: false});
     };
 
-    const onShowDocumentSelect = async () => {
+    const onShowReportDocumentSelect = async () => {
         closeMenu();
-        showMessage(INFO, getText("Loading available reports", "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), getText(REPORT_DOCUMENT_TYPE)), null, true);
 
         let res = await getAvailableDocuments(REPORT_DOCUMENT_TYPE);
 
@@ -324,6 +371,8 @@ const ReportDesign = () => {
             {currentReport.name}
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Page Size", ":  ")}</span>
             {currentReport.pageSize}
+            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Query Document", ":  ")}</span>
+            {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName : "-"}
         </span>;
     };
 

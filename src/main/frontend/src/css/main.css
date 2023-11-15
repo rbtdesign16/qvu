@@ -200,7 +200,7 @@ img {
 
 .editable-data-list {
     overflow: hidden;
-    height: calc(100% - 20px) !important;
+    height: calc(100% - 40px) !important;
     border: solid 1px var(--default-border-color);
     border-radius: 3px;
     display: inline-block;
@@ -785,4 +785,11 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .context-menu-element:hover {
   color: var(--context-menu-font-hover-color);
   background: var(--context-menu-background-hover-color);
+}
+
+.h-separator {
+    cursor: none;
+    background-color: var(--default-border-color);
+    padding: 1px;
+    margin: 5px;
 }

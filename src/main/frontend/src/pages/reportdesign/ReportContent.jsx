@@ -140,10 +140,10 @@ const ReportContent = (props) => {
 
     const deleteComponent = (componentIndex) => {
         let cr = {...currentReport};
-        c = [];
+        let c = [];
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (i !== componentIndex) {
-                c.push(cr.reportComponents);
+                c.push(cr.reportComponents[i]);
             }
         }
         cr.reportComponents = c;

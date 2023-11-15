@@ -3,18 +3,18 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import useMessage from "../context/MessageContext";
 import useLang from "../context/LangContext";
-import FontPanel from "./FontPanel";
+import BorderPanel from "./BorderPanel";
 import PropTypes from "prop-types";
 import {MODAL_TITLE_SIZE} from "../utils/helper";
 
 
-const FontSelectModal = (props) => {
+const BorderSelectModal = (props) => {
     const {config} = props;
     const {getText} = useLang();
     const defaultStyle = getComputedStyle(document.documentElement);
     
     const getTitle = () => {
-        return getText("Font Select");
+        return getText("Border Select");
     };
     
     const onHide = () => {
@@ -35,11 +35,11 @@ const FontSelectModal = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <FontPanel fontSettings={config.fontSettings} reportSettings={config.reportSettings}/>
+                        <BorderPanel borderSettings={config.borderSettings} reportSettings={config.reportSettings}/>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config.fontSettings)}>{getText("Save")}</Button>
+                        <Button size="sm" variant="primary" type="submit" onClick={() => config.save(config.borderSettings)}>{getText("Save")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
@@ -49,8 +49,8 @@ const FontSelectModal = (props) => {
     }
 };
 
-FontSelectModal.propTypes = {
+BorderSelectModal.propTypes = {
     config: PropTypes.object.isRequired
 };
 
-export default FontSelectModal;
+export default BorderSelectModal;

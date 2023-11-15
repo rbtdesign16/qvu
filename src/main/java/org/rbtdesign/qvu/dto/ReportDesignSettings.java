@@ -1,6 +1,7 @@
 package org.rbtdesign.qvu.dto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.rbtdesign.qvu.util.Constants;
@@ -17,6 +18,7 @@ public class ReportDesignSettings {
     private Double defaultFooterHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private String defaultFont = Constants.DEFAULT_REPORT_FONT;
     private int defaultFontSize = Constants.DEFAULT_REPORT_FONT_SIZE;
+    private String defaultBorderStyle = Constants.DEFAULT_BORDER_STYLE;
     private String defaultForegroundColor = Constants.DEFAULT_REPORT_COMPONENT_FOREGROUND_COLOR;
     private String defaultBackgroundColor = Constants.DEFAULT_REPORT_COMPONENT_BACKGROUND_COLOR;
     private List<Double> defaultPageBorder = new ArrayList<>();
@@ -25,9 +27,14 @@ public class ReportDesignSettings {
     private List<String> pageUnits = new ArrayList<>();
     private List<String> reportObjectTypes = new ArrayList<>();
     private List<String> defaultFonts = new ArrayList<>();
+    private List<String> borderStyles = new ArrayList<>(Arrays.asList(Constants.BORDER_STYLES));
     private List<Integer> defaultFontSizes = new ArrayList<>();
     private List<String> reportShapes = new ArrayList<>();
+    private Integer defaultBorderWidth = Constants.DEFAULT_BORDER_WIDTH;
+    private String defaultBorderColor = Constants.DEFAULT_BORDER_COLOR;
+    private List<Integer> borderWidths = new ArrayList<>(Arrays.asList(Constants.BORDER_WIDTHS));
     private Map<String, double[]> pageSizeSettings;
+    private String defaultBorderRadius = "10px";
     
     public String getDefaultPageUnits() {
         return defaultPageUnits;
@@ -172,4 +179,54 @@ public class ReportDesignSettings {
     public void setDefaultFontSize(int defaultFontSize) {
         this.defaultFontSize = defaultFontSize;
     }
+
+    public String getDefaultBorderStyle() {
+        return defaultBorderStyle;
+    }
+
+    public void setDefaultBorderStyle(String defaultBorderStyle) {
+        this.defaultBorderStyle = defaultBorderStyle;
+    }
+
+    public List<String> getBorderStyles() {
+        return borderStyles;
+    }
+
+    public void setBorderStyles(List<String> borderStyles) {
+        this.borderStyles = borderStyles;
+    }
+
+    public Integer getDefaultBorderWidth() {
+        return defaultBorderWidth;
+    }
+
+    public void setDefaultBorderWidth(Integer defaultBorderWidth) {
+        this.defaultBorderWidth = defaultBorderWidth;
+    }
+
+    public List<Integer> getBorderWidths() {
+        return borderWidths;
+    }
+
+    public void setBorderWidths(List<Integer> borderWidths) {
+        this.borderWidths = borderWidths;
+    }
+
+    public String getDefaultBorderColor() {
+        return defaultBorderColor;
+    }
+
+    public void setDefaultBorderColor(String defaultBorderColor) {
+        this.defaultBorderColor = defaultBorderColor;
+    }
+
+    public String getDefaultBorderRadius() {
+        return defaultBorderRadius;
+    }
+
+    public void setDefaultBorderRadius(String defaultBorderRadius) {
+        this.defaultBorderRadius = defaultBorderRadius;
+    }
+    
+    
 }

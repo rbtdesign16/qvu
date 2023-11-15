@@ -302,4 +302,30 @@ public class Constants {
         REPORT_SHAPE_ELLIPSE,
         REPORT_SHAPE_RECTANGLE,
         REPORT_SHAPE_ROUNDED_RECTANGLE};   
+    
+    public static final String DEFAULT_BORDER_STYLE = "none";
+    public static final String[] BORDER_STYLES = {
+        "none",
+        "dotted",
+        "dashed",
+        "solid",
+        "double",
+        "groove",
+        "ridge",
+        "inset",
+        "outset" };
+    public static final Integer[] BORDER_WIDTHS = {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10};
+    
+    public static final String DEFAULT_BORDER_COLOR = "#000000";
+    public static final int DEFAULT_BORDER_WIDTH = 1;
 }

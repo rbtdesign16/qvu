@@ -39,6 +39,19 @@ export const ReportDesignProvider = ({ children }) => {
         };
     };
     
+    const getNewBorderSettings = () => {
+        return {
+            border: reportSettings.defaultBorderStyle,
+            width: reportSettings.defaultBorderWidth,
+            left: true,
+            top: true,
+            right: true,
+            bottom: true,
+            rounded: false,
+            color: reportSettings.defaultBorderColor
+        };
+    };
+
     const getNewComponent = (section, type, value) => {
         return {
             type: type,
@@ -84,7 +97,8 @@ export const ReportDesignProvider = ({ children }) => {
                     setNewReport,
                     getNewComponent,
                     haveSelectedComponents,
-                    getNewFontSettings}}>
+                    getNewFontSettings,
+                    getNewBorderSettings}}>
                 {children}
             </ReportDesignContext.Provider>
             );

@@ -10,6 +10,7 @@ import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu";
 import useReportDesign from "../../context/ReportDesignContext";
 import FontSelectModal from "../../widgets/FontSelectModal";
+import BorderSelectModal from "../../widgets/BorderSelectModal";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import ReportSettingsModal from "./ReportSettingsModal";
@@ -43,8 +44,9 @@ getReportSettings,
         } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import {
-AiOutlineFontSize,
+        AiOutlineFontSize,
         AiOutlineBarChart,
+        AiOutlineBorder,
         AiOutlineVerticalAlignBottom,
         AiOutlineVerticalAlignTop,
         }  from "react-icons/ai";
@@ -62,6 +64,7 @@ const ReportDesign = () => {
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
     const [showFontSelect, setShowFontSelect] = useState({show: false});
+    const [showBorderSelect, setShowBorderSelect] = useState({show: false});
     const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
@@ -75,7 +78,8 @@ const ReportDesign = () => {
         setNewReport,
         initializeReportSettings,
         haveSelectedComponents,
-        getNewFontSettings} = useReportDesign();
+        getNewFontSettings,
+        getNewBorderSettings} = useReportDesign();
 
     const getComponentSelectMenu = () => {
         let retval = [];
@@ -140,9 +144,13 @@ const ReportDesign = () => {
         setShowFontSelect({show: false});
     };
 
+    const hideBorderSettings = () => {
+        setShowBorderSelect({show: false});
+    };
+    
     const saveFontSettings = (fs) => {
         hideFontSettings();
-        console.log("------>" + JSON.stringify(fs));
+
         let cr = {...currentReport};
         
         for (let i = 0; i < cr.reportComponents.length; ++i) {
@@ -152,7 +160,22 @@ const ReportDesign = () => {
         }
         
         setCurrentReport(cr);
+    };
+    
+    const saveBorderSettings = (bs) => {
+        hideBorderSettings();
+
+        let cr = {...currentReport};
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (cr.reportComponents[i].selected) {
+                cr.reportComponents[i].borderSettings = {...bs};
+            }
+        }
+        
+        setCurrentReport(cr);
     }
+
 
     const onSetFont = () => {
         closeMenu();
@@ -164,6 +187,18 @@ const ReportDesign = () => {
             fontSettings: getNewFontSettings()
         });
     };
+
+    const onSetBorder = () => {
+        closeMenu();
+        setShowBorderSelect({
+            show: true,
+            hide: hideBorderSettings,
+            save: saveBorderSettings,
+            reportSettings: reportSettings,
+            borderSettings: getNewBorderSettings()
+        });
+    };
+
 
     const onComponentAlign = (align) => {
         closeMenu();
@@ -203,6 +238,7 @@ const ReportDesign = () => {
             <div onClick={e => onAddComponent(e)}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
             {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
+            {sel && <div onClick={onSetBorder}><AiOutlineBorder size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Border")}</div>}
             {sel && <hr  style={{cursor: "none"}} />}
             {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
             {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
@@ -315,6 +351,7 @@ const ReportDesign = () => {
                 <div style={{top: "40px", width: "100%"}} className="report-design-tab">
                     <ContextMenu />
                     <FontSelectModal config={showFontSelect}/>
+                    <BorderSelectModal config={showBorderSelect}/>
                     <ReportSettingsModal config={showReportSettings}/>
                     <SaveDocumentModal config={showSaveDocument}/>
                     <DocumentSelectModal config={showDocumentSelect}/>

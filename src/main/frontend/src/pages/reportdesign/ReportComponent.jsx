@@ -72,8 +72,47 @@ const ReportComponent = (props) => {
                 retval.textDecoration = "underline";
             }
         }
+        
+        if (component.borderSettings) {
+            let bs = component.borderSettings;
+            if (haveBorder(bs)) {
+                let bdef = bs.border + " " + bs.width + "px " + bs.color;
+                if (haveAllBorders(bs)) {
+                    retval.border = bdef;
+                } else {
+                    if (bs.left) {
+                        retval.borderLeft = bdef;
+                    }
+
+                    if (bs.top) {
+                        retval.borderTop = bdef;
+                    }
+
+                    if (bs.rightt) {
+                        retval.borderRightt = bdef;
+                    }
+
+                    if (bs.bottom) {
+                        retval.borderBottom = bdef;
+                    }
+                }
+
+                if (bs.rounded) {
+                    retval.borderRadius = reportSettings.defaultBorderRadius;
+                }
+            }
+        }
+
 
         return retval;
+    };
+
+    const haveAllBorders = (bs) => {
+        return (bs.left && bs.top && bs.right && bs.bottom);
+    };
+        
+    const haveBorder = (bs) => {
+        return (bs.left ||  bs.top && bs.right || bs.bottom);
     };
 
     const getComponentValue = () => {

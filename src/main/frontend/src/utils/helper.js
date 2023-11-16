@@ -808,3 +808,12 @@ export const REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
 
 export const ESCAPE_KEY_CODE = 27;
 export const MAX_UNDOS = 3;
+export const MOVE_DROP_EFFECT = "move";
+
+// use for sizing logic
+export const COMPONENT_SIZING_RECT_WIDTH = 5;
+export const TOP_LEFT = 0;
+export const TOP_RIGHT = 1;
+export const BOTTOM_RIGHT = 2;
+export const BOTTOM_LEFT = 3;
+

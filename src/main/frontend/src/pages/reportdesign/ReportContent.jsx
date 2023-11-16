@@ -194,6 +194,8 @@ const ReportContent = (props) => {
             let c = getNewComponent("body", "datagrid", "this is a test");
             c.left = 3;
             c.top = 3;
+            c.width = 3;
+            c.height = 3;
             
             currentReport.reportComponents.push(c);
         }

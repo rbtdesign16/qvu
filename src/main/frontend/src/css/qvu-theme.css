@@ -74,5 +74,6 @@
    --context-menu-font-hover-color: white;
    --context-menu-font-size: 14px;
    --context-menu-font-color: black;
-
+   
+    --sizing-rect-width: 5px;
 }

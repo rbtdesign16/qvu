@@ -47,7 +47,13 @@ import {
     } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import { BiWindowOpen, BiWindowClose  } from "react-icons/bi";
-import { RxAlignLeft, RxAlignTop, RxAlignBottom, RxAlignRight} from "react-icons/rx";
+import { RxAlignLeft, 
+    RxAlignTop, 
+    RxAlignBottom, 
+    RxAlignRight,
+    RxSpaceBetweenVertically,
+    RxSpaceBetweenHorizontally 
+} from "react-icons/rx";
 import {
     AiOutlineFontSize,
     AiOutlineBarChart,
@@ -162,6 +168,23 @@ const ReportDesign = () => {
         setCurrentReport(cr, true);
     };
     
+    const onComponentSize = (ver) => {
+        let cr = copyObject(currentReport);
+        let basec = cr.reportComponents[lastSelectedIndex];
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (cr.reportComponents[i].selected && (i !== lastSelectedIndex)) {
+                if (ver) {
+                    cr.reportComponents[i].height = basec.height;
+                } else {
+                    cr.reportComponents[i].width = basec.width;
+                }   
+            }
+        }
+        
+        closeMenu();
+        setCurrentReport(cr);
+    };
+
     const hideFontSettings = () => {
         setShowFontSelect({show: false});
     };
@@ -181,7 +204,7 @@ const ReportDesign = () => {
             }
         }
         
-        setCurrentReport(cr, true);
+        setCurrentReport(cr);
     };
     
     const saveBorderSettings = (bs) => {
@@ -195,7 +218,7 @@ const ReportDesign = () => {
             }
         }
         
-        setCurrentReport(cr, true);
+        setCurrentReport(cr);
     };
 
     const onSetFont = () => {
@@ -362,7 +385,8 @@ const ReportDesign = () => {
             {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
             {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} style={{transform: 'rotate(90deg)'}} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
             {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
-        
+            {sel && <div onClick={e => onComponentSize(true)}><RxSpaceBetweenVertically size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Height")}</div>}
+            {sel && <div onClick={e => onComponentSize(false)}><RxSpaceBetweenHorizontally size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Width")}</div>}
         </Menu>;
     };
 

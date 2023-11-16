@@ -21,7 +21,12 @@ import {
     REPORT_COMPONENT_TYPE_SUBREPORT,
     REPORT_COMPONENT_CONTAINER_BORDER,
     REPORT_COMPONENT_CONTAINER_BORDER_SELECTED,
-    copyObject
+    copyObject,
+    MOVE_DROP_EFFECT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT
     }
 from "../../utils/helper";
 
@@ -162,12 +167,19 @@ const ReportComponent = (props) => {
         let x = e.clientX - rect.left;
         let y = e.clientY - rect.top;
         e.dataTransfer.setData("cinfo", JSON.stringify({index: componentIndex, left: x, top: y}));
-        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
     };
-    
+
+    const handleSizeStart = (e, corner) => {
+        let x = e.pageX;
+        let y = e.pageY;
+        e.dataTransfer.setData("szinfo", JSON.stringify({index: componentIndex, corner: corner, x: x, y: y}));
+        e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
+    };
+
     const handleDragOver = (e) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
+        e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
     };
 
      return <div 
@@ -178,6 +190,10 @@ const ReportComponent = (props) => {
         onClick={e => onClick(e)} 
         onDragOver={e => handleDragOver(e)}
         onDragStart={e => handleDragStart(e)}>
+        <div draggable="true" onDragStart={e => handleSizeStart(e, TOP_LEFT)} className="sizing-tl"></div>
+        <div draggable="true" onDragStart={e => handleSizeStart(e, TOP_RIGHT)} className="sizing-tr"></div>
+        <div draggable="true" onDragStart={e => handleSizeStart(e, BOTTOM_LEFT)} className="sizing-bl"></div>
+        <div draggable="true" onDragStart={e => handleSizeStart(e, BOTTOM_RIGHT)} className="sizing-br"></div>
         {getComponentValue()}
     </div>;
 };

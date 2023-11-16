@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button"
 import useLang from "../../context/LangContext";
 import NumberEntry from "../../widgets/NumberEntry";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE} from "../../utils/helper";
+import {MODAL_TITLE_SIZE, copyObject} from "../../utils/helper";
 
 const ReportSettingsModal = (props) => {
     const {config} = props;
@@ -62,7 +62,7 @@ const ReportSettingsModal = (props) => {
     };
 
     const onPageSettings = (e) => {
-        let ps = {...pageSettings};
+        let ps = copyObject(pageSettings);
         if (e.target.selectedIndex) {
             ps[e.target.name] = e.target.options[e.target.selectedIndex].value;
         } else {

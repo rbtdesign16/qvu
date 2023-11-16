@@ -11,7 +11,8 @@ import {
     doSortCompare,
     NODE_TYPE_IMPORTED_FOREIGNKEY,
     CUSTOM_FK_DATA_SEPARATOR,
-    COMPARISON_OPERATOR_IN
+    COMPARISON_OPERATOR_IN,
+    copyObject
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -77,7 +78,7 @@ export const QueryDesignProvider = ({ children }) => {
         let cMap = new Map();
 
         if (!scols) {
-            scols = [...selectColumns];
+            scols = copyObject(selectColumns);
         }
 
         for (let i = 0; i < scols.length; ++i) {
@@ -135,8 +136,8 @@ export const QueryDesignProvider = ({ children }) => {
                 });
             }
         }
-
-        setFromClause(buildFromRecords([...tablePathSet], cols));
+        
+        setFromClause(buildFromRecords(copyObject(Array.from(tablePathSet)), cols));
 
         let pSet = new Set();
         
@@ -157,7 +158,6 @@ export const QueryDesignProvider = ({ children }) => {
                 setFilterColumns(fc);
             }
         }
-
 
         setSelectColumns(cols);
     };
@@ -246,10 +246,11 @@ export const QueryDesignProvider = ({ children }) => {
     };
 
     const buildFromRecords = (paths, cols) => {
-        paths.sort((a, b) => {
-            return (b.length - a.length);
-        });
-
+        if (paths) {
+            paths.sort((a, b) => {
+                return (b.length - a.length);
+            });
+        }
 
         let tindx = 0;
         // root table
@@ -329,7 +330,7 @@ export const QueryDesignProvider = ({ children }) => {
             } while (pos > -1)
         }
 
-        paths = [...pSet];
+        paths = copyObject(Array.from(pSet));
 
         paths.sort();
 

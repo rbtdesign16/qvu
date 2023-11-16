@@ -16,7 +16,8 @@ import {
     MODAL_TITLE_SIZE,
     confirm,
     getUUID,
-    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+    CUSTOM_FK_DATA_SEPARATOR,
+    copyObject } from "../../utils/helper";
 
 const ColumnSelect = (props) => {
     const {config} = props;
@@ -41,7 +42,7 @@ const ColumnSelect = (props) => {
     };
 
     const onChange = (e, indx) => {
-        let cols = [...columnSelections];
+        let cols = copyObject(columnSelections);
         let sel = findColumnSelection(columns[indx]);
 
         if (e.target.checked && !sel) {

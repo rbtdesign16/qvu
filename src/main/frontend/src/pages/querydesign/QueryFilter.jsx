@@ -6,7 +6,7 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import { MdOutlineAddBox } from 'react-icons/md';
 import FilterEntry from "./FilterEntry";
-import { BIG_ICON_SIZE, updateAndOr} from "../../utils/helper";
+import { BIG_ICON_SIZE, updateAndOr, copyObject} from "../../utils/helper";
 
 const QueryFilter = () => {
     const {authData, setAuthData} = useAuth();
@@ -21,7 +21,7 @@ const QueryFilter = () => {
     const [selectColumn, setSelectColumn] = useState(null);
     
     const addFilterColumn = () => {
-        let fc = [...filterColumns];
+        let fc = copyObject(filterColumns);
 
         fc.push({
             datasource: selectColumn.datasource,
@@ -53,7 +53,7 @@ const QueryFilter = () => {
 
     const loadSelectColumns = () => {
         return selectColumns.map(s => {
-            return <option title={getOptionTitle(s)} value={s.path}>{getColumnNameForDisplay(s)}</option>
+            return <option title={getOptionTitle(s)} value={s.path}>{getColumnNameForDisplay(s)}</option>;
         });
     };
 

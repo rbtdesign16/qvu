@@ -20,7 +20,8 @@ REPORT_ORIENTATION_LANDSCAPE,
         getReportWidth,
         reportUnitsToPixels,
         pixelsToReportUnits,
-        ESCAPE_KEY
+        ESCAPE_KEY,
+        copyObject
     } from "../../utils/helper";
 
 const ReportContent = (props) => {
@@ -61,7 +62,7 @@ const ReportContent = (props) => {
     const onContextMenu = (e, componentIndex) => {
         if (!menuConfig.show) {
             e.preventDefault();
-            let menuItems = [...contextMenuItems];
+            let menuItems = copyObject(contextMenuItems);
             if (!currentReport.reportComponents[componentIndex].selected) {
                 menuItems.push({text: getText("Select Component"),
                     action: "select"});
@@ -83,7 +84,7 @@ const ReportContent = (props) => {
     };
 
     const setComponentSelected = (componentIndex, select) => {
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         cr.reportComponents[componentIndex].selected = select;
         if (select) {
             setLastSelectedIndex(componentIndex);
@@ -131,20 +132,20 @@ const ReportContent = (props) => {
     
     const moveComponentToBack = (componentIndex) => {
         let minz = getMinZindex();
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         cr.reportComponents[componentIndex].zindex = minz - 1;
         setCurrentReport(cr);
     };
     
     const moveComponentToFront = (componentIndex) => {
         let maxz = getMaxZindex();
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         cr.reportComponents[componentIndex].zindex = maxz + 1;
         setCurrentReport(cr);
     };
 
     const deleteComponent = (componentIndex) => {
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         let c = [];
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (i !== componentIndex) {
@@ -231,7 +232,7 @@ const ReportContent = (props) => {
     };
 
     const onResize = (e) => {
-        let r = {...currentReport};
+        let r = copyObject(currentReport);
         r.headerHeight = reportHeight * (e.sizes[0] / 100);
         r.footerHeight = reportHeight * (e.sizes[2] / 100);
         setCurrentReport(r);

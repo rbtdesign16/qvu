@@ -137,7 +137,11 @@ export const isEmpty = (val) => {
 };
 
 export const copyObject = (o) => {
-    return JSON.parse(JSON.stringify(o));
+    if (o) {
+        return JSON.parse(JSON.stringify(o));
+    } else {
+        return o;
+    }
 };
 
 export const loadDocumentFromBlob = async (fileName, blob) => {
@@ -803,4 +807,4 @@ export const REPORT_COMPONENT_TYPE_GRAPH = "graph";
 export const REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
 
 export const ESCAPE_KEY_CODE = 27;
-
+export const MAX_UNDOS = 3;

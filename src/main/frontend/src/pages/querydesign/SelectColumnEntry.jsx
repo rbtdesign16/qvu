@@ -6,7 +6,7 @@ import useHelp from "../../context/HelpContext";
 import NumberEntry from "../../widgets/NumberEntry";
 import { MdHelpOutline } from "react-icons/md";
 import {AiOutlineFileAdd, AiOutlineDelete, AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineCopy} from "react-icons/ai";
-import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType} from "../../utils/helper";
+import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType, copyObject} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
     const {index} = props;
@@ -50,7 +50,7 @@ const SelectColumnEntry = (props) => {
     };
 
     const duplicateEntry = async () => {
-        let s = [...selectColumns];
+        let s = copyObject(selectColumns);
         let item = s[index];
         item.isdup = true;
         if (index < (s.length - 1)) {
@@ -67,7 +67,7 @@ const SelectColumnEntry = (props) => {
     };
 
     const moveUp = () => {
-        let s = [...selectColumns];
+        let s = copyObject(selectColumns);
         let item = s[index];
         s.splice(index, 1);
         s.splice(index - 1, 0, item);
@@ -75,7 +75,7 @@ const SelectColumnEntry = (props) => {
     };
 
     const moveDown = () => {
-        let s = [...selectColumns];
+        let s = copyObject(selectColumns);
         let item = s[index + 1];
         s.splice(index + 1, 1);
         s.splice(index, 0, item);
@@ -84,7 +84,7 @@ const SelectColumnEntry = (props) => {
 
     const remove = async () => {
         if (await confirm(getText("Remove:", " " + selectColumns[index].displayName + "?"))) {
-            let s = [...selectColumns];
+            let s = copyObject(selectColumns);
             s.splice(index, 1);
 
             let cnt = 0;
@@ -99,7 +99,7 @@ const SelectColumnEntry = (props) => {
                 let indx = selectedColumnIds.findIndex((element) => element === selectColumns[index].nodeId);
 
                 if (indx > -1) {
-                    let sids = [...selectedColumnIds];
+                    let sids = copyObject(selectedColumnIds);
                     sids.splice(indx, 1);
                     setSelectedColumnIds(sids);
                 }
@@ -153,7 +153,7 @@ const SelectColumnEntry = (props) => {
             let dindx = Number(el.id.replace("hdr-", ""));
             let sindx = Number(e.dataTransfer.getData("text/plain"));
             if (sindx !== dindx) {
-                let scols = [...selectColumns];
+                let scols = copyObject(selectColumns);
                 let col = scols[sindx];
                 scols.splice(sindx, 1);
                 scols.splice(dindx, 0, col);
@@ -168,7 +168,7 @@ const SelectColumnEntry = (props) => {
     };
 
     const onChange = (e) => {
-        let sel = [...selectColumns];
+        let sel = copyObject(selectColumns);
         let c = sel[index];
         if (e.target.name === "showInResults") {
             c.showInResults = e.target.checked;

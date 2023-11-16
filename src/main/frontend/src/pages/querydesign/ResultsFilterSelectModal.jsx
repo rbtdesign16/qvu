@@ -5,7 +5,7 @@ import useMessage from "../../context/MessageContext";
 import useQueryDesign from "../../context/QueryDesignContext";
 import useLang from "../../context/LangContext";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE, isNotEmpty, doSortCompare} from "../../utils/helper";
+import {MODAL_TITLE_SIZE, isNotEmpty, doSortCompare, copyObject} from "../../utils/helper";
 
 
 const ResultsFilterSelectModal = (props) => {
@@ -88,7 +88,7 @@ const ResultsFilterSelectModal = (props) => {
                 }
             }
 
-            let cf = {...currentFilters};
+            let cf = copyObject(currentFilters);
             cf[config.columnIndex] = selected;
 
             config.setFilters(cf);
@@ -96,7 +96,7 @@ const ResultsFilterSelectModal = (props) => {
     };
 
     const onReset = () => {
-        let cf = {...currentFilters};
+        let cf = copyObject(currentFilters);
         cf[config.columnIndex] = "";
         let ck = getCheckboxes();
         if (ck) {

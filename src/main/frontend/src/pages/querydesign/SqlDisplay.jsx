@@ -28,7 +28,8 @@ import {
     loadDocumentFromBlob,
     checkColorString,
     CUSTOM_FK_DATA_SEPARATOR,
-    COMPARISON_OPERATOR_IN} from "../../utils/helper";
+    COMPARISON_OPERATOR_IN,
+    copyObject} from "../../utils/helper";
 import {runQuery, isApiError, exportToExcel} from "../../utils/apiHelper";
 
 const SqlDisplay = (props) => {
@@ -440,7 +441,7 @@ const SqlDisplay = (props) => {
 
     const excelExport = async () => {
         let style = getComputedStyle(document.documentElement);
-        let qr = {... queryResults};
+        let qr = copyObject(queryResults);
         
         qr.data = [];
         

@@ -14,7 +14,8 @@ import {
     ERROR,
     DEFAULT_ERROR_TITLE,
     SMALL_ICON_SIZE,
-    MODAL_TITLE_SIZE} from "../../utils/helper";
+    MODAL_TITLE_SIZE,
+    copyObject} from "../../utils/helper";
 import {
     loadTableSettings,
     isApiSuccess,
@@ -32,7 +33,7 @@ const ColumnSettings = (props) => {
     
    const setColumnRoles = (indx, selections) => {
         if (selections) {
-            let t = {...table};
+            let t = copyObject(table);
             if (!t.tableColumnSettings[indx].roles) {
                 t.tableColumnSettings[indx].roles = [];
             } else {
@@ -86,7 +87,7 @@ const ColumnSettings = (props) => {
     };
 
     const setDisplayName = (e, indx) => {
-        let t = {...table};
+        let t = copyObject(table);
         t.tableColumnSettings[indx].displayName = e.target.value;
         setTable(t);
     };
@@ -104,7 +105,7 @@ const ColumnSettings = (props) => {
     };
     
     const setHidden = (e, indx) => {
-        let t = {...table};
+        let t = copyObject(table);
         t.tableColumnSettings[indx].hide = e.target.checked;
         setTable(t);
     };

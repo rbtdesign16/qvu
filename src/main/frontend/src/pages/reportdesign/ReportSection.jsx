@@ -11,7 +11,8 @@ import {
     pixelsToReportUnits,
     getReportWidth,
     getReportHeight,
-    isNotEmpty
+    isNotEmpty,
+    copyObject
 } from "../../utils/helper";
 
 const ReportSection = (props) => {
@@ -92,7 +93,7 @@ const ReportSection = (props) => {
         e.preventDefault();
         let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
 
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         let c = cr.reportComponents[cinfo.index];
 
         let rect;

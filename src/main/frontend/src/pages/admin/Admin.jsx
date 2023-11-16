@@ -26,7 +26,8 @@ import {
     replaceTokens,
     SMALL_ICON_SIZE,
     DEFAULT_EXPORTED_KEY_DEPTH,
-    DEFAULT_IMPORTED_KEY_DEPTH
+    DEFAULT_IMPORTED_KEY_DEPTH,
+    copyObject
     } from "../../utils/helper";
 
 import {
@@ -448,7 +449,7 @@ const Admin = () => {
 
             hideMessage();
 
-            let ds = {...dataObject};
+            let ds = copyObject(dataObject);
             ds.datasourceTables = t;
             setTableSettings({show: true,
                 dataObject: dataObject,
@@ -478,7 +479,7 @@ const Admin = () => {
                 showMessage(ERROR, res.message);
             } else {
                 hideMessage();
-                let dsnames = {...datasourceTableNames};
+                let dsnames = copyObject(datasourceTableNames);
                 dsnames[dataObject.datasourceName] = res.result;
                 setDatasourceTableNames(dsnames);
             }
@@ -486,7 +487,7 @@ const Admin = () => {
 
         setCustomForeignKeys({show: true,
             dataObject: dataObject,
-            datasource: {...dataObject},
+            datasource: copyObject(dataObject),
             saveCustomForeignKeys: saveCustomForeignKeys,
             hideCustomForeignKeys: hideCustomForeignKeys});
     };
@@ -583,7 +584,7 @@ const Admin = () => {
     };
 
     const editDatasource = (indx) => {
-        setEditModal(getDatasourceConfig(replaceTokens(getText("Update datasource"), [datasources[indx].datasourceName]), {...datasources[indx]}));
+        setEditModal(getDatasourceConfig(replaceTokens(getText("Update datasource"), [datasources[indx].datasourceName]), copyObject(datasources[indx])));
     };
 
     const deleteSelectedDatasource = (indx) => {
@@ -609,7 +610,7 @@ const Admin = () => {
 
     const editRole = (indx) => {
         let r = authData.allRoles[indx];
-        setEditModal(getRoleConfig(replaceTokens(getText("Update role"), [r.name]), {...r}));
+        setEditModal(getRoleConfig(replaceTokens(getText("Update role"), [r.name]), copyObject(r)));
     };
 
     const deleteSelectedRole = async (indx) => {
@@ -635,7 +636,7 @@ const Admin = () => {
 
     const editDocumentGroup = (indx) => {
         let g = documentGroups[indx];
-        setEditModal(getDocumentGroupConfig(replaceTokens(getText("Update group"), [g.name]), {...g}));
+        setEditModal(getDocumentGroupConfig(replaceTokens(getText("Update group"), [g.name]), copyObject(g)));
     };
 
     const deleteSelectedDocumentGroup = async (indx) => {
@@ -663,7 +664,7 @@ const Admin = () => {
 
     const editUser = (indx) => {
         let u = authData.allUsers[indx];
-        setEditModal(getUserConfig(replaceTokens(getText("Update user"), [u.userId]), {...u}));
+        setEditModal(getUserConfig(replaceTokens(getText("Update user"), [u.userId]), copyObject(u)));
     };
 
     const deleteSelectedUser = async (indx) => {
@@ -901,7 +902,7 @@ const Admin = () => {
                 showMessage(INFO, replaceTokens(getText("Saving user"), [config.dataObject.userId]), null, true);
                 config.dataObject.repeatPassword = "";
                 
-                let user = {...config.dataObject};
+                let user = copyObject(config.dataObject);
                 
                 // get rid of the repeat password field
                 if (user.newRecord) {
@@ -974,9 +975,7 @@ const Admin = () => {
         catch (e) {
             showMessage(ERROR, e);
         }
-                
-        
-    }
+    };
     
     const onShowScheduleTable = () => {
         setShowScheduleTable({show: true, hide: hideScheduleTable, save: saveSchedules});

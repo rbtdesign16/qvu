@@ -3,6 +3,7 @@ import {
     isEmpty,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
+    MAX_UNDOS
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -12,21 +13,42 @@ export const ReportDesignContext = createContext();
 export const ReportDesignProvider = ({ children }) => {
     const {getText} = useLang();
     const [reportSettings, setReportSettings] = useState(null);
-    const [currentReport, setCurrentReport] = useState(null);
+    const [currentReport, setReport] = useState(null);
+    const [saveReports, setSaveReports] = useState({reports: [], lastSelectedIndex: -1});
     const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
-
+    
     const initializeReportSettings = async (settings) => {
         setReportSettings(settings);
         setNewReport(settings);
     };
     
+    const setCurrentReport = (report) => {
+        if (currentReport && (saveReports.reports.length < MAX_UNDOS)) {
+           let sr = {...saveReports};
+           sr.reports.unshift(currentReport);
+           sr.lastSelectedIndex = lastSelectedIndex;
+           setSaveReports(sr);
+        } 
+        
+        setReport(report);
+    };  
+    
     const haveSelectedComponents = () => {
         if (currentReport && currentReport.reportComponents) {
-            for (let i = 0; i <  currentReport.reportComponents.length; ++i) {
-                if (currentReport.reportComponents[i].selected) {
-                    return true;
-                }
-            }
+            return (currentReport.reportComponents.findIndex((r) => r.selected) > -1);
+        }
+    };
+    
+    const canUndo = () => {
+        return (saveReports.reports.length > 0);
+    };
+    
+    const undo = () => {
+        if (canUndo()) {
+            let sr = {...saveReports};
+            setSaveReports(sr);
+            setReport(sr.reports.shift());
+            setLastSelectedIndex(sr.lastSelectedIndex);
         }
     };
     
@@ -84,7 +106,8 @@ export const ReportDesignProvider = ({ children }) => {
             footerHeight: settings ? settings.defaultFooterHeight : reportSettings.defaultFooterHeight,
             reportComponents: []
          };
-    }
+    };
+    
     const setNewReport = (settings) => {
         setCurrentReport(getNewDocument(settings));
     };
@@ -102,7 +125,9 @@ export const ReportDesignProvider = ({ children }) => {
                     getNewFontSettings,
                     getNewBorderSettings,
                     lastSelectedIndex, 
-                    setLastSelectedIndex}}>
+                    setLastSelectedIndex,
+                    undo,
+                    canUndo}}>
                 {children}
             </ReportDesignContext.Provider>
             );

@@ -15,7 +15,8 @@ import {
     isValidFilenameKey,
     isEmpty,
     UNARY_COMPARISON_OPERATORS,
-    getParameterTypeFromId} from "../utils/helper";
+    getParameterTypeFromId,
+    copyObject} from "../utils/helper";
 
 
 const ParameterEntryModal = (props) => {
@@ -66,7 +67,7 @@ const ParameterEntryModal = (props) => {
     const onChange = (e) => {
         let indx = Number(e.target.id.replace("f-", ""));
         
-        let params = [...parameters];
+        let params = copyObject(parameters);
         params[indx] = e.target.value;
         
         setParameters(params);

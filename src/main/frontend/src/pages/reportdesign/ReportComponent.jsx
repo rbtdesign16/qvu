@@ -20,7 +20,8 @@ import {
     REPORT_COMPONENT_TYPE_GRAPH,
     REPORT_COMPONENT_TYPE_SUBREPORT,
     REPORT_COMPONENT_CONTAINER_BORDER,
-    REPORT_COMPONENT_CONTAINER_BORDER_SELECTED
+    REPORT_COMPONENT_CONTAINER_BORDER_SELECTED,
+    copyObject
     }
 from "../../utils/helper";
 
@@ -40,8 +41,8 @@ const ReportComponent = (props) => {
     const onClick = (e) => {
         if (e.ctrlKey) {
             e.preventDefault();
-            let c = {...component};
-            let cr = {...currentReport};
+            let c = copyObject(component);
+            let cr = copyObject(currentReport);
             let sindx = componentIndex;
             
             // if this was the last selected index and we are deselecting

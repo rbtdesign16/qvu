@@ -36,7 +36,8 @@ import {
     CENTER,
     BOTTOM,
     RULER_WIDTH,
-    replaceTokens
+    replaceTokens,
+    copyObject
 } from "../../utils/helper";
 import {
     getReportSettings,
@@ -60,7 +61,8 @@ import { LiaFileInvoiceSolid,
     LiaAlignLeftSolid,
     LiaAlignRightSolid,
     LiaWindowRestoreSolid,
-    LiaCoinsSolid } from "react-icons/lia";
+    LiaCoinsSolid,
+    LiaUndoAltSolid } from "react-icons/lia";
 
 const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -84,10 +86,18 @@ const ReportDesign = () => {
         getNewFontSettings,
         getNewBorderSettings,
         lastSelectedIndex,
-        setLastSelectedIndex} = useReportDesign();
+        setLastSelectedIndex,
+        undo,
+        canUndo} = useReportDesign();
 
     const isQueryRequiredForType = (type) => {
         return (type.includes("data") || type.includes("chart"));
+    };
+    
+    const onUndo = (e) => {
+        e.preventDefault();
+        setMenuOpen(false);
+        undo();
     };
     
     const getComponentSelectMenu = () => {
@@ -140,7 +150,7 @@ const ReportDesign = () => {
     };
 
     const onTextAlign = (align) => {
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (cr.reportComponents[i].selected) {
@@ -149,7 +159,7 @@ const ReportDesign = () => {
         }
         
         closeMenu();
-        setCurrentReport(cr);
+        setCurrentReport(cr, true);
     };
     
     const hideFontSettings = () => {
@@ -163,29 +173,29 @@ const ReportDesign = () => {
     const saveFontSettings = (fs) => {
         hideFontSettings();
 
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (cr.reportComponents[i].selected) {
-                cr.reportComponents[i].fontSettings = {...fs};
+                cr.reportComponents[i].fontSettings = copyObject(fs);
             }
         }
         
-        setCurrentReport(cr);
+        setCurrentReport(cr, true);
     };
     
     const saveBorderSettings = (bs) => {
         hideBorderSettings();
 
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (cr.reportComponents[i].selected) {
-                cr.reportComponents[i].borderSettings = {...bs};
+                cr.reportComponents[i].borderSettings = copyObject(bs);
             }
         }
         
-        setCurrentReport(cr);
+        setCurrentReport(cr, true);
     };
 
     const onSetFont = () => {
@@ -213,7 +223,7 @@ const ReportDesign = () => {
     const onSelectAll = (sel) => {
         closeMenu();
         
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             cr.reportComponents[i].selected = sel;
@@ -234,7 +244,7 @@ const ReportDesign = () => {
         if (currentReport.reportComponents 
             && (lastSelectedIndex >= 0) 
             && (lastSelectedIndex < currentReport.reportComponents.length)) {
-            let cr = {...currentReport};
+            let cr = copyObject(currentReport);
 
             let basecr = cr.reportComponents[lastSelectedIndex];
 
@@ -267,7 +277,7 @@ const ReportDesign = () => {
     };
 
     const saveReportSettings = (settings) => {
-        let cr = {...currentReport};
+        let cr = copyObject(currentReport);
         cr.pageSize = settings.pageSize;
         cr.pageOrientation = settings.pageOrientation;
         cr.pageUnits = settings.pageUnits;
@@ -283,7 +293,7 @@ const ReportDesign = () => {
 
      const setQueryDocument = (group, name) => {
          hideDocumentSelect();
-         let cr = {...currentReport};
+         let cr = copyObject(currentReport);
          cr.queryDocumentGroup = group;
          cr.queryDocumentName = name;
          
@@ -336,6 +346,7 @@ const ReportDesign = () => {
             <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
             <hr className="h-separator" />
             <div onClick={e => onAddComponent(e)}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
+            {canUndo() && <div onClick={e => onUndo(e)}><LiaUndoAltSolid   size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Undo Last Change")}</div>}
             <hr className="h-separator" />
             <div onClick={e => onSelectAll(true)}><BiWindowOpen size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Select All")}</div>
             <div onClick={e => onSelectAll(false)}><BiWindowClose size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Deselect All")}</div>
@@ -347,9 +358,9 @@ const ReportDesign = () => {
             {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
             {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
             {sel && <hr  className="h-separator" />}
-            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
+            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft size={SMALL_ICON_SIZE} style={{transform: 'rotate(90deg)'}} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
             {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
-            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight style={{transform: 'rotate(90deg)'}} size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
+            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} style={{transform: 'rotate(90deg)'}} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
             {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
         
         </Menu>;
@@ -420,7 +431,7 @@ const ReportDesign = () => {
     };
 
     const getReportInfo = () => {
-        return  <span style={{marginLeft: "10px"}} className="cobaltBlue-f">
+        return  <span lassName="cobaltBlue-f" style={{marginLeft: "10px"}}>
             <span style={{color: "darkslategray"}}>{getText("Group", ":  ")}</span>
             {currentReport.group} 
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Report", ":  ")}</span>
@@ -453,7 +464,7 @@ const ReportDesign = () => {
 
     if (reportSettings && currentReport) {
         return (
-                <div style={{top: "40px", width: "100%"}} className="report-design-tab">
+                <div className="report-design-tab" style={{top: "40px", width: "100%"}} >
                     <ContextMenu />
                     <FontSelectModal config={showFontSelect}/>
                     <BorderSelectModal config={showBorderSelect}/>

@@ -14,7 +14,8 @@ import {
     NODE_TYPE_COLUMN,
     NODE_TYPE_IMPORTED_FOREIGNKEY,
     NODE_TYPE_EXPORTED_FOREIGNKEY,
-    SMALL_ICON_SIZE} from "../../utils/helper";
+    SMALL_ICON_SIZE,
+    copyObject} from "../../utils/helper";
 
 const DataSelectTree = (props) => {
     const {getText} = useLang();
@@ -101,14 +102,14 @@ const DataSelectTree = (props) => {
                     setSelectedNodeIds([element.id]);
                     setBaseTable(element.metadata.roottable);
                 } else {
-                    let sids = [...selectedColumnIds];
+                    let sids = copyObject(selectedColumnIds);
                     sids.push(element.id);
                     setSelectedNodeIds(sids);
                 }
 
             }
         } else { // unselect - remove id
-            let sids = [...selectedColumnIds];
+            let sids = copyObject(selectedColumnIds);
             let indx = sids.indexOf(element.id);
             if (indx > -1) {
                 sids.splice(indx, 1);
@@ -143,7 +144,7 @@ const DataSelectTree = (props) => {
             }
         }
 
-        let retval = [...tset];
+        let retval = copyObject(Array.from(tset));
         return retval;
     };
     
@@ -153,7 +154,7 @@ const DataSelectTree = (props) => {
     
     const setJoinType = (joinType, nodeId) => {
         treeViewData[nodeId].metadata.jointype = joinType;
-        let sc = [...selectColumns];
+        let sc = copyObject(selectColumns);
         
         for (let i = 0; i < sc.length; ++i) {
             if (sc[i].path.includes("{" + treeViewData[nodeId].metadata.fkname + "@")) {
@@ -165,7 +166,7 @@ const DataSelectTree = (props) => {
             }
         }
 
-        let filc = [...filterColumns];
+        let filc = copyObject(filterColumns);
         
         for (let i = 0; i < filc.length; ++i) {
             if (filc[i].path.includes("{" + treeViewData[nodeId].metadata.fkname + "@")) {
@@ -177,7 +178,7 @@ const DataSelectTree = (props) => {
             }
         }
 
-        let fc = [...fromClause];
+        let fc = copyObject(fromClause);
         
         for (let i = 0; i < fc.length; ++i) {
             if (fc[i].foreignKeyName === treeViewData[nodeId].metadata.fkname) {

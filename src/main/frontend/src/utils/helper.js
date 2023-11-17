@@ -116,6 +116,10 @@ export const DEFAULT_PAGE_SIZE = 200;
 
 export const ARROW_UP_KEY = "arrowup";
 export const ARROW_DOWN_KEY = "arrowdown";
+export const ARROW_LEFT_KEY = "arrowleft";
+export const ARROW_RIGHT_KEY = "arrowright";
+
+
 export const HOME_KEY = "arrowleft";
 export const END_KEY = "arrowright";
 
@@ -817,3 +821,16 @@ export const TOP_RIGHT = 1;
 export const BOTTOM_RIGHT = 2;
 export const BOTTOM_LEFT = 3;
 
+
+export const isArrowKey = (e) => {
+    if (e.code) {
+        let code = e.code.toLowerCase();
+
+        return (code === ARROW_LEFT_KEY 
+            || code === ARROW_RIGHT_KEY
+            || code === ARROW_UP_KEY
+            || code === ARROW_DOWN_KEY);
+    }
+};
+
+export const PIXELS_PER_KEYDOWN_MOVE = 5;

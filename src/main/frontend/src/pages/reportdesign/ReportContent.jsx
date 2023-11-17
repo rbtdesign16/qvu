@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import useReportDesign from "../../context/ReportDesignContext";
@@ -6,22 +6,28 @@ import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu"
 import useLang from "../../context/LangContext";
 import {
-REPORT_ORIENTATION_LANDSCAPE,
-        REPORT_ORIENTATION_PORTRAIT,
-        REPORT_UNITS_INCH,
-        REPORT_UNITS_MM,
-        SPLITTER_GUTTER_SIZE,
-        REPORT_SECTION_HEADER,
-        REPORT_SECTION_BODY,
-        REPORT_SECTION_FOOTER,
-        getReportHeightInPixels,
-        getReportWidthInPixels,
-        getReportHeight,
-        getReportWidth,
-        reportUnitsToPixels,
-        pixelsToReportUnits,
-        ESCAPE_KEY,
-        copyObject
+    REPORT_ORIENTATION_LANDSCAPE,
+    REPORT_ORIENTATION_PORTRAIT,
+    REPORT_UNITS_INCH,
+    REPORT_UNITS_MM,
+    SPLITTER_GUTTER_SIZE,
+    REPORT_SECTION_HEADER,
+    REPORT_SECTION_BODY,
+    REPORT_SECTION_FOOTER,
+    getReportHeightInPixels,
+    getReportWidthInPixels,
+    getReportHeight,
+    getReportWidth,
+    reportUnitsToPixels,
+    pixelsToReportUnits,
+    ESCAPE_KEY,
+    copyObject,
+    isArrowKey,
+    ARROW_UP_KEY,
+    ARROW_DOWN_KEY,
+    ARROW_LEFT_KEY,
+    ARROW_RIGHT_KEY,
+    PIXELS_PER_KEYDOWN_MOVE
     } from "../../utils/helper";
 
 const ReportContent = (props) => {
@@ -31,7 +37,8 @@ const ReportContent = (props) => {
         setCurrentReport,
         getNewComponent,
         lastSelectedIndex,
-        setLastSelectedIndex
+        setLastSelectedIndex,
+        haveSelectedComponents
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -210,7 +217,6 @@ const ReportContent = (props) => {
             height = reportHeight + "mm";
         }
 
-
         return {
             width: width,
             height: height,
@@ -244,26 +250,150 @@ const ReportContent = (props) => {
         hideMenu(e);
     };
     
-    return <div style={getStyle()} 
-     className="report-content"
-     onClick={e => onClick(e)}>
-    <ContextMenu />
-    <Splitter style={{border: "none",
-        width: (reportWidthPixels - 1) + "px",
-        height: (reportHeightPixels - 1) + "px"}} 
-        layout="vertical"
-        gutterSize={SPLITTER_GUTTER_SIZE / 2}
-        onResizeEnd={e => onResize(e)}>
-        <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
-            <ReportSection section={REPORT_SECTION_HEADER} onContextMenu={onContextMenu} />
-        </SplitterPanel>
-        <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
-            <ReportSection section={REPORT_SECTION_BODY} onContextMenu={onContextMenu} />
-        </SplitterPanel>
-        <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
-            <ReportSection section={REPORT_SECTION_FOOTER} onContextMenu={onContextMenu}/>
-        </SplitterPanel>
-    </Splitter>
+    const componentCanMove = (section, key, pos) => {
+        let retval = false;
+        let gutterHeight = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), SPLITTER_GUTTER_SIZE);
+        switch(section) {
+            case REPORT_SECTION_HEADER:
+                 switch(key) {
+                    case ARROW_UP_KEY:
+                         retval = (pos > 0);
+                         break;   
+                    case ARROW_DOWN_KEY:
+                         retval = (pos < (currentReport.headerHeight - currentReport.pageBorder[1]));
+                         break;
+                    case ARROW_LEFT_KEY:
+                         retval = (pos > 0);
+                         break;
+                    case ARROW_RIGHT_KEY:
+                        retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
+                        break;
+                }
+                break;
+            case REPORT_SECTION_BODY:
+                switch(key) {
+                    case ARROW_UP_KEY:
+                         retval = (pos > 0);
+                         break;   
+                    case ARROW_DOWN_KEY:
+                         retval = (pos < (reportHeight - (currentReport.headerHeight + currentReport.footerHeight + gutterHeight)));
+                         break;
+                    case ARROW_LEFT_KEY:
+                         retval = (pos > 0);
+                         break;
+                    case ARROW_RIGHT_KEY:
+                        retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
+                        break;
+                }
+                break;
+            case REPORT_SECTION_FOOTER:
+               switch(key) {
+                    case ARROW_UP_KEY:
+                         retval = (pos > 0);
+                         break;   
+                    case ARROW_DOWN_KEY:
+                         retval = (pos < (currentReport.footerHeight - currentReport.pageBorder[3]));
+                         break;
+                    case ARROW_LEFT_KEY:
+                         retval = (pos > 0);
+                         break;
+                    case ARROW_RIGHT_KEY:
+                        retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
+                        break;
+                }
+                break;
+        }
+
+        return retval;
+    };
+    
+    const onKeyDown = (e) => {
+        if (isArrowKey(e) && haveSelectedComponents()) {
+            e.preventDefault();
+            let cr = copyObject(currentReport);
+            let updated = false;
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                let c = cr.reportComponents[i];
+                
+                 if (c.selected) {
+                    let units = currentReport.pageUnits.substring(0, 2);
+                    let delta = pixelsToReportUnits(units, PIXELS_PER_KEYDOWN_MOVE);
+                     
+                     if (!e.shiftKey) {
+                       let code = e.code.toLowerCase(); 
+                       switch(code) {
+                            case ARROW_UP_KEY:
+                                if (componentCanMove(c.section, code, (c.top - delta))) {
+                                    c.top -= delta;
+                                    updated = true;
+                                }
+                                break;   
+                            case ARROW_DOWN_KEY:
+                                if (componentCanMove(c.section, code, (c.top + delta))) {
+                                    c.top += delta;
+                                    updated = true;
+                                }
+                                break;
+                            case ARROW_LEFT_KEY:
+                                if (componentCanMove(c.section, code, (c.left - delta))) {
+                                    c.left -= delta;
+                                    updated = true;
+                                }
+                                break;
+                            case ARROW_RIGHT_KEY:
+                                if (componentCanMove(c.section, code, (c.left + delta))) {
+                                    c.left += delta;
+                                    updated = true;
+                                }
+                                break;
+                        }
+                    } else {
+                        updated = true;
+                        switch(e.code.toLowerCase()) {
+                            case ARROW_UP_KEY:
+                                c.height -= delta;
+                                break;   
+                            case ARROW_DOWN_KEY:
+                                c.height += delta;
+                                break;
+                            case ARROW_LEFT_KEY:
+                                c.width -= delta;
+                                break;
+                            case ARROW_RIGHT_KEY:
+                                c.width += delta;
+                                break;
+                        }
+                    }
+                }
+            }
+            
+            if (updated) {
+                setCurrentReport(cr);
+            }
+        }
+    };
+    
+    return <div tabIndex="0" style={getStyle()} 
+        className="report-content"
+        onKeyDown={e => onKeyDown(e)}
+        onClick={e => onClick(e)}>
+        <ContextMenu />
+        <Splitter style={{border: "none",
+            width: (reportWidthPixels - 1) + "px",
+            height: (reportHeightPixels - 1) + "px"}} 
+            layout="vertical"
+            gutterSize={SPLITTER_GUTTER_SIZE / 2}
+            onResizeEnd={e => onResize(e)}>
+            <SplitterPanel style={{overflow: "hidden"}} size={getHeaderHeightPercent()} minSize={0}>
+                <ReportSection section={REPORT_SECTION_HEADER} onContextMenu={onContextMenu} />
+            </SplitterPanel>
+            <SplitterPanel style={{overflow: "hidden"}}  size={getBodyHeightPercent()}  minSize={0}>
+                <ReportSection section={REPORT_SECTION_BODY} onContextMenu={onContextMenu} />
+            </SplitterPanel>
+            <SplitterPanel style={{overflow: "hidden"}} size={getFooterHeightPercent()}  minSize={0}>
+                <ReportSection section={REPORT_SECTION_FOOTER} onContextMenu={onContextMenu}/>
+            </SplitterPanel>
+        </Splitter>
 </div>;
 };
 

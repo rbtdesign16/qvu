@@ -455,7 +455,7 @@ const ReportDesign = () => {
     };
 
     const getReportInfo = () => {
-        return  <span lassName="cobaltBlue-f" style={{marginLeft: "10px"}}>
+        return  <span className="cobaltBlue-f" style={{marginLeft: "10px"}}>
             <span style={{color: "darkslategray"}}>{getText("Group", ":  ")}</span>
             {currentReport.group} 
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Report", ":  ")}</span>

@@ -33,7 +33,6 @@ const SizingControl = (props) => {
         let width = pixelPosToNumber(sz.style.width);
         let height = pixelPosToNumber(sz.style.height);
 
-
         switch (corner) {
             case TOP_LEFT:
                 top += ydif;
@@ -86,8 +85,9 @@ const SizingControl = (props) => {
     };
 
     const onMouseDown = (e) => {
+        e.preventDefault();
         let units = currentReport.pageUnits.substring(0, 2);
-
+        
         let sz = getSizer(component.section);
         sz.style.left = reportUnitsToPixels(units, component.left) + "px";
         sz.style.top = reportUnitsToPixels(units, component.top) + "px";

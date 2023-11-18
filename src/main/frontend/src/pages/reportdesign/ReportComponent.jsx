@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
+import SizingControl from "../../widgets/SizingControl"
 import useMenu from "../../context/MenuContext";
 import useReportDesign from "../../context/ReportDesignContext";
 import {
@@ -170,13 +171,6 @@ const ReportComponent = (props) => {
         e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
     };
 
-    const handleSizeStart = (e, corner) => {
-        let x = e.pageX;
-        let y = e.pageY;
-        e.dataTransfer.setData("szinfo", JSON.stringify({index: componentIndex, corner: corner, x: x, y: y}));
-        e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
-    };
-
     const handleDragOver = (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
@@ -190,10 +184,10 @@ const ReportComponent = (props) => {
         onClick={e => onClick(e)} 
         onDragOver={e => handleDragOver(e)}
         onDragStart={e => handleDragStart(e)}>
-        <div draggable="true" onDragStart={e => handleSizeStart(e, TOP_LEFT)} className="sizing-tl"></div>
-        <div draggable="true" onDragStart={e => handleSizeStart(e, TOP_RIGHT)} className="sizing-tr"></div>
-        <div draggable="true" onDragStart={e => handleSizeStart(e, BOTTOM_LEFT)} className="sizing-bl"></div>
-        <div draggable="true" onDragStart={e => handleSizeStart(e, BOTTOM_RIGHT)} className="sizing-br"></div>
+        <SizingControl corner="tl" componentIndex={componentIndex} component={component}/>
+        <SizingControl corner="tr" componentIndex={componentIndex} component={component}/>
+        <SizingControl corner="bl" componentIndex={componentIndex} component={component}/>
+        <SizingControl corner="br" componentIndex={componentIndex} component={component}/>
         {getComponentValue()}
     </div>;
 };

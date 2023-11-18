@@ -726,10 +726,16 @@ export const getReportWidth = (report, reportSettings) => {
 };
 
 export const reportUnitsToPixels = (type, size) => {
-    if (type === REPORT_UNITS_MM) {
-        return PIXELS_PER_MM * size;
-    } else {
-        return PIXELS_PER_INCH * size;
+    if (type) {
+        if (type.length > 2) {
+            type = type.substring(0, 2);
+        }
+        
+        if (type === REPORT_UNITS_MM) {
+            return PIXELS_PER_MM * size;
+        } else {
+            return PIXELS_PER_INCH * size;
+        }
     }
 };
     
@@ -786,10 +792,16 @@ export const getDigitsCount = (num) => {
 };
 
 export const pixelsToReportUnits = (type, pixels) => {
-    if (type === REPORT_UNITS_MM) {
-        return pixels / PIXELS_PER_MM;
-    } else {
-        return pixels / PIXELS_PER_INCH;
+    if (type) {
+        if (type.length > 2) {
+            type = type.substring(0, 2);
+        }
+        
+        if (type === REPORT_UNITS_MM) {
+            return pixels / PIXELS_PER_MM;
+        } else {
+            return pixels / PIXELS_PER_INCH;
+        }
     }
 };
 
@@ -816,11 +828,10 @@ export const MOVE_DROP_EFFECT = "move";
 
 // use for sizing logic
 export const COMPONENT_SIZING_RECT_WIDTH = 5;
-export const TOP_LEFT = 0;
-export const TOP_RIGHT = 1;
-export const BOTTOM_RIGHT = 2;
-export const BOTTOM_LEFT = 3;
-
+export const TOP_LEFT = "tl";
+export const TOP_RIGHT = "tr";
+export const BOTTOM_RIGHT = "br";
+export const BOTTOM_LEFT = "bl";
 
 export const isArrowKey = (e) => {
     if (e.code) {
@@ -834,3 +845,9 @@ export const isArrowKey = (e) => {
 };
 
 export const PIXELS_PER_KEYDOWN_MOVE = 5;
+
+export const pixelPosToNumber = (pos) => {
+    if (pos) {
+        return Number(pos.replace("px", ""));
+    }
+}

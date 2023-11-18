@@ -95,57 +95,25 @@ const ReportSection = (props) => {
     };
     
     const handleDrop = (e) => {
-        if (e.dataTransfer.getData("szinfo") 
-            || e.dataTransfer.getData("cinfo")) {
+        if (e.dataTransfer.getData("cinfo")) {
             e.preventDefault();
             let cr = copyObject(currentReport);
-            let units = currentReport.pageUnits.substring(0, 2);
-            if (e.dataTransfer.getData("szinfo")) {
-                let szinfo = JSON.parse(e.dataTransfer.getData("szinfo"));
-                let c = cr.reportComponents[szinfo.index];
-                let xdif = pixelsToReportUnits(units, e.pageX - szinfo.x);
-                let ydif = pixelsToReportUnits(units, e.pageY - szinfo.y);
+            let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
+            let c = cr.reportComponents[cinfo.index];
 
-                switch(szinfo.corner) {
-                    case TOP_LEFT:
-                        c.top += ydif;
-                        c.left += xdif;
-                        c.width -= xdif;
-                        c.height -= ydif;
-                        break;
-                    case TOP_RIGHT:
-                        c.top += ydif;
-                        c.width += xdif;
-                        c.height -= ydif;
-                        break;
-                    case BOTTOM_RIGHT:
-                        c.height += ydif;
-                        c.width += xdif;
-                        break;
-                    case BOTTOM_LEFT:
-                        c.left += xdif;
-                        c.width -= xdif;
-                        c.height += ydif;
-                        break;
-                }
-            } else if (e.dataTransfer.getData("cinfo")) {
-                let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
-                let c = cr.reportComponents[cinfo.index];
-
-                let rect;
-                // if we are dropping on a section
-                if (isDropTargetSection(e.target.id)) {
-                    rect = e.target.getBoundingClientRect();
-                } else { // else dropping on a component
-                    rect = e.target.parentElement.getBoundingClientRect();
-                }
-
-                let x = e.clientX - rect.left;
-                let y = e.clientY - rect.top;
-                c.section = section;
-                c.left = pixelsToReportUnits(units, x - cinfo.left);
-                c.top = pixelsToReportUnits(units, y - cinfo.top);
+            let rect;
+            // if we are dropping on a section
+            if (isDropTargetSection(e.target.id)) {
+                rect = e.target.getBoundingClientRect();
+            } else { // else dropping on a component
+                rect = e.target.parentElement.getBoundingClientRect();
             }
+
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+            c.section = section;
+            c.left = pixelsToReportUnits(currentReport.pageUnits, x - cinfo.left);
+            c.top = pixelsToReportUnits(currentReport.pageUnits, y - cinfo.top);
 
             setCurrentReport(cr);
         }
@@ -171,7 +139,10 @@ const ReportSection = (props) => {
     return <div id={section} 
          onDrop={e => handleDrop(e)} 
          onDragOver={e => handleDragOver(e)}
-         style={getStyle()}>{loadComponents()}</div>;
+         style={getStyle()}>
+            <div id={"sz-" + section} style={{display: "none"}}></div>
+            {loadComponents()}
+        </div>;
 };
 
 ReportSection.propTypes = {

@@ -1,0 +1,80 @@
+.sizing-tl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--sizing-rect-width);
+    height: var(--sizing-rect-width);
+    background: transparent;
+    z-index: 10;
+}
+
+.sizing-tl:hover {
+    background: var(--separator-color);
+    cursor: pointer;
+}
+
+.sizing-tr {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--sizing-rect-width);
+    height: var(--sizing-rect-width);
+    background: transparent;
+    z-index: 10;
+}
+
+.sizing-tr:hover {
+    background: var(--separator-color);
+    cursor: pointer;
+}
+
+.sizing-bl {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--sizing-rect-width);
+    height: var(--sizing-rect-width);
+    background: transparent;
+    z-index: 10;
+}
+
+.sizing-bl:hover {
+    background: var(--separator-color);
+    cursor: pointer;
+}
+
+.sizing-br {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: var(--sizing-rect-width);
+    height: var(--sizing-rect-width);
+    background: transparent;
+    z-index: 10;
+}
+
+.sizing-br:hover {
+    background: var(--separator-color);
+    cursor: pointer;
+}
+
+#sz-header {
+    background: transparent;
+    position: absolute;
+    border: var(--sizing-div-border);
+    z-index: 100
+}
+
+#sz-body {
+    background: transparent;
+    position: absolute;
+    border: var(--sizing-div-border);
+    z-index: 100
+}
+
+#sz-footer {
+    background: transparent;
+    position: absolute;
+    border: var(--sizing-div-border);
+    z-index: 100;
+}

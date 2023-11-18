@@ -252,7 +252,7 @@ const ReportContent = (props) => {
     
     const componentCanMove = (section, key, pos) => {
         let retval = false;
-        let gutterHeight = pixelsToReportUnits(currentReport.pageUnits.substring(0, 2), SPLITTER_GUTTER_SIZE);
+        let gutterHeight = pixelsToReportUnits(currentReport.pageUnits, SPLITTER_GUTTER_SIZE);
         switch(section) {
             case REPORT_SECTION_HEADER:
                  switch(key) {
@@ -316,8 +316,7 @@ const ReportContent = (props) => {
                 let c = cr.reportComponents[i];
                 
                  if (c.selected) {
-                    let units = currentReport.pageUnits.substring(0, 2);
-                    let delta = pixelsToReportUnits(units, PIXELS_PER_KEYDOWN_MOVE);
+                    let delta = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_KEYDOWN_MOVE);
                      
                      if (!e.shiftKey) {
                        let code = e.code.toLowerCase(); 

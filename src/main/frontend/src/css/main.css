@@ -5,6 +5,7 @@
 @import "colors.css";
 @import "entrygrid.css";
 @import "treeview.css";
+@import "sizing.css";
 
 html {
     overflow: hidden;
@@ -795,46 +796,4 @@ Note: Beware of modifying this element as it can break the animations - you shou
     margin: 5px;
 }
 
-.sizing-tl {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: var(--sizing-rect-width);
-    height: var(--sizing-rect-width);
-    cursor: nw-resize;
-    background: transparent;
-    z-index: 10;
-}
 
-.sizing-tr {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: var(--sizing-rect-width);
-    height: var(--sizing-rect-width);
-    cursor: ne-resize;
-    background: transparent;
-    z-index: 10;
-}
-
-.sizing-bl {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: var(--sizing-rect-width);
-    height: var(--sizing-rect-width);
-    cursor: sw-resize;
-    background: transparent;
-    z-index: 10;
-}
-
-.sizing-br {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: var(--sizing-rect-width);
-    height: var(--sizing-rect-width);
-    cursor: se-resize;
-    background: transparent;
-    z-index: 10;
-}

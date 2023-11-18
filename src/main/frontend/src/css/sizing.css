@@ -58,23 +58,11 @@
     cursor: pointer;
 }
 
-#sz-header {
+.resizer {
+    display: none;
     background: transparent;
     position: absolute;
-    border: var(--sizing-div-border);
+    cursor: crosshair;
+    border: var(--sizing-border);
     z-index: 100
-}
-
-#sz-body {
-    background: transparent;
-    position: absolute;
-    border: var(--sizing-div-border);
-    z-index: 100
-}
-
-#sz-footer {
-    background: transparent;
-    position: absolute;
-    border: var(--sizing-div-border);
-    z-index: 100;
 }

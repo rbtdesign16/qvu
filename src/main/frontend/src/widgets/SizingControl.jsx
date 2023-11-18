@@ -9,7 +9,8 @@ import {
     pixelsToReportUnits,
     reportUnitsToPixels,
     copyObject,
-    pixelPosToNumber} from "../utils/helper";
+    pixelPosToNumber,
+    getSizer} from "../utils/helper";
 const SizingControl = (props) => {
     const {component, componentIndex, corner} = props;
     const {
@@ -19,7 +20,7 @@ const SizingControl = (props) => {
 
     const onHandleSize = (e) => {
         e.preventDefault();
-        let sz = getSizer();
+        let sz = getSizer(component.section);
 
         let xdif = e.pageX - sz.startX;
         let ydif = e.pageY - sz.startY;
@@ -64,14 +65,10 @@ const SizingControl = (props) => {
         }
     };
 
-    const getSizer = () => {
-        return document.getElementById("sz-" + component.section);
-    };
-    
     const onStopSize = (e) => {
         e.preventDefault();
-        let sz = getSizer();
-        sz.style.display = "none";
+        let sz = getSizer(component.section);
+        sz.style.display = "";
         sz.style.border = "";
         sz.startX = "";
         sz.startY = "";
@@ -91,7 +88,7 @@ const SizingControl = (props) => {
     const onMouseDown = (e) => {
         let units = currentReport.pageUnits.substring(0, 2);
 
-        let sz = getSizer();
+        let sz = getSizer(component.section);
         sz.style.left = reportUnitsToPixels(units, component.left) + "px";
         sz.style.top = reportUnitsToPixels(units, component.top) + "px";
         sz.style.width = reportUnitsToPixels(units, component.width) + "px";

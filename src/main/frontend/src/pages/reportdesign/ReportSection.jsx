@@ -9,6 +9,7 @@ import {
     REPORT_SECTION_FOOTER,
     REPORT_SECTION_BORDER,
     pixelsToReportUnits,
+    reportUnitsToPixels,
     getReportWidth,
     getReportHeight,
     isNotEmpty,
@@ -17,7 +18,10 @@ import {
     TOP_LEFT,
     TOP_RIGHT,
     BOTTOM_LEFT,
-    BOTTOM_RIGHT
+    BOTTOM_RIGHT,
+    getSizer,
+    intersectRect,
+    pixelPosToNumber
 } from "../../utils/helper";
 
 const ReportSection = (props) => {
@@ -136,11 +140,99 @@ const ReportSection = (props) => {
         }
     };
 
+    const onHandleLasso = (e) => {
+        e.preventDefault();
+        let sz = getSizer(section);
+
+        let top;
+        let left;
+        let width;
+        let height;
+
+        let rc = document.getElementById(section).getBoundingClientRect();
+
+        if ((e.clientX - rc.left) >= sz.startX) {
+            left = sz.startX + "px";
+            width = ((e.clientX - rc.left) - sz.startX) + "px";;
+            
+        } else {
+            left = (e.clientX - rc.left) + "px";
+            width = (sz.startX - (e.clientX - rc.left)) + "px";
+        }
+        
+        if ((e.clientY - rc.top) >= sz.startY) {
+            top = sz.startY + "px";
+            height = ((e.clientY - rc.top) - sz.startY) + "px";
+        } else {
+            top = (e.clientY - rc.top) + "px";
+            height = (sz.startY - (e.clientY - rc.top)) + "px";
+        }
+        
+        sz.style.left = left;
+        sz.style.top = top;
+        sz.style.width = width;
+        sz.style.height = height;
+
+    };
+    
+    const onStopLasso = (e) => {
+        e.preventDefault();
+        let sz = getSizer(section);
+        let cr = copyObject(currentReport);
+        
+         let rc1 = {left: pixelPosToNumber(sz.style.left), 
+            top: pixelPosToNumber(sz.style.top), 
+            right: pixelPosToNumber(sz.style.left) + pixelPosToNumber(sz.style.width), 
+            bottom: pixelPosToNumber(sz.style.top) + pixelPosToNumber(sz.style.height)};
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            let c = cr.reportComponents[i];
+            if (c.section === section) {
+                let rc2 = {
+                    left: reportUnitsToPixels(cr.pageUnits, c.left), 
+                    top: reportUnitsToPixels(cr.pageUnits, c.top), 
+                    right: reportUnitsToPixels(cr.pageUnits, c.left + c.width), 
+                    bottom: reportUnitsToPixels(cr.pageUnits, c.top + c.height)};
+                    c.selected = intersectRect(rc1, rc2);
+             } else {
+                c.selected = false;
+             }
+        }  
+        
+        sz.style.display = "";
+        sz.style.border = "";
+        sz.style.left = sz.style.top = sz.style.width = sz.style.height = 0;
+        sz.startX = "";
+        sz.startY = "";
+
+        document.getElementById(section).removeEventListener("mousemove", onHandleLasso, true);
+        document.getElementById(section).removeEventListener("mouseup", onStopLasso, true);
+        setCurrentReport(cr);
+    };
+
+    const onMouseDown = (e) => {
+        if (e.target.id && (e.target.id === section)) {
+            let sz = getSizer(section);
+             let rc = document.getElementById(section).getBoundingClientRect();
+            sz.startX = e.clientX - rc.left;
+            sz.startY =  e.clientY - rc.top;
+            
+            sz.style.left = sz.startX + "px";
+            sz.style.top = sz.startY + "px";
+            sz.style.width = sz.style.height = 0;
+            sz.style.display = "inline-block";
+           
+            document.getElementById(section).addEventListener("mousemove", onHandleLasso, true);
+            document.getElementById(section).addEventListener("mouseup", onStopLasso, true);
+        }
+    };
+
     return <div id={section} 
          onDrop={e => handleDrop(e)} 
          onDragOver={e => handleDragOver(e)}
+         onMouseDown={e => onMouseDown(e)}
          style={getStyle()}>
-            <div id={"sz-" + section} style={{display: "none"}}></div>
+            <div id={"sz-" + section} className="resizer"></div>
             {loadComponents()}
         </div>;
 };

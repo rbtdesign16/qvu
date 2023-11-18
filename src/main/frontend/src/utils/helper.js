@@ -850,4 +850,15 @@ export const pixelPosToNumber = (pos) => {
     if (pos) {
         return Number(pos.replace("px", ""));
     }
-}
+};
+
+export const getSizer = (sec) => {
+    return document.getElementById("sz-" + sec);
+};
+
+export const intersectRect = (r1, r2) => {
+  return !(r2.left > r1.right ||
+    r2.right < r1.left ||
+    r2.top > r1.bottom ||
+    r2.bottom < r1.top);
+};

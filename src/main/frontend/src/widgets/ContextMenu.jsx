@@ -5,9 +5,13 @@ const ContextMenu = (props) => {
     const {menuConfig} = useMenu();
     const getMenuItems = () => {
         return menuConfig.menuItems.map(m => {
-            return <div className="context-menu-element" onClick={() => menuConfig.handleContextMenu(m.action, menuConfig.id)}>
-                {m.text}
-            </div>;
+            if (m.separator) {
+                return <hr className="h-separator" />;
+            } else {
+                return <div className="context-menu-element" onClick={() => menuConfig.handleContextMenu(m.action, menuConfig.id)}>
+                    {m.text}
+                </div>;
+            }
         });
     };
     

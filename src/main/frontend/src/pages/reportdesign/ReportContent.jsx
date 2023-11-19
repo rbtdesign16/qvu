@@ -57,12 +57,18 @@ const ReportContent = (props) => {
             action: "delete"
         },
         {
+            separator: true
+        },
+        {
             text: getText("Push to Back"),
             action: "toback"
         },
         {
             text: getText("Move to Front"),
             action: "tofront"
+        },
+        {
+            separator: true
         }
     ];
 
@@ -70,6 +76,7 @@ const ReportContent = (props) => {
         if (!menuConfig.show) {
             e.preventDefault();
             let menuItems = copyObject(contextMenuItems);
+            
             if (!currentReport.reportComponents[componentIndex].selected) {
                 menuItems.push({text: getText("Select Component"),
                     action: "select"});

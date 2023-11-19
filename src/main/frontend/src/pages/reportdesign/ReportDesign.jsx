@@ -109,9 +109,15 @@ const ReportDesign = () => {
     const getComponentSelectMenu = () => {
         let retval = [];
 
+        let sepadded = false;
         for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
             // only include data types if query doc set
-            if (currentReport.queryDocumentName || !isQueryRequiredForType(reportSettings.reportObjectTypes[i])) {
+            let qr = isQueryRequiredForType(reportSettings.reportObjectTypes[i]);
+            if (currentReport.queryDocumentName || !qr) {
+                if (!sepadded && qr) {
+                    retval.push({separator: true});
+                    sepadded = true;
+                }
                 retval.push({
                     text: getText(reportSettings.reportObjectTypes[i]),
                     action: reportSettings.reportObjectTypes[i]

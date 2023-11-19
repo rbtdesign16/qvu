@@ -776,12 +776,13 @@ Note: Beware of modifying this element as it can break the animations - you shou
     z-index: 12;
     position: fixed;
     background: var(--context-menu-background-color);
+    border: var(--query-results-table-border);
 }
 .context-menu-element {
     color: var(--context-menu-font-color);
     font-size: var(--context-menu-font-size);
     cursor: pointer;
-    padding: 7px;
+    padding: 5px;
 }
 
 .context-menu-element:hover {

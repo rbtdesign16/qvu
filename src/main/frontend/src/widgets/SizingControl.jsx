@@ -79,15 +79,16 @@ const SizingControl = (props) => {
         c.top =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
         c.width =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
         c.height =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
-        document.getElementById(component.section).removeEventListener("mousemove", onHandleSize, true);
-        document.getElementById(component.section).removeEventListener("mouseup", onStopSize, true);
+        let sec = document.getElementById(component.section);
+        sec.style.cursor = "crosshair";
+        sec.removeEventListener("mousemove", onHandleSize, true);
+        sec.removeEventListener("mouseup", onStopSize, true);
         setCurrentReport(cr);
     };
 
     const onMouseDown = (e) => {
         e.preventDefault();
         let units = currentReport.pageUnits.substring(0, 2);
-        
         let sz = getSizer(component.section);
         sz.style.left = reportUnitsToPixels(units, component.left) + "px";
         sz.style.top = reportUnitsToPixels(units, component.top) + "px";
@@ -97,8 +98,10 @@ const SizingControl = (props) => {
         sz.startX = e.pageX;
         sz.startY = e.pageY;
         
-        document.getElementById(component.section).addEventListener("mousemove", onHandleSize, true);
-        document.getElementById(component.section).addEventListener("mouseup", onStopSize, true);
+        let sec = document.getElementById(component.section);
+        sec.style.cursor = "crosshair";
+        sec.addEventListener("mousemove", onHandleSize, true);
+        sec.addEventListener("mouseup", onStopSize, true);
     };
 
     return (

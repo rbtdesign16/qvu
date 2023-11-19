@@ -201,19 +201,25 @@ const ReportSection = (props) => {
         
         sz.style.display = "";
         sz.style.border = "";
+        
+        let sec = document.getElementById(section);
+        sec.style.cursor = "default";
+        
         sz.style.left = sz.style.top = sz.style.width = sz.style.height = 0;
         sz.startX = "";
         sz.startY = "";
 
-        document.getElementById(section).removeEventListener("mousemove", onHandleLasso, true);
-        document.getElementById(section).removeEventListener("mouseup", onStopLasso, true);
+        sec.removeEventListener("mousemove", onHandleLasso, true);
+        sec.removeEventListener("mouseup", onStopLasso, true);
         setCurrentReport(cr);
     };
 
     const onMouseDown = (e) => {
         if (e.target.id && (e.target.id === section)) {
             let sz = getSizer(section);
-             let rc = document.getElementById(section).getBoundingClientRect();
+            let sec = document.getElementById(section);
+            let rc = sec.getBoundingClientRect();
+            sec.style.cursor = "crosshair";
             sz.startX = e.clientX - rc.left;
             sz.startY =  e.clientY - rc.top;
             
@@ -222,8 +228,8 @@ const ReportSection = (props) => {
             sz.style.width = sz.style.height = 0;
             sz.style.display = "inline-block";
            
-            document.getElementById(section).addEventListener("mousemove", onHandleLasso, true);
-            document.getElementById(section).addEventListener("mouseup", onStopLasso, true);
+            sec.addEventListener("mousemove", onHandleLasso, true);
+            sec.addEventListener("mouseup", onStopLasso, true);
         }
     };
 

@@ -28,7 +28,9 @@ import {
     ARROW_LEFT_KEY,
     ARROW_RIGHT_KEY,
     PIXELS_PER_KEYDOWN_MOVE,
-    isQueryRequiredForReportObject
+    isQueryRequiredForReportObject,
+    confirm,
+
 } from "../../utils/helper";
 
 const ReportContent = (props) => {
@@ -227,8 +229,15 @@ const ReportContent = (props) => {
         cr.reportComponents[componentIndex].zindex = maxz + 1;
         setCurrentReport(cr);
     };
-
+    
+    const onDeleteComponent = async (componentIndex) => {
+        if (await confirm(getText("delete-component-prompt"))) {
+            deleteComponent(componentIndex);
+        }
+    };
+    
     const deleteComponent = (componentIndex) => {
+        
         let cr = copyObject(currentReport);
         let c = [];
         for (let i = 0; i < cr.reportComponents.length; ++i) {
@@ -255,7 +264,7 @@ const ReportContent = (props) => {
                 editComponent(id);
                 break;
             case "delete":
-                deleteComponent(id);
+                onDeleteComponent(id);
                 break;
             case "select":
                 setComponentSelected(id, true);

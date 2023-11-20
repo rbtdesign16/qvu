@@ -100,6 +100,7 @@
         "Default Report Units": "Default Report Units",
         "Default Security Type": "Default Security Type",
         "default document name": "new-document",
+        "delete-component-prompt": "Delete current component?",
         "Delete Component": "Delete Component",
         "delete datasource prompt": "delete datasource $1?",
         "Delete datasource": "Delete datasource",

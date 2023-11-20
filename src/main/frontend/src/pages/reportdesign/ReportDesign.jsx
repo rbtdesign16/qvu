@@ -37,7 +37,11 @@ import {
     BOTTOM,
     RULER_WIDTH,
     replaceTokens,
-    copyObject
+    copyObject,
+    isQueryRequiredForReportObject,
+    REPORT_UNITS_MM,
+    INCHES_TO_MM,
+    MM_TO_INCHES
 } from "../../utils/helper";
 import {
     getReportSettings,
@@ -96,40 +100,12 @@ const ReportDesign = () => {
         undo,
         canUndo} = useReportDesign();
 
-    const isQueryRequiredForType = (type) => {
-        return (type.includes("data") || type.includes("chart"));
-    };
-    
     const onUndo = (e) => {
         e.preventDefault();
         setMenuOpen(false);
         undo();
     };
     
-    const getComponentSelectMenu = () => {
-        let retval = [];
-
-        let sepadded = false;
-        for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
-            // only include data types if query doc set
-            let qr = isQueryRequiredForType(reportSettings.reportObjectTypes[i]);
-            if (currentReport.queryDocumentName || !qr) {
-                if (!sepadded && qr) {
-                    retval.push({separator: true});
-                    sepadded = true;
-                }
-                retval.push({
-                    text: getText(reportSettings.reportObjectTypes[i]),
-                    action: reportSettings.reportObjectTypes[i]
-                });
-            }
-        }
-        return retval;
-    };
-
-    const handleAddComponent = (type) => {
-        alert("----->" + type);
-    };
 
     const handleStateChange = (state) => {
         setMenuOpen(state.isOpen);
@@ -143,23 +119,6 @@ const ReportDesign = () => {
         return isReportDesigner(authData);
     };
 
-    const onAddComponent = (e) => {
-        closeMenu();
-        if (!menuConfig.show) {
-            e.preventDefault();
-
-            const items = getComponentSelectMenu();
-            showMenu({
-                show: true,
-                x: e.pageX,
-                y: 150,
-                menuItems: items,
-                handleContextMenu: handleAddComponent});
-        } else {
-            hideMenu(e);
-        }
-
-    };
 
     const onTextAlign = (align) => {
         let cr = copyObject(currentReport);
@@ -249,24 +208,6 @@ const ReportDesign = () => {
         });
     };
 
-    const onSelectAll = (sel) => {
-        closeMenu();
-        
-        let cr = copyObject(currentReport);
-        
-        for (let i = 0; i < cr.reportComponents.length; ++i) {
-            cr.reportComponents[i].selected = sel;
-        }
-        
-        if (!sel) {
-            setLastSelectedIndex(-1);
-        } else {
-            setLastSelectedIndex(cr.reportComponents.length - 1);
-        }
-        
-        setCurrentReport(cr);
-    };
-
     const onComponentAlign = (align) => {
         closeMenu();
         
@@ -309,8 +250,32 @@ const ReportDesign = () => {
         let cr = copyObject(currentReport);
         cr.pageSize = settings.pageSize;
         cr.pageOrientation = settings.pageOrientation;
+        let convFactor = 1.0;
+        if (settings.pageUnits !== cr.pageUnits) {
+            if (cr.pageUnits === REPORT_UNITS_MM) {
+                convFactor = MM_TO_INCHES;
+            } else {
+                convFactor = INCHES_TO_MM;;
+            }
+        }
+        
         cr.pageUnits = settings.pageUnits;
-        cr.pageBorder = [Number(settings.borderLeft), Number(settings.borderTop), Number(settings.borderRight), Number(settings.borderBottom)];
+        cr.pageBorder = [Number(settings.borderLeft), 
+            Number(settings.borderTop), 
+            Number(settings.borderRight), 
+            Number(settings.borderBottom)];
+        
+        if (convFactor !== 1) {
+            cr.headerHeight *= convFactor;
+            cr.footerHeight *= convFactor;
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                cr.reportComponents[i].left *= convFactor;
+                cr.reportComponents[i].top *= convFactor;
+                cr.reportComponents[i].width *= convFactor;
+                cr.reportComponents[i].height *= convFactor;
+            }
+        }
+        
         setCurrentReport(cr);
         setShowReportSettings({show: false});
     };
@@ -334,7 +299,7 @@ const ReportDesign = () => {
                 let c = [];
 
                 for (let i = 0; i < cr.reportComponents.length; ++i) {
-                    if (!isQueryRequiredForType(cr.reportComponents[i].type)) {
+                    if (!isQueryRequiredForReportObject(cr.reportComponents[i].type)) {
                         c.push(cr.reportComponents[i]);
                     }
                 }
@@ -374,11 +339,7 @@ const ReportDesign = () => {
             <hr  className="h-separator" />
             <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
             <hr className="h-separator" />
-            <div onClick={e => onAddComponent(e)}><LiaThListSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Add Component")}</div>
             {canUndo() && <div onClick={e => onUndo(e)}><LiaUndoAltSolid   size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Undo Last Change")}</div>}
-            <hr className="h-separator" />
-            <div onClick={e => onSelectAll(true)}><BiWindowOpen size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Select All")}</div>
-            <div onClick={e => onSelectAll(false)}><BiWindowClose size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Deselect All")}</div>
             {sel && <hr  className="h-separator" />}
             {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
             {sel && <div onClick={onSetBorder}><AiOutlineBorder size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Border")}</div>}

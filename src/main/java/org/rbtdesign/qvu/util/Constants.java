@@ -256,17 +256,17 @@ public class Constants {
         REPORT_SECTION_FOOTER
     };
     
-    public static final String REPORT_COMPONENT_TYPE_TEXT = "text";
-    public static final String REPORT_COMPONENT_TYPE_IMAGE = "image";
-    public static final String REPORT_COMPONENT_TYPE_SHAPE = "shape";
-    public static final String REPORT_COMPONENT_TYPE_HYPERLINK = "hyperlink";
-    public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER = "pagenumber";
-    public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE = "currentdate";
-    public static final String REPORT_COMPONENT_TYPE_DATA_GRID = "datagrid";
-    public static final String REPORT_COMPONENT_TYPE_DATA_FIELD = "datafield";
-    public static final String REPORT_COMPONENT_TYPE_DATA_RECORD = "datarecord";
-    public static final String REPORT_COMPONENT_TYPE_CHART = "chart";
-    public static final String REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
+    public static final String REPORT_COMPONENT_TYPE_TEXT = "Text";
+    public static final String REPORT_COMPONENT_TYPE_IMAGE = "Image";
+    public static final String REPORT_COMPONENT_TYPE_SHAPE = "Shape";
+    public static final String REPORT_COMPONENT_TYPE_HYPERLINK = "Hyperlink";
+    public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER = "Page Number";
+    public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE = "Current Date";
+    public static final String REPORT_COMPONENT_TYPE_DATA_GRID = "Data Grid";
+    public static final String REPORT_COMPONENT_TYPE_DATA_FIELD = "Data Field";
+    public static final String REPORT_COMPONENT_TYPE_DATA_RECORD = "Data Record";
+    public static final String REPORT_COMPONENT_TYPE_CHART = "Chart";
+    public static final String REPORT_COMPONENT_TYPE_SUBREPORT = "Sub Report";
     
     public static final String[] REPORT_OBJECT_TYPES = {
         REPORT_COMPONENT_TYPE_TEXT,
@@ -275,11 +275,11 @@ public class Constants {
         REPORT_COMPONENT_TYPE_HYPERLINK,
         REPORT_COMPONENT_TYPE_PAGE_NUMBER,
         REPORT_COMPONENT_TYPE_CURRENT_DATE,
+        REPORT_COMPONENT_TYPE_CHART,
+        REPORT_COMPONENT_TYPE_SUBREPORT,
         REPORT_COMPONENT_TYPE_DATA_FIELD,
         REPORT_COMPONENT_TYPE_DATA_GRID,
-        REPORT_COMPONENT_TYPE_DATA_RECORD,
-        REPORT_COMPONENT_TYPE_CHART,
-        REPORT_COMPONENT_TYPE_SUBREPORT
+        REPORT_COMPONENT_TYPE_DATA_RECORD
     };
         
     public static final String DEFAULT_REPORT_FONT = "Arial";

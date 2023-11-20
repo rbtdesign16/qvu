@@ -27,8 +27,9 @@ import {
     ARROW_DOWN_KEY,
     ARROW_LEFT_KEY,
     ARROW_RIGHT_KEY,
-    PIXELS_PER_KEYDOWN_MOVE
-    } from "../../utils/helper";
+    PIXELS_PER_KEYDOWN_MOVE,
+    isQueryRequiredForReportObject
+} from "../../utils/helper";
 
 const ReportContent = (props) => {
     const {
@@ -47,8 +48,10 @@ const ReportContent = (props) => {
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
 
-    const contextMenuItems = [
-        {
+    const getComponentContextMenuItems = (componentIndex) => {
+        let retval = [];
+        
+        retval.push({
             text: getText("Edit Component"),
             action: "edit"
         },
@@ -69,29 +72,96 @@ const ReportContent = (props) => {
         },
         {
             separator: true
+        });
+    
+    
+        if (!currentReport.reportComponents[componentIndex].selected) {
+           retval.push({text: getText("Select Component"),
+                action: "select"});
+        } else {
+            retval.push({text: getText("Deselect Component"),
+                action: "deselect"});
         }
-    ];
+ 
+        return retval;
+    };
 
-    const onContextMenu = (e, componentIndex) => {
+    const getSectionContextMenuItems = () => {
+        let retval = [{group: getText("Add Component")}];
+        let fd = false;
+        for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
+            let qr = isQueryRequiredForReportObject(reportSettings.reportObjectTypes[i]);
+            if (currentReport.queryDocumentName || !qr) {
+                if (qr && !fd) {
+                    retval.push({separator: true});
+                    fd = true;
+                }
+                
+                retval.push({
+                    style: {paddingLeft: "20px"},
+                    text: " - " + getText(reportSettings.reportObjectTypes[i]),
+                    action: reportSettings.reportObjectTypes[i].toLowerCase().replaceAll(" ", "")
+                });
+            }
+        }
+
+        
+        retval.push({ separator: true});
+        retval.push({
+            text: getText("Select All"),
+            action: "selectall"
+        });
+        
+        retval.push({
+            text: getText("Deselect All"),
+            action: "deselectall"
+        });
+        
+        return retval;
+    };
+    
+    
+    const onSelectAll = (sel, section) => {
+        hideMenu();
+        
+        let cr = copyObject(currentReport);
+        
+        for (let i = 0; i < cr.reportComponents.length; ++i) {
+            if (cr.reportComponents[i].section === section) {
+                cr.reportComponents[i].selected = sel;
+            }
+        }
+        
+        if (!sel) {
+            setLastSelectedIndex(-1);
+        } else {
+            setLastSelectedIndex(cr.reportComponents.length - 1);
+        }
+        
+        setCurrentReport(cr);
+    };
+    
+    
+    const onContextMenu = (e, componentIndex, section) => {
         if (!menuConfig.show) {
             e.preventDefault();
-            let menuItems = copyObject(contextMenuItems);
-            
-            if (!currentReport.reportComponents[componentIndex].selected) {
-                menuItems.push({text: getText("Select Component"),
-                    action: "select"});
-            } else {
-                menuItems.push({text: getText("Deselect Component"),
-                    action: "deselect"});
-            }
+            e.stopPropagation();
+            let menuItems;
 
+            if (componentIndex < 0) {
+                menuItems = getSectionContextMenuItems();
+            } else {
+                menuItems = getComponentContextMenuItems(componentIndex);
+            }
             showMenu({
                 show: true,
                 x: e.pageX,
                 y: e.pageY,
                 id: componentIndex,
+                section: section,
                 menuItems: menuItems,
                 handleContextMenu: handleContextMenu});
+
         } else {
             hideMenu(e);
         }
@@ -107,7 +177,7 @@ const ReportContent = (props) => {
         }
         setCurrentReport(cr);
     };
-    
+
     const getMaxZindex = () => {
         let retval = 0;
         for (let i = 0; i < currentReport.reportComponents.length; ++i) {
@@ -118,14 +188,14 @@ const ReportContent = (props) => {
                 }
             }
         }
-    
+
         if (retval === 0) {
             retval = 1;
         }
-        
+
         return retval;
     };
-    
+
     const getMinZindex = () => {
         let retval = 100;
         for (let i = 0; i < currentReport.reportComponents.length; ++i) {
@@ -134,23 +204,23 @@ const ReportContent = (props) => {
                 if (retval > z) {
                     retval = z;
                 }
-            } 
+            }
         }
-    
+
         if (retval === 100) {
             retval = 1;
         }
-        
+
         return retval;
     };
-    
+
     const moveComponentToBack = (componentIndex) => {
         let minz = getMinZindex();
         let cr = copyObject(currentReport);
         cr.reportComponents[componentIndex].zindex = minz - 1;
         setCurrentReport(cr);
     };
-    
+
     const moveComponentToFront = (componentIndex) => {
         let maxz = getMaxZindex();
         let cr = copyObject(currentReport);
@@ -170,14 +240,14 @@ const ReportContent = (props) => {
         if (lastSelectedIndex === componentIndex) {
             setLastSelectedIndex(-1);
         }
-        
+
         setCurrentReport(cr);
     };
 
     const editComponent = (componentIndex) => {
     };
-    
-    const handleContextMenu = (action, id) => {
+
+    const handleContextMenu = (action, id, section) => {
         hideMenu();
 
         switch (action) {
@@ -199,18 +269,32 @@ const ReportContent = (props) => {
             case "toback":
                 moveComponentToBack(id);
                 break;
+            case "selectall":
+                onSelectAll(true, section);
+                break;
+            case "deselectall":
+                onSelectAll(false, section);
+                break;
+            case "text":   
+            case "image":   
+            case "hyperlink":   
+            case "pagenumber":   
+            case "currentdate":   
+            case "datagrid":   
+            case "datafield":   
+            case "datarecord":   
+            case "chart":   
+            case "subreport":
+                onAddComponent(action, section);
+                break;
         }
     };
 
     const getStyle = () => {
         if (currentReport.reportComponents.length === 0) {
             currentReport.reportComponents.push(getNewComponent("body", "text", "this is a test"));
-            let c = getNewComponent("body", "datagrid", "this is a test");
-            c.left = 3;
-            c.top = 3;
-            c.width = 3;
-            c.height = 3;
-            
+            let c = getNewComponent("body", "text", "this is another test", {left: 2, top: 2, width: 2, height: 1});
+      
             currentReport.reportComponents.push(c);
         }
 
@@ -256,54 +340,54 @@ const ReportContent = (props) => {
     const onClick = (e) => {
         hideMenu(e);
     };
-    
+
     const componentCanMove = (section, key, pos) => {
         let retval = false;
         let gutterHeight = pixelsToReportUnits(currentReport.pageUnits, SPLITTER_GUTTER_SIZE);
-        switch(section) {
+        switch (section) {
             case REPORT_SECTION_HEADER:
-                 switch(key) {
+                switch (key) {
                     case ARROW_UP_KEY:
-                         retval = (pos > 0);
-                         break;   
+                        retval = (pos > 0);
+                        break;
                     case ARROW_DOWN_KEY:
-                         retval = (pos < (currentReport.headerHeight - currentReport.pageBorder[1]));
-                         break;
+                        retval = (pos < (currentReport.headerHeight - currentReport.pageBorder[1]));
+                        break;
                     case ARROW_LEFT_KEY:
-                         retval = (pos > 0);
-                         break;
+                        retval = (pos > 0);
+                        break;
                     case ARROW_RIGHT_KEY:
                         retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
                         break;
                 }
                 break;
             case REPORT_SECTION_BODY:
-                switch(key) {
+                switch (key) {
                     case ARROW_UP_KEY:
-                         retval = (pos > 0);
-                         break;   
+                        retval = (pos > 0);
+                        break;
                     case ARROW_DOWN_KEY:
-                         retval = (pos < (reportHeight - (currentReport.headerHeight + currentReport.footerHeight + gutterHeight)));
-                         break;
+                        retval = (pos < (reportHeight - (currentReport.headerHeight + currentReport.footerHeight + gutterHeight)));
+                        break;
                     case ARROW_LEFT_KEY:
-                         retval = (pos > 0);
-                         break;
+                        retval = (pos > 0);
+                        break;
                     case ARROW_RIGHT_KEY:
                         retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
                         break;
                 }
                 break;
             case REPORT_SECTION_FOOTER:
-               switch(key) {
+                switch (key) {
                     case ARROW_UP_KEY:
-                         retval = (pos > 0);
-                         break;   
+                        retval = (pos > 0);
+                        break;
                     case ARROW_DOWN_KEY:
-                         retval = (pos < (currentReport.footerHeight - currentReport.pageBorder[3]));
-                         break;
+                        retval = (pos < (currentReport.footerHeight - currentReport.pageBorder[3]));
+                        break;
                     case ARROW_LEFT_KEY:
-                         retval = (pos > 0);
-                         break;
+                        retval = (pos > 0);
+                        break;
                     case ARROW_RIGHT_KEY:
                         retval = (pos < (reportWidth - (currentReport.pageBorder[2] + currentReport.pageBorder[0])));
                         break;
@@ -313,7 +397,7 @@ const ReportContent = (props) => {
 
         return retval;
     };
-    
+
     const onKeyDown = (e) => {
         if (isArrowKey(e) && haveSelectedComponents()) {
             e.preventDefault();
@@ -321,19 +405,19 @@ const ReportContent = (props) => {
             let updated = false;
             for (let i = 0; i < cr.reportComponents.length; ++i) {
                 let c = cr.reportComponents[i];
-                
-                 if (c.selected) {
+
+                if (c.selected) {
                     let delta = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_KEYDOWN_MOVE);
-                     
-                     if (!e.shiftKey) {
-                       let code = e.code.toLowerCase(); 
-                       switch(code) {
+
+                    if (!e.shiftKey) {
+                        let code = e.code.toLowerCase();
+                        switch (code) {
                             case ARROW_UP_KEY:
                                 if (componentCanMove(c.section, code, (c.top - delta))) {
                                     c.top -= delta;
                                     updated = true;
                                 }
-                                break;   
+                                break;
                             case ARROW_DOWN_KEY:
                                 if (componentCanMove(c.section, code, (c.top + delta))) {
                                     c.top += delta;
@@ -355,10 +439,10 @@ const ReportContent = (props) => {
                         }
                     } else {
                         updated = true;
-                        switch(e.code.toLowerCase()) {
+                        switch (e.code.toLowerCase()) {
                             case ARROW_UP_KEY:
                                 c.height -= delta;
-                                break;   
+                                break;
                             case ARROW_DOWN_KEY:
                                 c.height += delta;
                                 break;
@@ -372,17 +456,17 @@ const ReportContent = (props) => {
                     }
                 }
             }
-            
+
             if (updated) {
                 setCurrentReport(cr);
             }
         }
     };
-    
+
     return <div tabIndex="0" style={getStyle()} 
-        className="report-content"
-        onKeyDown={e => onKeyDown(e)}
-        onClick={e => onClick(e)}>
+         className="report-content"
+         onKeyDown={e => onKeyDown(e)}
+         onClick={e => onClick(e)}>
         <ContextMenu />
         <Splitter style={{border: "none",
             width: (reportWidthPixels - 1) + "px",
@@ -400,7 +484,7 @@ const ReportContent = (props) => {
                 <ReportSection section={REPORT_SECTION_FOOTER} onContextMenu={onContextMenu}/>
             </SplitterPanel>
         </Splitter>
-</div>;
+    </div>;
 };
 
 export default ReportContent;

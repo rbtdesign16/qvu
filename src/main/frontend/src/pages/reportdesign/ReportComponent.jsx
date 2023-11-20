@@ -10,16 +10,6 @@ import {
     REPORT_SECTION_HEADER,
     REPORT_SECTION_BODY,
     REPORT_SECTION_FOOTER,
-    REPORT_COMPONENT_TYPE_TEXT,
-    REPORT_COMPONENT_TYPE_IMAGE,
-    REPORT_COMPONENT_TYPE_HYPERLINK,
-    REPORT_COMPONENT_TYPE_PAGE_NUMBER,
-    REPORT_COMPONENT_TYPE_CURRENT_DATE,
-    REPORT_COMPONENT_TYPE_DATA_GRID,
-    REPORT_COMPONENT_TYPE_DATA_FIELD,
-    REPORT_COMPONENT_TYPE_DATA_RECORD,
-    REPORT_COMPONENT_TYPE_GRAPH,
-    REPORT_COMPONENT_TYPE_SUBREPORT,
     REPORT_COMPONENT_CONTAINER_BORDER,
     REPORT_COMPONENT_CONTAINER_BORDER_SELECTED,
     copyObject,
@@ -139,20 +129,7 @@ const ReportComponent = (props) => {
     };
 
     const getComponentValue = () => {
-        switch (component.type) {
-            case REPORT_COMPONENT_TYPE_TEXT:
-                return component.value;
-            case REPORT_COMPONENT_TYPE_IMAGE:
-            case REPORT_COMPONENT_TYPE_HYPERLINK:
-            case REPORT_COMPONENT_TYPE_PAGE_NUMBER:
-            case REPORT_COMPONENT_TYPE_CURRENT_DATE:
-            case REPORT_COMPONENT_TYPE_DATA_GRID:
-            case REPORT_COMPONENT_TYPE_DATA_FIELD:
-            case REPORT_COMPONENT_TYPE_DATA_RECORD:
-            case REPORT_COMPONENT_TYPE_GRAPH:
-            case REPORT_COMPONENT_TYPE_SUBREPORT:
-                return component.value;
-        }
+        return component.value;
     };
 
     const getClassName = () => {

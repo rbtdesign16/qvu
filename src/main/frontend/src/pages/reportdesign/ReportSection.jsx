@@ -2,6 +2,7 @@ import React from "react";
 import { Splitter, SplitterPanel } from 'primereact/splitter';
 import useReportDesign from "../../context/ReportDesignContext";
 import ReportComponent from "./ReportComponent";
+import ReportContent from "./ReportContent";
 import PropTypes from "prop-types";
 import {
     REPORT_SECTION_HEADER,
@@ -35,7 +36,8 @@ const ReportSection = (props) => {
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
 
-    const getSectionHeight = () => {
+
+     const getSectionHeight = () => {
         switch (section) {
             case REPORT_SECTION_HEADER:
                 return currentReport.headerHeight;
@@ -237,8 +239,9 @@ const ReportSection = (props) => {
          onDrop={e => handleDrop(e)} 
          onDragOver={e => handleDragOver(e)}
          onMouseDown={e => onMouseDown(e)}
+         onContextMenu={e => onContextMenu(e, -1, section)} 
          style={getStyle()}>
-            <div id={"sz-" + section} className="resizer"></div>
+             <div id={"sz-" + section} className="resizer"></div>
             {loadComponents()}
         </div>;
 };

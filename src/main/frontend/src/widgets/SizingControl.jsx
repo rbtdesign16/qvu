@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useReportDesign from "../context/ReportDesignContext";
 import {
-    TOP_LEFT,
-    TOP_RIGHT,
-    BOTTOM_LEFT,
-    BOTTOM_RIGHT,
-    pixelsToReportUnits,
-    reportUnitsToPixels,
-    copyObject,
-    pixelPosToNumber,
-    getSizer} from "../utils/helper";
+TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_RIGHT,
+        pixelsToReportUnits,
+        reportUnitsToPixels,
+        copyObject,
+        pixelPosToNumber,
+        getSizer} from "../utils/helper";
 const SizingControl = (props) => {
     const {component, componentIndex, corner} = props;
     const {
@@ -24,10 +24,10 @@ const SizingControl = (props) => {
 
         let xdif = e.pageX - sz.startX;
         let ydif = e.pageY - sz.startY;
-        
+
         sz.startX = e.pageX;
         sz.startY = e.pageY;
-        
+
         let top = pixelPosToNumber(sz.style.top);
         let left = pixelPosToNumber(sz.style.left);
         let width = pixelPosToNumber(sz.style.width);
@@ -71,14 +71,14 @@ const SizingControl = (props) => {
         sz.style.border = "";
         sz.startX = "";
         sz.startY = "";
-        
+
         let cr = copyObject(currentReport);
         let c = cr.reportComponents[componentIndex];
         let units = currentReport.pageUnits.substring(0, 2);
         c.left = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
-        c.top =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
-        c.width =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
-        c.height =  pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
+        c.top = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
+        c.width = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
+        c.height = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
         let sec = document.getElementById(component.section);
         sec.style.cursor = "crosshair";
         sec.removeEventListener("mousemove", onHandleSize, true);
@@ -97,7 +97,7 @@ const SizingControl = (props) => {
         sz.style.display = "inline-block";
         sz.startX = e.pageX;
         sz.startY = e.pageY;
-        
+
         let sec = document.getElementById(component.section);
         sec.style.cursor = "crosshair";
         sec.addEventListener("mousemove", onHandleSize, true);

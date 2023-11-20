@@ -3,7 +3,10 @@ import {
     isEmpty,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
-    MAX_UNDOS
+    MAX_UNDOS,
+    REPORT_UNITS_MM,
+    DEFAULT_MM_COMPONENT_POS,
+    DEFAULT_INCH_COMPONENT_POS
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -74,8 +77,21 @@ export const ReportDesignProvider = ({ children }) => {
             color: reportSettings.defaultBorderColor
         };
     };
-
-    const getNewComponent = (section, type, value) => {
+    
+    const getNewComponentPosition = () => {
+        if (currentReport.pageUnits === REPORT_UNITS_MM) {
+            return DEFAULT_MM_COMPONENT_POS;
+        } else {
+            return DEFAULT_INCH_COMPONENT_POS;
+        }
+    };
+    
+    const getNewComponent = (section, type, value, pos) => {
+        
+        if (!pos) {
+            pos = getNewComponentPosition();
+        }
+        
         return {
             type: type,
             align: "center",
@@ -83,10 +99,10 @@ export const ReportDesignProvider = ({ children }) => {
             backgroundColor: reportSettings.defaultBackgroundColor,
             fontSettings: getNewFontSettings(),
             value: value,
-            left: 0.5,
-            top: 0.5,
-            width: 1.0,
-            height: 0.5,
+            left: pos.left,
+            top: pos.top,
+            width: pos.width,
+            height: pos.height,
             section: section,
             selected: false,
             zindex: 1

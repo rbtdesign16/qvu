@@ -810,18 +810,6 @@ export const REPORT_SECTION_BODY = "body";
 export const REPORT_SECTION_FOOTER = "footer";
 export const REPORT_SECTION_BORDER = "solid 1px blue";
 
-export const REPORT_COMPONENT_TYPE_TEXT = "text";
-export const REPORT_COMPONENT_TYPE_IMAGE = "image";
-export const REPORT_COMPONENT_TYPE_SHAPE = "shape";
-export const REPORT_COMPONENT_TYPE_HYPERLINK = "hyperlink";
-export const REPORT_COMPONENT_TYPE_PAGE_NUMBER = "page number";
-export const REPORT_COMPONENT_TYPE_CURRENT_DATE = "current date";
-export const REPORT_COMPONENT_TYPE_DATA_GRID = "data grid";
-export const REPORT_COMPONENT_TYPE_DATA_FIELD = "data field";
-export const REPORT_COMPONENT_TYPE_DATA_RECORD = "data record";
-export const REPORT_COMPONENT_TYPE_GRAPH = "graph";
-export const REPORT_COMPONENT_TYPE_SUBREPORT = "subreport";
-
 export const ESCAPE_KEY_CODE = 27;
 export const MAX_UNDOS = 3;
 export const MOVE_DROP_EFFECT = "move";
@@ -862,3 +850,14 @@ export const intersectRect = (r1, r2) => {
     r2.top > r1.bottom ||
     r2.bottom < r1.top);
 };
+
+export const isQueryRequiredForReportObject = (type) => {
+    let check = type.toLowerCase();
+    return (check.includes("data") || check.includes("chart"));
+};
+   
+export const MM_TO_INCHES = 0.0393701;
+export const INCHES_TO_MM = 25.4;       
+export const DEFAULT_MM_COMPONENT_POS = {left: 5, top: 5, height: 5, width: 10};    
+export const DEFAULT_INCH_COMPONENT_POS = {left: 0.5, top: 0.5, height: 0.5, width: 1};    
+

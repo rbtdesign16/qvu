@@ -95,7 +95,7 @@ const SaveDocumentModal = (props) => {
 };
 
 SaveDocumentModal.propTypes = {
-    config: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired
 };
 
 export default SaveDocumentModal;

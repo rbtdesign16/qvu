@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import useMessage from "../context/MessageContext";
 import useLang from "../context/LangContext";
+import ColorPicker from "./ColorPicker";
 import PropTypes from "prop-types";
 
 const BorderPanel = (props) => {
@@ -21,10 +22,6 @@ const BorderPanel = (props) => {
             case "rounded":
                 borderSettings[e.target.name] = e.target.checked;
                 break;
-            case "color":
-                borderSettings[e.target.name] = e.target.value;
-                break;
-                
         }
         
         setToggle(!toggle);
@@ -96,11 +93,15 @@ const BorderPanel = (props) => {
         return retval;
     };
     
+    const setColor = (color) => {
+        borderSettings.color = color;
+    };
+        
     if (borderSettings && reportSettings) {
         return (<div className="entrygrid-100-150">
                 <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => onChange(e)}>{getBorderStyles()}</select></div>
                 <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => onChange(e)}>{getBorderSizes()}</select></div>
-                <div className="label">{getText("Color:")}</div><div><input name="color" type="color" onChange={e => onChange(e)} defaultValue={borderSettings.color}/></div>
+                <div className="label">{getText("Color:")}</div><div><ColorPicker color={borderSettings.color} setColor={setColor}/></div>
                 <div></div><div><input name="left" type="checkbox" defaultChecked={borderSettings.left} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="left">{getText("Left")}</label></div>
                 <div></div><div><input name="top" type="checkbox" defaultChecked={borderSettings.top} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="top">{getText("Top")}</label></div>
                 <div></div><div><input name="right" type="checkbox" defaultChecked={borderSettings.right} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="right">{getText("Right")}</label></div>

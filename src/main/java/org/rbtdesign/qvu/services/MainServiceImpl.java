@@ -2351,6 +2351,8 @@ public class MainServiceImpl implements MainService {
         result.setDefaultBackgroundColor(config.getDefaultComponentBackgroundColor());
         result.setDefaultForegroundColor(config.getDefaultComponentForegroundColor());
         result.setReportShapes(Arrays.asList(Constants.REPORT_SHAPES));
+        result.setDefaultBorderColor(Constants.DEFAULT_BORDER_COLOR);
+        result.setDefaultBorderStyle(Constants.DEFAULT_BORDER_STYLE);
         retval.setResult(result);
 
         return retval;

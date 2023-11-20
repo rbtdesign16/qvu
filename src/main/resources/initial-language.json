@@ -153,7 +153,7 @@
         "errorCode2": "$1 updated",
         "errorCode3": "$1 not found",
         "errorCode4": "An unexpected error has occured = $1",
-        "Example:": "Excample:",
+        "Example:": "Example:",
         "excel": "excel",
         "Execute Timeout Seconds": "Execute Timeout Seconds",
         "Export to excel": "Export to excel",

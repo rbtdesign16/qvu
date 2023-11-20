@@ -20,7 +20,12 @@ const ContextMenu = (props) => {
                         
                     return <div style={myStyle} 
                         className="context-menu-element" 
-                        onClick={() => menuConfig.handleContextMenu(m.action, menuConfig.id, menuConfig.section)}>
+                        onClick={(e) => menuConfig.handleContextMenu(m.action, 
+                            menuConfig.id, 
+                            menuConfig.section, 
+                            m.displayText, 
+                            menuConfig.x, 
+                            menuConfig.y)}>
                                 {m.text}
                         </div>;
                 }

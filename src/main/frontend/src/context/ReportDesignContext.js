@@ -98,6 +98,7 @@ export const ReportDesignProvider = ({ children }) => {
             foregroundColor: reportSettings.defaultForegroundColor,
             backgroundColor: reportSettings.defaultBackgroundColor,
             fontSettings: getNewFontSettings(),
+            borderSettings: getNewBorderSettings(),
             value: value,
             left: pos.left,
             top: pos.top,

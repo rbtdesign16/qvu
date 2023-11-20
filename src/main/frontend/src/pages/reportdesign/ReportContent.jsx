@@ -4,6 +4,7 @@ import ReportSection from "./ReportSection";
 import useReportDesign from "../../context/ReportDesignContext";
 import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu"
+import AddEditComponentModal from "./AddEditComponentModal";
 import useLang from "../../context/LangContext";
 import {
     REPORT_ORIENTATION_LANDSCAPE,
@@ -47,6 +48,7 @@ const ReportContent = (props) => {
     const reportHeight = getReportHeight(currentReport, reportSettings);
     const reportWidthPixels = getReportWidthInPixels(currentReport, reportSettings);
     const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
+    const [showAddEditComponent, setShowAddEditComponent] = useState({show: false});
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
 
@@ -102,6 +104,7 @@ const ReportContent = (props) => {
                 retval.push({
                     style: {paddingLeft: "20px"},
                     text: " - " + getText(reportSettings.reportObjectTypes[i]),
+                    displayText: getText(reportSettings.reportObjectTypes[i]),
                     action: reportSettings.reportObjectTypes[i].toLowerCase().replaceAll(" ", "")
                 });
             }
@@ -237,7 +240,6 @@ const ReportContent = (props) => {
     };
     
     const deleteComponent = (componentIndex) => {
-        
         let cr = copyObject(currentReport);
         let c = [];
         for (let i = 0; i < cr.reportComponents.length; ++i) {
@@ -254,9 +256,26 @@ const ReportContent = (props) => {
     };
 
     const editComponent = (componentIndex) => {
+        let comp = copyObject(currentReport.reportComponents[componentIndex]);
+        setShowAddEditComponent({show: true, component: comp, saveComponent: saveReportComponent, hide: hideAddEditComponent});
     };
 
-    const handleContextMenu = (action, id, section) => {
+    const hideAddEditComponent = () => {
+        setShowAddEditComponent({show: false});
+    };
+    
+    const saveReportComponent = (component) => {
+        hideAddEditComponent();
+    };
+    
+    const onAddComponent = (section, type, displayText, x, y) => {
+        let comp = getNewComponent(section, type);
+        comp.left = x;
+        comp.top = y;
+        setShowAddEditComponent({show: true, component: comp, reportSettings: reportSettings, displayText: displayText, saveComponent: saveReportComponent, hide: hideAddEditComponent});
+    };
+
+    const handleContextMenu = (action, id, section, displayText, x, y) => {
         hideMenu();
 
         switch (action) {
@@ -294,7 +313,7 @@ const ReportContent = (props) => {
             case "datarecord":   
             case "chart":   
             case "subreport":
-                onAddComponent(action, section);
+                onAddComponent(section, action, displayText, x, y);
                 break;
         }
     };
@@ -477,6 +496,7 @@ const ReportContent = (props) => {
          onKeyDown={e => onKeyDown(e)}
          onClick={e => onClick(e)}>
         <ContextMenu />
+        <AddEditComponentModal config={showAddEditComponent}/>
         <Splitter style={{border: "none",
             width: (reportWidthPixels - 1) + "px",
             height: (reportHeightPixels - 1) + "px"}} 

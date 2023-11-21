@@ -77,6 +77,7 @@ const AddEditComponentModal = (props) => {
                     c.value[e.target.name] = e.target.value;
                 }
                 break;
+            case "email":
             case "hyperlink":
                 if (e.target.name === "underline") {
                     c.value[e.target.name] = e.target.checked;
@@ -126,6 +127,18 @@ const AddEditComponentModal = (props) => {
         </div>;
     };
     
+    const getEmailEntry = () => {
+        return <div className="entrygrid-100-150">
+            <div className="label">{getText("To:")}</div><div><input name="to" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.to}/></div>
+            <div className="label">{getText("Subject:")}</div><div><input type="text" name="subject" size={40} onChange={e => setValue(e)} value={currentComponent.value.subject}/></div>
+            <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
+            <div></div><div><input key={getUUID()} name="underline" type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
+            <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
+            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
+        </div>;
+    };
+
     const getImageEntry = () => {
         return <div className="entrygrid-100-150">
             <div className="label">{getText("URL:")}</div><div><input type="text" name="url" size={40} onChange={e => setValue(e)} value={currentComponent.value.url}/></div>
@@ -144,6 +157,8 @@ const AddEditComponentModal = (props) => {
                     return getHyperlinkEntry();
                 case "image":
                     return getImageEntry();
+                case "email":
+                    return getEmailEntry();
             }
         }
     };

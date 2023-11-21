@@ -326,6 +326,7 @@ const ReportContent = (props) => {
                 break;
             case "text":   
             case "image":   
+            case "email":   
             case "hyperlink":   
             case "pagenumber":   
             case "currentdate":   

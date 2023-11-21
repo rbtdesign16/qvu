@@ -126,6 +126,14 @@ export const ReportDesignProvider = ({ children }) => {
                     sizetofit: false
                 };
                 break;
+            case "email":
+                retval.value = {
+                    to: "to@email.com",
+                    text: "new email",
+                    subject: "my subject",
+                    underline: false
+                };
+                break;
         }
         
         return retval;

@@ -52,7 +52,10 @@ const ReportComponent = (props) => {
             cr.reportComponents[componentIndex] = c;
             setCurrentReport(cr);
             setLastSelectedIndex(sindx);
-        } 
+        } else if ((component.type === "hyperlink") 
+            || (component.type === "email")) {
+            e.stopPropagation();
+        }
     };
 
     const getStyle = () => {
@@ -138,6 +141,11 @@ const ReportComponent = (props) => {
                     myStyle.textDecoration = "none";
                 }
                 return <a style={myStyle} href={component.value.url} target="_blank">{component.value.text}</a>;
+            case "email":
+                if (!component.value.underline) {
+                    myStyle.textDecoration = "none";
+                }
+                return <a style={myStyle} href={"mailto:" + component.value.to + (component.value.subject ? "?\nsubject=" + component.value.subject : "")} target="_blank">{component.value.text}</a>;
             case "image":
                 if (component.value.sizetofit) {
                     myStyle.width="100%";

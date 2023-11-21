@@ -259,6 +259,7 @@ public class Constants {
     public static final String REPORT_COMPONENT_TYPE_TEXT = "Text";
     public static final String REPORT_COMPONENT_TYPE_IMAGE = "Image";
     public static final String REPORT_COMPONENT_TYPE_SHAPE = "Shape";
+    public static final String REPORT_COMPONENT_TYPE_EMAIL = "Email";
     public static final String REPORT_COMPONENT_TYPE_HYPERLINK = "Hyperlink";
     public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER = "Page Number";
     public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE = "Current Date";
@@ -271,6 +272,7 @@ public class Constants {
     public static final String[] REPORT_OBJECT_TYPES = {
         REPORT_COMPONENT_TYPE_TEXT,
         REPORT_COMPONENT_TYPE_IMAGE,
+        REPORT_COMPONENT_TYPE_EMAIL,
         REPORT_COMPONENT_TYPE_SHAPE,
         REPORT_COMPONENT_TYPE_HYPERLINK,
         REPORT_COMPONENT_TYPE_PAGE_NUMBER,

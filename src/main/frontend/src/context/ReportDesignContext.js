@@ -123,6 +123,7 @@ export const ReportDesignProvider = ({ children }) => {
                 retval.value = {
                     url: "",
                     alttext: "",
+                    linkurl: "",
                     sizetofit: false
                 };
                 break;

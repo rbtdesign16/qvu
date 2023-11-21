@@ -143,6 +143,7 @@ const AddEditComponentModal = (props) => {
         return <div className="entrygrid-100-150">
             <div className="label">{getText("URL:")}</div><div><input type="text" name="url" size={40} onChange={e => setValue(e)} value={currentComponent.value.url}/></div>
             <div className="label">{getText("Alt Text:")}</div><div><input name="alttext" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.alttext}/></div>
+            <div className="label">{getText("Link URL:")}</div><div><input name="linkurl" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.linkurl}/></div>
             <div></div><div><input key={getUUID()} name="sizetofit" type="checkbox" checked={currentComponent.value.sizetofit} onChange={e => setValue(e)} value={currentComponent.value.sizetofit}/><label className="ck-label" htmlFor="sizrtofit">{getText("Size to Fit")}</label></div>
         </div>;
     };

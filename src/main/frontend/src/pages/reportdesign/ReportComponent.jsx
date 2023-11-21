@@ -53,7 +53,8 @@ const ReportComponent = (props) => {
             setCurrentReport(cr);
             setLastSelectedIndex(sindx);
         } else if ((component.type === "hyperlink") 
-            || (component.type === "email")) {
+            || (component.type === "email")
+            || (component.type === "image")) {
             e.stopPropagation();
         }
     };
@@ -151,9 +152,13 @@ const ReportComponent = (props) => {
                     myStyle.width="100%";
                     myStyle.height="100%";
                 }
-                return <img style={myStyle} alt={component.value.url} src={component.value.url}></img>;
+                if (component.value.linkurl) {
+                    myStyle.cursor = "pointer";
+                    return <a style={{textDecoration: "none"}} href={component.value.linkurl} target="_blank"><img style={myStyle} alt={component.value.alttext} src={component.value.url} /></a>;
+                } else {
+                    return <img style={myStyle} alt={component.value.alttext} src={component.value.url}/>;
+                }
         }      
-         
     };
 
     const getClassName = () => {

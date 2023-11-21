@@ -861,3 +861,31 @@ export const INCHES_TO_MM = 25.4;
 export const DEFAULT_MM_COMPONENT_POS = {left: 5, top: 5, height: 5, width: 10};    
 export const DEFAULT_INCH_COMPONENT_POS = {left: 0.5, top: 0.5, height: 0.5, width: 1};    
 
+export const getComponentTypeDisplayText = (type) => {
+    switch(type) {
+        case "text":   
+            return "Text";
+        case "image":   
+            return "Image";
+        case "hyperlink":   
+            return "Hyperlink";
+        case "pagenumber":   
+            return "Page Number";
+        case "currentdate":   
+            return "Current Date";
+        case "datagrid":   
+            return "Data Grid";
+        case "datafield":   
+            return "Data Field";
+        case "datarecord":   
+            return "Data Record";
+        case "chart":   
+            return "Chart";
+        case "subreport":
+            return "Sub Report";
+     }
+};
+
+export const TEXT_ALIGN_OPTIONS = ["left", "center", "right"];
+export const BOLD_FONT_WEIGHT = 700;
+export const STANDARD_FONT_WEIGHT = 400;

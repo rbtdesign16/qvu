@@ -41,7 +41,8 @@ import {
     isQueryRequiredForReportObject,
     REPORT_UNITS_MM,
     INCHES_TO_MM,
-    MM_TO_INCHES
+    MM_TO_INCHES,
+    REPORT_SECTION_BODY
 } from "../../utils/helper";
 import {
     getReportSettings,
@@ -90,6 +91,8 @@ const ReportDesign = () => {
         reportSettings,
         currentReport,
         setCurrentReport,
+        currentComponent,
+        setCurrentComponent,
         setNewReport,
         initializeReportSettings,
         haveSelectedComponents,
@@ -161,29 +164,36 @@ const ReportDesign = () => {
     const saveFontSettings = (fs) => {
         hideFontSettings();
 
-        let cr = copyObject(currentReport);
-        
-        for (let i = 0; i < cr.reportComponents.length; ++i) {
-            if (cr.reportComponents[i].selected) {
-                cr.reportComponents[i].fontSettings = copyObject(fs);
+        if (fs) {
+            let cr = copyObject(currentReport);
+
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                if (cr.reportComponents[i].selected) {
+                    cr.reportComponents[i].fontSettings = copyObject(fs);
+                }
             }
+
+            setCurrentComponent(null);
+            setCurrentReport(cr);
         }
-        
-        setCurrentReport(cr);
     };
     
     const saveBorderSettings = (bs) => {
         hideBorderSettings();
+        
+        
+        if (bs) {
+            let cr = copyObject(currentReport);
 
-        let cr = copyObject(currentReport);
-        
-        for (let i = 0; i < cr.reportComponents.length; ++i) {
-            if (cr.reportComponents[i].selected) {
-                cr.reportComponents[i].borderSettings = copyObject(bs);
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                if (cr.reportComponents[i].selected) {
+                    cr.reportComponents[i].borderSettings = copyObject(bs);
+                }
             }
+
+            setCurrentComponent(null);
+            setCurrentReport(cr);
         }
-        
-        setCurrentReport(cr);
     };
 
     const onSetFont = () => {
@@ -191,10 +201,8 @@ const ReportDesign = () => {
         setShowFontSelect({
             show: true,
             hide: hideFontSettings,
-            save: saveFontSettings,
-            reportSettings: reportSettings,
-            fontSettings: getNewFontSettings()
-        });
+            save: saveFontSettings
+         });
     };
 
     const onSetBorder = () => {
@@ -202,9 +210,7 @@ const ReportDesign = () => {
         setShowBorderSelect({
             show: true,
             hide: hideBorderSettings,
-            save: saveBorderSettings,
-            reportSettings: reportSettings,
-            borderSettings: getNewBorderSettings()
+            save: saveBorderSettings
         });
     };
 
@@ -447,12 +453,13 @@ const ReportDesign = () => {
         return true;
     };
 
+
     useEffect(() => {
         if (!reportSettings) {
             loadReportSettings();
         }
     });
-
+    
     if (reportSettings && currentReport) {
         return (
                 <div className="report-design-tab" style={{top: "40px", width: "100%"}} >

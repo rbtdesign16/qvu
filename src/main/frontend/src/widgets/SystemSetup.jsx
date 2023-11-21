@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from "react";
+import React, {useContext, useState} from "react";
 import { Tabs, Tab } from "react-bootstrap";
 import PropTypes from "prop-types";
 import Modal from "react-bootstrap/Modal";

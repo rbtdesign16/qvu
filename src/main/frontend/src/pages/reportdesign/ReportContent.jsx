@@ -31,7 +31,7 @@ import {
     PIXELS_PER_KEYDOWN_MOVE,
     isQueryRequiredForReportObject,
     confirm,
-
+    getComponentTypeDisplayText
 } from "../../utils/helper";
 
 const ReportContent = (props) => {
@@ -39,6 +39,8 @@ const ReportContent = (props) => {
         reportSettings,
         currentReport,
         setCurrentReport,
+        currentComponent,
+        setCurrentComponent,
         getNewComponent,
         lastSelectedIndex,
         setLastSelectedIndex,
@@ -48,7 +50,7 @@ const ReportContent = (props) => {
     const reportHeight = getReportHeight(currentReport, reportSettings);
     const reportWidthPixels = getReportWidthInPixels(currentReport, reportSettings);
     const reportHeightPixels = getReportHeightInPixels(currentReport, reportSettings);
-    const [showAddEditComponent, setShowAddEditComponent] = useState({show: false});
+    const [showAddEditComponent, setShowAddEditComponent] = useState({show: false, componentIndex: -100});
     const {showMenu, hideMenu, menuConfig} = useMenu();
     const {getText} = useLang();
 
@@ -104,7 +106,6 @@ const ReportContent = (props) => {
                 retval.push({
                     style: {paddingLeft: "20px"},
                     text: " - " + getText(reportSettings.reportObjectTypes[i]),
-                    displayText: getText(reportSettings.reportObjectTypes[i]),
                     action: reportSettings.reportObjectTypes[i].toLowerCase().replaceAll(" ", "")
                 });
             }
@@ -256,26 +257,46 @@ const ReportContent = (props) => {
     };
 
     const editComponent = (componentIndex) => {
-        let comp = copyObject(currentReport.reportComponents[componentIndex]);
-        setShowAddEditComponent({show: true, component: comp, saveComponent: saveReportComponent, hide: hideAddEditComponent});
+        let c = copyObject(currentReport.reportComponents[componentIndex]);
+        setCurrentComponent(c);
+        setShowAddEditComponent({
+            show: true, 
+            edit: true,
+            componentIndex: componentIndex,
+            saveComponent: saveReportComponent, 
+            hide: hideAddEditComponent});
     };
 
     const hideAddEditComponent = () => {
         setShowAddEditComponent({show: false});
     };
     
-    const saveReportComponent = (component) => {
+    const saveReportComponent = (component, componentIndex) => {
         hideAddEditComponent();
+        let cr = copyObject(currentReport);
+        if (componentIndex > -1) {
+            cr.reportComponents.splice(componentIndex, 1, component);
+        } else {
+            cr.reportComponents.push(component);
+        }
+        setCurrentComponent(null);
+        setCurrentReport(cr);
     };
     
-    const onAddComponent = (section, type, displayText, x, y) => {
-        let comp = getNewComponent(section, type);
-        comp.left = x;
-        comp.top = y;
-        setShowAddEditComponent({show: true, component: comp, reportSettings: reportSettings, displayText: displayText, saveComponent: saveReportComponent, hide: hideAddEditComponent});
+    const onAddComponent = (section, type, left, top) => {
+        let c = getNewComponent(section, type);
+        c.left = left;
+        c.top =  top;
+        
+        setCurrentComponent(c);
+        setShowAddEditComponent({show: true, 
+            edit: false,
+            componentIndex: -1,
+            saveComponent: saveReportComponent, 
+            hide: hideAddEditComponent});
     };
 
-    const handleContextMenu = (action, id, section, displayText, x, y) => {
+    const handleContextMenu = (action, id, section, x, y) => {
         hideMenu();
 
         switch (action) {
@@ -313,7 +334,12 @@ const ReportContent = (props) => {
             case "datarecord":   
             case "chart":   
             case "subreport":
-                onAddComponent(section, action, displayText, x, y);
+                let sec = document.getElementById(section);
+                let rc = sec.getBoundingClientRect();
+                let left = pixelsToReportUnits(currentReport.pageUnits, (x - rc.left));
+                let top = pixelsToReportUnits(currentReport.pageUnits, (y - rc.top));
+
+                onAddComponent(section, action, left, top);
                 break;
         }
     };

@@ -157,7 +157,7 @@ const ReportComponent = (props) => {
         className={getClassName()}
         draggable={true} 
         style={getStyle()}
-        onContextMenu={e => onContextMenu(e, componentIndex)} 
+        onContextMenu={e => onContextMenu(e, componentIndex, component.section)} 
         onClick={e => onClick(e)} 
         onDragOver={e => handleDragOver(e)}
         onDragStart={e => handleDragStart(e)}>

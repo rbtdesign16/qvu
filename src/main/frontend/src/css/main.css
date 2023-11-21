@@ -347,6 +347,10 @@ select {
     width: 225px !important;
 }
 
+.color-settings {
+    width: 250px;
+}
+
 .table-settings {
     left: 10%;
     top: 10%;

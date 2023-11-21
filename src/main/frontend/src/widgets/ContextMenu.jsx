@@ -1,4 +1,4 @@
-import React, {useEffect}from "react";
+import React from "react";
 import useMenu from "../context/MenuContext";
 
 const ContextMenu = (props) => {
@@ -23,7 +23,6 @@ const ContextMenu = (props) => {
                         onClick={(e) => menuConfig.handleContextMenu(m.action, 
                             menuConfig.id, 
                             menuConfig.section, 
-                            m.displayText, 
                             menuConfig.x, 
                             menuConfig.y)}>
                                 {m.text}

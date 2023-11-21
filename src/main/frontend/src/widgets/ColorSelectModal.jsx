@@ -23,10 +23,10 @@ const ColorSelectModal = (props) => {
         <div className="static-modal">
             <Modal 
                 animation={false} 
-                size="sm"
+                dialogClassName="color-settings"
                 show={config.show} 
                 onHide={onHide}
-                backdrop={true} 
+                backdrop={false} 
                 keyboard={true}>
                 <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>

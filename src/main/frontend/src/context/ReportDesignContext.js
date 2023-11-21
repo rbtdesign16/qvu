@@ -16,6 +16,7 @@ export const ReportDesignContext = createContext();
 export const ReportDesignProvider = ({ children }) => {
     const {getText} = useLang();
     const [reportSettings, setReportSettings] = useState(null);
+    const [currentComponent, setCurrentComponent] = useState(null);
     const [currentReport, setReport] = useState(null);
     const [saveReports, setSaveReports] = useState({reports: [], lastSelectedIndex: -1});
     const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
@@ -144,7 +145,9 @@ export const ReportDesignProvider = ({ children }) => {
                     lastSelectedIndex, 
                     setLastSelectedIndex,
                     undo,
-                    canUndo}}>
+                    canUndo,
+                    currentComponent,
+                    setCurrentComponent}}>
                 {children}
             </ReportDesignContext.Provider>
             );

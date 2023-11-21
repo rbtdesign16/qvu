@@ -53,20 +53,20 @@ const AddEditComponentModal = (props) => {
     const setForegroundColor = (color) => {
         let c = {...currentComponent};
         c.foregroundColor = color;
-        setComponent(c);
+        setCurrentComponent(c);
     };
 
 
     const setBackgroundColor = (color) => {
         let c = {...currentComponent};
         c.backgroundColor = color;
-        setComponent(c);
+        setCurrentComponent(c);
     };
 
     const setValue = (e) => {
         let c = {...currentComponent};
         c.value = e.target.value;
-        setComponent(c);
+        setCurrentComponent(c);
      };
 
     const loadTextAlignOptions = () => {
@@ -82,7 +82,7 @@ const AddEditComponentModal = (props) => {
     const setTextAlign = (e) => {
         let c = {...currentComponent};
         c.align = e.target.options[e.target.selectedIndex].value;
-        setComponent(c);
+        setCurrentComponent(c);
     };
     
     const getTextEntry = () => {

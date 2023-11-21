@@ -129,7 +129,23 @@ const ReportComponent = (props) => {
     };
 
     const getComponentValue = () => {
-        return component.value;
+        let myStyle = {};
+        switch (component.type) {
+            case "text":
+                return component.value;
+            case "hyperlink":
+                if (!component.value.underline) {
+                    myStyle.textDecoration = "none";
+                }
+                return <a style={myStyle} href={component.value.url} target="_blank">{component.value.text}</a>;
+            case "image":
+                if (component.value.sizetofit) {
+                    myStyle.width="100%";
+                    myStyle.height="100%";
+                }
+                return <img style={myStyle} alt={component.value.url} src={component.value.url}></img>;
+        }      
+         
     };
 
     const getClassName = () => {

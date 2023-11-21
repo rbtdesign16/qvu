@@ -93,14 +93,13 @@ export const ReportDesignProvider = ({ children }) => {
             pos = getNewComponentPosition();
         }
         
-        return {
+        let retval =  {
             type: type,
             align: "center",
             foregroundColor: reportSettings.defaultForegroundColor,
             backgroundColor: reportSettings.defaultBackgroundColor,
             fontSettings: getNewFontSettings(),
             borderSettings: getNewBorderSettings(),
-            value: value,
             left: pos.left,
             top: pos.top,
             width: pos.width,
@@ -109,6 +108,27 @@ export const ReportDesignProvider = ({ children }) => {
             selected: false,
             zindex: 1
         };
+        
+        switch(type) {
+            case "text":
+                retval.value="new text component";
+                break;
+            case "hyperlink":
+                retval.value = {
+                    url: "http://some.url.com",
+                    text: "new hyperlink",
+                    underline: true};
+                break;
+            case "image":
+                retval.value = {
+                    url: "",
+                    alttext: "",
+                    sizetofit: false
+                };
+                break;
+        }
+        
+        return retval;
     };
         
     const getNewDocument = (settings) => {

@@ -13,7 +13,8 @@ import {MODAL_TITLE_SIZE,
     pixelsToReportUnits, 
     copyObject,
     TEXT_ALIGN_OPTIONS,
-    getComponentTypeDisplayText} from "../../utils/helper";
+    getComponentTypeDisplayText,
+    getUUID} from "../../utils/helper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -65,7 +66,26 @@ const AddEditComponentModal = (props) => {
 
     const setValue = (e) => {
         let c = {...currentComponent};
-        c.value = e.target.value;
+        switch (currentComponent.type) {
+            case "text":
+                c.value = e.target.value;
+                break;
+            case "image":
+                if (e.target.name === "sizetofit") {
+                    c.value[e.target.name] = e.target.checked;
+                } else {
+                    c.value[e.target.name] = e.target.value;
+                }
+                break;
+            case "hyperlink":
+                if (e.target.name === "underline") {
+                    c.value[e.target.name] = e.target.checked;
+                } else {
+                    c.value[e.target.name] = e.target.value;
+                }
+                break;
+        }
+        
         setCurrentComponent(c);
      };
 
@@ -95,11 +115,35 @@ const AddEditComponentModal = (props) => {
         </div>;
     };
     
+    const getHyperlinkEntry = () => {
+        return <div className="entrygrid-100-150">
+            <div className="label">{getText("URL:")}</div><div><input type="text" name="url" size={40} onChange={e => setValue(e)} value={currentComponent.value.url}/></div>
+            <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
+            <div></div><div><input key={getUUID()} name="underline" type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
+            <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
+            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
+        </div>;
+    };
+    
+    const getImageEntry = () => {
+        return <div className="entrygrid-100-150">
+            <div className="label">{getText("URL:")}</div><div><input type="text" name="url" size={40} onChange={e => setValue(e)} value={currentComponent.value.url}/></div>
+            <div className="label">{getText("Alt Text:")}</div><div><input name="alttext" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.alttext}/></div>
+            <div></div><div><input key={getUUID()} name="sizetofit" type="checkbox" checked={currentComponent.value.sizetofit} onChange={e => setValue(e)} value={currentComponent.value.sizetofit}/><label className="ck-label" htmlFor="sizrtofit">{getText("Size to Fit")}</label></div>
+        </div>;
+    };
+
+
     const getComponentPanel = () => {
         if (currentComponent) {
             switch (currentComponent.type) {
                 case "text":
                     return getTextEntry();
+                case "hyperlink":
+                    return getHyperlinkEntry();
+                case "image":
+                    return getImageEntry();
             }
         }
     };

@@ -1170,13 +1170,11 @@ public class MainServiceImpl implements MainService {
     public OperationResult getDocument(String type, String group, String name) {
         OperationResult retval = null;
         try {
+            User u = getCurrentUser();
             if (Constants.DOCUMENT_TYPE_QUERY.equals(type)) {
-                User u = getCurrentUser();
                 retval = getQueryDocument(group, name, u.getName());
             } else {
-                retval = new OperationResult();
-                retval.setErrorCode(Errors.NOT_SUPPORTED);
-                retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, Errors.getMessage(Errors.NOT_SUPPORTED)));
+                retval = getReportDocument(group, name, u.getName());
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -1190,11 +1188,13 @@ public class MainServiceImpl implements MainService {
         try {
             if (docWrapper.isReportDocument()) {
                 ReportDocument doc = docWrapper.getReportDocument();
-                if (doc.getCreateDate() == null) {
-                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                if (doc.isNewRecord()) {
+                    doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                     doc.setCreatedBy(docWrapper.getUser());
+                    doc.setLastUpdated(null);
+                    doc.setUpdatedBy(null);
                 } else {
-                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                     doc.setUpdatedBy(docWrapper.getUser());
                 }
 
@@ -1210,13 +1210,16 @@ public class MainServiceImpl implements MainService {
                 }
             } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
-                if (doc.getCreateDate() == null) {
-                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                if (doc.isNewRecord()) {
+                    doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                     doc.setCreatedBy(docWrapper.getUser());
+                    doc.setLastUpdated(null);
+                    doc.setUpdatedBy(null);
                 } else {
-                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                     doc.setUpdatedBy(docWrapper.getUser());
                 }
+                
                 OperationResult<QueryDocument> opr = fileHandler.saveQueryDocument(doc, docWrapper.getUser());
                 docWrapper.setQueryDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
@@ -1347,9 +1350,28 @@ public class MainServiceImpl implements MainService {
         QueryDocument doc = null; //cacheHelper.getQueryDocumentCache().get(key);
 
         if (doc == null) {
-            retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
+            retval = fileHandler.getQueryDocument(group, user, name);
             if (retval.isSuccess()) {
                 cacheHelper.getQueryDocumentCache().put(key, retval.getResult());
+            }
+        } else {
+            retval.setResult(doc);
+        }
+
+        return retval;
+    }
+
+    private OperationResult<ReportDocument> getReportDocument(String group, String name, String user) {
+        OperationResult<ReportDocument> retval = new OperationResult<>();
+
+        String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, group, name, user);
+
+        ReportDocument doc = null; //cacheHelper.getReportDocumentCache().get(key);
+
+        if (doc == null) {
+            retval = fileHandler.getReportDocument(group, user, name);
+            if (retval.isSuccess()) {
+                cacheHelper.getReportDocumentCache().put(key, retval.getResult());
             }
         } else {
             retval.setResult(doc);

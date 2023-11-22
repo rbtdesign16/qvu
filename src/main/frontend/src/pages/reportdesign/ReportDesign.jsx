@@ -51,6 +51,8 @@ import {
 import {
     getReportSettings,
     getAvailableDocuments,
+    saveDocument,
+    getDocument,
     isApiError,
     isApiSuccess
     } from "../../utils/apiHelper";
@@ -391,6 +393,32 @@ const ReportDesign = () => {
 
     const saveReportDocument = async (name, group) => {
         closeMenu();
+        let userId = authData.currentUser.userId;
+        let actionTimestamp = new Date().toISOString();
+        let cr = copyObject(currentReport);
+        
+        if (name !== cr.name) {
+            cr.newRecord = true;
+        }
+        
+        cr.name = name;
+        cr.documentGroupName = group;
+        showMessage(INFO, replaceTokens(getText("Saving document", "..."), [name]), null, true);
+        
+        let docWrapper = {
+            user: userId,
+            actionTimestamp: actionTimestamp,
+            reportDocument: cr
+        };
+
+        let res = await saveDocument(docWrapper);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
+            hideShowSave();
+            setCurrentReport(res.result);
+        }
     };
 
     const onSaveDocument = async () => {
@@ -404,7 +432,6 @@ const ReportDesign = () => {
     };
 
     const loadDocument = (group, name) => {
-        setNewReport();
         populateDocument(group, name);
     };
 
@@ -419,12 +446,9 @@ const ReportDesign = () => {
             setNewReport();
             let doc = res.result;
 
-            setCurrentReport({
-                name: doc.name,
-                group: doc.documentGroupName,
-                newRecord: false,
-                reportComponents: []
-            });
+            setCurrentComponent(null);
+            setLastSelectedIndex(-1);
+            setCurrentReport(doc);
 
             hideMessage();
         }

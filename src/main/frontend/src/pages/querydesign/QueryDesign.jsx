@@ -124,11 +124,11 @@ import { getDatasourceTreeViewData,
             actionTimestamp: actionTimestamp,
             queryDocument: {
                 name: name,
-                newRecord: currentDocument.newdoc,
-                createdBy: userId,
-                updatedBy: userId,
-                createDate: actionTimestamp,
-                lastUpdated: actionTimestamp,
+                newRecord: currentDocument.newRecord,
+                createdBy: currentDocument.createdBy,
+                updatedBy: currentDocument.updatedBy,
+                createDate: currentDocument.createDate,
+                lastUpdated: currentDocument.lastUpdated,
                 datasource: datasource,
                 schema: getDatasourceSchema(datasource),
                 baseTable: baseTable,
@@ -144,8 +144,21 @@ import { getDatasourceTreeViewData,
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
+            let udoc = res.result;
             showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
             hideShowSave();
+ 
+            setCurrentDocument({
+                name: udoc.queryDocument.name,
+                group: udoc.documentGroupName,
+                newRecord: false,
+                createDate: udoc.createDate,
+                createdBy: udoc.createdBy,
+                lastUpdated: udoc.lastUpdated,
+                updatedBy: udoc.updatedBy
+            });
+
+
         }
 
     };
@@ -296,7 +309,11 @@ import { getDatasourceTreeViewData,
                 setCurrentDocument({
                     name: doc.name,
                     group: doc.documentGroupName,
-                    newRecord: false
+                    newRecord: false,
+                    createDate: doc.createDate,
+                    createdBy: doc.createdBy,
+                    lastUpdated: doc.lastUpdated,
+                    updatedBy: doc.updatedBy
                 });
 
                 hideMessage();

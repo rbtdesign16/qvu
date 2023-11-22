@@ -454,8 +454,10 @@ export const QueryDesignProvider = ({ children }) => {
     };
 
     const setNewDocument = () => {
-        setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME),
-            group: DEFAULT_DOCUMENT_GROUP, newdoc: true});
+        setCurrentDocument({
+            name: getText(DEFAULT_NEW_DOCUMENT_NAME),
+            group: DEFAULT_DOCUMENT_GROUP, 
+            newRecord: true});
         clearData();
     };
 

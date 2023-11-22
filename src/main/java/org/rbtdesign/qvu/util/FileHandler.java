@@ -579,19 +579,43 @@ public class FileHandler {
         return retval;
     }
 
-    public OperationResult getDocument(String type, String group, String user, String name) {
-        OperationResult retval = new OperationResult();
+    public OperationResult <QueryDocument> getQueryDocument(String group, String user, String name) {
+        OperationResult <QueryDocument> retval = new OperationResult();
 
         try {
             File f = config.getDocumentGroupsFolder(group, user);
-            File docfile = new File(f.getPath() + File.separator + type + File.separator + name);
+            File docfile = new File(f.getPath() + File.separator + Constants.DOCUMENT_TYPE_QUERY + File.separator + name);
 
             if (!docfile.exists()) {
                 retval.setErrorCode(Errors.DOCUMENT_NOT_FOUND);
-                retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{type, name}));
+                retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{Constants.DOCUMENT_TYPE_QUERY, name}));
             } else {
                 byte[] bytes = FileUtils.readFileToByteArray(docfile);
                 QueryDocument doc = gson.fromJson(new String(bytes), QueryDocument.class);
+                doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
+                retval.setResult(doc);
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            Errors.populateError(retval, ex);
+        }
+
+        return retval;
+    }
+
+    public OperationResult <ReportDocument> getReportDocument(String group, String user, String name) {
+        OperationResult <ReportDocument> retval = new OperationResult();
+
+        try {
+            File f = config.getDocumentGroupsFolder(group, user);
+            File docfile = new File(f.getPath() + File.separator + Constants.DOCUMENT_TYPE_REPORT + File.separator + name);
+
+            if (!docfile.exists()) {
+                retval.setErrorCode(Errors.DOCUMENT_NOT_FOUND);
+                retval.setMessage(Errors.getMessage(Errors.DOCUMENT_NOT_FOUND, new String[]{Constants.DOCUMENT_TYPE_REPORT , name}));
+            } else {
+                byte[] bytes = FileUtils.readFileToByteArray(docfile);
+                ReportDocument doc = gson.fromJson(new String(bytes), ReportDocument.class);
                 doc.setSavedDocumentGroupName(doc.getDocumentGroupName());
                 retval.setResult(doc);
             }
@@ -642,7 +666,8 @@ public class FileHandler {
                     byte[] bytes = fis.readAllBytes();
                     QueryDocument curdoc = gson.fromJson(new String(bytes), QueryDocument.class);
 
-                    if (curdoc.getLastUpdated().getTime() > doc.getLastUpdated().getTime()) {
+                    if ((curdoc.getLastUpdated() != null) 
+                            && (curdoc.getLastUpdated().getTime() > doc.getLastUpdated().getTime())) {
                         retval.setErrorCode(Errors.RECORD_UPDATED);
                         retval.setMessage(Errors.getMessage(retval.getErrorCode(), new String[]{"query document"}));
                         throw new SaveException(retval);
@@ -650,8 +675,7 @@ public class FileHandler {
                 }
             }
 
-            doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
-
+            doc.setNewRecord(false);
             if (docFile.exists()) {
                 try (FileOutputStream fos = new FileOutputStream(docFile); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                     fos.write(getGson(true).toJson(doc).getBytes());
@@ -661,6 +685,7 @@ public class FileHandler {
                         FileUtils.delete(originalFile);
                     }
 
+                    retval.setResult(doc);
                 }
             } else {
                 FileUtils.writeStringToFile(docFile, getGson(true).toJson(doc), "UTF-8");
@@ -689,11 +714,19 @@ public class FileHandler {
                         + File.separator + REPORT_FOLDER + File.separator + doc.getName());
             }
 
+            String fileName = folder.getPath() + File.separator + REPORT_FOLDER + File.separator + doc.getName();
+            if (!fileName.endsWith(".json")) {
+                fileName = fileName + ".json";
+            }
+
+            File docFile = new File(fileName);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
-            File docFile = new File(folder.getPath() + File.separator + REPORT_FOLDER + File.separator + doc.getName());
+            if (!docFile.getParentFile().exists()) {
+                docFile.getParentFile().mkdirs();
+            }
 
             if (doc.isNewRecord() && docFile.exists()) {
                 retval.setErrorCode(OperationResult.RECORD_EXISTS);
@@ -704,9 +737,10 @@ public class FileHandler {
             if (docFile.exists()) {
                 try (FileInputStream fis = new FileInputStream(docFile); FileChannel channel = fis.getChannel(); FileLock lock = channel.lock(0, Long.MAX_VALUE, true)) {
                     byte[] bytes = fis.readAllBytes();
-                    QueryDocument curdoc = gson.fromJson(new String(bytes), QueryDocument.class);
+                    ReportDocument curdoc = gson.fromJson(new String(bytes), ReportDocument.class);
 
-                    if (curdoc.getLastUpdated().getTime() > doc.getLastUpdated().getTime()) {
+                    if ((curdoc.getLastUpdated() != null) 
+                            && (curdoc.getLastUpdated().getTime() > doc.getLastUpdated().getTime())) {
                         retval.setErrorCode(Errors.RECORD_UPDATED);
                         retval.setMessage(Errors.getMessage(retval.getErrorCode(), new String[]{"report document"}));
                         throw new SaveException(retval);
@@ -716,6 +750,7 @@ public class FileHandler {
 
             doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
 
+            doc.setNewRecord(false);
             try (FileOutputStream fos = new FileOutputStream(docFile); FileChannel channel = fos.getChannel(); FileLock lock = channel.lock()) {
                 fos.write(getGson(true).toJson(doc).getBytes());
                 // if originalFile is not null then we need to delete it
@@ -724,6 +759,7 @@ public class FileHandler {
                     FileUtils.delete(originalFile);
                 }
 
+                retval.setResult(doc);
             }
         } catch (SaveException ex) {
             retval = ex.getOpResult();

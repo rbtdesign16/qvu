@@ -417,7 +417,7 @@ const ReportDesign = () => {
         } else {
             showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
             hideShowSave();
-            setCurrentReport(res.result);
+            setCurrentReport(res.result.reportDocument);
         }
     };
 

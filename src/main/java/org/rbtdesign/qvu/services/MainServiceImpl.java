@@ -1208,6 +1208,7 @@ public class MainServiceImpl implements MainService {
                     String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
                     cacheHelper.getReportDocumentCache().invalidate(key);
                 }
+                
             } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
                 if (doc.isNewRecord()) {

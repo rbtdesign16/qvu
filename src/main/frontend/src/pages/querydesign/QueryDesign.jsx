@@ -150,12 +150,12 @@ import { getDatasourceTreeViewData,
  
             setCurrentDocument({
                 name: udoc.queryDocument.name,
-                group: udoc.documentGroupName,
+                group: udoc.queryDocument.documentGroupName,
                 newRecord: false,
-                createDate: udoc.createDate,
-                createdBy: udoc.createdBy,
-                lastUpdated: udoc.lastUpdated,
-                updatedBy: udoc.updatedBy
+                createDate: udoc.queryDocument.createDate,
+                createdBy: udoc.queryDocument.createdBy,
+                lastUpdated: udoc.queryDocument.lastUpdated,
+                updatedBy: udoc.queryDocument.updatedBy
             });
 
 

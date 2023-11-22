@@ -6,8 +6,8 @@ import useLang from "../context/LangContext";
 import FontPanel from "./FontPanel";
 import useReportDesign from "../context/ReportDesignContext";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE, REPORT_SECTION_BODY} from "../utils/helper";
-
+import {MODAL_TITLE_SIZE} from "../utils/helper";
+import {REPORT_SECTION_BODY} from  "../utils/reportHelper";
 
 const FontSelectModal = (props) => {
     const {config} = props;

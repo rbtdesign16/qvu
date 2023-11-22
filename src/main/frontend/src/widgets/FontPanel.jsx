@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import useMessage from "../context/MessageContext";
 import useReportDesign from "../context/ReportDesignContext";
 import useLang from "../context/LangContext";
-import {BOLD_FONT_WEIGHT, 
-    STANDARD_FONT_WEIGHT,
-    getUUID} from "../utils/helper"
+import {getUUID} from "../utils/helper"
+import {BOLD_FONT_WEIGHT, STANDARD_FONT_WEIGHT} from "../utils/reportHelper"
+
 const FontPanel = (props) => {
     const {getText} = useLang();
     const {currentReport, 

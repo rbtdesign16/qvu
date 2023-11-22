@@ -1,15 +1,29 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import NumberEntry from "../widgets/NumberEntry";
+import useLang from "./LangContext";
 import {
     isEmpty,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
+} from "../utils/helper";
+import {
+    COMPONENT_TYPE_TEXT,  
+    COMPONENT_TYPE_IMAGE, 
+    COMPONENT_TYPE_SHAPE,
+    COMPONENT_TYPE_EMAIL, 
+    COMPONENT_TYPE_HYPERLINK,
+    COMPONENT_TYPE_PAGENUMBER,
+    COMPONENT_TYPE_CURRENTDATE,
+    COMPONENT_TYPE_DATAGRID,
+    COMPONENT_TYPE_DATAFIELD,
+    COMPONENT_TYPE_DATARECORD,
+    COMPONENT_TYPE_CHART,
+    COMPONENT_TYPE_SUBREPORT,
     MAX_UNDOS,
     REPORT_UNITS_MM,
     DEFAULT_MM_COMPONENT_POS,
     DEFAULT_INCH_COMPONENT_POS
-} from "../utils/helper";
-import NumberEntry from "../widgets/NumberEntry";
-import useLang from "./LangContext";
+    } from "../utils/reportHelper";
 
 export const ReportDesignContext = createContext();
 
@@ -110,16 +124,16 @@ export const ReportDesignProvider = ({ children }) => {
         };
         
         switch(type) {
-            case "text":
+            case COMPONENT_TYPE_TEXT:
                 retval.value="new text component";
                 break;
-            case "hyperlink":
+            case COMPONENT_TYPE_HYPERLINK:
                 retval.value = {
                     url: "http://some.url.com",
                     text: "new hyperlink",
                     underline: true};
                 break;
-            case "image":
+            case COMPONENT_TYPE_IMAGE:
                 retval.value = {
                     url: "",
                     alttext: "",
@@ -127,7 +141,7 @@ export const ReportDesignProvider = ({ children }) => {
                     sizetofit: false
                 };
                 break;
-            case "email":
+            case COMPONENT_TYPE_EMAIL:
                 retval.value = {
                     to: "to@email.com",
                     text: "new email",
@@ -135,7 +149,7 @@ export const ReportDesignProvider = ({ children }) => {
                     underline: false
                 };
                 break;
-            case "shape":
+            case COMPONENT_TYPE_SHAPE:
                 retval.value = {
                     shape: "",
                     bordercolor: "",

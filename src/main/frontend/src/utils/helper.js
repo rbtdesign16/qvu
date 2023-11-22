@@ -132,6 +132,8 @@ export const RESULT_TYPE_CSV = "csv";
 export const RESULT_TYPE_JSON_FLAT = "jsonflat";
 export const RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
 
+export const ESCAPE_KEY_CODE = 27;
+
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
 };
@@ -667,159 +669,10 @@ export const arraysEqual = (a1, a2, nosort = false) => {
     }
 };
 
-const getPPI = () => {
-    const el = document.createElement('div');
-    el.style = "width: 1in;";
-    document.body.appendChild(el);
-    let retval = el.offsetWidth;
-    document.body.removeChild(el);
-    return retval;
-};
-
-
-export const PIXELS_PER_INCH = getPPI();
-export const PIXELS_PER_MM = PIXELS_PER_INCH / 25.4;
-export const PIXELS_PER_POINT = 1.3333;
-
-export const REPORT_ORIENTATION_LANDSCAPE = "landscape";
-export const REPORT_ORIENTATION_PORTRAIT = "portrait";
-export const REPORT_UNITS_INCH = "inch";
-export const REPORT_UNITS_MM = "mm";
-
-export const HORIZONTAL_KEY = "hor";
-export const VERTICAL_KEY = "ver";
-
-export const getReportWidthInPixels = (report, reportSettings) => {
-    let size = reportSettings.pageSizeSettings[report.pageSize];
-    let units = report.pageUnits;
-    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
-        if (units === REPORT_UNITS_MM) {
-            return size[1] * PIXELS_PER_MM;
-        } else {
-            return size[3] * PIXELS_PER_INCH;
-        }
-    } else {
-        if (units === REPORT_UNITS_MM) {
-            return size[0] * PIXELS_PER_MM;
-        } else {
-            return size[2] * PIXELS_PER_INCH;
-        }
-    }
-};
-
-export const getReportWidth = (report, reportSettings) => {
-    let size = reportSettings.pageSizeSettings[report.pageSize];
-    let units = report.pageUnits;
-    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
-        if (units === REPORT_UNITS_MM) {
-            return size[1];
-        } else {
-            return size[3];
-        }
-    } else {
-        if (units === REPORT_UNITS_MM) {
-            return size[0];
-        } else {
-            return size[2];
-        }
-    }
-};
-
-export const reportUnitsToPixels = (type, size) => {
-    if (type) {
-        if (type.length > 2) {
-            type = type.substring(0, 2);
-        }
-        
-        if (type === REPORT_UNITS_MM) {
-            return PIXELS_PER_MM * size;
-        } else {
-            return PIXELS_PER_INCH * size;
-        }
-    }
-};
-    
-export const getReportHeightInPixels = (report, reportSettings) => {
-    let size = reportSettings.pageSizeSettings[report.pageSize];
-    let units = report.pageUnits;
-
-    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
-        if (units === REPORT_UNITS_MM) {
-            return size[0] * PIXELS_PER_MM;
-        } else {
-            return size[2] * PIXELS_PER_INCH;
-        }
-    } else {
-        if (units === REPORT_UNITS_MM) {
-            return size[1] * PIXELS_PER_MM;
-        } else {
-            return size[3] * PIXELS_PER_INCH;
-        }
-    }
-};
-
-export const getReportHeight = (report, reportSettings) => {
-    let size = reportSettings.pageSizeSettings[report.pageSize];
-    let units = report.pageUnits;
-
-    if (report.pageOrientation === REPORT_ORIENTATION_LANDSCAPE) {
-        if (units === REPORT_UNITS_MM) {
-            return size[0];
-        } else {
-            return size[2];
-        }
-    } else {
-        if (units === REPORT_UNITS_MM) {
-            return size[1];
-        } else {
-            return size[3];
-        }
-    }
-};
-
-export const LEFT = "left";
-export const RIGHT = "right";
-export const TOP = "top";
-export const BOTTOM = "bottom";
-export const CENTER = "center";
-
-export const RULER_WIDTH = 30;
-export const RULER_FONT_SIZE = 8;
-
 export const getDigitsCount = (num) => {
     let s = num + "";
     return s.length;
 };
-
-export const pixelsToReportUnits = (type, pixels) => {
-    if (type) {
-        if (type.length > 2) {
-            type = type.substring(0, 2);
-        }
-        
-        if (type === REPORT_UNITS_MM) {
-            return pixels / PIXELS_PER_MM;
-        } else {
-            return pixels / PIXELS_PER_INCH;
-        }
-    }
-};
-
-export const REPORT_SECTION_HEADER = "header";
-export const REPORT_SECTION_BODY = "body";
-export const REPORT_SECTION_FOOTER = "footer";
-export const REPORT_SECTION_BORDER = "solid 1px blue";
-
-export const ESCAPE_KEY_CODE = 27;
-export const MAX_UNDOS = 3;
-export const MOVE_DROP_EFFECT = "move";
-
-// use for sizing logic
-export const COMPONENT_SIZING_RECT_WIDTH = 5;
-export const TOP_LEFT = "tl";
-export const TOP_RIGHT = "tr";
-export const BOTTOM_RIGHT = "br";
-export const BOTTOM_LEFT = "bl";
 
 export const isArrowKey = (e) => {
     if (e.code) {
@@ -832,18 +685,6 @@ export const isArrowKey = (e) => {
     }
 };
 
-export const PIXELS_PER_KEYDOWN_MOVE = 5;
-
-export const pixelPosToNumber = (pos) => {
-    if (pos) {
-        return Number(pos.replace("px", ""));
-    }
-};
-
-export const getSizer = (sec) => {
-    return document.getElementById("sz-" + sec);
-};
-
 export const intersectRect = (r1, r2) => {
   return !(r2.left > r1.right ||
     r2.right < r1.left ||
@@ -851,45 +692,3 @@ export const intersectRect = (r1, r2) => {
     r2.bottom < r1.top);
 };
 
-export const isQueryRequiredForReportObject = (type) => {
-    let check = type.toLowerCase();
-    return (check.includes("data") || check.includes("chart"));
-};
-   
-export const MM_TO_INCHES = 0.0393701;
-export const INCHES_TO_MM = 25.4;       
-export const DEFAULT_MM_COMPONENT_POS = {left: 5, top: 5, height: 5, width: 10};    
-export const DEFAULT_INCH_COMPONENT_POS = {left: 0.5, top: 0.5, height: 0.5, width: 1};    
-
-export const getComponentTypeDisplayText = (type) => {
-    switch(type) {
-        case "text":   
-            return "Text";
-        case "image":   
-            return "Image";
-        case "shape":   
-            return "Shape";
-        case "email":   
-            return "Email";
-        case "hyperlink":   
-            return "Hyperlink";
-        case "pagenumber":   
-            return "Page Number";
-        case "currentdate":   
-            return "Current Date";
-        case "datagrid":   
-            return "Data Grid";
-        case "datafield":   
-            return "Data Field";
-        case "datarecord":   
-            return "Data Record";
-        case "chart":   
-            return "Chart";
-        case "subreport":
-            return "Sub Report";
-     }
-};
-
-export const TEXT_ALIGN_OPTIONS = ["left", "center", "right"];
-export const BOLD_FONT_WEIGHT = 700;
-export const STANDARD_FONT_WEIGHT = 400;

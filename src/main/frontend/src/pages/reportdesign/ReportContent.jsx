@@ -7,11 +7,34 @@ import ContextMenu from "../../widgets/ContextMenu"
 import AddEditComponentModal from "./AddEditComponentModal";
 import useLang from "../../context/LangContext";
 import {
+    SPLITTER_GUTTER_SIZE,
+    ESCAPE_KEY,
+    copyObject,
+    isArrowKey,
+    ARROW_UP_KEY,
+    ARROW_DOWN_KEY,
+    ARROW_LEFT_KEY,
+    ARROW_RIGHT_KEY,
+    confirm
+} from "../../utils/helper";
+
+import {
+    COMPONENT_TYPE_TEXT,  
+    COMPONENT_TYPE_IMAGE, 
+    COMPONENT_TYPE_SHAPE,
+    COMPONENT_TYPE_EMAIL, 
+    COMPONENT_TYPE_HYPERLINK,
+    COMPONENT_TYPE_PAGENUMBER,
+    COMPONENT_TYPE_CURRENTDATE,
+    COMPONENT_TYPE_DATAGRID,
+    COMPONENT_TYPE_DATAFIELD,
+    COMPONENT_TYPE_DATARECORD,
+    COMPONENT_TYPE_CHART,
+    COMPONENT_TYPE_SUBREPORT,
     REPORT_ORIENTATION_LANDSCAPE,
     REPORT_ORIENTATION_PORTRAIT,
     REPORT_UNITS_INCH,
     REPORT_UNITS_MM,
-    SPLITTER_GUTTER_SIZE,
     REPORT_SECTION_HEADER,
     REPORT_SECTION_BODY,
     REPORT_SECTION_FOOTER,
@@ -21,18 +44,10 @@ import {
     getReportWidth,
     reportUnitsToPixels,
     pixelsToReportUnits,
-    ESCAPE_KEY,
-    copyObject,
-    isArrowKey,
-    ARROW_UP_KEY,
-    ARROW_DOWN_KEY,
-    ARROW_LEFT_KEY,
-    ARROW_RIGHT_KEY,
     PIXELS_PER_KEYDOWN_MOVE,
     isQueryRequiredForReportObject,
-    confirm,
     getComponentTypeDisplayText
-} from "../../utils/helper";
+} from "../../utils/reportHelper";
 
 const ReportContent = (props) => {
     const {
@@ -323,18 +338,18 @@ const ReportContent = (props) => {
             case "deselectall":
                 onSelectAll(false, section);
                 break;
-            case "text":   
-            case "image":   
-            case "email":   
-            case "shape":   
-            case "hyperlink":   
-            case "pagenumber":   
-            case "currentdate":   
-            case "datagrid":   
-            case "datafield":   
-            case "datarecord":   
-            case "chart":   
-            case "subreport":
+            case COMPONENT_TYPE_TEXT:   
+            case COMPONENT_TYPE_IMAGE:   
+            case COMPONENT_TYPE_EMAIL:   
+            case COMPONENT_TYPE_SHAPE:   
+            case COMPONENT_TYPE_HYPERLINK:   
+            case COMPONENT_TYPE_PAGENUMBER:   
+            case COMPONENT_TYPE_CURRENT_DATE:   
+            case COMPONENT_TYPE_DATAGRID:   
+            case COMPONENT_TYPE_DATAFIELD:   
+            case COMPONENT_TYPE_DATARECORD:   
+            case COMPONENT_TYPE_CHART:   
+            case COMPONENT_TYPE_SUBREPORT:
                 let sec = document.getElementById(section);
                 let rc = sec.getBoundingClientRect();
                 let left = pixelsToReportUnits(currentReport.pageUnits, (x - rc.left));

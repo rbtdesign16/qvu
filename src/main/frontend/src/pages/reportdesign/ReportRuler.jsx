@@ -1,6 +1,10 @@
 import React, {useEffect} from "react";
 import PropTypes from "prop-types";
 import {
+    getDigitsCount
+} from "../../utils/helper";
+
+import {
     HORIZONTAL_KEY,
     VERTICAL_KEY,
     REPORT_UNITS_MM,
@@ -9,9 +13,7 @@ import {
     PIXELS_PER_POINT,
     RULER_WIDTH,
     RULER_FONT_SIZE,
-    getDigitsCount
-} from "../../utils/helper";
-
+} from "../../utils/reportHelper";
 const ReportRuler = (props) => {
     const {report, height, width, type} = props;
 

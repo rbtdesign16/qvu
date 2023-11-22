@@ -10,11 +10,24 @@ import PropTypes from "prop-types";
 import ColorPicker from "../../widgets/ColorPicker"
 import useReportDesign from "../../context/ReportDesignContext";
 import {MODAL_TITLE_SIZE, 
-    pixelsToReportUnits, 
     copyObject,
-    TEXT_ALIGN_OPTIONS,
-    getComponentTypeDisplayText,
     getUUID} from "../../utils/helper";
+import {
+    COMPONENT_TYPE_TEXT,  
+    COMPONENT_TYPE_IMAGE, 
+    COMPONENT_TYPE_SHAPE,
+    COMPONENT_TYPE_EMAIL, 
+    COMPONENT_TYPE_HYPERLINK,
+    COMPONENT_TYPE_PAGENUMBER,
+    COMPONENT_TYPE_CURRENTDATE,
+    COMPONENT_TYPE_DATAGRID,
+    COMPONENT_TYPE_DATAFIELD,
+    COMPONENT_TYPE_DATARECORD,
+    COMPONENT_TYPE_CHART,
+    COMPONENT_TYPE_SUBREPORT,
+    pixelsToReportUnits, 
+    TEXT_ALIGN_OPTIONS,
+    getComponentTypeDisplayText} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -67,7 +80,7 @@ const AddEditComponentModal = (props) => {
     const setValue = (e) => {
         let c = {...currentComponent};
         switch (currentComponent.type) {
-            case "text":
+            case COMPONENT_TYPE_TEXT:
                 c.value = e.target.value;
                 break;
             case "image":
@@ -77,15 +90,15 @@ const AddEditComponentModal = (props) => {
                     c.value[e.target.name] = e.target.value;
                 }
                 break;
-            case "email":
-            case "hyperlink":
+            case COMPONENT_TYPE_EMAIL:
+            case COMPONENT_TYPE_HYPERLINK:
                 if (e.target.name === "underline") {
                     c.value[e.target.name] = e.target.checked;
                 } else {
                     c.value[e.target.name] = e.target.value;
                 }
                 break;
-            case "shape":
+            case COMPONENT_TYPE_HYPERLINK:
                 if (e.target.name === "filled") {
                     c.value[e.target.name] = e.target.checked;
                 } else {
@@ -165,15 +178,15 @@ const AddEditComponentModal = (props) => {
     const getComponentPanel = () => {
         if (currentComponent) {
             switch (currentComponent.type) {
-                case "text":
+                case COMPONENT_TYPE_TEXT:
                     return getTextEntry();
-                case "hyperlink":
+                case COMPONENT_TYPE_HYPERLINK:
                     return getHyperlinkEntry();
-                case "image":
+                case COMPONENT_TYPE_IMAGE:
                     return getImageEntry();
-                case "email":
+                case COMPONENT_TYPE_EMAIL:
                     return getEmailEntry();
-                case "shape":
+                case COMPONENT_TYPE_SHAPE:
                     return getShapeEntry();
             }
         }
@@ -181,9 +194,9 @@ const AddEditComponentModal = (props) => {
     
     const getTabs = () => {
         if (currentComponent) {
-            if (currentComponent.type === "shape") {
+            if (currentComponent.type === COMPONENT_TYPE_SHAPE) {
                 return getShapeEntry();
-            } else if (currentComponent.type === "subreport") {
+            } else if (currentComponent.type === COMPONENT_TYPE_SUBREPORT) {
                 return <div>subreport</div>;
             } else {
                 return <Tabs id="t1" className="mb-3">

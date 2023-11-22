@@ -5,6 +5,12 @@ import ReportComponent from "./ReportComponent";
 import ReportContent from "./ReportContent";
 import PropTypes from "prop-types";
 import {
+    isNotEmpty,
+    copyObject,
+    intersectRect
+} from "../../utils/helper";
+
+import {
     REPORT_SECTION_HEADER,
     REPORT_SECTION_BODY,
     REPORT_SECTION_FOOTER,
@@ -13,17 +19,15 @@ import {
     reportUnitsToPixels,
     getReportWidth,
     getReportHeight,
-    isNotEmpty,
-    copyObject,
     MOVE_DROP_EFFECT,
     TOP_LEFT,
     TOP_RIGHT,
     BOTTOM_LEFT,
     BOTTOM_RIGHT,
     getSizer,
-    intersectRect,
-    pixelPosToNumber
-} from "../../utils/helper";
+    pixelPosToNumber,
+    COMPONENT_DRAG_DATA
+} from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
     const {
@@ -101,10 +105,10 @@ const ReportSection = (props) => {
     };
     
     const handleDrop = (e) => {
-        if (e.dataTransfer.getData("cinfo")) {
+        if (e.dataTransfer.getData(COMPONENT_DRAG_DATA)) {
             e.preventDefault();
             let cr = copyObject(currentReport);
-            let cinfo = JSON.parse(e.dataTransfer.getData("cinfo"));
+            let cinfo = JSON.parse(e.dataTransfer.getData(COMPONENT_DRAG_DATA));
             let c = cr.reportComponents[cinfo.index];
 
             let rect;

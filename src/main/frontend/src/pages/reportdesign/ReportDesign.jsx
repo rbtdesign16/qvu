@@ -25,25 +25,31 @@ import {
     ERROR,
     REPORT_DOCUMENT_TYPE,
     QUERY_DOCUMENT_TYPE,
+    SMALL_ICON_SIZE,
+    replaceTokens,
+    copyObject,
+} from "../../utils/helper";
+
+import {
     HORIZONTAL_KEY,
     VERTICAL_KEY,
     getReportWidthInPixels,
     getReportHeightInPixels,
-    SMALL_ICON_SIZE,
     LEFT,
     TOP,
     RIGHT,
     CENTER,
     BOTTOM,
     RULER_WIDTH,
-    replaceTokens,
-    copyObject,
     isQueryRequiredForReportObject,
     REPORT_UNITS_MM,
     INCHES_TO_MM,
     MM_TO_INCHES,
     REPORT_SECTION_BODY
-} from "../../utils/helper";
+} from "../../utils/reportHelper";
+
+
+
 import {
     getReportSettings,
     getAvailableDocuments,

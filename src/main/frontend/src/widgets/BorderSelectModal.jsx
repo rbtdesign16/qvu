@@ -6,8 +6,8 @@ import useLang from "../context/LangContext";
 import BorderPanel from "./BorderPanel";
 import useReportDesign from "../context/ReportDesignContext";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE, REPORT_SECTION_BODY} from "../utils/helper";
-
+import {MODAL_TITLE_SIZE} from "../utils/helper";
+import {REPORT_SECTION_BODY}  from "../utils/reportHelper";
 
 const BorderSelectModal = (props) => {
     const {config} = props;

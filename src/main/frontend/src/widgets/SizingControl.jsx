@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useReportDesign from "../context/ReportDesignContext";
+import {copyObject} from "../utils/helper";
 import {
-TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        pixelsToReportUnits,
-        reportUnitsToPixels,
-        copyObject,
-        pixelPosToNumber,
-        getSizer} from "../utils/helper";
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
+    pixelsToReportUnits,
+    reportUnitsToPixels,
+    pixelPosToNumber,
+    getSizer} from "../utils/reportHelper";
+
 const SizingControl = (props) => {
     const {component, componentIndex, corner} = props;
     const {

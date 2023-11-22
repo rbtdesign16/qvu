@@ -43,6 +43,12 @@ export const SPLITTER_GUTTER_SIZE = 8;
 export const SMALL_ICON_SIZE = 18;
 export const MEDIUM_ICON_SIZE = 20;
 export const BIG_ICON_SIZE = 25;
+export const EDIT_ACTION = "edit";
+export const DELETE_ACTION = "delete";
+export const SELECT_ACTION = "select";
+export const SELECTALL_ACTION = "selectall";
+export const DESELECT_ACTION = "deselect";
+export const DESELECTALL_ACTION = "deselectall";
 
 export const DEFAULT_PIXELS_PER_CHARACTER = 12;
 

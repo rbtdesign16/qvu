@@ -48,10 +48,10 @@ const ReportComponent = (props) => {
         onClick={e => onComponentClick(e, currentReport, component, componentIndex, lastSelectedIndex)} 
         onDragOver={e => handleComponentDragOver(e)}
         onDragStart={e => handleComponentDragStart(e, componentIndex)}>
-        <SizingControl corner="tl" componentIndex={componentIndex} component={component}/>
-        <SizingControl corner="tr" componentIndex={componentIndex} component={component}/>
-        <SizingControl corner="bl" componentIndex={componentIndex} component={component}/>
-        <SizingControl corner="br" componentIndex={componentIndex} component={component}/>
+        <SizingControl corner={TOP_LEFT} componentIndex={componentIndex} component={component}/>
+        <SizingControl corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
+        <SizingControl corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
+        <SizingControl corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
         {getComponentValue(component)}
     </div>; 
 };

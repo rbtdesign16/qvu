@@ -7,6 +7,12 @@ import ContextMenu from "../../widgets/ContextMenu"
 import AddEditComponentModal from "./AddEditComponentModal";
 import useLang from "../../context/LangContext";
 import {
+    EDIT_ACTION,
+    DELETE_ACTION,
+    SELECT_ACTION,
+    DESELECT_ACTION,
+    SELECTALL_ACTION,
+    DESELECTALL_ACTION,
     SPLITTER_GUTTER_SIZE,
     ESCAPE_KEY,
     copyObject,
@@ -31,6 +37,8 @@ import {
     COMPONENT_TYPE_DATARECORD,
     COMPONENT_TYPE_CHART,
     COMPONENT_TYPE_SUBREPORT,
+    TOBACK_ACTION,
+    TOFRONT_ACTION,
     REPORT_ORIENTATION_LANDSCAPE,
     REPORT_ORIENTATION_PORTRAIT,
     REPORT_UNITS_INCH,
@@ -74,22 +82,22 @@ const ReportContent = (props) => {
         
         retval.push({
             text: getText("Edit Component"),
-            action: "edit"
+            action: EDIT_ACTION
         },
         {
             text: getText("Delete Component"),
-            action: "delete"
+            action: DELETE_ACTION
         },
         {
             separator: true
         },
         {
             text: getText("Push to Back"),
-            action: "toback"
+            action: TOBACK_ACTION
         },
         {
             text: getText("Move to Front"),
-            action: "tofront"
+            action: TOFRONT_ACTION
         },
         {
             separator: true
@@ -98,10 +106,10 @@ const ReportContent = (props) => {
     
         if (!currentReport.reportComponents[componentIndex].selected) {
            retval.push({text: getText("Select Component"),
-                action: "select"});
+                action: SELECT_ACTION});
         } else {
             retval.push({text: getText("Deselect Component"),
-                action: "deselect"});
+                action: DESELECT_ACTION});
         }
  
         return retval;
@@ -129,12 +137,12 @@ const ReportContent = (props) => {
         retval.push({ separator: true});
         retval.push({
             text: getText("Select All"),
-            action: "selectall"
+            action: SELECTALL_ACTION
         });
         
         retval.push({
             text: getText("Deselect All"),
-            action: "deselectall"
+            action: DESELECTALL_ACTION
         });
         
         return retval;
@@ -314,28 +322,28 @@ const ReportContent = (props) => {
         hideMenu();
 
         switch (action) {
-            case "edit":
+            case EDIT_ACTION:
                 editComponent(id);
                 break;
-            case "delete":
+            case DELETE_ACTION:
                 onDeleteComponent(id);
                 break;
-            case "select":
+            case SELECT_ACTION:
                 setComponentSelected(id, true);
                 break;
-            case "deselect":
+            case DESELECT_ACTION:
                 setComponentSelected(id, false);
                 break;
-            case "tofront":
+            case TOFRONT_ACTION:
                 moveComponentToFront(id);
                 break;
-            case "toback":
+            case TOBACK_ACTION:
                 moveComponentToBack(id);
                 break;
-            case "selectall":
+            case SELECTALL_ACTION:
                 onSelectAll(true, section);
                 break;
-            case "deselectall":
+            case DESELECTALL_ACTION:
                 onSelectAll(false, section);
                 break;
             case COMPONENT_TYPE_TEXT:   
@@ -344,7 +352,7 @@ const ReportContent = (props) => {
             case COMPONENT_TYPE_SHAPE:   
             case COMPONENT_TYPE_HYPERLINK:   
             case COMPONENT_TYPE_PAGENUMBER:   
-            case COMPONENT_TYPE_CURRENT_DATE:   
+            case COMPONENT_TYPE_CURRENTDATE:   
             case COMPONENT_TYPE_DATAGRID:   
             case COMPONENT_TYPE_DATAFIELD:   
             case COMPONENT_TYPE_DATARECORD:   

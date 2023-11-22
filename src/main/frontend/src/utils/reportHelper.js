@@ -40,6 +40,9 @@ export const TOP_RIGHT = "tr";
 export const BOTTOM_RIGHT = "br";
 export const BOTTOM_LEFT = "bl";
 export const PIXELS_PER_KEYDOWN_MOVE = 5;
+export const TOBACK_ACTION = "toback";
+export const TOFRONT_ACTION = "tofront";
+
 
 export const COMPONENT_TYPE_TEXT = "text";   
 export const COMPONENT_TYPE_IMAGE = "image";  

@@ -56,6 +56,7 @@ export const COMPONENT_TYPE_DATAFIELD = "datafield";
 export const COMPONENT_TYPE_DATARECORD = "datarecord";   
 export const COMPONENT_TYPE_CHART = "chart";  
 export const COMPONENT_TYPE_SUBREPORT = "subreport";
+export const MIN_LASSO_CHANGE = 10;
 
 export const SHAPE_HORIZONTAL_LINE = "horizontal line";
 export const SHAPE_VERTICAL_LINE = "vertical line";
@@ -255,7 +256,7 @@ const isStopPropagationRequired = (component) => {
             || (component.type === COMPONENT_TYPE_IMAGE));
     };
     
-export const onComponentClick = (e, currentReport, component, componentIndex, lastSelectedIndex) => {
+export const onComponentClick = (e, currentReport, setCurrentReport, component, componentIndex, lastSelectedIndex) => {
     if (e.ctrlKey) {
         e.preventDefault();
         let c = copyObject(component);

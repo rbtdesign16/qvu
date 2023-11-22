@@ -323,11 +323,17 @@ public class Constants {
     public static final String DEFAULT_BORDER_COLOR = "#000000";
     public static final int DEFAULT_BORDER_WIDTH = 1;
     
+    public static final String SHAPE_HORIZONTAL_LINE = "horizontal line";
+    public static final String SHAPE_VERTICAL_LINE = "vertical line";
+    public static final String SHAPE_ELLIPSE = "ellipse";
+    public static final String SHAPE_ROUNDED_RECTANGLE = "rounded rectangle";
+    public static final String SHAPE_RECTANGLE = "rectangle";
+
     public static final String[] REPORT_SHAPES = {
-        "rectangle",
-        "rounded rectangle",
-        "ellipse",
-        "horizontal line",
-        "vertical line"
+        SHAPE_RECTANGLE,
+        SHAPE_ROUNDED_RECTANGLE,
+        SHAPE_ELLIPSE,
+        SHAPE_HORIZONTAL_LINE,
+        SHAPE_VERTICAL_LINE
     };
 }

@@ -45,7 +45,7 @@ const ReportComponent = (props) => {
         draggable={true} 
         style={getComponentStyle(reportSettings, currentReport, component)}
         onContextMenu={e => onContextMenu(e, componentIndex, component.section)} 
-        onClick={e => onComponentClick(e, currentReport, component, componentIndex, lastSelectedIndex)} 
+        onClick={e => onComponentClick(e, currentReport, setCurrentReport, component, componentIndex, lastSelectedIndex)} 
         onDragOver={e => handleComponentDragOver(e)}
         onDragStart={e => handleComponentDragStart(e, componentIndex)}>
         <SizingControl corner={TOP_LEFT} componentIndex={componentIndex} component={component}/>

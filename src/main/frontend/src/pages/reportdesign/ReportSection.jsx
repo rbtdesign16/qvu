@@ -11,6 +11,7 @@ import {
 } from "../../utils/helper";
 
 import {
+    MIN_LASSO_CHANGE,
     REPORT_SECTION_HEADER,
     REPORT_SECTION_BODY,
     REPORT_SECTION_FOOTER,
@@ -33,7 +34,9 @@ const ReportSection = (props) => {
     const {
         reportSettings,
         currentReport,
-        setCurrentReport
+        setCurrentReport,
+        setLastSelectedIndex,
+        lastSelectedIndex
     } = useReportDesign();
 
     const {section, onContextMenu} = props;
@@ -184,41 +187,64 @@ const ReportSection = (props) => {
     const onStopLasso = (e) => {
         e.preventDefault();
         let sz = getSizer(section);
-        let cr = copyObject(currentReport);
         
-         let rc1 = {left: pixelPosToNumber(sz.style.left), 
-            top: pixelPosToNumber(sz.style.top), 
-            right: pixelPosToNumber(sz.style.left) + pixelPosToNumber(sz.style.width), 
-            bottom: pixelPosToNumber(sz.style.top) + pixelPosToNumber(sz.style.height)};
-        
-        for (let i = 0; i < cr.reportComponents.length; ++i) {
-            let c = cr.reportComponents[i];
-            if (c.section === section) {
-                let rc2 = {
-                    left: reportUnitsToPixels(cr.pageUnits, c.left), 
-                    top: reportUnitsToPixels(cr.pageUnits, c.top), 
-                    right: reportUnitsToPixels(cr.pageUnits, c.left + c.width), 
-                    bottom: reportUnitsToPixels(cr.pageUnits, c.top + c.height)};
-                    c.selected = intersectRect(rc1, rc2);
-             } else {
-                c.selected = false;
-             }
-        }  
+        let width = pixelPosToNumber(sz.style.width);
+        let height =  pixelPosToNumber(sz.style.height);
+
+        let sec = document.getElementById(section);
+        sec.style.cursor = "default";
+        sec.removeEventListener("mousemove", onHandleLasso);
+        sec.removeEventListener("mouseup", onStopLasso);
+
+        if ((width >= MIN_LASSO_CHANGE) || (height >= MIN_LASSO_CHANGE)) {
+            let cr = copyObject(currentReport);
+ 
+            let rc1 = {left: pixelPosToNumber(sz.style.left), 
+                top: pixelPosToNumber(sz.style.top), 
+                right: pixelPosToNumber(sz.style.left) + width, 
+                bottom: pixelPosToNumber(sz.style.top) +height};
+
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                let c = cr.reportComponents[i];
+                if (c.section === section) {
+                    let rc2 = {
+                        left: reportUnitsToPixels(cr.pageUnits, c.left), 
+                        top: reportUnitsToPixels(cr.pageUnits, c.top), 
+                        right: reportUnitsToPixels(cr.pageUnits, c.left + c.width), 
+                        bottom: reportUnitsToPixels(cr.pageUnits, c.top + c.height)};
+                        c.selected = intersectRect(rc1, rc2);
+                 } else {
+                    c.selected = false;
+                 }
+            }  
+
+
+            let lastSelected = -1;
+            for (let i = 0; i < cr.reportComponents.length; ++i) {
+                let c = cr.reportComponents[i];
+
+                if (c.selected) {
+                    if (i === lastSelectedIndex) {
+                        lastSelected = setLastSelectedIndex;
+                        break;
+                    } else {
+                        lastSelected = i;
+                    }
+                }
+            }
+
+            setLastSelectedIndex(lastSelected);
+            setCurrentReport(cr);
+        }
         
         sz.style.display = "";
         sz.style.border = "";
-        
-        let sec = document.getElementById(section);
-        sec.style.cursor = "default";
-        
+
         sz.style.left = sz.style.top = sz.style.width = sz.style.height = 0;
         sz.startX = "";
         sz.startY = "";
 
-        sec.removeEventListener("mousemove", onHandleLasso, true);
-        sec.removeEventListener("mouseup", onStopLasso, true);
-        setCurrentReport(cr);
-    };
+     };
 
     const onMouseDown = (e) => {
         if (e.target.id && (e.target.id === section)) {

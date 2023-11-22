@@ -193,8 +193,8 @@ const ReportSection = (props) => {
 
         let sec = document.getElementById(section);
         sec.style.cursor = "default";
-        sec.removeEventListener("mousemove", onHandleLasso);
-        sec.removeEventListener("mouseup", onStopLasso);
+        sec.removeEventListener("mousemove", onHandleLasso, true);
+        sec.removeEventListener("mouseup", onStopLasso, true);
 
         if ((width >= MIN_LASSO_CHANGE) || (height >= MIN_LASSO_CHANGE)) {
             let cr = copyObject(currentReport);
@@ -218,7 +218,6 @@ const ReportSection = (props) => {
                  }
             }  
 
-
             let lastSelected = -1;
             for (let i = 0; i < cr.reportComponents.length; ++i) {
                 let c = cr.reportComponents[i];
@@ -235,14 +234,14 @@ const ReportSection = (props) => {
 
             setLastSelectedIndex(lastSelected);
             setCurrentReport(cr);
+            
+            sz.style.left = sz.style.top = sz.style.width = sz.style.height = 0;
+            sz.startX = "";
+            sz.startY = "";
         }
         
         sz.style.display = "";
         sz.style.border = "";
-
-        sz.style.left = sz.style.top = sz.style.width = sz.style.height = 0;
-        sz.startX = "";
-        sz.startY = "";
 
      };
 

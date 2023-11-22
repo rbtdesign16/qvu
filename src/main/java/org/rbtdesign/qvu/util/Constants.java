@@ -296,14 +296,6 @@ public class Constants {
     public static final String DEFAULT_REPORT_COMPONENT_ALIGN = "center";
     public static final String DEFAULT_REPORT_SECTION = REPORT_SECTION_BODY;
     
-    public static final String REPORT_SHAPE_ELLIPSE = "ellipse";
-    public static final String REPORT_SHAPE_RECTANGLE = "rectangle";
-    public static final String REPORT_SHAPE_ROUNDED_RECTANGLE = "roundedrectangle";
-    
-    public static final String[] REPORT_SHAPES = {
-        REPORT_SHAPE_ELLIPSE,
-        REPORT_SHAPE_RECTANGLE,
-        REPORT_SHAPE_ROUNDED_RECTANGLE};   
     
     public static final String DEFAULT_BORDER_STYLE = "none";
     public static final String[] BORDER_STYLES = {
@@ -330,4 +322,12 @@ public class Constants {
     
     public static final String DEFAULT_BORDER_COLOR = "#000000";
     public static final int DEFAULT_BORDER_WIDTH = 1;
+    
+    public static final String[] REPORT_SHAPES = {
+        "rectangle",
+        "rounded rectangle",
+        "ellipse",
+        "horizontal line",
+        "vertical line"
+    };
 }

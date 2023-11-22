@@ -135,6 +135,15 @@ export const ReportDesignProvider = ({ children }) => {
                     underline: false
                 };
                 break;
+            case "shape":
+                retval.value = {
+                    shape: "",
+                    bordercolor: "",
+                    fillcolor: "",
+                    size: 1,
+                    filled: false
+                };
+                break;
         }
         
         return retval;

@@ -158,6 +158,42 @@ const ReportComponent = (props) => {
                 } else {
                     return <img style={myStyle} alt={component.value.alttext} src={component.value.url}/>;
                 }
+            case "shape":
+                if ((component.value.shape === "horizonal line") 
+                   || (component.value.shape === "vertical line")) {
+                    myStyle.background = component.value.fillcolor;
+                    if (component.value.shape === "horizontal line") {
+                        myStyle.height = component.value.size + "px";
+                        myStyle.width = "100%";
+                        myStyle.top = "50%";
+                        return <div style={myStyle} />;
+                    } else {
+                        myStyle.width = component.value.size + "px";
+                        myStyle.height = "100%";
+                        myStyle.left = "50%";
+                        return <div style={myStyle} />;
+                    }
+               } else {
+                    myStyle.border = "solid " + component.value.width + "px " + component.value.bordercolor;
+
+                    if (component.value.filled) {
+                        myStyle.background = component.value.fillcolor;
+                    } else {
+                        myStyle.background = "transparent";
+                    }
+
+                    switch(component.value.shape) {
+                        case "ellipse":
+                            myStyle.borderRadius = "50%";
+                            break;
+                        case "rounded rectangle":
+                            myStyle.borderRadius = "5%";
+                            break;
+                    }
+                    
+                    return <div style={myStyle} />;
+               }
+
         }      
     };
 

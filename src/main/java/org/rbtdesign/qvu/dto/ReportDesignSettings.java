@@ -29,7 +29,7 @@ public class ReportDesignSettings {
     private List<String> defaultFonts = new ArrayList<>();
     private List<String> borderStyles = new ArrayList<>(Arrays.asList(Constants.BORDER_STYLES));
     private List<Integer> defaultFontSizes = new ArrayList<>();
-    private List<String> reportShapes = new ArrayList<>();
+    private List<String> reportShapes = new ArrayList<>(Arrays.asList(Constants.REPORT_SHAPES));
     private Integer defaultBorderWidth = Constants.DEFAULT_BORDER_WIDTH;
     private String defaultBorderColor = Constants.DEFAULT_BORDER_COLOR;
     private List<Integer> borderWidths = new ArrayList<>(Arrays.asList(Constants.BORDER_WIDTHS));

@@ -867,6 +867,10 @@ export const getComponentTypeDisplayText = (type) => {
             return "Text";
         case "image":   
             return "Image";
+        case "shape":   
+            return "Shape";
+        case "email":   
+            return "Email";
         case "hyperlink":   
             return "Hyperlink";
         case "pagenumber":   

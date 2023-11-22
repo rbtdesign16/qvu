@@ -110,7 +110,6 @@ const ReportContent = (props) => {
                 });
             }
         }
-
         
         retval.push({ separator: true});
         retval.push({
@@ -327,6 +326,7 @@ const ReportContent = (props) => {
             case "text":   
             case "image":   
             case "email":   
+            case "shape":   
             case "hyperlink":   
             case "pagenumber":   
             case "currentdate":   

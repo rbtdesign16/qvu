@@ -85,6 +85,13 @@ const AddEditComponentModal = (props) => {
                     c.value[e.target.name] = e.target.value;
                 }
                 break;
+            case "shape":
+                if (e.target.name === "filled") {
+                    c.value[e.target.name] = e.target.checked;
+                } else {
+                    c.value[e.target.name] = e.target.value;
+                }
+                break;
         }
         
         setCurrentComponent(c);
@@ -148,6 +155,12 @@ const AddEditComponentModal = (props) => {
         </div>;
     };
 
+    const getShapeEntry = () => {
+        return <div className="entrygrid-100-150">
+        this is a test
+        </div>;
+    };
+
 
     const getComponentPanel = () => {
         if (currentComponent) {
@@ -160,23 +173,31 @@ const AddEditComponentModal = (props) => {
                     return getImageEntry();
                 case "email":
                     return getEmailEntry();
+                case "shape":
+                    return getShapeEntry();
             }
         }
     };
     
     const getTabs = () => {
         if (currentComponent) {
+            if (currentComponent.type === "shape") {
+                return getShapeEntry();
+            } else if (currentComponent.type === "subreport") {
+                return <div>subreport</div>;
+            } else {
                 return <Tabs id="t1" className="mb-3">
-                <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
-                    {getComponentPanel()}
-                </Tab>
-                <Tab eventKey="font" title={getText("Font")}>
-                    <FontPanel />
-                </Tab>
-                <Tab eventKey="border" title={getText("Border")}>
-                    <BorderPanel />
-                </Tab>
-            </Tabs>;
+                    <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
+                        {getComponentPanel()}
+                    </Tab>
+                    <Tab eventKey="font" title={getText("Font")}>
+                        <FontPanel />
+                    </Tab>
+                    <Tab eventKey="border" title={getText("Border")}>
+                        <BorderPanel />
+                    </Tab>
+                </Tabs>;
+            }
         } else {
             return "";
         }

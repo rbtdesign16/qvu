@@ -39,11 +39,6 @@ const AddEditComponentModal = (props) => {
         setCurrentComponent, 
         getNewComponent} = useReportDesign();
     
-    const settings = {
-        fontSettings: {},
-        borderSettings: {}
-    };
-    
     const getTitle = () => {
         if (currentComponent) {
             if (config.edit) {
@@ -83,7 +78,7 @@ const AddEditComponentModal = (props) => {
             case COMPONENT_TYPE_TEXT:
                 c.value = e.target.value;
                 break;
-            case "image":
+            case COMPONENT_TYPE_IMAGE:
                 if (e.target.name === "sizetofit") {
                     c.value[e.target.name] = e.target.checked;
                 } else {
@@ -199,7 +194,7 @@ const AddEditComponentModal = (props) => {
             } else if (currentComponent.type === COMPONENT_TYPE_SUBREPORT) {
                 return <div>subreport</div>;
             } else {
-                return <Tabs id="t1" className="mb-3">
+                return <Tabs id="rcomp" className="mb-3">
                     <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
                         {getComponentPanel()}
                     </Tab>

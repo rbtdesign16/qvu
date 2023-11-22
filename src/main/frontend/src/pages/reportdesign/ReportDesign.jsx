@@ -48,8 +48,6 @@ import {
     REPORT_SECTION_BODY
 } from "../../utils/reportHelper";
 
-
-
 import {
     getReportSettings,
     getAvailableDocuments,
@@ -186,8 +184,7 @@ const ReportDesign = () => {
     
     const saveBorderSettings = (bs) => {
         hideBorderSettings();
-        
-        
+
         if (bs) {
             let cr = copyObject(currentReport);
 
@@ -434,14 +431,16 @@ const ReportDesign = () => {
     };
 
     const getReportInfo = () => {
+        let gstyle = getComputedStyle(document.documentElement);
+        let fcolor = gstyle.getPropertyValue('--default-font-color')
         return  <span className="cobaltBlue-f" style={{marginLeft: "10px"}}>
-            <span style={{color: "darkslategray"}}>{getText("Group", ":  ")}</span>
+            <span style={{color: fcolor}}>{getText("Group", ":  ")}</span>
             {currentReport.group} 
-            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Report", ":  ")}</span>
+            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Report", ":  ")}</span>
             {currentReport.name}
-            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Page Size", ":  ")}</span>
+            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Page Size", ":  ")}</span>
             {currentReport.pageSize}
-            <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Query Document", ":  ")}</span>
+            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Query Document", ":  ")}</span>
             {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName : "-"}
         </span>;
     };

@@ -169,6 +169,7 @@ export const getComponentStyle = (reportSettings, currentReport, component) => {
         height: component.height + unit,
         top: component.top + unit,
         left: component.left + unit,
+        cursor: "pointer",
         textAlign: component.align,
         color: component.foregroundColor,
         backgroundColor: component.backgroundColor,
@@ -221,7 +222,6 @@ export const getComponentStyle = (reportSettings, currentReport, component) => {
             }
         }
     }
-
 
     return retval;
 };

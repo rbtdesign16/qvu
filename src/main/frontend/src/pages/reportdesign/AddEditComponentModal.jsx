@@ -14,7 +14,8 @@ import {MODAL_TITLE_SIZE,
     getUUID,
     COLOR_BLACK,
     NONE_SETTING,
-    TRANSPARENT_SETTING} from "../../utils/helper";
+    TRANSPARENT_SETTING,
+    UNDERLINE_SETTING} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 

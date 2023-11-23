@@ -207,23 +207,20 @@ export const getBorderWidthOptions = (reportSettings, bs) => {
     });
 };
 
-export const getComponentStyle = (reportSettings, currentReport, component) => {
-    let unit = currentReport.pageUnits.substring(0, 2);
-
-    let retval;
-    
-    if (component.type === COMPONENT_TYPE_SHAPE) {
-        retval = {
+const getShapeComponentStyle = (component, unit) => {
+    return {
             width: component.width + unit,
             height: component.height + unit,
             top: component.top + unit,
             left: component.left + unit,
             cursor: "pointer",
-            background: "transparent",
+            background: TRANSPARENT_SETTING,
             zIndex: component.zindex
         };
-    } else {       
-        retval = {
+};
+
+export const getDefaultComponentStyle = (reportSettings, component, unit) => {
+    let retval = {
             width: component.width + unit,
             height: component.height + unit,
             top: component.top + unit,
@@ -235,55 +232,65 @@ export const getComponentStyle = (reportSettings, currentReport, component) => {
             zIndex: component.zindex
         };
     
-        if (component.fontSettings) {
-            let fs = component.fontSettings;
-            retval.fontFamilty = fs.font;
-            retval.fontSize = fs.size + "pt";
-            if (fs.italic) {
-                retval.fontStyle = ITALIC_SETTING;
-            }
-
-            if (fs.bold) {
-                retval.fontWeight = 700;
-            }
-
-            if (fs.underline) {
-                retval.textDecoration = UNDERLINE_SETTING;
-            }
+    if (component.fontSettings) {
+        let fs = component.fontSettings;
+        retval.fontFamilty = fs.font;
+        retval.fontSize = fs.size + "pt";
+        if (fs.italic) {
+            retval.fontStyle = ITALIC_SETTING;
         }
 
-        if (component.borderSettings) {
-            let bs = component.borderSettings;
-            if (haveBorder(bs)) {
-                let bdef = bs.border + " " + bs.width + "px " + bs.color;
-                if (haveAllBorders(bs)) {
-                    retval.border = bdef;
-                } else {
-                    if (bs.left) {
-                        retval.borderLeft = bdef;
-                    }
+        if (fs.bold) {
+            retval.fontWeight = 700;
+        }
 
-                    if (bs.top) {
-                        retval.borderTop = bdef;
-                    }
+        if (fs.underline) {
+            retval.textDecoration = UNDERLINE_SETTING;
+        }
+    }
 
-                    if (bs.rightt) {
-                        retval.borderRightt = bdef;
-                    }
-
-                    if (bs.bottom) {
-                        retval.borderBottom = bdef;
-                    }
+    if (component.borderSettings) {
+        let bs = component.borderSettings;
+        if (haveBorder(bs)) {
+            let bdef = bs.border + " " + bs.width + "px " + bs.color;
+            if (haveAllBorders(bs)) {
+                retval.border = bdef;
+            } else {
+                if (bs.left) {
+                    retval.borderLeft = bdef;
                 }
 
-                if (bs.rounded) {
-                    retval.borderRadius = reportSettings.defaultBorderRadius;
+                if (bs.top) {
+                    retval.borderTop = bdef;
                 }
+
+                if (bs.rightt) {
+                    retval.borderRightt = bdef;
+                }
+
+                if (bs.bottom) {
+                    retval.borderBottom = bdef;
+                }
+            }
+
+            if (bs.rounded) {
+                retval.borderRadius = reportSettings.defaultBorderRadius;
             }
         }
     }
 
     return retval;
+};
+
+export const getComponentStyle = (reportSettings, currentReport, component) => {
+    let unit = currentReport.pageUnits.substring(0, 2);
+
+    switch(component.type) {
+        case COMPONENT_TYPE_SHAPE:
+            return getShapeComponentStyle(component, unit);
+        default:
+            return getDefaultComponentStyle(reportSettings, component, unit);
+    }
 };
 
 export const getComponentClassName = (comp) => {

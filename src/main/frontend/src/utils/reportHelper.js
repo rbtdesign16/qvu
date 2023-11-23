@@ -1,4 +1,7 @@
 import {copyObject} from "./helper";
+import moment from "moment";
+import javadatefp from "moment-jdateformatparser";
+
 import {NONE_SETTING,
     TRANSPARENT_SETTING, 
     ITALIC_SETTING, 
@@ -67,6 +70,34 @@ export const SHAPE_VERTICAL_LINE = "vertical line";
 export const SHAPE_ELLIPSE = "ellipse";
 export const SHAPE_ROUNDED_RECTANGLE = "rounded rectangle";
 export const SHAPE_RECTANGLE = "rectangle";
+
+export const PAGE_NUMBER_FORMATS = [
+    "?",
+    "?.",
+    "[?]",
+    "(?)"];
+export const DEFAULT_PAGE_NUMBER_FORMAT = PAGE_NUMBER_FORMATS[0];
+
+export const CURRENT_DATE_FORMATS = [
+    "yyyy-MM-dd",
+    "MM/dd/yyyy",
+    "yyyy.MM.dd",
+    "yyyy-MM-dd HH:mm",
+    "MM/dd/yyyy HH:mm",
+    "yyyy-MM-dd hh:mm a",
+    "MM/dd/yyyy hh:mm a",
+    "E yyyy.MM.dd",
+    "E, yyyy-MM-dd",
+    "E yyyy.MM.dd HH:mm",
+    "E, yyyy-MM-dd HH:mm",
+    "E yyyy.MM.dd hh:mm a",
+    "E, yyyy-MM-dd hh:mm a",
+];
+
+export const DEFAULT_CURRENT_DATE_FORMAT = CURRENT_DATE_FORMATS[0];
+export const TEXT_ALIGN_OPTIONS = ["left", "center", "right"];
+export const BOLD_FONT_WEIGHT = 700;
+export const STANDARD_FONT_WEIGHT = 400;
 
 export const pixelPosToNumber = (pos) => {
     if (pos) {
@@ -162,6 +193,10 @@ export const getComponentValue = (reportSettings, component) => {
             }
             
             return <div style={myStyle}></div>;
+        case COMPONENT_TYPE_CURRENTDATE:
+            return moment().formatWithJDF(component.value.format); 
+        case COMPONENT_TYPE_PAGENUMBER:
+            return component.value.format.replace("?", "1");;
     }
 };
 
@@ -320,7 +355,13 @@ const isStopPropagationRequired = (component) => {
             || (component.type === COMPONENT_TYPE_IMAGE));
     };
     
-export const onComponentClick = (e, currentReport, setCurrentReport, component, componentIndex, lastSelectedIndex) => {
+export const onComponentClick = (e, 
+    currentReport, 
+    setCurrentReport, 
+    component, 
+    componentIndex, 
+    lastSelectedIndex,
+    setLastSelectedIndex) => {
     if (e.ctrlKey) {
         e.preventDefault();
         let c = copyObject(component);
@@ -477,6 +518,23 @@ export const getComponentTypeDisplayText = (type) => {
      }
 };
 
-export const TEXT_ALIGN_OPTIONS = ["left", "center", "right"];
-export const BOLD_FONT_WEIGHT = 700;
-export const STANDARD_FONT_WEIGHT = 400;
+export const getPageNumberOptions = (valueObject) => {
+    return PAGE_NUMBER_FORMATS.map(f => {
+        if (valueObject.format === f) {
+            return <option value={f} selected>{f.replace("?", "1")}</option>
+        } else {
+            return <option value={f}>{f.replace("?", "1")}</option>
+        }
+    });
+};
+
+export const getCurrentDateFormatOptions = (valueObject) => {
+    let dt = moment();
+    return CURRENT_DATE_FORMATS.map(df => {
+        if (valueObject.format === df) {
+            return <option value={df} selected>{dt.formatWithJDF(df)}</option>;
+        } else {
+            return <option value={df}>{dt.formatWithJDF(df)}</option>;
+        }
+    });
+};

@@ -22,7 +22,9 @@ import {
     MAX_UNDOS,
     REPORT_UNITS_MM,
     DEFAULT_MM_COMPONENT_POS,
-    DEFAULT_INCH_COMPONENT_POS
+    DEFAULT_INCH_COMPONENT_POS,
+    DEFAULT_PAGE_NUMBER_FORMAT,
+    DEFAULT_CURRENT_DATE_FORMAT
     } from "../utils/reportHelper";
 
 export const ReportDesignContext = createContext();
@@ -156,6 +158,16 @@ export const ReportDesignProvider = ({ children }) => {
                     fillcolor: "",
                     size: 1,
                     filled: false
+                };
+                break;
+            case COMPONENT_TYPE_PAGENUMBER:
+                retval.value = {
+                    format: DEFAULT_PAGE_NUMBER_FORMAT
+                };
+                break;
+            case COMPONENT_TYPE_CURRENTDATE:
+                retval.value = {
+                    format: DEFAULT_CURRENT_DATE_FORMAT
                 };
                 break;
         }

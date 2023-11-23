@@ -15,7 +15,8 @@ import {MODAL_TITLE_SIZE,
     COLOR_BLACK,
     NONE_SETTING,
     TRANSPARENT_SETTING,
-    UNDERLINE_SETTING} from "../../utils/helper";
+    UNDERLINE_SETTING,
+    FORMAT_SETTING} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 
@@ -38,7 +39,11 @@ import {
     getBorderWidthOptions,
     getShapeOptions,
     getComponentValue,
-    BORDER_STYLE_SOLID} from "../../utils/reportHelper";
+    BORDER_STYLE_SOLID,
+    DEFAULT_PAGE_NUMBER_FORMAT,
+    DEFAULT_CURRENT_DATE_FORMAT,
+    getPageNumberOptions,
+    getCurrentDateFormatOptions} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -47,8 +52,7 @@ const AddEditComponentModal = (props) => {
     const {currentReport, 
         reportSettings, 
         currentComponent, 
-        setCurrentComponent, 
-        getNewComponent} = useReportDesign();
+        setCurrentComponent} = useReportDesign();
     
     const getTitle = () => {
         if (currentComponent) {
@@ -118,6 +122,10 @@ const AddEditComponentModal = (props) => {
                 } else {
                     c.value[e.target.name] = e.target.value;
                 }
+                break;
+            case COMPONENT_TYPE_CURRENTDATE:
+            case COMPONENT_TYPE_PAGENUMBER:
+                c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
                 break;
         }
         
@@ -233,6 +241,31 @@ const AddEditComponentModal = (props) => {
          }
     };
 
+    const getCurrentDateEntry = () => {
+       if (!currentComponent.value.format) {
+            currentComponent.value.format = DEFAULT_CURRENT_DATE_FORMAT;
+        }
+        return <div className="entrygrid-125-125">
+            <div className="label">{getText("Format:")}</div><div><select name="format" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(currentComponent.value)}</select></div>
+            <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
+            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
+        </div>;
+    };
+            
+    const getPageNumberEntry = () => {
+        if (!currentComponent.value.format) {
+            currentComponent.value.format = DEFAULT_PAGE_NUMBER_FORMAT;
+        }
+        
+        return <div className="entrygrid-125-125">
+            <div className="label">{getText("Format:")}</div><div><select name={FORMAT_SETTING} onChange={e => setValue(e)}>{getPageNumberOptions(currentComponent.value)}</select></div>
+            <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
+            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
+        </div>;
+    };
+            
 
     const getComponentPanel = () => {
         if (currentComponent) {
@@ -247,6 +280,10 @@ const AddEditComponentModal = (props) => {
                     return getEmailEntry();
                 case COMPONENT_TYPE_SHAPE:
                     return getShapeEntry();
+                case COMPONENT_TYPE_CURRENTDATE:
+                    return getCurrentDateEntry();
+                case COMPONENT_TYPE_PAGENUMBER:
+                    return getPageNumberEntry();
             }
         }
     };

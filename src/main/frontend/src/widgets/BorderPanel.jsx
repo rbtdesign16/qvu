@@ -4,6 +4,11 @@ import useLang from "../context/LangContext";
 import ColorPicker from "./ColorPicker";
 import useReportDesign from "../context/ReportDesignContext";
 import {getUUID} from "../utils/helper";
+import {
+    haveAllBorders, 
+    haveBorder, 
+    getBorderStyleOptions, 
+    getBorderWidthOptions} from "../utils/reportHelper";
 
 const BorderPanel = (props) => {
    const {getText} = useLang();
@@ -32,47 +37,13 @@ const BorderPanel = (props) => {
         setCurrentComponent(c);
     };
     
-    const getBorderStyles = () => {
-        return reportSettings.borderStyles.map(b => {
-            if (currentComponent.borderSettings.border === b) {
-                return <option value={b} selected>{b}</option>;
-            } else {
-                return <option value={b}>{b}</option>;
-            }  
-        });
-    };
-    
-    const getBorderSizes = () => {
-        return reportSettings.borderWidths.map(w => {
-            if (currentComponent.borderSettings.width == w) {
-                return <option value={w} selected>{w}</option>;
-            } else {
-                return <option value={w}>{w}</option>;
-            }  
-        });
-    };
-
-    const haveAllBorders = () => {
-        return (currentComponent.borderSettings.left 
-            && currentComponent.borderSettings.top 
-            && currentComponent.borderSettings.right 
-            && currentComponent.borderSettings.bottom);
-    };
-        
-    const haveBorder = () => {
-        return (currentComponent.borderSettings.left 
-            ||  currentComponent.borderSettings.top     
-            || currentComponent.borderSettings.right 
-            || currentComponent.borderSettings.bottom);
-    };
-        
     const getExampleStyle = () => {
         let retval = {
             width: "50px", 
             height: "30px"
         };
         
-        if (haveBorder()) {
+        if (haveBorder(currentComponent.borderSettings)) {
             retval.width = "50px";
             retval.height = "30px";
             let bdef = currentComponent.borderSettings.border 
@@ -80,7 +51,7 @@ const BorderPanel = (props) => {
                 + currentComponent.borderSettings.width 
                 + "px " 
                 + currentComponent.borderSettings.color;
-            if (haveAllBorders()) {
+            if (haveAllBorders(currentComponent.borderSettings)) {
                retval.border = bdef;
             } else {
                 if (currentComponent.borderSettings.left) {
@@ -116,8 +87,8 @@ const BorderPanel = (props) => {
         
     if (currentComponent) {
         return (<div className="entrygrid-100-150">
-                <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => onChange(e)}>{getBorderStyles()}</select></div>
-                <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => onChange(e)}>{getBorderSizes()}</select></div>
+                <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => onChange(e)}>{getBorderStyleOptions(reportSettings, currentComponent.borderSettings)}</select></div>
+                <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => onChange(e)}>{getBorderWidthOptions(reportSettings, currentComponent.borderSettings)}</select></div>
                 <div className="label">{getText("Color:")}</div><div><ColorPicker color={currentComponent.borderSettings.color} setColor={setColor}/></div>
                 <div></div><div><input key={getUUID()} name="left" type="checkbox" checked={currentComponent.borderSettings.left} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="left">{getText("Left")}</label></div>
                 <div></div><div><input key={getUUID()} name="top" type="checkbox" checked={currentComponent.borderSettings.top} onChange={e => onChange(e)} /><label className="ck-label" htmlFor="top">{getText("Top")}</label></div>

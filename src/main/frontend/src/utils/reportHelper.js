@@ -88,7 +88,7 @@ export const pixelsToReportUnits = (type, pixels) => {
     }
 };
 
-export const getComponentValue = (component) => {
+export const getComponentValue = (reportSettings, component) => {
     let myStyle = {};
     
     switch (component.type) {
@@ -118,21 +118,31 @@ export const getComponentValue = (component) => {
         case COMPONENT_TYPE_SHAPE:
             if ((component.value.shape === SHAPE_HORIZONTAL_LINE)
                     || (component.value.shape === SHAPE_VERTICAL_LINE)) {
-                myStyle.background = component.value.fillcolor;
+                myStyle.backgroundColor = component.value.fillcolor;
+                myStyle.position = "absolute";
+                
                 if (component.value.shape === SHAPE_HORIZONTAL_LINE) {
-                    myStyle.height = component.value.size + "px";
                     myStyle.width = "100%";
+                    myStyle.height = component.value.width + "px";
                     myStyle.top = "50%";
-                    return <div style={myStyle} />;
+                   return <div style={myStyle} />;
                 } else {
-                    myStyle.width = component.value.size + "px";
+                    myStyle.width = component.value.width + "px";
                     myStyle.height = "100%";
-                    myStyle.left = "50%";
+                    myStyle.marginLeft = "50%" ;
                     return <div style={myStyle} />;
                 }
             } else {
-                myStyle.border = "solid " + component.value.width + "px " + component.value.bordercolor;
-
+                myStyle.height = "100%";
+                myStyle.width = "100%";
+                
+                if (!component.value.border 
+                    || (component.value.border === "none")) {
+                    myStyle.border = "none";
+                } else {
+                    myStyle.border = component.value.border + " " + component.value.width + "px " + component.value.bordercolor;
+                }
+                 
                 if (component.value.filled) {
                     myStyle.background = component.value.fillcolor;
                 } else {
@@ -144,14 +154,24 @@ export const getComponentValue = (component) => {
                         myStyle.borderRadius = "50%";
                         break;
                     case SHAPE_ROUNDED_RECTANGLE:
-                        myStyle.borderRadius = "5%";
+                        myStyle.borderRadius = reportSettings.defaultBorderRadius;
                         break;
                 }
 
-                return <div style={myStyle} />;
+                 return <div style={myStyle} />;
             }
 
     }
+};
+
+ export const getShapeOptions = (reportSettings, valueObject) => {
+    return reportSettings.reportShapes.map(s => {
+        if (s === valueObject[COMPONENT_TYPE_SHAPE]) {
+            return <option value={s} selected>{s}</option>;
+        } else {
+            return <option value={s}>{s}</option>;
+        }
+    });
 };
 
 export const haveAllBorders = (bs) => {
@@ -160,6 +180,26 @@ export const haveAllBorders = (bs) => {
 
 export const haveBorder = (bs) => {
     return (bs.left || bs.top && bs.right || bs.bottom);
+};
+
+export const getBorderStyleOptions = (reportSettings, bs) => {
+    return reportSettings.borderStyles.map(b => {
+        if (bs.border === b) {
+            return <option value={b} selected>{b}</option>;
+        } else {
+            return <option value={b}>{b}</option>;
+        }  
+    });
+};
+    
+export const getBorderWidthOptions = (reportSettings, bs) => {
+    return reportSettings.borderWidths.map(w => {
+        if (bs.width == w) {
+            return <option value={w} selected>{w}</option>;
+        } else {
+            return <option value={w}>{w}</option>;
+        }  
+    });
 };
 
 export const getComponentStyle = (reportSettings, currentReport, component) => {

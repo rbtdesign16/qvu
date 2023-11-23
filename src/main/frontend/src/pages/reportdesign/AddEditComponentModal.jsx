@@ -27,7 +27,13 @@ import {
     COMPONENT_TYPE_SUBREPORT,
     pixelsToReportUnits, 
     TEXT_ALIGN_OPTIONS,
-    getComponentTypeDisplayText} from "../../utils/reportHelper";
+    SHAPE_VERTICAL_LINE,
+    SHAPE_HORIZONTAL_LINE,
+    getComponentTypeDisplayText,
+    getBorderStyleOptions, 
+    getBorderWidthOptions,
+    getShapeOptions,
+    getComponentValue} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -72,6 +78,12 @@ const AddEditComponentModal = (props) => {
         setCurrentComponent(c);
     };
 
+    const setColorValue = (color, name) => {
+        let c = {...currentComponent};
+        c.value[name] = color;
+        setCurrentComponent(c);
+    };
+
     const setValue = (e) => {
         let c = {...currentComponent};
         switch (currentComponent.type) {
@@ -93,9 +105,11 @@ const AddEditComponentModal = (props) => {
                     c.value[e.target.name] = e.target.value;
                 }
                 break;
-            case COMPONENT_TYPE_HYPERLINK:
+            case COMPONENT_TYPE_SHAPE:
                 if (e.target.name === "filled") {
                     c.value[e.target.name] = e.target.checked;
+                } else if (e.target.options) {
+                    c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
                 } else {
                     c.value[e.target.name] = e.target.value;
                 }
@@ -162,11 +176,56 @@ const AddEditComponentModal = (props) => {
             <div></div><div><input key={getUUID()} name="sizetofit" type="checkbox" checked={currentComponent.value.sizetofit} onChange={e => setValue(e)} value={currentComponent.value.sizetofit}/><label className="ck-label" htmlFor="sizrtofit">{getText("Size to Fit")}</label></div>
         </div>;
     };
-
+    
+    const isShapeLine = () => {
+        return ((currentComponent.type === (COMPONENT_TYPE_SHAPE) 
+                && (currentComponent.value.shape === SHAPE_VERTICAL_LINE) 
+                    || (currentComponent.value.shape === SHAPE_HORIZONTAL_LINE)));
+        };
+        
     const getShapeEntry = () => {
-        return <div className="entrygrid-100-150">
-        this is a test
+        if (!currentComponent.value.width) {
+            currentComponent.value.width = 1;
+        }
+        
+        if (!isShapeLine()) {
+            if (!currentComponent.value.border) {
+                currentComponent.value.border = "none";
+            }
+            
+            if (!currentComponent.value.bordercolor) {
+                currentComponent.value.bordercolor = "#000000";
+            }
+ 
+            if (!currentComponent.value.filled || !currentComponent.value.fillcolor) {
+                currentComponent.value.fillcolor ="transparent";
+            }
+
+            return <div className="entrygrid-125-125">
+                    <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Border Color:")}</div><div><ColorPicker name="bordercolor" color={currentComponent.value.bordercolor} setColor={setColorValue}/></div>
+                    <div></div><div><input key={getUUID()} name="filled" type="checkbox" checked={currentComponent.value.filled} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Filled")}</label></div>
+                    <div className="label">{getText("Fill Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
+                    <div className="label">{getText("Example:")}</div><div style={{height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
         </div>;
+        } else {
+           if (!currentComponent.value.fillcolor) {
+                currentComponent.value.fillcolor = "#000000";
+            }
+           
+            if (!currentComponent.value.width) {
+                currentComponent.value.width = 2;
+            }
+            
+            return <div className="entrygrid-125-125">
+                    <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
+                    <div className="label">{getText("Example:")}</div><div style={{position: "relative", height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
+                </div>;
+         }
     };
 
 

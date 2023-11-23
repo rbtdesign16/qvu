@@ -3,11 +3,11 @@ import ColorSelectModal from "./ColorSelectModal";
 import PropTypes from "prop-types";
 
 const ColorPicker = (props) => {
-    const {color, setColor} = props;
+    const {color, setColor, name} = props;
     const [showColorSelect, setShowColorSelect] = useState({show: false, color: color});
     
     const saveColor = (color) => {
-        setColor(color);
+        setColor(color, name);
         hideColorSelect();
     };
     

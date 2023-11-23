@@ -37,6 +37,10 @@ export const INFO_TEXT_COLOR = "#4682B4";
 export const COLOR_CRIMSON = "crimson";
 export const COLOR_COBALT_BLUE = "#0020C2";
 export const COLOR_BLACK = "black";
+export const NONE_SETTING = "none";
+export const TRANSPARENT_SETTING = "transparent";
+export const ITALIC_SETTING = "italic";
+export const UNDERLINE_SETTING = "underline";
 
 export const MODAL_TITLE_SIZE = "h5";
 export const SPLITTER_GUTTER_SIZE = 8;

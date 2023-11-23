@@ -11,7 +11,10 @@ import ColorPicker from "../../widgets/ColorPicker"
 import useReportDesign from "../../context/ReportDesignContext";
 import {MODAL_TITLE_SIZE, 
     copyObject,
-    getUUID} from "../../utils/helper";
+    getUUID,
+    COLOR_BLACK,
+    NONE_SETTING,
+    TRANSPARENT_SETTING} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 
@@ -33,7 +36,8 @@ import {
     getBorderStyleOptions, 
     getBorderWidthOptions,
     getShapeOptions,
-    getComponentValue} from "../../utils/reportHelper";
+    getComponentValue,
+    BORDER_STYLE_SOLID} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -99,7 +103,7 @@ const AddEditComponentModal = (props) => {
                 break;
             case COMPONENT_TYPE_EMAIL:
             case COMPONENT_TYPE_HYPERLINK:
-                if (e.target.name === "underline") {
+                if (e.target.name === UNDERLINE_SETTING) {
                     c.value[e.target.name] = e.target.checked;
                 } else {
                     c.value[e.target.name] = e.target.value;
@@ -149,7 +153,7 @@ const AddEditComponentModal = (props) => {
         return <div className="entrygrid-100-150">
             <div className="label">{getText("URL:")}</div><div><input type="text" name="url" size={40} onChange={e => setValue(e)} value={currentComponent.value.url}/></div>
             <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
-            <div></div><div><input key={getUUID()} name="underline" type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
+            <div></div><div><input key={getUUID()} name={UNDERLINE_SETTING} type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
             <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
             <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
@@ -161,7 +165,7 @@ const AddEditComponentModal = (props) => {
             <div className="label">{getText("To:")}</div><div><input name="to" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.to}/></div>
             <div className="label">{getText("Subject:")}</div><div><input type="text" name="subject" size={40} onChange={e => setValue(e)} value={currentComponent.value.subject}/></div>
             <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
-            <div></div><div><input key={getUUID()} name="underline" type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
+            <div></div><div><input key={getUUID()} name={UNDERLINE_SETTING} type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
             <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
             <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
@@ -190,20 +194,20 @@ const AddEditComponentModal = (props) => {
         
         if (!isShapeLine()) {
             if (!currentComponent.value.border) {
-                currentComponent.value.border = "none";
+                currentComponent.value.border = BORDER_STYLE_SOLID;
             }
             
             if (!currentComponent.value.bordercolor) {
-                currentComponent.value.bordercolor = "#000000";
+                currentComponent.value.bordercolor = COLOR_BLACK;
             }
  
             if (!currentComponent.value.filled || !currentComponent.value.fillcolor) {
-                currentComponent.value.fillcolor ="transparent";
+                currentComponent.value.fillcolor = TRANSPARENT_SETTING;
             }
 
             return <div className="entrygrid-125-125">
                     <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
-                    <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value, true)}</select></div>
                     <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
                     <div className="label">{getText("Border Color:")}</div><div><ColorPicker name="bordercolor" color={currentComponent.value.bordercolor} setColor={setColorValue}/></div>
                     <div></div><div><input key={getUUID()} name="filled" type="checkbox" checked={currentComponent.value.filled} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Filled")}</label></div>

@@ -21,7 +21,8 @@ import {
     ARROW_DOWN_KEY,
     ARROW_LEFT_KEY,
     ARROW_RIGHT_KEY,
-    confirm
+    confirm,
+    NONE_SETTING
 } from "../../utils/helper";
 
 import {
@@ -369,13 +370,6 @@ const ReportContent = (props) => {
     };
 
     const getStyle = () => {
-        if (currentReport.reportComponents.length === 0) {
-            currentReport.reportComponents.push(getNewComponent("body", "text", "this is a test"));
-            let c = getNewComponent("body", "text", "this is another test", {left: 2, top: 2, width: 2, height: 1});
-      
-            currentReport.reportComponents.push(c);
-        }
-
         let width;
         let height;
         if (currentReport.pageUnits === REPORT_UNITS_INCH) {
@@ -547,7 +541,7 @@ const ReportContent = (props) => {
          onClick={e => onClick(e)}>
         <ContextMenu />
         <AddEditComponentModal config={showAddEditComponent}/>
-        <Splitter style={{border: "none",
+        <Splitter style={{border: NONE_SETTING,
             width: (reportWidthPixels - 1) + "px",
             height: (reportHeightPixels - 1) + "px"}} 
             layout="vertical"

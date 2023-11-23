@@ -114,17 +114,13 @@ const ReportSection = (props) => {
             let cinfo = JSON.parse(e.dataTransfer.getData(COMPONENT_DRAG_DATA));
             let c = cr.reportComponents[cinfo.index];
 
-            let rect;
-            // if we are dropping on a section
-            if (isDropTargetSection(e.target.id)) {
-                rect = e.target.getBoundingClientRect();
-            } else { // else dropping on a component
-                rect = e.target.parentElement.getBoundingClientRect();
-            }
+            c.section = section;
+            
+            let rect = document.getElementById(c.section).getBoundingClientRect();
 
             let x = e.clientX - rect.left;
             let y = e.clientY - rect.top;
-            c.section = section;
+ 
             c.left = pixelsToReportUnits(currentReport.pageUnits, x - cinfo.left);
             c.top = pixelsToReportUnits(currentReport.pageUnits, y - cinfo.top);
 

@@ -1,4 +1,8 @@
 import {copyObject} from "./helper";
+import {NONE_SETTING,
+    TRANSPARENT_SETTING, 
+    ITALIC_SETTING, 
+    UNDERLINE_SETTING} from "./helper";
 
 export const COMPONENT_DRAG_DATA = "cinfo";
 export const MOVE_DROP_EFFECT = "move";
@@ -25,7 +29,6 @@ export const REPORT_ORIENTATION_PORTRAIT = "portrait";
 export const REPORT_UNITS_INCH = "inch";
 export const REPORT_UNITS_MM = "mm";
 
-
 export const REPORT_SECTION_HEADER = "header";
 export const REPORT_SECTION_BODY = "body";
 export const REPORT_SECTION_FOOTER = "footer";
@@ -43,6 +46,7 @@ export const PIXELS_PER_KEYDOWN_MOVE = 5;
 export const TOBACK_ACTION = "toback";
 export const TOFRONT_ACTION = "tofront";
 
+export const BORDER_STYLE_SOLID = "solid";
 
 export const COMPONENT_TYPE_TEXT = "text";   
 export const COMPONENT_TYPE_IMAGE = "image";  
@@ -96,12 +100,12 @@ export const getComponentValue = (reportSettings, component) => {
             return component.value;
         case COMPONENT_TYPE_HYPERLINK:
             if (!component.value.underline) {
-                myStyle.textDecoration = "none";
+                myStyle.textDecoration = NONE_SETTING;
             }
             return <a style={myStyle} href={component.value.url} target="_blank">{component.value.text}</a>;
         case COMPONENT_TYPE_EMAIL:
             if (!component.value.underline) {
-                myStyle.textDecoration = "none";
+                myStyle.textDecoration = NONE_SETTING;
             }
             return <a style={myStyle} href={"mailto:" + component.value.to + (component.value.subject ? "?\nsubject=" + component.value.subject : "")} target="_blank">{component.value.text}</a>;
         case COMPONENT_TYPE_IMAGE:
@@ -111,7 +115,7 @@ export const getComponentValue = (reportSettings, component) => {
             }
             if (component.value.linkurl) {
                 myStyle.cursor = "pointer";
-                return <a style={{textDecoration: "none"}} href={component.value.linkurl} target="_blank"><img style={myStyle} alt={component.value.alttext} src={component.value.url} /></a>;
+                return <a style={{textDecoration: NONE_SETTING}} href={component.value.linkurl} target="_blank"><img style={myStyle} alt={component.value.alttext} src={component.value.url} /></a>;
             } else {
                 return <img style={myStyle} alt={component.value.alttext} src={component.value.url}/>;
             }
@@ -125,20 +129,18 @@ export const getComponentValue = (reportSettings, component) => {
                     myStyle.width = "100%";
                     myStyle.height = component.value.width + "px";
                     myStyle.top = "50%";
-                   return <div style={myStyle} />;
                 } else {
                     myStyle.width = component.value.width + "px";
                     myStyle.height = "100%";
                     myStyle.marginLeft = "50%" ;
-                    return <div style={myStyle} />;
                 }
             } else {
                 myStyle.height = "100%";
                 myStyle.width = "100%";
                 
                 if (!component.value.border 
-                    || (component.value.border === "none")) {
-                    myStyle.border = "none";
+                    || (component.value.border === NONE_SETTING)) {
+                    myStyle.border = NONE_SETTING;
                 } else {
                     myStyle.border = component.value.border + " " + component.value.width + "px " + component.value.bordercolor;
                 }
@@ -157,10 +159,9 @@ export const getComponentValue = (reportSettings, component) => {
                         myStyle.borderRadius = reportSettings.defaultBorderRadius;
                         break;
                 }
-
-                 return <div style={myStyle} />;
             }
-
+            
+            return <div style={myStyle}></div>;
     }
 };
 
@@ -182,13 +183,17 @@ export const haveBorder = (bs) => {
     return (bs.left || bs.top && bs.right || bs.bottom);
 };
 
-export const getBorderStyleOptions = (reportSettings, bs) => {
+export const getBorderStyleOptions = (reportSettings, bs, noNone) => {
     return reportSettings.borderStyles.map(b => {
-        if (bs.border === b) {
-            return <option value={b} selected>{b}</option>;
+        if (!noNone || (b !== NONE_SETTING)) {
+            if (bs.border === b) {
+                return <option value={b} selected>{b}</option>;
+            } else {
+                return <option value={b}>{b}</option>;
+            }  
         } else {
-            return <option value={b}>{b}</option>;
-        }  
+            return "";
+        }
     });
 };
     
@@ -205,69 +210,81 @@ export const getBorderWidthOptions = (reportSettings, bs) => {
 export const getComponentStyle = (reportSettings, currentReport, component) => {
     let unit = currentReport.pageUnits.substring(0, 2);
 
-    let retval = {
-        width: component.width + unit,
-        height: component.height + unit,
-        top: component.top + unit,
-        left: component.left + unit,
-        cursor: "pointer",
-        textAlign: component.align,
-        color: component.foregroundColor,
-        backgroundColor: component.backgroundColor,
-        zIndex: component.zindex
-    };
-
-    if (component.fontSettings) {
-        let fs = component.fontSettings;
-        retval.fontFamilty = fs.font;
-        retval.fontSize = fs.size + "pt";
-        if (fs.italic) {
-            retval.fontStyle = "italic";
-        }
-
-        if (fs.bold) {
-            retval.fontWeight = 700;
-        }
-
-        if (fs.underline) {
-            retval.textDecoration = "underline";
-        }
-    }
-
-    if (component.borderSettings) {
-        let bs = component.borderSettings;
-        if (haveBorder(bs)) {
-            let bdef = bs.border + " " + bs.width + "px " + bs.color;
-            if (haveAllBorders(bs)) {
-                retval.border = bdef;
-            } else {
-                if (bs.left) {
-                    retval.borderLeft = bdef;
-                }
-
-                if (bs.top) {
-                    retval.borderTop = bdef;
-                }
-
-                if (bs.rightt) {
-                    retval.borderRightt = bdef;
-                }
-
-                if (bs.bottom) {
-                    retval.borderBottom = bdef;
-                }
+    let retval;
+    
+    if (component.type === COMPONENT_TYPE_SHAPE) {
+        retval = {
+            width: component.width + unit,
+            height: component.height + unit,
+            top: component.top + unit,
+            left: component.left + unit,
+            cursor: "pointer",
+            background: "transparent",
+            zIndex: component.zindex
+        };
+    } else {       
+        retval = {
+            width: component.width + unit,
+            height: component.height + unit,
+            top: component.top + unit,
+            left: component.left + unit,
+            cursor: "pointer",
+            textAlign: component.align,
+            color: component.foregroundColor,
+            backgroundColor: component.backgroundColor,
+            zIndex: component.zindex
+        };
+    
+        if (component.fontSettings) {
+            let fs = component.fontSettings;
+            retval.fontFamilty = fs.font;
+            retval.fontSize = fs.size + "pt";
+            if (fs.italic) {
+                retval.fontStyle = ITALIC_SETTING;
             }
 
-            if (bs.rounded) {
-                retval.borderRadius = reportSettings.defaultBorderRadius;
+            if (fs.bold) {
+                retval.fontWeight = 700;
+            }
+
+            if (fs.underline) {
+                retval.textDecoration = UNDERLINE_SETTING;
+            }
+        }
+
+        if (component.borderSettings) {
+            let bs = component.borderSettings;
+            if (haveBorder(bs)) {
+                let bdef = bs.border + " " + bs.width + "px " + bs.color;
+                if (haveAllBorders(bs)) {
+                    retval.border = bdef;
+                } else {
+                    if (bs.left) {
+                        retval.borderLeft = bdef;
+                    }
+
+                    if (bs.top) {
+                        retval.borderTop = bdef;
+                    }
+
+                    if (bs.rightt) {
+                        retval.borderRightt = bdef;
+                    }
+
+                    if (bs.bottom) {
+                        retval.borderBottom = bdef;
+                    }
+                }
+
+                if (bs.rounded) {
+                    retval.borderRadius = reportSettings.defaultBorderRadius;
+                }
             }
         }
     }
 
     return retval;
 };
-
-
 
 export const getComponentClassName = (comp) => {
     if (comp.selected) {

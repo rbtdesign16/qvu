@@ -123,7 +123,7 @@ export const pixelsToReportUnits = (type, pixels) => {
     }
 };
 
-export const getComponentValue = (reportSettings, component) => {
+export const getComponentValue = (reportSettings, component, forExample) => {
     let myStyle = {};
     
     switch (component.type) {
@@ -154,7 +154,10 @@ export const getComponentValue = (reportSettings, component) => {
             if ((component.value.shape === SHAPE_HORIZONTAL_LINE)
                     || (component.value.shape === SHAPE_VERTICAL_LINE)) {
                 myStyle.backgroundColor = component.value.fillcolor;
-                myStyle.position = "absolute";
+                
+                if (!forExample) {
+                    myStyle.position = "absolute";
+                }
                 
                 if (component.value.shape === SHAPE_HORIZONTAL_LINE) {
                     myStyle.width = "100%";

@@ -234,9 +234,9 @@ const AddEditComponentModal = (props) => {
                     <div></div><div><input key={getUUID()} name="wantfilled" type="checkbox" checked={currentComponent.value.wantfilled} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Filled")}</label></div>
                     <div className="label">{getText("Color:")}</div>     
                     <div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
-                    <div className="label">{getText("Example:")}</div>
-                    <div style={{height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
                 </div>    
+                <div className="tb-border">{getText("Example:")}</div>    
+                <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentComponent)}</div></div>
             </div>;
         } else {
            if (!currentComponent.value.fillcolor) {
@@ -247,11 +247,17 @@ const AddEditComponentModal = (props) => {
                 currentComponent.value.width = 2;
             }
             
-            return <div className="entrygrid-125-125">
-                    <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
-                    <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
-                    <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
-                    <div className="label">{getText("Example:")}</div><div style={{position: "relative", height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
+            return <div>
+                    <div className="entrygrid-125-125">
+                        <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
+                    </div>
+                    <div className="tb-border">{getText("Line:")}</div>    
+                    <div className="entrygrid-125-125">
+                        <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
+                        <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
+                    </div>
+                    <div className="tb-border">{getText("Example:")}</div>    
+                    <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentComponent, true)}</div></div>
                 </div>;
          }
     };

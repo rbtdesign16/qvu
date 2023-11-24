@@ -808,13 +808,13 @@ Note: Beware of modifying this element as it can break the animations - you shou
 
 .shape-example {
     height: 50px;
-    margin-top: 10px;
-}
+    margin: 10px 50px 0 50px;
+ }
 
 .ta-center {
     text-align: center;
 }
 
-.w-100{
+.w-100 {
     width: 100%;
 }

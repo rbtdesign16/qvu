@@ -38,6 +38,7 @@ import {
     getBorderStyleOptions, 
     getBorderWidthOptions,
     getShapeOptions,
+    getOpacityOptions,
     getComponentValue,
     BORDER_STYLE_SOLID,
     DEFAULT_PAGE_NUMBER_FORMAT,
@@ -218,6 +219,7 @@ const AddEditComponentModal = (props) => {
             return <div>
                 <div className="entrygrid-125-125">
                     <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
+                    <div className="label">{getText("Opacity:")}</div><div><select name="opacity" onChange={e => setValue(e)}>{getOpacityOptions(currentComponent.value)}</select></div>
                 </div>
                 <div className="tb-border">{getText("Border:")}</div>    
                 <div className="entrygrid-125-125">

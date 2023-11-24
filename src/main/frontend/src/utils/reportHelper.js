@@ -9,7 +9,8 @@ import {NONE_SETTING,
 
 export const COMPONENT_DRAG_DATA = "cinfo";
 export const MOVE_DROP_EFFECT = "move";
-
+export const OPACITY_OPTIONS = [0.25, 0.5, 0.75, 1];
+    
 const getPPI = () => {
     const el = document.createElement('div');
     el.style = "width: 1in;";
@@ -23,7 +24,8 @@ export const PIXELS_PER_INCH = getPPI();
 export const PIXELS_PER_MM = PIXELS_PER_INCH / 25.4;
 export const PIXELS_PER_POINT = 1.3333;
 export const MM_TO_INCHES = 0.0393701;
-export const INCHES_TO_MM = 25.4;       
+export const INCHES_TO_MM = 25.4;      
+
 export const DEFAULT_MM_COMPONENT_POS = {left: 5, top: 5, height: 5, width: 10};    
 export const DEFAULT_INCH_COMPONENT_POS = {left: 0.5, top: 0.5, height: 0.5, width: 1};    
 
@@ -70,6 +72,8 @@ export const SHAPE_VERTICAL_LINE = "vertical line";
 export const SHAPE_ELLIPSE = "ellipse";
 export const SHAPE_ROUNDED_RECTANGLE = "rounded rectangle";
 export const SHAPE_RECTANGLE = "rectangle";
+
+export const DEFAULT_SHAPE = SHAPE_RECTANGLE;
 
 export const PAGE_NUMBER_FORMATS = [
     "?",
@@ -177,7 +181,11 @@ export const getComponentValue = (reportSettings, component, forExample) => {
                 } else {
                     myStyle.border = NONE_SETTING;
                 }
-                 
+                
+                if (component.value.opacity) {
+                    myStyle.opacity = Number(component.value.opacity);
+                }
+                
                 if (component.value.wantfilled) {
                     myStyle.background = component.value.fillcolor;
                 } else {
@@ -244,6 +252,16 @@ export const getBorderWidthOptions = (reportSettings, bs) => {
     });
 };
 
+export const getOpacityOptions = (valueObject) => {
+    return OPACITY_OPTIONS.map(o => {
+        if (o == valueObject.opacity) {
+            return <option value={o} selected>{o}</option>;
+        } else {
+            return <option value={o}>{o}</option>;
+        }
+    });
+};
+    
 const getShapeComponentStyle = (component, unit) => {
     return {
             width: component.width + unit,
@@ -251,7 +269,7 @@ const getShapeComponentStyle = (component, unit) => {
             top: component.top + unit,
             left: component.left + unit,
             cursor: "pointer",
-            value: {shape: "rectangle", wantborder: true, border: "solid", width: 1, cowantfilled: true},
+            value: {shape: DEFAULT_SHAPE, wantborder: true, border: "solid", width: 1, wantfilled: false},
             background: TRANSPARENT_SETTING,
             zIndex: component.zindex
         };

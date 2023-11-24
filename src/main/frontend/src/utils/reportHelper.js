@@ -84,18 +84,18 @@ export const DEFAULT_PAGE_NUMBER_FORMAT = PAGE_NUMBER_FORMATS[0];
 
 export const CURRENT_DATE_FORMATS = [
     "yyyy-MM-dd",
-    "MM/dd/yyyy",
-    "yyyy.MM.dd",
     "yyyy-MM-dd HH:mm",
-    "MM/dd/yyyy HH:mm",
     "yyyy-MM-dd hh:mm a",
+    "MM/dd/yyyy",
+    "MM/dd/yyyy HH:mm",
     "MM/dd/yyyy hh:mm a",
-    "E yyyy.MM.dd",
     "E, yyyy-MM-dd",
-    "E yyyy.MM.dd HH:mm",
     "E, yyyy-MM-dd HH:mm",
-    "E yyyy.MM.dd hh:mm a",
     "E, yyyy-MM-dd hh:mm a",
+    "yyyy.MM.dd",
+    "E yyyy.MM.dd",
+    "E yyyy.MM.dd HH:mm",
+    "E yyyy.MM.dd hh:mm a"
 ];
 
 export const DEFAULT_CURRENT_DATE_FORMAT = CURRENT_DATE_FORMATS[0];

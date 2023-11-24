@@ -169,17 +169,16 @@ export const getComponentValue = (reportSettings, component) => {
                 myStyle.height = "100%";
                 myStyle.width = "100%";
                 
-                if (!component.value.border 
-                    || (component.value.border === NONE_SETTING)) {
-                    myStyle.border = NONE_SETTING;
-                } else {
+                if (component.value.wantborder) {
                     myStyle.border = component.value.border + " " + component.value.width + "px " + component.value.bordercolor;
+                } else {
+                    myStyle.border = NONE_SETTING;
                 }
                  
-                if (component.value.filled) {
+                if (component.value.wantfilled) {
                     myStyle.background = component.value.fillcolor;
                 } else {
-                    myStyle.background = "transparent";
+                    myStyle.background = TRANSPARENT_SETTING;
                 }
 
                 switch (component.value.shape) {
@@ -249,6 +248,7 @@ const getShapeComponentStyle = (component, unit) => {
             top: component.top + unit,
             left: component.left + unit,
             cursor: "pointer",
+            value: {shape: "rectangle", wantborder: true, border: "solid", width: 1, cowantfilled: true},
             background: TRANSPARENT_SETTING,
             zIndex: component.zindex
         };

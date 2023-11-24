@@ -115,7 +115,8 @@ const AddEditComponentModal = (props) => {
                 }
                 break;
             case COMPONENT_TYPE_SHAPE:
-                if (e.target.name === "filled") {
+                if ((e.target.name === "wantfilled") 
+                    || (e.target.name === "wantborder")) {
                     c.value[e.target.name] = e.target.checked;
                 } else if (e.target.options) {
                     c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
@@ -210,22 +211,36 @@ const AddEditComponentModal = (props) => {
                 currentComponent.value.bordercolor = COLOR_BLACK;
             }
  
-            if (!currentComponent.value.filled || !currentComponent.value.fillcolor) {
+            if (!currentComponent.value.wantfilled || !currentComponent.value.fillcolor) {
                 currentComponent.value.fillcolor = TRANSPARENT_SETTING;
             }
 
-            return <div className="entrygrid-125-125">
+            return <div>
+                <div className="entrygrid-125-125">
                     <div className="label">{getText("Shape:")}</div><div><select name="shape" onChange={e => setValue(e)}>{getShapeOptions(reportSettings, currentComponent.value)}</select></div>
-                    <div className="label">{getText("Border:")}</div><div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value, true)}</select></div>
-                    <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
-                    <div className="label">{getText("Border Color:")}</div><div><ColorPicker name="bordercolor" color={currentComponent.value.bordercolor} setColor={setColorValue}/></div>
-                    <div></div><div><input key={getUUID()} name="filled" type="checkbox" checked={currentComponent.value.filled} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Filled")}</label></div>
-                    <div className="label">{getText("Fill Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
-                    <div className="label">{getText("Example:")}</div><div style={{height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
-        </div>;
+                </div>
+                <div className="tb-border">{getText("Border:")}</div>    
+                <div className="entrygrid-125-125">
+                    <div></div><div><input key={getUUID()} name="wantborder" type="checkbox" checked={currentComponent.value.wantborder} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Show")}</label></div>
+                    <div className="label">{getText("Style:")}</div>
+                    <div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value, true)}</select></div>
+                    <div className="label">{getText("Width:")}</div>
+                    <div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select> </div>
+                    <div className="label">{getText("Color")}</div>
+                    <div><ColorPicker name="bordercolor" color={currentComponent.value.bordercolor} setColor={setColorValue}/> </div>                  
+                </div>        
+                <div className="tb-border">{getText("Fill:")}</div>    
+                <div className="entrygrid-125-125">
+                    <div></div><div><input key={getUUID()} name="wantfilled" type="checkbox" checked={currentComponent.value.wantfilled} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="left">{getText("Filled")}</label></div>
+                    <div className="label">{getText("Color:")}</div>     
+                    <div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
+                    <div className="label">{getText("Example:")}</div>
+                    <div style={{height: "30px", width: "40px"}}>{getComponentValue(reportSettings, currentComponent)}</div>
+                </div>    
+            </div>;
         } else {
            if (!currentComponent.value.fillcolor) {
-                currentComponent.value.fillcolor = "#000000";
+                currentComponent.value.fillcolor = COLOR_BLACK;
             }
            
             if (!currentComponent.value.width) {

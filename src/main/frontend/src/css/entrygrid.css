@@ -5,6 +5,13 @@
     grid-row-gap: 6px;
 }
 
+.entrygrid-75-75 {
+    display: grid;
+    grid-template-columns: 75px 75px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
 .entrygrid-125-100 {
     display: grid;
     grid-template-columns: 125px 100px;

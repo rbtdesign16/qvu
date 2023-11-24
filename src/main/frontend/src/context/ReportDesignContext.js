@@ -5,6 +5,7 @@ import {
     isEmpty,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
+    COLOR_BLACK
 } from "../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
@@ -154,10 +155,13 @@ export const ReportDesignProvider = ({ children }) => {
             case COMPONENT_TYPE_SHAPE:
                 retval.value = {
                     shape: "",
-                    bordercolor: "",
+                    wantborder: true,
+                    border: "solid",
+                    bordercolor: COLOR_BLACK,
+                    opacity: 1,
                     fillcolor: "",
                     size: 1,
-                    filled: false
+                    wantfilled: false
                 };
                 break;
             case COMPONENT_TYPE_PAGENUMBER:

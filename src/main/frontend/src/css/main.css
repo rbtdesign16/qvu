@@ -776,7 +776,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
     background: var(--context-menu-background-color);
     border: var(--query-results-table-border);
     max-height: 250px;
-    width: 150px;
+    width: 175px;
     overflow-y: auto;
     overflow-x: hidden;
 }

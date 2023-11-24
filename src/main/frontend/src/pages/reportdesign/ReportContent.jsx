@@ -22,7 +22,8 @@ import {
     ARROW_LEFT_KEY,
     ARROW_RIGHT_KEY,
     confirm,
-    NONE_SETTING
+    NONE_SETTING,
+    replaceTokens
 } from "../../utils/helper";
 
 import {
@@ -81,8 +82,9 @@ const ReportContent = (props) => {
     const getComponentContextMenuItems = (componentIndex) => {
         let retval = [];
         
+        let ctype = getText(getComponentTypeDisplayText(currentReport.reportComponents[componentIndex].type));
         retval.push({
-            text: getText("Edit Component"),
+            text: replaceTokens(getText("Edit Component"), ctype),
             action: EDIT_ACTION
         },
         {
@@ -117,7 +119,7 @@ const ReportContent = (props) => {
     };
 
     const getSectionContextMenuItems = () => {
-        let retval = [{group: getText("Add Component")}];
+        let retval = [{group: replaceTokens(getText("Add Component"), getText("Report"))}];
         let fd = false;
         for (let i = 0; i < reportSettings.reportObjectTypes.length; ++i) {
             let qr = isQueryRequiredForReportObject(reportSettings.reportObjectTypes[i]);

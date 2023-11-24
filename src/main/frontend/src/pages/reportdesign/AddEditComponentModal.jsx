@@ -16,7 +16,8 @@ import {MODAL_TITLE_SIZE,
     NONE_SETTING,
     TRANSPARENT_SETTING,
     UNDERLINE_SETTING,
-    FORMAT_SETTING} from "../../utils/helper";
+    FORMAT_SETTING,
+    replaceTokens} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 
@@ -58,9 +59,9 @@ const AddEditComponentModal = (props) => {
     const getTitle = () => {
         if (currentComponent) {
             if (config.edit) {
-                return getText("Edit " + typeDisplay + " Component");
+                return replaceTokens(getText("Edit Component"), typeDisplay);
             } else {
-                return getText("Add " + typeDisplay + " Component");
+                return replaceTokens(getText("Add Component"), typeDisplay);
             }
         } else {
             return "";

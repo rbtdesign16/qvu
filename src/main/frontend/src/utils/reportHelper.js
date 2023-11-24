@@ -9,7 +9,7 @@ import {NONE_SETTING,
 
 export const COMPONENT_DRAG_DATA = "cinfo";
 export const MOVE_DROP_EFFECT = "move";
-export const OPACITY_OPTIONS = [0.25, 0.5, 0.75, 1];
+export const OPACITY_OPTIONS = [1, 0.76, 0.5, 0.25];
     
 const getPPI = () => {
     const el = document.createElement('div');

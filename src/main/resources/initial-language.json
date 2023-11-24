@@ -2,7 +2,7 @@
     "en-US": {
         "?": "?",
         "Add datasource": "Add datasource",
-        "Add Component": "Add Component",
+        "Add Component": "Add $1 Component",
         "Add Document Schedule": "Add Document Schedule",
         "Add group": "Add group",
         "Add role": "Add role",
@@ -133,7 +133,7 @@
         "Duplicate entry": "Duplicate entry",
         "Duplicate name exists:": "Duplicate name exists:",
         "duplicate-schedule-message": "The entered schedule is a duplicate of an existing schedule with the exception of the email addresses - the new email addresses will be added to the existing schedule.",
-        "Edit Component": "Edit Component",
+        "Edit Component": "Edit $1 Component",
         "Edit datasource": "Edit datasource",
         "Edit role": "Edit role",
         "Edit role": "Edit role",

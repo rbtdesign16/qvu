@@ -299,6 +299,7 @@
                             <systemPropertyVariables>
                                 <repository.folder>c:/dev/qvu</repository.folder>
                                 <log.level>DEBUG</log.level>
+                                <dev.mode>true</dev.mode>
                             </systemPropertyVariables>
                         </configuration>
                         <executions>

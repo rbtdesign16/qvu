@@ -1348,8 +1348,12 @@ public class MainServiceImpl implements MainService {
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
 
-        QueryDocument doc = null; //cacheHelper.getQueryDocumentCache().get(key);
+        QueryDocument doc = null; 
 
+        if (System.getProperty("dev.mode") == null) {
+            doc = cacheHelper.getQueryDocumentCache().getIfPresent(key);
+        }
+        
         if (doc == null) {
             retval = fileHandler.getQueryDocument(group, user, name);
             if (retval.isSuccess()) {
@@ -1367,8 +1371,12 @@ public class MainServiceImpl implements MainService {
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, group, name, user);
 
-        ReportDocument doc = null; //cacheHelper.getReportDocumentCache().get(key);
+        ReportDocument doc = null; 
 
+        if (System.getProperty("dev.mode") == null) {
+            doc = cacheHelper.getReportDocumentCache().getIfPresent(key);
+        }
+        
         if (doc == null) {
             retval = fileHandler.getReportDocument(group, user, name);
             if (retval.isSuccess()) {

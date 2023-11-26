@@ -77,5 +77,8 @@
    --context-menu-font-color: black;
    
     --sizing-rect-width: 5px;
+    --sizing-rect-background: silver;
+    --sizing-rect-width-hover: 10px;
+    --sizing-corner-border: solid 2px crimson;
     --sizing-border: solid 1px crimson;
 }

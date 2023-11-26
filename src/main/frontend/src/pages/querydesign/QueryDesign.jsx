@@ -243,7 +243,7 @@ import { getDatasourceTreeViewData,
 
     const populateDocument = async (group, name) => {
         hideDocumentSelect();
-        showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
+        showMessage(INFO, getText("Loading document", name), null, true);
         
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {

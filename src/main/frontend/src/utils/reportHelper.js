@@ -61,7 +61,6 @@ export const COMPONENT_TYPE_HYPERLINK = "hyperlink";
 export const COMPONENT_TYPE_PAGENUMBER = "pagenumber";  
 export const COMPONENT_TYPE_CURRENTDATE = "currentdate";   
 export const COMPONENT_TYPE_DATAGRID = "datagrid";  
-export const COMPONENT_TYPE_DATAFIELD = "datafield";  
 export const COMPONENT_TYPE_DATARECORD = "datarecord";   
 export const COMPONENT_TYPE_CHART = "chart";  
 export const COMPONENT_TYPE_SUBREPORT = "subreport";
@@ -528,8 +527,6 @@ export const getComponentTypeDisplayText = (type) => {
             return "Current Date";
         case COMPONENT_TYPE_DATAGRID:   
             return "Data Grid";
-        case COMPONENT_TYPE_DATAFIELD:   
-            return "Data Field";
         case COMPONENT_TYPE_DATARECORD:   
             return "Data Record";
         case COMPONENT_TYPE_CHART:   
@@ -542,9 +539,9 @@ export const getComponentTypeDisplayText = (type) => {
 export const getPageNumberOptions = (valueObject) => {
     return PAGE_NUMBER_FORMATS.map(f => {
         if (valueObject.format === f) {
-            return <option value={f} selected>{f.replace("?", "1")}</option>
+            return <option value={f} selected>{f.replace("?", "1")}</option>;
         } else {
-            return <option value={f}>{f.replace("?", "1")}</option>
+            return <option value={f}>{f.replace("?", "1")}</option>;
         }
     });
 };

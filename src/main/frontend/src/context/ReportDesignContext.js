@@ -16,7 +16,6 @@ import {
     COMPONENT_TYPE_PAGENUMBER,
     COMPONENT_TYPE_CURRENTDATE,
     COMPONENT_TYPE_DATAGRID,
-    COMPONENT_TYPE_DATAFIELD,
     COMPONENT_TYPE_DATARECORD,
     COMPONENT_TYPE_CHART,
     COMPONENT_TYPE_SUBREPORT,
@@ -35,6 +34,7 @@ export const ReportDesignProvider = ({ children }) => {
     const [reportSettings, setReportSettings] = useState(null);
     const [currentComponent, setCurrentComponent] = useState(null);
     const [currentReport, setReport] = useState(null);
+    const [currentQuery, setCurrentQuery] = useState(null);
     const [saveReports, setSaveReports] = useState({reports: [], lastSelectedIndex: -1});
     const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
     
@@ -196,6 +196,7 @@ export const ReportDesignProvider = ({ children }) => {
     
     const setNewReport = (settings) => {
         setCurrentReport(getNewDocument(settings));
+        setCurrentQuery(null);
     };
 
     return (
@@ -215,7 +216,9 @@ export const ReportDesignProvider = ({ children }) => {
                     undo,
                     canUndo,
                     currentComponent,
-                    setCurrentComponent}}>
+                    setCurrentComponent,
+                    setCurrentQuery,
+                    currentQuery}}>
                 {children}
             </ReportDesignContext.Provider>
             );

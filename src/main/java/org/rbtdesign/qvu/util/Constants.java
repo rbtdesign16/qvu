@@ -264,7 +264,6 @@ public class Constants {
     public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER = "Page Number";
     public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE = "Current Date";
     public static final String REPORT_COMPONENT_TYPE_DATA_GRID = "Data Grid";
-    public static final String REPORT_COMPONENT_TYPE_DATA_FIELD = "Data Field";
     public static final String REPORT_COMPONENT_TYPE_DATA_RECORD = "Data Record";
     public static final String REPORT_COMPONENT_TYPE_CHART = "Chart";
     public static final String REPORT_COMPONENT_TYPE_SUBREPORT = "Sub Report";
@@ -279,7 +278,6 @@ public class Constants {
         REPORT_COMPONENT_TYPE_CURRENT_DATE,
         REPORT_COMPONENT_TYPE_CHART,
         REPORT_COMPONENT_TYPE_SUBREPORT,
-        REPORT_COMPONENT_TYPE_DATA_FIELD,
         REPORT_COMPONENT_TYPE_DATA_GRID,
         REPORT_COMPONENT_TYPE_DATA_RECORD
     };

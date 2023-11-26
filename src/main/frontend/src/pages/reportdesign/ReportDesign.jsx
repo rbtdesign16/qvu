@@ -107,7 +107,8 @@ const ReportDesign = () => {
         lastSelectedIndex,
         setLastSelectedIndex,
         undo,
-        canUndo} = useReportDesign();
+        canUndo,
+        setCurrentQuery} = useReportDesign();
 
     const onUndo = (e) => {
         e.preventDefault();
@@ -296,30 +297,38 @@ const ReportDesign = () => {
         setShowReportSettings({show: true, report: currentReport, reportSettings: reportSettings, hide: hideReportSettings, saveSettings: saveReportSettings});
     };
 
-     const setQueryDocument = (group, name) => {
-         hideDocumentSelect();
-         let cr = copyObject(currentReport);
-         cr.queryDocumentGroup = group;
-         cr.queryDocumentName = name;
+     const setQueryDocument = async (group, name) => {
+        hideDocumentSelect();
+        let cr = copyObject(currentReport);
+        cr.queryDocumentGroup = group;
+        cr.queryDocumentName = name;
          
-         
-         if (cr.reportComponents && (cr.reportComponents.length > 0)) {
-             // if we have changed query document then clear any
-             // query-related components from report
-            if ((group !== cr.getQueryDocuentGroup) || (name !== cr.queryDocumentName)) {
-                let c = [];
+        showMessage(INFO, getText("Loading document",  name), null, true);
 
-                for (let i = 0; i < cr.reportComponents.length; ++i) {
-                    if (!isQueryRequiredForReportObject(cr.reportComponents[i].type)) {
-                        c.push(cr.reportComponents[i]);
-                    }
-                }
-                
-                cr.reportComponents = c;
-            }
-        }
-         
-        setCurrentReport(cr);
+        let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
+        if (isApiError(res)) {
+            showMessage(ERROR, res.message);
+        } else {
+            hideMessage();
+            if (cr.reportComponents && (cr.reportComponents.length > 0)) {
+                // if we have changed query document then clear any
+                // query-related components from report
+               if ((group !== cr.getQueryDocuentGroup) || (name !== cr.queryDocumentName)) {
+                   let c = [];
+
+                   for (let i = 0; i < cr.reportComponents.length; ++i) {
+                       if (!isQueryRequiredForReportObject(cr.reportComponents[i].type)) {
+                           c.push(cr.reportComponents[i]);
+                       }
+                   }
+
+                   cr.reportComponents = c;
+               }
+           }
+           
+           setCurrentQuery(res.result);
+           setCurrentReport(cr);
+       }
      };
 
     const onShowQueryDocumentSelect = async (e) => {

@@ -242,7 +242,7 @@
         "Loading custom foreign keys": "Loading custom foreign keys",
         "Loading datasource information": "Loading datasource information",
         "Loading report": "Loading report",
-        "Loading document": "Loading document",
+        "Loading document": "Loading document $1...",
         "Loading foreign settings": "Loading foreign settings",
         "Loading scheduled documents": "Loading scheduled documents",
         "Loading system settings": "Loading system settings",

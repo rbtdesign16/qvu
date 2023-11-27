@@ -368,9 +368,9 @@ const ReportDesign = () => {
             {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
             {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
             {sel && <hr  className="h-separator" />}
-            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft size={SMALL_ICON_SIZE} style={{transform: 'rotate(90deg)'}} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
+            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
             {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
-            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} style={{transform: 'rotate(90deg)'}} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
+            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
             {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
             {sel && <div onClick={e => onComponentSize(true)}><RxSpaceBetweenVertically size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Height")}</div>}
             {sel && <div onClick={e => onComponentSize(false)}><RxSpaceBetweenHorizontally size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Width")}</div>}

@@ -282,13 +282,13 @@ export const getDefaultComponentStyle = (reportSettings, component, unit) => {
             left: component.left + unit,
             cursor: "pointer",
             textAlign: component.align,
-            color: component.foregroundColor,
-            backgroundColor: component.backgroundColor,
             zIndex: component.zindex
         };
     
     if (component.fontSettings) {
         let fs = component.fontSettings;
+        retval.color = fs.color,
+        retval.backgroundColor = fs.backgroundColor,
         retval.fontFamilty = fs.font;
         retval.fontSize = fs.size + "pt";
         if (fs.italic) {

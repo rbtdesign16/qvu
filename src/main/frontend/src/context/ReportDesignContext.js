@@ -77,6 +77,8 @@ export const ReportDesignProvider = ({ children }) => {
         return {
             font: reportSettings.defaultFont,
             size: reportSettings.defaultFontSize,
+            color: reportSettings.defaultForegroundColor,
+            backgroundColor: reportSettings.defaultBackgroundColor,
             bold: false,
             italic: false,
             underline: false
@@ -113,10 +115,9 @@ export const ReportDesignProvider = ({ children }) => {
         let retval =  {
             type: type,
             align: "center",
-            foregroundColor: reportSettings.defaultForegroundColor,
-            backgroundColor: reportSettings.defaultBackgroundColor,
             fontSettings: getNewFontSettings(),
             borderSettings: getNewBorderSettings(),
+            value: value,
             left: pos.left,
             top: pos.top,
             width: pos.width,
@@ -131,6 +132,7 @@ export const ReportDesignProvider = ({ children }) => {
                 retval.value="new text component";
                 break;
             case COMPONENT_TYPE_HYPERLINK:
+                retval.fontSettings = {font: reportSettings.defaultFont, fontSize: reportSettings.defaultFontSize, color: reportSettings.defaultForegroundColor, backgroundColor: reportSettings.defaultBackgroundColor};
                 retval.value = {
                     url: "http://some.url.com",
                     text: "new hyperlink",
@@ -173,6 +175,11 @@ export const ReportDesignProvider = ({ children }) => {
                 retval.value = {
                     format: DEFAULT_CURRENT_DATE_FORMAT
                 };
+                break;
+            case COMPONENT_TYPE_DATAGRID:
+            case COMPONENT_TYPE_DATARECORD:
+                retval.fontSettings2 = getNewFontSettings();
+                retval.borderSettings2 = getNewBorderSettings();
                 break;
         }
         

@@ -155,8 +155,6 @@ const AddEditComponentModal = (props) => {
             <div className="label">{getText("Text:")}</div>
             <div><textarea cols={40} rows={2} onChange={e => setValue(e)} value={currentComponent.value}/></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
-            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
-            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
         </div>;
     };
     
@@ -166,8 +164,6 @@ const AddEditComponentModal = (props) => {
             <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
             <div></div><div><input key={getUUID()} name={UNDERLINE_SETTING} type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
-            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
-            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
         </div>;
     };
     
@@ -178,8 +174,6 @@ const AddEditComponentModal = (props) => {
             <div className="label">{getText("Display Text:")}</div><div><input name="text" type="text" size={40} onChange={e => setValue(e)} value={currentComponent.value.text}/></div>
             <div></div><div><input key={getUUID()} name={UNDERLINE_SETTING} type="checkbox" checked={currentComponent.value.underline} onChange={e => setValue(e)} /><label className="ck-label" htmlFor="textdecor">{getText("Underline")}</label></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
-            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
-            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
         </div>;
     };
 
@@ -271,8 +265,6 @@ const AddEditComponentModal = (props) => {
         return <div className="entrygrid-125-125">
             <div className="label">{getText("Format:")}</div><div><select name="format" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(currentComponent.value)}</select></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
-            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
-            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
         </div>;
     };
             
@@ -284,8 +276,6 @@ const AddEditComponentModal = (props) => {
         return <div className="entrygrid-125-125">
             <div className="label">{getText("Format:")}</div><div><select name={FORMAT_SETTING} onChange={e => setValue(e)}>{getPageNumberOptions(currentComponent.value)}</select></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
-            <div className="label">{getText("Foreground:")}</div><div><ColorPicker color={currentComponent.foregroundColor} setColor={setForegroundColor}/></div>
-            <div className="label">{getText("Background:")}</div><div><ColorPicker color={currentComponent.backgroundColor} setColor={setBackgroundColor}/></div>
         </div>;
     };
             
@@ -311,22 +301,42 @@ const AddEditComponentModal = (props) => {
         }
     };
     
+    const getDataComponentFontPanel = (type) => {
+        return <div className="entrygrid-50p-50p">
+            <div>{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Font") : getText("Label Font")}</div>
+            <div>{getText("Data Font")}</div>
+            <FontPanel name="fontSettings"/><FontPanel name="fontSettings2"/>
+        </div>;
+    };
+    
+    const getDataComponentBorderPanel = (type) => {
+        return <div className="entrygrid-50p-50p">
+             <div>{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Border") : getText("Label Border")}</div>
+             <div>{getText("Data Border")}</div>
+             <BorderPanel name="borderSettings"/><BorderPanel name="borderSettings2"/>
+         </div>;
+   };
+
+    const isDataComponent = (type) => {
+        return type = ((type === COMPONENT_TYPE_DATAGRID) 
+                || (type === COMPONENT_TYPE_DATARECORD));
+    };
+    
     const getTabs = () => {
         if (currentComponent) {
-            if (currentComponent.type === COMPONENT_TYPE_SHAPE) {
+            let type = currentComponent.type;
+            if (type === COMPONENT_TYPE_SHAPE) {
                 return getShapeEntry();
-            } else if (currentComponent.type === COMPONENT_TYPE_SUBREPORT) {
-                return <div>subreport</div>;
-            } else {
+             } else {
                 return <Tabs id="rcomp" className="mb-3">
                     <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
                         {getComponentPanel()}
                     </Tab>
-                    <Tab eventKey="font" title={getText("Font")}>
-                        <FontPanel />
-                    </Tab>
+                        <Tab eventKey="font" title={getText("Font")}>
+                        {isDataComponent(type) ? getDataComponentFontPanel(type) : <FontPanel name="fontSettings"/>}
+                     </Tab>
                     <Tab eventKey="border" title={getText("Border")}>
-                        <BorderPanel />
+                        {isDataComponent(type) ? getDataComponentBorderPanel(type) : <BorderPanel name="borderSettings"/>}
                     </Tab>
                 </Tabs>;
             }
@@ -343,6 +353,7 @@ const AddEditComponentModal = (props) => {
         <div className="static-modal">
             <Modal animation={false} 
                    show={config.show} 
+                   size="lg"
                    onShow={onShow}
                    onHide={onHide}
                    backdrop={true} 

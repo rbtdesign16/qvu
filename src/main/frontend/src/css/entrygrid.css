@@ -5,6 +5,13 @@
     grid-row-gap: 6px;
 }
 
+.entrygrid-50p-50p {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
 .entrygrid-75-75 {
     display: grid;
     grid-template-columns: 75px 75px;
@@ -26,6 +33,12 @@
     grid-row-gap: 6px;
 }
 
+.entrygrid-125-150 {
+    display: grid;
+    grid-template-columns: 125px 150px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
 
 .entrygrid-175-100 {
     display: grid;

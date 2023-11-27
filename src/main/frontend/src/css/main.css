@@ -224,11 +224,13 @@ img {
 
 .icon {
     cursor: pointer;
+    margin-right: 5px;
 }
 
 .icon-dis {
     cursor: default;
     filter: grayscale();
+    margin-right: 5px;
 }
 
 .ck-label {

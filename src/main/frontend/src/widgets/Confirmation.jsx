@@ -44,6 +44,6 @@ Confirmation.propTypes = {
   show: PropTypes.bool,
   proceed: PropTypes.func,     // called when ok button is clicked.
   enableEscape: PropTypes.bool,
-}
+};
 
 export default confirmable(Confirmation);

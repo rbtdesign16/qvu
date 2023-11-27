@@ -279,6 +279,11 @@ const AddEditComponentModal = (props) => {
         </div>;
     };
             
+    const getDataComponentEntry = () => {
+        return <div className="">
+        this is a test
+         </div>;
+    };
 
     const getComponentPanel = () => {
         if (currentComponent) {
@@ -297,22 +302,25 @@ const AddEditComponentModal = (props) => {
                     return getCurrentDateEntry();
                 case COMPONENT_TYPE_PAGENUMBER:
                     return getPageNumberEntry();
+                case COMPONENT_TYPE_DATAGRID:
+                case COMPONENT_TYPE_DATARECORD:
+                    return getDataComponentEntry();
             }
         }
     };
     
     const getDataComponentFontPanel = (type) => {
         return <div className="entrygrid-50p-50p">
-            <div>{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Font") : getText("Label Font")}</div>
-            <div>{getText("Data Font")}</div>
+            <div className="ta-center tb-border">{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Font") : getText("Label Font")}</div>
+            <div className="ta-center tb-border">{getText("Data Font")}</div>
             <FontPanel name="fontSettings"/><FontPanel name="fontSettings2"/>
         </div>;
     };
     
     const getDataComponentBorderPanel = (type) => {
         return <div className="entrygrid-50p-50p">
-             <div>{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Border") : getText("Label Border")}</div>
-             <div>{getText("Data Border")}</div>
+             <div className="ta-center tb-border">{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Border") : getText("Label Border")}</div>
+             <div className="ta-center tb-border">{getText("Data Border")}</div>
              <BorderPanel name="borderSettings"/><BorderPanel name="borderSettings2"/>
          </div>;
    };

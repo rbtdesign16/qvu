@@ -9,6 +9,8 @@ import org.rbtdesign.qvu.util.Constants;
 public class FontSettings {
     private String font = Constants.DEFAULT_REPORT_FONT;
     private int size = Constants.DEFAULT_REPORT_FONT_SIZE;
+    private String color;
+    private String backgroundColor;
     private boolean bold = false;
     private boolean italic = false;
     private boolean underline = false;
@@ -52,6 +54,22 @@ public class FontSettings {
 
     public void setUnderline(boolean underline) {
         this.underline = underline;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
     
     

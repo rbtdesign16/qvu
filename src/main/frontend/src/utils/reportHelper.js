@@ -224,7 +224,7 @@ export const haveAllBorders = (bs) => {
 };
 
 export const haveBorder = (bs) => {
-    return (bs.left || bs.top && bs.right || bs.bottom);
+    return (bs.left || bs.top || bs.right || bs.bottom);
 };
 
 export const getBorderStyleOptions = (reportSettings, bs, noNone) => {

@@ -294,9 +294,7 @@ img {
     border-top: solid 1px var(--default-border-color);
     border-bottom: solid 1px var(--default-border-color);
     padding: 0;
-
 }
-
 
 .modal-error-msg {
     color: crimson;

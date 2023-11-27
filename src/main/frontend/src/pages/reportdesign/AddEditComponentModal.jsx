@@ -75,19 +75,6 @@ const AddEditComponentModal = (props) => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
     };
 
-    const setForegroundColor = (color) => {
-        let c = {...currentComponent};
-        c.foregroundColor = color;
-        setCurrentComponent(c);
-    };
-
-
-    const setBackgroundColor = (color) => {
-        let c = {...currentComponent};
-        c.backgroundColor = color;
-        setCurrentComponent(c);
-    };
-
     const setColorValue = (color, name) => {
         let c = {...currentComponent};
         c.value[name] = color;

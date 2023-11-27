@@ -107,4 +107,22 @@ public class ReportComponent {
     public void setBorderSettings(BorderSettings borderSettings) {
         this.borderSettings = borderSettings;
     }
+
+    public FontSettings getFontSettings2() {
+        return fontSettings2;
+    }
+
+    public void setFontSettings2(FontSettings fontSettings2) {
+        this.fontSettings2 = fontSettings2;
+    }
+
+    public BorderSettings getBorderSettings2() {
+        return borderSettings2;
+    }
+
+    public void setBorderSettings2(BorderSettings borderSettings2) {
+        this.borderSettings2 = borderSettings2;
+    }
+    
+    
  }

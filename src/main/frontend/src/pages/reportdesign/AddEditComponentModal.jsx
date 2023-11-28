@@ -93,7 +93,7 @@ const AddEditComponentModal = (props) => {
     const onShow = () => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
         
-        if (currentQuery) {
+        if (currentQuery && isDataComponent(currentComponent.type)) {
             let cset = new Set();
             
             if (currentComponent.value.dataColumns) {
@@ -112,6 +112,8 @@ const AddEditComponentModal = (props) => {
                 
                 
             setSelectColumns(scols);
+        } else {
+            setSelectColumns(null);
         }
     };
 
@@ -403,7 +405,7 @@ const AddEditComponentModal = (props) => {
     };
     
     const getQuerySelectColumns = (type) => {
-         if (currentQuery) {
+         if (currentQuery && selectColumns) {
             let nameLabel = getText("Header:");
             if (type === COMPONENT_TYPE_DATARECORD) {
                 nameLabel = getText("Label:");
@@ -502,7 +504,9 @@ const AddEditComponentModal = (props) => {
             let type = currentComponent.type;
             if (type === COMPONENT_TYPE_SHAPE) {
                 return getShapeEntry();
-             } else {
+            } else if (type === COMPONENT_TYPE_IMAGE) {
+                return getImageEntry();
+            } else {
                 return <Tabs id="rcomp" className="mb-3">
                     <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
                         {getComponentPanel(type)}

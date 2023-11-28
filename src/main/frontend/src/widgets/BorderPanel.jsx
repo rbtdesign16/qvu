@@ -71,8 +71,6 @@ const BorderPanel = (props) => {
                 if (currentComponent[name].bottom) {
                     retval.borderBottom = bdef;
                 }
-                console.log("------------>" + JSON.stringify(currentComponent));
-                
             }
 
             if (currentComponent[name].rounded) {

@@ -94,7 +94,24 @@ const AddEditComponentModal = (props) => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
         
         if (currentQuery) {
-            setSelectColumns(copyObject(currentQuery.selectColumns));
+            let cset = new Set();
+            
+            if (currentComponent.value.dataColumns) {
+                currentComponent.value.dataColumns.map(d => cset.add(d.selectIndex));
+            }
+            
+            let scols = copyObject(currentComponent.value.dataColumns);;
+
+            currentQuery.selectColumns.map((sc, indx) => {
+                if (!cset.has(indx)) {
+                    let c = copyObject(sc);
+                    c.selectIndex = indx;
+                    scols.push(c);
+                }
+            });
+                
+                
+            setSelectColumns(scols);
         }
     };
 
@@ -155,19 +172,19 @@ const AddEditComponentModal = (props) => {
     };
 
     const moveSelectColumnUp = (indx) => {
-        let q = copyObject(currentQuery);
-        let item = q.selectColumns[indx];
-        q.selectColumns.splice(indx, 1);
-        q.selectColumns.splice(indx - 1, 0, item);
-        setCurrentQuery(q);
+        let sc = copyObject(selectColumns);
+        let item = sc[indx];
+        sc.splice(indx, 1);
+        sc.splice(indx - 1, 0, item);
+        setSelectColumns(sc);
     };
 
     const moveSelectColumnDown = (indx) => {
-        let q = copyObject(currentQuery);
-        let item = q.selectColumns[indx + 1];
-        q.selectColumns.splice(indx + 1, 1);
-        q.selectColumns.splice(indx, 0, item);
-        setCurrentQuery(q);
+        let sc = copyObject(selectColumns);
+        let item = sc[indx + 1];
+        sc.splice(indx + 1, 1);
+        sc.splice(indx, 0, item);
+        setSelectColumns(sc);
     };
 
     const setTextAlign = (e) => {
@@ -305,29 +322,26 @@ const AddEditComponentModal = (props) => {
         </div>;
     };
     
-    const setDataSelection = (e, indx) => {
-    };
-    
     const getHeaderTitle = (sc) => {
         return getText("Table Alias:", " ") + sc.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(sc.path);
     };
 
-    const handleDragStart = (e, indx) => {
-        e.dataTransfer.setData("text/plain", "" + indx);
+    const handleDragStart = (e) => {
+        e.dataTransfer.setData("text/plain",e.target.id.replace("scol-", ""));
         e.dataTransfer.effectAllowed = "move";
     };
 
     const handleDrop = (e) => {
         let el = document.elementFromPoint(e.clientX, e.clientY);
-        if (el && el.id && el.id.startsWith("scol-")) {
+         if (el && el.id && el.id.startsWith("scol-")) {
             let dindx = Number(el.id.replace("scol-", ""));
             let sindx = Number(e.dataTransfer.getData("text/plain"));
-            if (sindx !== dindx) {
-                let q = copyObject(currentQuery);
-                let col = q.selectColumns[sindx];
-                q.selectColumns.splice(sindx, 1);
-                q.selectColumns.splice(dindx, 0, col);
-                setCurrentQuery(q);
+           if (sindx !== dindx) {
+                let sc = copyObject(selectColumns);
+                let col = sc[sindx];
+                sc.splice(sindx, 1);
+                sc.splice(dindx, 0, col);
+                setSelectColumns(sc);
             }
         }
     };
@@ -368,7 +382,7 @@ const AddEditComponentModal = (props) => {
                 }            
            });
         } else if (isDataTypeFloat(sc.dataType)) {
-           return reportSettings.defaultFloatFormats.map(f => {
+            return reportSettings.defaultFloatFormats.map(f => {
                 if (f === sc.displayFormat) {
                     return <option value={f} selected>{f}</option>;
                 } else {        
@@ -376,7 +390,7 @@ const AddEditComponentModal = (props) => {
                 }            
            });
         } else if (isDataTypeInt(sc.dataType)) {
-          return reportSettings.defaultIntFormats.map(f => {
+            return reportSettings.defaultIntFormats.map(f => {
                 if (f === sc.displayFormat) {
                     return <option value={f} selected>{f}</option>;
                 } else {        
@@ -386,15 +400,10 @@ const AddEditComponentModal = (props) => {
         } else {
             return "";
         }
-     }
+    };
     
     const getQuerySelectColumns = (type) => {
          if (currentQuery) {
-            let selectedPaths = new Map();
-            for (let i = 0; i < currentComponent.value.dataColumns.length; ++i) {
-                selectedPaths.add(currentComponent.value.dataColumns[i].path, currentComponent.value.dataColumns[i]);
-            }
-
             let nameLabel = getText("Header:");
             if (type === COMPONENT_TYPE_DATARECORD) {
                 nameLabel = getText("Label:");
@@ -402,18 +411,12 @@ const AddEditComponentModal = (props) => {
 
             let colcnt = selectColumns.length;
             return selectColumns.map((sc, indx) => {
-                let column = selectedPaths.get(sc.path);
-                if (column) {
-                    sc.selected = true;
-                    sc.displayName = column.displayName;
-                }
-
                 let wantFormat = isColumnFormatAvailable(sc);
                 return <div key={"sce-" + indx} className="report-query-column">
                         <div draggable={true} 
                             className="detail-hdr"
                             id={"scol-" + indx}  
-                            onDragStart={e => handleDragStart(e, indx)} 
+                            onDragStart={e => handleDragStart(e)} 
                             onDrop={e => handleDrop(e)} 
                             onDragOver={e => handleDragOver(e)}>
                             <span>
@@ -491,7 +494,7 @@ const AddEditComponentModal = (props) => {
 
     const isDataComponent = (type) => {
         return type = ((type === COMPONENT_TYPE_DATAGRID) 
-                || (type === COMPONENT_TYPE_DATARECORD));
+            || (type === COMPONENT_TYPE_DATARECORD));
     };
     
     const getTabs = () => {
@@ -523,13 +526,7 @@ const AddEditComponentModal = (props) => {
             c.value.dataColumns = [];
             for (let i = 0; i < selectColumns.length; ++i) {
                 if (selectColumns[i].selected) {
-                    c.value.dataColumns.push({
-                        displayName: selectColumns[i].displayName,
-                        displayFormat: selectColumns[i].displayFormat,
-                        tableAlias: selectColumns[i].tableAlias,
-                        columnName: selectColumns[i].columnName,
-                        dataType: selectColumns[i].dataType});
-                        
+                    c.value.dataColumns.push(selectColumns[i]);
                 }
             }
             config.saveComponent(c, config.componentIndex);

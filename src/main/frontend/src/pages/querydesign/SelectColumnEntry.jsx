@@ -6,7 +6,12 @@ import useHelp from "../../context/HelpContext";
 import NumberEntry from "../../widgets/NumberEntry";
 import { MdHelpOutline } from "react-icons/md";
 import {AiOutlineFileAdd, AiOutlineDelete, AiOutlineCaretDown, AiOutlineCaretUp, AiOutlineCopy} from "react-icons/ai";
-import {SMALL_ICON_SIZE, confirm, getAggregateFunctionsByDataType, copyObject} from "../../utils/helper";
+import {SMALL_ICON_SIZE, 
+    confirm, 
+    getAggregateFunctionsByDataType, 
+    copyObject,
+    getColumnHelpDisplay,
+    formatPathForDisplay} from "../../utils/helper";
 
 const SelectColumnEntry = (props) => {
     const {index} = props;
@@ -14,39 +19,12 @@ const SelectColumnEntry = (props) => {
     const {showHelp} = useHelp();
     const {selectColumns,
         setSelectColumns,
-        formatPathForDisplay,
         updateSelectColumns,
         selectedColumnIds,
         setSelectedColumnIds} = useQueryDesign();
 
     const getHelpText = () => {
-        let pkindex = -1;
-
-        let columnData = selectColumns[index];
-        if (columnData.pkindex) {
-            pkindex = Number(columnData.pkindex);
-        }
-
-        if (pkindex > -1) {
-            return <div className="entrygrid-125-550">
-                <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
-                <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
-                <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-            </div>;
-        } else {
-            return <div className="entrygrid-125-550">
-                <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
-                <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-            </div>;
-        }
+        return getColumnHelpDisplay(selectColumns[index], getText);
     };
 
     const duplicateEntry = async () => {

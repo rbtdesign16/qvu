@@ -297,19 +297,26 @@ const ReportDesign = () => {
         setShowReportSettings({show: true, report: currentReport, reportSettings: reportSettings, hide: hideReportSettings, saveSettings: saveReportSettings});
     };
 
-     const setQueryDocument = async (group, name) => {
-        hideDocumentSelect();
-        let cr = copyObject(currentReport);
-        cr.queryDocumentGroup = group;
-        cr.queryDocumentName = name;
-         
+    const loadQueryDocument = async (group, name) => {
         showMessage(INFO, getText("Loading document",  name), null, true);
-
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             hideMessage();
+            return res.result;
+       }
+    };
+    
+    const setQueryDocument = async (group, name) => {
+        hideDocumentSelect();
+        let cr = copyObject(currentReport);
+        cr.queryDocumentGroup = group;
+        cr.queryDocumentName = name;
+         
+        let qdoc = await loadQueryDocument(group, name);
+        
+        if (qdoc) {
             if (cr.reportComponents && (cr.reportComponents.length > 0)) {
                 // if we have changed query document then clear any
                 // query-related components from report
@@ -325,10 +332,10 @@ const ReportDesign = () => {
                    cr.reportComponents = c;
                }
            }
-           
-           setCurrentQuery(res.result);
+
+           setCurrentQuery(qdoc);
            setCurrentReport(cr);
-       }
+        }
      };
 
     const onShowQueryDocumentSelect = async (e) => {
@@ -452,12 +459,23 @@ const ReportDesign = () => {
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
-            setNewReport();
             let doc = res.result;
-
-            setCurrentComponent(null);
-            setLastSelectedIndex(-1);
-            setCurrentReport(doc);
+            let qdoc;
+            if (doc.queryDocumentName) {
+                qdoc = await loadQueryDocument(doc.queryDocumentGroup, doc.queryDocumentName);
+            }
+            
+            if (!doc.queryDocumentName || qdoc) {
+                setNewReport();
+                setCurrentComponent(null);
+                setLastSelectedIndex(-1);
+                if (qdoc) {
+                    setCurrentQuery(qdoc);
+                } else {
+                    setCurrentQuery(null);
+                }
+                setCurrentReport(doc);
+            }
 
             hideMessage();
         }

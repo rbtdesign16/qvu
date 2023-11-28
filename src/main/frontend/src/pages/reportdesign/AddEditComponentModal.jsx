@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button"
 import useLang from "../../context/LangContext";
+import useHelp from "../../context/HelpContext";
+import { MdHelpOutline } from "react-icons/md";
+import {AiOutlineCaretDown, AiOutlineCaretUp} from "react-icons/ai";
 import { Tabs, Tab } from "react-bootstrap";
 import NumberEntry from "../../widgets/NumberEntry";
 import BorderPanel from "../../widgets/BorderPanel";
@@ -17,7 +20,14 @@ import {MODAL_TITLE_SIZE,
     TRANSPARENT_SETTING,
     UNDERLINE_SETTING,
     FORMAT_SETTING,
-    replaceTokens} from "../../utils/helper";
+    SMALL_ICON_SIZE,
+    replaceTokens,
+    getColumnHelpDisplay,
+    formatPathForDisplay,
+    isDataTypeInt,
+    isDataTypeFloat,
+    isDataTypeNumeric,
+    isDataTypeDateTime} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 
@@ -49,12 +59,21 @@ import {
 const AddEditComponentModal = (props) => {
     const {config} = props;
     const {getText} = useLang();
+    const {showHelp} = useHelp();
     const [typeDisplay, setTypeDisplay] = useState("");
     const {currentReport, 
         reportSettings, 
         currentComponent, 
-        setCurrentComponent} = useReportDesign();
+        setCurrentComponent,
+        currentQuery,
+        setCurrentQuery} = useReportDesign();
+ 
+    const [selectColumns, setSelectColumns] = useState([]);
     
+    const getHelpText = (index) => {
+         return getColumnHelpDisplay(selectColumns[index], getText);
+    };
+
     const getTitle = () => {
         if (currentComponent) {
             if (config.edit) {
@@ -73,6 +92,10 @@ const AddEditComponentModal = (props) => {
 
     const onShow = () => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
+        
+        if (currentQuery) {
+            setSelectColumns(copyObject(currentQuery.selectColumns));
+        }
     };
 
     const setColorValue = (color, name) => {
@@ -129,6 +152,22 @@ const AddEditComponentModal = (props) => {
                  return <option value={ta}>{getText(ta)}</option>;
              }
          });
+    };
+
+    const moveSelectColumnUp = (indx) => {
+        let q = copyObject(currentQuery);
+        let item = q.selectColumns[indx];
+        q.selectColumns.splice(indx, 1);
+        q.selectColumns.splice(indx - 1, 0, item);
+        setCurrentQuery(q);
+    };
+
+    const moveSelectColumnDown = (indx) => {
+        let q = copyObject(currentQuery);
+        let item = q.selectColumns[indx + 1];
+        q.selectColumns.splice(indx + 1, 1);
+        q.selectColumns.splice(indx, 0, item);
+        setCurrentQuery(q);
     };
 
     const setTextAlign = (e) => {
@@ -250,7 +289,7 @@ const AddEditComponentModal = (props) => {
             currentComponent.value.format = DEFAULT_CURRENT_DATE_FORMAT;
         }
         return <div className="entrygrid-125-125">
-            <div className="label">{getText("Format:")}</div><div><select name="format" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(currentComponent.value)}</select></div>
+            <div className="label">{getText("Format:")}</div><div><select name="format" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(reportSettings, currentComponent.value)}</select></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
         </div>;
     };
@@ -265,16 +304,154 @@ const AddEditComponentModal = (props) => {
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
         </div>;
     };
+    
+    const setDataSelection = (e, indx) => {
+    };
+    
+    const getHeaderTitle = (sc) => {
+        return getText("Table Alias:", " ") + sc.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(sc.path);
+    };
+
+    const handleDragStart = (e, indx) => {
+        e.dataTransfer.setData("text/plain", "" + indx);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDrop = (e) => {
+        let el = document.elementFromPoint(e.clientX, e.clientY);
+        if (el && el.id && el.id.startsWith("scol-")) {
+            let dindx = Number(el.id.replace("scol-", ""));
+            let sindx = Number(e.dataTransfer.getData("text/plain"));
+            if (sindx !== dindx) {
+                let q = copyObject(currentQuery);
+                let col = q.selectColumns[sindx];
+                q.selectColumns.splice(sindx, 1);
+                q.selectColumns.splice(dindx, 0, col);
+                setCurrentQuery(q);
+            }
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const setQueryValue = (e, indx) => {
+        let c = copyObject(selectColumns);
+        switch(e.target.name) {
+            case "selected":
+                c[indx].selected = e.target.checked;
+                break;
+            case "displayName":
+                c[indx].displayName = e.target.value;
+                break;
+           case "displayFormat":
+                c[indx].displayFormat = e.target.options[e.target.selectedIndex].value;
+                break;
+        }
+        
+        setSelectColumns(c);
+    };
+    
+    const isColumnFormatAvailable = (sc) => {
+        return (isDataTypeNumeric(sc.dataType) || isDataTypeDateTime(sc.dataType));
+    };
+    
+    const getQueryColumnFormatOptions = (sc) => {
+        if (isDataTypeDateTime(sc.dataType)) {
+            return reportSettings.defaultDateFormats.map(f => {
+                if (f === sc.displayFormat) {
+                    return <option value={f} selected>{f}</option>;
+                } else {        
+                    return  <option value={f}>{f}</option>;
+                }            
+           });
+        } else if (isDataTypeFloat(sc.dataType)) {
+           return reportSettings.defaultFloatFormats.map(f => {
+                if (f === sc.displayFormat) {
+                    return <option value={f} selected>{f}</option>;
+                } else {        
+                    return  <option value={f}>{f}</option>;
+                }            
+           });
+        } else if (isDataTypeInt(sc.dataType)) {
+          return reportSettings.defaultIntFormats.map(f => {
+                if (f === sc.displayFormat) {
+                    return <option value={f} selected>{f}</option>;
+                } else {        
+                    return  <option value={f}>{f}</option>;
+                }            
+           });
+        } else {
+            return "";
+        }
+     }
+    
+    const getQuerySelectColumns = (type) => {
+         if (currentQuery) {
+            let selectedPaths = new Map();
+            for (let i = 0; i < currentComponent.value.dataColumns.length; ++i) {
+                selectedPaths.add(currentComponent.value.dataColumns[i].path, currentComponent.value.dataColumns[i]);
+            }
+
+            let nameLabel = getText("Header:");
+            if (type === COMPONENT_TYPE_DATARECORD) {
+                nameLabel = getText("Label:");
+            }
+
+            let colcnt = selectColumns.length;
+            return selectColumns.map((sc, indx) => {
+                let column = selectedPaths.get(sc.path);
+                if (column) {
+                    sc.selected = true;
+                    sc.displayName = column.displayName;
+                }
+
+                let wantFormat = isColumnFormatAvailable(sc);
+                return <div key={"sce-" + indx} className="report-query-column">
+                        <div draggable={true} 
+                            className="detail-hdr"
+                            id={"scol-" + indx}  
+                            onDragStart={e => handleDragStart(e, indx)} 
+                            onDrop={e => handleDrop(e)} 
+                            onDragOver={e => handleDragOver(e)}>
+                            <span>
+                                <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText(indx))} />
+                                <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
+                            </span>
+                        </div>
+                        <div className="tab platinum-b">
+                            <div style={{paddingTop: "10%"}}>
+                                {(indx > 0) && <span title={getText("Move up")}><AiOutlineCaretUp className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnUp(indx)} /></span>}
+                                {(indx < (colcnt - 1)) && <span title={getText("Move down")}><AiOutlineCaretDown className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnDown(indx)} /></span>}
+                            </div>
+                        </div>
+
+                        <div className="detail">
+                            <div className="entrygrid-100-400">
+                                <div></div><div><input key={getUUID()} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor="selected">{getText("Include Column")}</label></div>
+                                <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
+                                {wantFormat && <div className="label">{getText("Format:")}</div>}
+                                {wantFormat && <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
+                            </div> 
+                        </div>
+                    </div>;  
+                });
+        } else {
+            return "";
+        }
+    };
             
-    const getDataComponentEntry = () => {
-        return <div className="">
-        this is a test
+    const getDataComponentEntry = (type) => {
+        return <div className="report-query-column-select">
+            {getQuerySelectColumns(type)}
          </div>;
     };
 
-    const getComponentPanel = () => {
+    const getComponentPanel = (type) => {
         if (currentComponent) {
-            switch (currentComponent.type) {
+            switch (type) {
                 case COMPONENT_TYPE_TEXT:
                     return getTextEntry();
                 case COMPONENT_TYPE_HYPERLINK:
@@ -291,7 +468,7 @@ const AddEditComponentModal = (props) => {
                     return getPageNumberEntry();
                 case COMPONENT_TYPE_DATAGRID:
                 case COMPONENT_TYPE_DATARECORD:
-                    return getDataComponentEntry();
+                    return getDataComponentEntry(type);
             }
         }
     };
@@ -325,7 +502,7 @@ const AddEditComponentModal = (props) => {
              } else {
                 return <Tabs id="rcomp" className="mb-3">
                     <Tab eventKey="detail" title={typeDisplay + " " + getText("Detail")}>
-                        {getComponentPanel()}
+                        {getComponentPanel(type)}
                     </Tab>
                         <Tab eventKey="font" title={getText("Font")}>
                         {isDataComponent(type) ? getDataComponentFontPanel(type) : <FontPanel name="fontSettings"/>}
@@ -341,7 +518,24 @@ const AddEditComponentModal = (props) => {
     };
     
     const saveComponent = () => {
-        config.saveComponent(currentComponent, config.componentIndex);
+        if (isDataComponent(currentComponent.type)) {
+            let c = copyObject(currentComponent);
+            c.value.dataColumns = [];
+            for (let i = 0; i < selectColumns.length; ++i) {
+                if (selectColumns[i].selected) {
+                    c.value.dataColumns.push({
+                        displayName: selectColumns[i].displayName,
+                        displayFormat: selectColumns[i].displayFormat,
+                        tableAlias: selectColumns[i].tableAlias,
+                        columnName: selectColumns[i].columnName,
+                        dataType: selectColumns[i].dataType});
+                        
+                }
+            }
+            config.saveComponent(c, config.componentIndex);
+        } else {
+            config.saveComponent(currentComponent, config.componentIndex);
+        }
     };
     
     return (

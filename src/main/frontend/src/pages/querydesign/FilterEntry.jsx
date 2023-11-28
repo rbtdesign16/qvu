@@ -15,7 +15,9 @@ import {
     COMPARISON_OPERATORS,
     UNARY_COMPARISON_OPERATORS,
     COMPARISON_OPERATOR_IN,
-    copyObject
+    copyObject,
+    formatPathForDisplay,
+    getColumnHelpDisplay
     } from "../../utils/helper";
 
 const FilterEntry = (props) => {
@@ -27,7 +29,6 @@ const FilterEntry = (props) => {
         setFilterColumns,
         selectColumns,
         setSelectColumns,
-        formatPathForDisplay,
         getFilterComparisonInput,
         getColumnNameForDisplay
     } = useQueryDesign();
@@ -66,33 +67,10 @@ const FilterEntry = (props) => {
 
 
     const getHelpText = () => {
-        let pkindex = -1;
-
         let columnData = findColumnData();
 
         if (columnData) {
-            if (columnData.pkindex) {
-                pkindex = Number(columnData.pkindex);
-            }
-
-            if (pkindex > -1) {
-                return <div className="entrygrid-125-550">
-                    <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                    <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
-                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-                </div>;
-            } else {
-                return <div className="entrygrid-125-550">
-                    <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-                </div>;
-            }
+            return getColumnHelpDisplay(columnData, getText);
         }
     };
 

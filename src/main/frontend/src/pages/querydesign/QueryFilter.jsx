@@ -6,14 +6,17 @@ import useQueryDesign from "../../context/QueryDesignContext";
 import useDataHandler from "../../context/DataHandlerContext";
 import { MdOutlineAddBox } from 'react-icons/md';
 import FilterEntry from "./FilterEntry";
-import { BIG_ICON_SIZE, updateAndOr, copyObject} from "../../utils/helper";
+import { 
+    BIG_ICON_SIZE, 
+    updateAndOr, 
+    copyObject,
+    formatPathForDisplay} from "../../utils/helper";
 
 const QueryFilter = () => {
     const {authData, setAuthData} = useAuth();
     const {selectColumns,
         filterColumns,
         setFilterColumns,
-        formatPathForDisplay, 
         selectedColumnIds,
         getColumnNameForDisplay} = useQueryDesign();
     const {getText} = useLang();

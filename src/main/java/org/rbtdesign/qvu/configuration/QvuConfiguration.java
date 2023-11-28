@@ -110,6 +110,15 @@ public class QvuConfiguration {
     
     @Value("${default.component.foreground.color:black}")
     private String defaultCompoenetForegroundColor;
+    
+    @Value("#{'${default.float.formats:}'.split('\\|')}")
+    private List<String> defaultFloatFormats;
+
+    @Value("#{'${default.int.formats:}'.split('\\|')}")
+    private List<String> defaultIntFormats;
+
+    @Value("#{'${default.date.formats:yyyy-MM-dd\\|yyyy-MM-dd HH:mm}'.split('\\|')}")
+    private List<String> defaultDateFormats;
 
     @PostConstruct
     private void init() {
@@ -133,6 +142,9 @@ public class QvuConfiguration {
         config.setDefaultFonts(defaultFonts);
         config.setDefaultComponentBackgroundColor(defaultCompoenetBackgroundColor);
         config.setDefaultComponentForegroundColor(defaultCompoenetForegroundColor);
+        config.setDefaultFloatFormats(defaultFloatFormats);
+        config.setDefaultIntFormats(defaultIntFormats);
+        config.setDefaultDateFormats(defaultDateFormats);
     }
 
     @Autowired

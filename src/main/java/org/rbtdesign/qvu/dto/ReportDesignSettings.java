@@ -27,6 +27,9 @@ public class ReportDesignSettings {
     private List<String> pageUnits = new ArrayList<>();
     private List<String> reportObjectTypes = new ArrayList<>();
     private List<String> defaultFonts = new ArrayList<>();
+    private List<String> defaultFloatFormats = new ArrayList<>();
+    private List<String> defaultIntFormats = new ArrayList<>();
+    private List<String> defaultDateFormats = new ArrayList<>();
     private List<String> borderStyles = new ArrayList<>(Arrays.asList(Constants.BORDER_STYLES));
     private List<Integer> defaultFontSizes = new ArrayList<>();
     private List<String> reportShapes = new ArrayList<>(Arrays.asList(Constants.REPORT_SHAPES));
@@ -226,6 +229,30 @@ public class ReportDesignSettings {
 
     public void setDefaultBorderRadius(String defaultBorderRadius) {
         this.defaultBorderRadius = defaultBorderRadius;
+    }
+
+    public List<String> getDefaultFloatFormats() {
+        return defaultFloatFormats;
+    }
+
+    public void setDefaultFloatFormats(List<String> defaultFloatFormats) {
+        this.defaultFloatFormats = defaultFloatFormats;
+    }
+
+    public List<String> getDefaultIntFormats() {
+        return defaultIntFormats;
+    }
+
+    public void setDefaultIntFormats(List<String> defaultIntFormats) {
+        this.defaultIntFormats = defaultIntFormats;
+    }
+
+    public List<String> getDefaultDateFormats() {
+        return defaultDateFormats;
+    }
+
+    public void setDefaultDateFormats(List<String> defaultDateFormats) {
+        this.defaultDateFormats = defaultDateFormats;
     }
     
     

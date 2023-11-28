@@ -381,16 +381,24 @@ export const getAggregateFunctionsByDataType = (dataType) => {
 
 
 export const isDataTypeNumeric = (type) => {
-    return ((type === JDBC_TYPE_TINYINT)
-            || (type === JDBC_TYPE_BIT)
-            || (type === JDBC_TYPE_SMALLINT)
-            || (type === JDBC_TYPE_INTEGER)
-            || (type === JDBC_TYPE_BIGINT)
-            || (type === JDBC_TYPE_REAL)
+    return (isDataTypeFloat(type) || isDataTypeInt(type));
+};
+
+export const isDataTypeFloat = (type) => {
+    return ((type === JDBC_TYPE_REAL)
             || (type === JDBC_TYPE_DOUBLE)
             || (type === JDBC_TYPE_NUMERIC)
             || (type === JDBC_TYPE_DECIMAL));
 };
+
+export const isDataTypeInt = (type) => {
+   return ((type === JDBC_TYPE_TINYINT)
+            || (type === JDBC_TYPE_BIT)
+            || (type === JDBC_TYPE_SMALLINT)
+            || (type === JDBC_TYPE_INTEGER)
+            || (type === JDBC_TYPE_BIGINT));
+};
+
 
 export const isDataTypeDateTime = (type) => {
     return ((type === JDBC_TYPE_DATE)
@@ -410,14 +418,6 @@ export const isDataTypeString = (type) => {
             || (type === JDBC_TYPE_NVARCHAR)
             || (type === JDBC_TYPE_LONGNVARCHAR)
             || (type === JDBC_TYPE_NCLOB));
-};
-
-export const isDataTypeFloat = (type, decimalDigits) => {
-    if ((type === JDBC_TYPE_REAL) || (type === JDBC_TYPE_DOUBLE)) {
-        return true;
-    } else if ((type === JDBC_TYPE_NUMERIC) || (type === JDBC_TYPE_DECIMAL)) {
-        return decimalDigits > 0;
-    }
 };
 
 export const isSqlOrderByRequired = (selectColumns) => {
@@ -702,4 +702,57 @@ export const intersectRect = (r1, r2) => {
     r2.top > r1.bottom ||
     r2.bottom < r1.top);
 };
+
+
+export const getColumnHelpDisplay = (columnData, getText) => {
+    let pkindex = -1;
+    if (columnData.pkindex) {
+        pkindex = Number(columnData.pkindex);
+    }
+
+    if (pkindex > -1) {
+        return <div className="entrygrid-125-550">
+            <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
+            <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+            <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
+            <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+            <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+            <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
+            <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+        </div>;
+    } else {
+        return <div className="entrygrid-125-550">
+            <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
+            <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+            <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+            <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+            <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
+            <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+        </div>;
+    }
+};
+
+ export const formatPathForDisplay = (path, noColumnDisplay) => {
+        let l = path.split("|");
+        
+        let end = l.length;
+        
+        if (noColumnDisplay) {
+            end -= 1;
+        }
+        
+        for (let i = 0; i < end; ++i) {
+            if (l[i].includes("{")) {
+                let pos1 = l[i].indexOf("{");
+                let pos2 = l[i].indexOf("}");
+                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
+                l[i] = fkcols.replace("?", "");
+            }
+        }
+
+
+
+        return l.join("->");
+    };
+
 

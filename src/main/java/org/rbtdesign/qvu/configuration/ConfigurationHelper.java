@@ -46,6 +46,9 @@ public class ConfigurationHelper {
     private Double defaultFooterHeight;
     private List<Integer> defaultFontSizes;
     private List<String> defaultFonts;
+    private List<String> defaultFloatFormats;
+    private List<String> defaultIntFormats;
+    private List<String> defaultDateFormats;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -363,6 +366,30 @@ public class ConfigurationHelper {
 
     public void setDefaultComponentForegroundColor(String defaultComponentForegroundColor) {
         this.defaultComponentForegroundColor = defaultComponentForegroundColor;
+    }
+
+    public List<String> getDefaultFloatFormats() {
+        return defaultFloatFormats;
+    }
+
+    public void setDefaultFloatFormats(List<String> defaultFloatFormats) {
+        this.defaultFloatFormats = defaultFloatFormats;
+    }
+
+    public List<String> getDefaultIntFormats() {
+        return defaultIntFormats;
+    }
+
+    public void setDefaultIntFormats(List<String> defaultIntFormats) {
+        this.defaultIntFormats = defaultIntFormats;
+    }
+
+    public List<String> getDefaultDateFormats() {
+        return defaultDateFormats;
+    }
+
+    public void setDefaultDateFormats(List<String> defaultDateFormats) {
+        this.defaultDateFormats = defaultDateFormats;
     }
     
     

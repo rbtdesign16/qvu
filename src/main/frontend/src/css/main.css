@@ -818,3 +818,40 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .w-100 {
     width: 100%;
 }
+
+.report-query-column-select {
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.report-query-column {
+    border: 1px solid var(--default-border-color);
+    display: block;
+    height: 125px;
+    width: 100%;
+}
+
+.report-query-column .tab {
+    display: inline-block;
+    left: 0;
+    height: 100px;
+    width: 25px;
+    text-align: center;
+}
+
+.report-query-column .detail {
+    display: inline-block;
+    float: right;
+    height: 100px;
+    width: calc(100% - 25px);
+}
+
+.report-query-column .detail-hdr {
+    left: 25px;
+    width: 100%;
+    overflow: hidden;
+    height: 25px;
+    text-align: left;
+    border-bottom: solid 2px var(--default-border-color);
+}

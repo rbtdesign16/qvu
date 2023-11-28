@@ -2384,6 +2384,9 @@ public class MainServiceImpl implements MainService {
         result.setReportShapes(Arrays.asList(Constants.REPORT_SHAPES));
         result.setDefaultBorderColor(Constants.DEFAULT_BORDER_COLOR);
         result.setDefaultBorderStyle(Constants.DEFAULT_BORDER_STYLE);
+        result.setDefaultFloatFormats(config.getDefaultFloatFormats());
+        result.setDefaultIntFormats(config.getDefaultIntFormats());
+        result.setDefaultDateFormats(config.getDefaultDateFormats());
         retval.setResult(result);
 
         return retval;

@@ -150,6 +150,13 @@
     margin: 5px;
 }
 
+.entrygrid-100-400 {
+    display: grid;
+    grid-template-columns: 100px 400px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
 .entrygrid-225-150 {
     display: grid;
     grid-template-columns: 225px 150px;

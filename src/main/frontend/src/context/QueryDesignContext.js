@@ -162,29 +162,6 @@ export const QueryDesignProvider = ({ children }) => {
         setSelectColumns(cols);
     };
 
-    const formatPathForDisplay = (path, noColumnDisplay) => {
-        let l = path.split("|");
-        
-        let end = l.length;
-        
-        if (noColumnDisplay) {
-            end -= 1;
-        }
-        
-        for (let i = 0; i < end; ++i) {
-            if (l[i].includes("{")) {
-                let pos1 = l[i].indexOf("{");
-                let pos2 = l[i].indexOf("}");
-                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
-                l[i] = fkcols.replace("?", "");
-            }
-        }
-
-
-
-        return l.join("->");
-    };
-
     const getJoinFromColumns = (part) => {
         let pos1 = part.indexOf("[");
         let pos2 = part.indexOf("]");
@@ -525,7 +502,6 @@ export const QueryDesignProvider = ({ children }) => {
                                 setSelectColumns,
                                 setFilterColumns,
                                 updateSelectColumns,
-                                formatPathForDisplay,
                                 splitter1Sizes,
                                 setSplitter1Sizes,
                                 isParameterEntryRequired,

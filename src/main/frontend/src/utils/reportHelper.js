@@ -81,23 +81,7 @@ export const PAGE_NUMBER_FORMATS = [
     "(?)"];
 export const DEFAULT_PAGE_NUMBER_FORMAT = PAGE_NUMBER_FORMATS[0];
 
-export const CURRENT_DATE_FORMATS = [
-    "yyyy-MM-dd",
-    "yyyy-MM-dd HH:mm",
-    "yyyy-MM-dd hh:mm a",
-    "MM/dd/yyyy",
-    "MM/dd/yyyy HH:mm",
-    "MM/dd/yyyy hh:mm a",
-    "E, yyyy-MM-dd",
-    "E, yyyy-MM-dd HH:mm",
-    "E, yyyy-MM-dd hh:mm a",
-    "yyyy.MM.dd",
-    "E yyyy.MM.dd",
-    "E yyyy.MM.dd HH:mm",
-    "E yyyy.MM.dd hh:mm a"
-];
-
-export const DEFAULT_CURRENT_DATE_FORMAT = CURRENT_DATE_FORMATS[0];
+export const DEFAULT_CURRENT_DATE_FORMAT = "yyyy-MM-dd";
 export const TEXT_ALIGN_OPTIONS = ["left", "center", "right"];
 export const BOLD_FONT_WEIGHT = 700;
 export const STANDARD_FONT_WEIGHT = 400;
@@ -546,9 +530,9 @@ export const getPageNumberOptions = (valueObject) => {
     });
 };
 
-export const getCurrentDateFormatOptions = (valueObject) => {
+export const getCurrentDateFormatOptions = (reportSettings, valueObject) => {
     let dt = moment();
-    return CURRENT_DATE_FORMATS.map(df => {
+    return reportSettings.defaultDateFormats.map(df => {
         if (valueObject.format === df) {
             return <option value={df} selected>{dt.formatWithJDF(df)}</option>;
         } else {
@@ -556,3 +540,4 @@ export const getCurrentDateFormatOptions = (valueObject) => {
         }
     });
 };
+

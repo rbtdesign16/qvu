@@ -54,7 +54,8 @@ import {
     DEFAULT_PAGE_NUMBER_FORMAT,
     DEFAULT_CURRENT_DATE_FORMAT,
     getPageNumberOptions,
-    getCurrentDateFormatOptions} from "../../utils/reportHelper";
+    getCurrentDateFormatOptions,
+    isDataComponent} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -103,8 +104,16 @@ const AddEditComponentModal = (props) => {
             let scols = copyObject(currentComponent.value.dataColumns);;
 
             currentQuery.selectColumns.map((sc, indx) => {
-                if (!cset.has(indx)) {
+                if (!cset.has(indx) && sc.showInResults) {
                     let c = copyObject(sc);
+                    if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
+                        c.headerTextAlign = "right";
+                        c.dataTextAlign = "left";
+                    } else {
+                        c.headerTextAlign = "center";
+                        c.dataTextAlign = "center";
+                    }
+                        
                     c.selectIndex = indx;
                     scols.push(c);
                 }
@@ -166,6 +175,16 @@ const AddEditComponentModal = (props) => {
     const loadTextAlignOptions = () => {
          return TEXT_ALIGN_OPTIONS.map(ta => {
              if (ta === currentComponent.align) {
+                 return <option value={ta} selected>{getText(ta)}</option>;
+             } else {
+                 return <option value={ta}>{getText(ta)}</option>;
+             }
+         });
+    };
+
+    const loadQueryColumnTextAlignOptions = (sc, name) => {
+         return TEXT_ALIGN_OPTIONS.map(ta => {
+             if (ta === sc[name]) {
                  return <option value={ta} selected>{getText(ta)}</option>;
              } else {
                  return <option value={ta}>{getText(ta)}</option>;
@@ -358,11 +377,22 @@ const AddEditComponentModal = (props) => {
         switch(e.target.name) {
             case "selected":
                 c[indx].selected = e.target.checked;
+                if (!e.target.checked && c[indx].addTotal) {
+                    c[indx].addTotal = false;
+                }
+                break;
+            case "addTotal":
+                c[indx].addTotal = e.target.checked;
+                if (e.target.checked) {
+                    c[indx].selected = true;
+                }
                 break;
             case "displayName":
                 c[indx].displayName = e.target.value;
                 break;
            case "displayFormat":
+           case "headerTextAlign":
+           case "dataTextAlign":
                 c[indx].displayFormat = e.target.options[e.target.selectedIndex].value;
                 break;
         }
@@ -407,13 +437,17 @@ const AddEditComponentModal = (props) => {
     const getQuerySelectColumns = (type) => {
          if (currentQuery && selectColumns) {
             let nameLabel = getText("Header:");
+            let alignLabel = getText("Header Align:");
             if (type === COMPONENT_TYPE_DATARECORD) {
                 nameLabel = getText("Label:");
+                alignLabel = getText("Label Align:");
             }
 
             let colcnt = selectColumns.length;
             return selectColumns.map((sc, indx) => {
                 let wantFormat = isColumnFormatAvailable(sc);
+                let isnum = isDataTypeNumeric(sc.dataType);
+                let showAddTotal = isnum && (type === COMPONENT_TYPE_DATAGRID);
                 return <div key={"sce-" + indx} className="report-query-column">
                         <div draggable={true} 
                             className="detail-hdr"
@@ -424,6 +458,11 @@ const AddEditComponentModal = (props) => {
                             <span>
                                 <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText(indx))} />
                                 <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
+                                <span style = {{float: "right", marginRight: "15px"}}>
+                                    <input key={getUUID()} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor="selected">{getText("Include Column")}</label>
+                                    { showAddTotal && <input style={{marginLeft: "10px"}} key={getUUID()} name="addTotal" type="checkbox" checked={sc.addTotal} onChange={e => setQueryValue(e, indx)} /> }
+                                    { showAddTotal && <label className="ck-label" htmlFor="totalData">{getText("Add Total")}</label>}
+                                </span>    
                             </span>
                         </div>
                         <div className="tab platinum-b">
@@ -434,12 +473,17 @@ const AddEditComponentModal = (props) => {
                         </div>
 
                         <div className="detail">
-                            <div className="entrygrid-100-400">
-                                <div></div><div><input key={getUUID()} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor="selected">{getText("Include Column")}</label></div>
-                                <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
-                                {wantFormat && <div className="label">{getText("Format:")}</div>}
-                                {wantFormat && <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
-                            </div> 
+                            <div className="entrygrid-50p-50p">
+                                <div className="entrygrid-100-175">
+                                    <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
+                                    {wantFormat && <div className="label">{getText("Format:")}</div>}
+                                    {wantFormat && <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
+                                </div> 
+                                <div className="entrygrid-175-100">
+                                     <div className="label">{alignLabel}</div><div><select name="headerTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "headerTextAlign")}</select></div>
+                                    <div className="label">{getText("Data Align:")}</div><div><select name="dataTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "dataTextAlign")}</select></div>
+                                </div> 
+                            </div>    
                         </div>
                     </div>;  
                 });
@@ -494,11 +538,6 @@ const AddEditComponentModal = (props) => {
          </div>;
    };
 
-    const isDataComponent = (type) => {
-        return type = ((type === COMPONENT_TYPE_DATAGRID) 
-            || (type === COMPONENT_TYPE_DATARECORD));
-    };
-    
     const getTabs = () => {
         if (currentComponent) {
             let type = currentComponent.type;

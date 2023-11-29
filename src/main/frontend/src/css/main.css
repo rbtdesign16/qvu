@@ -296,6 +296,12 @@ img {
     padding: 0;
 }
 
+.tb-border-dark {
+    border-top: var(--query-results-table-border);
+    border-bottom: var(--query-results-table-border);
+    padding: 0;
+}
+
 .modal-error-msg {
     color: crimson;
     text-align: center;
@@ -853,5 +859,6 @@ Note: Beware of modifying this element as it can break the animations - you shou
     overflow: hidden;
     height: 25px;
     text-align: left;
-    border-bottom: solid 2px var(--default-border-color);
+    outline: var(--query-results-table-border);
+    background: #E5E4E2;
 }

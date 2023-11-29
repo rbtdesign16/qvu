@@ -110,6 +110,14 @@ export const pixelsToReportUnits = (type, pixels) => {
     }
 };
 
+const getDataGridComponentValue = (reportSettings, component) => {
+    return <div>this is a test</div>;
+};
+
+const getDataRecordComponentValue = (reportSettings, component) => {
+    return <div>this is a test</div>;
+};
+
 export const getComponentValue = (reportSettings, component, forExample) => {
     let myStyle = {};
     
@@ -189,7 +197,11 @@ export const getComponentValue = (reportSettings, component, forExample) => {
         case COMPONENT_TYPE_CURRENTDATE:
             return moment().formatWithJDF(component.value.format); 
         case COMPONENT_TYPE_PAGENUMBER:
-            return component.value.format.replace("?", "1");;
+            return component.value.format.replace("?", "1");
+        case COMPONENT_TYPE_DATAGRID:
+            return getDataGridComponentValue(reportSettings, component);
+        case COMPONENT_TYPE_DATARECORD:
+           return getDataRecordComponentValue(reportSettings, component);
     }
 };
 
@@ -258,6 +270,11 @@ const getShapeComponentStyle = (component, unit) => {
         };
 };
 
+export const isDataComponent = (type) => {
+    return type = ((type === COMPONENT_TYPE_DATAGRID) 
+        || (type === COMPONENT_TYPE_DATARECORD));
+};
+
 export const getDefaultComponentStyle = (reportSettings, component, unit) => {
     let retval = {
             width: component.width + unit,
@@ -269,55 +286,57 @@ export const getDefaultComponentStyle = (reportSettings, component, unit) => {
             zIndex: component.zindex
         };
     
-    if (component.fontSettings) {
-        let fs = component.fontSettings;
-        retval.color = fs.color,
-        retval.backgroundColor = fs.backgroundColor,
-        retval.fontFamilty = fs.font;
-        retval.fontSize = fs.size + "pt";
-        if (fs.italic) {
-            retval.fontStyle = ITALIC_SETTING;
-        }
-
-        if (fs.bold) {
-            retval.fontWeight = 700;
-        }
-
-        if (fs.underline) {
-            retval.textDecoration = UNDERLINE_SETTING;
-        }
-    }
-
-    if (component.borderSettings) {
-        let bs = component.borderSettings;
-        if (haveBorder(bs)) {
-            let bdef = bs.border + " " + bs.width + "px " + bs.color;
-            if (haveAllBorders(bs)) {
-                retval.border = bdef;
-            } else {
-                if (bs.left) {
-                    retval.borderLeft = bdef;
-                }
-
-                if (bs.top) {
-                    retval.borderTop = bdef;
-                }
-
-                if (bs.rightt) {
-                    retval.borderRightt = bdef;
-                }
-
-                if (bs.bottom) {
-                    retval.borderBottom = bdef;
-                }
+    if (!isDataComponent(component.type)) {
+        if (component.fontSettings) {
+            let fs = component.fontSettings;
+            retval.color = fs.color,
+            retval.backgroundColor = fs.backgroundColor,
+            retval.fontFamilty = fs.font;
+            retval.fontSize = fs.size + "pt";
+            if (fs.italic) {
+                retval.fontStyle = ITALIC_SETTING;
             }
 
-            if (bs.rounded) {
-                retval.borderRadius = reportSettings.defaultBorderRadius;
+            if (fs.bold) {
+                retval.fontWeight = 700;
+            }
+
+            if (fs.underline) {
+                retval.textDecoration = UNDERLINE_SETTING;
+            }
+        }
+
+        if (component.borderSettings) {
+            let bs = component.borderSettings;
+            if (haveBorder(bs)) {
+                let bdef = bs.border + " " + bs.width + "px " + bs.color;
+                if (haveAllBorders(bs)) {
+                    retval.border = bdef;
+                } else {
+                    if (bs.left) {
+                        retval.borderLeft = bdef;
+                    }
+
+                    if (bs.top) {
+                        retval.borderTop = bdef;
+                    }
+
+                    if (bs.rightt) {
+                        retval.borderRightt = bdef;
+                    }
+
+                    if (bs.bottom) {
+                        retval.borderBottom = bdef;
+                    }
+                }
+
+                if (bs.rounded) {
+                    retval.borderRadius = reportSettings.defaultBorderRadius;
+                }
             }
         }
     }
-
+    
     return retval;
 };
 

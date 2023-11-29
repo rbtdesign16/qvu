@@ -318,9 +318,7 @@ const ScheduleEntryModal = (props) => {
                        show={config.show} 
                        onShow={onShow}
                        dialogClassName="schedule-entry"
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>

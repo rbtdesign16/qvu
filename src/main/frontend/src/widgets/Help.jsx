@@ -22,8 +22,8 @@ const Help = (props) => {
                 size="lg"
                 onHide={onHide}
                 dialaogClassName="help-dlg"
+                enforceFocus={false}
                 contentClassName="help-content"
-                backdrop={false}
                 id="help-popup"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered

@@ -106,9 +106,7 @@ const ParameterEntryModal = (props) => {
                 <Modal animation={false} 
                        show={config.show} 
                        onHide={onHide}
-                       onShow={onShow}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onShow={onShow}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>

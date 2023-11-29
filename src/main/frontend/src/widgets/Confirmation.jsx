@@ -11,16 +11,15 @@ const Confirmation = ({
   title = 'Confirmation',
   confirmation,
   show,
-  proceed,
-  enableEscape = true
+  proceed
 }) => {
   return (
     <div className="static-modal">
       <Modal animation={false} 
         show={show} 
         onHide={() => proceed(false)} 
-        backdrop={enableEscape ? true : 'static'} 
-        keyboard={enableEscape}>
+        backdrop="static" 
+        keyboard={false}>
         <Modal.Header>
           <Modal.Title as={MODAL_TITLE_SIZE}>{title}</Modal.Title>
         </Modal.Header>

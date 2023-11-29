@@ -34,9 +34,7 @@ const JoinType = (props) => {
                    onShow={onShow}
                 aria-labelledby="contained-modal-title-vcenter"
                    centered
-                   onHide={onHide}
-                   backdrop={true} 
-                   keyboard={true}>
+                   onHide={onHide}>
                 <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}>
                         <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getText("joinType-help"))}/>

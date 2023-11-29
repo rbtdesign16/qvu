@@ -25,9 +25,7 @@ const ColorSelectModal = (props) => {
                 animation={false} 
                 dialogClassName="color-settings"
                 show={config.show} 
-                onHide={onHide}
-                backdrop={false} 
-                keyboard={true}>
+                onHide={onHide}>
                 <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                 </Modal.Header>

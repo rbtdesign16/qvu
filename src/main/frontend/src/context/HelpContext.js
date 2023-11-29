@@ -15,9 +15,8 @@ export const HelpProvider = ({ children }) => {
         if (!tokens) {
             setHelpInfo({show: true, message: message});
         } else {
-            setHelpInfo({show: true, message: helper.replaceTokens(message, tokens)});
+            setHelpInfo({show: true, message: replaceTokens(message, tokens)});
         }
-                
     };
 
     return (

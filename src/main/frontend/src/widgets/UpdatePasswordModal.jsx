@@ -35,9 +35,7 @@ const UpdatePasswordModal = (props) => {
                        show={config.show} 
                        aria-labelledby="contained-modal-title-vcenter"
                        centered
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>
                             {getText("Update Password")}</Modal.Title>

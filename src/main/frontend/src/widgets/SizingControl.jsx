@@ -10,6 +10,8 @@ import {
     pixelsToReportUnits,
     reportUnitsToPixels,
     pixelPosToNumber,
+    reformatDataComponent,
+    isDataComponent,
     getSizer} from "../utils/reportHelper";
 
 const SizingControl = (props) => {
@@ -80,7 +82,12 @@ const SizingControl = (props) => {
         c.top = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
         c.width = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
         c.height = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
-        let sec = document.getElementById(component.section);
+        
+        if (isDataComponent(c.type)) {
+            reformatDataComponent(currentReport, c);
+        }
+        
+         let sec = document.getElementById(component.section);
         sec.style.cursor = "crosshair";
         sec.removeEventListener("mousemove", onHandleSize, true);
         sec.removeEventListener("mouseup", onStopSize, true);

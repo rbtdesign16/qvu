@@ -58,7 +58,7 @@ const ReportComponent = (props) => {
         <SizingControl corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
         <SizingControl corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
         <SizingControl corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
-        {getComponentValue(reportSettings, component)}
+        {getComponentValue(reportSettings, currentReport, component)}
     </div>; 
 };
 

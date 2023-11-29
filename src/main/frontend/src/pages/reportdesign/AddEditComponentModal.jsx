@@ -70,6 +70,7 @@ const AddEditComponentModal = (props) => {
         setCurrentQuery} = useReportDesign();
  
     const [selectColumns, setSelectColumns] = useState([]);
+    const [dataColumnCount, setDataColumnCount] = useState(0);
     
     const getHelpText = (index) => {
          return getColumnHelpDisplay(selectColumns[index], getText);
@@ -101,7 +102,7 @@ const AddEditComponentModal = (props) => {
                 currentComponent.value.dataColumns.map(d => cset.add(d.selectIndex));
             }
             
-            let scols = copyObject(currentComponent.value.dataColumns);;
+            let scols = copyObject(currentComponent.value.dataColumns);
 
             currentQuery.selectColumns.map((sc, indx) => {
                 if (!cset.has(indx) && sc.showInResults) {
@@ -119,6 +120,11 @@ const AddEditComponentModal = (props) => {
                 }
             });
                 
+            if (currentComponent.value.dataColumns) {
+                setDataColumnCount(currentComponent.value.dataColumns.length);
+            } else {
+                setDataColumnCount(0);
+            }
                 
             setSelectColumns(scols);
         } else {
@@ -296,7 +302,7 @@ const AddEditComponentModal = (props) => {
                     <div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
                 </div>    
                 <div className="tb-border">{getText("Example:")}</div>    
-                <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentComponent)}</div></div>
+                <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent)}</div></div>
             </div>;
         } else {
            if (!currentComponent.value.fillcolor) {
@@ -317,7 +323,7 @@ const AddEditComponentModal = (props) => {
                         <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
                     </div>
                     <div className="tb-border">{getText("Example:")}</div>    
-                    <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentComponent, true)}</div></div>
+                    <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent, true)}</div></div>
                 </div>;
          }
     };
@@ -571,6 +577,11 @@ const AddEditComponentModal = (props) => {
                 if (selectColumns[i].selected) {
                     c.value.dataColumns.push(selectColumns[i]);
                 }
+             }
+             
+             if (!c.value.dataColumns 
+                || (c.value.dataColumns.length !== dataColumnCount)) {
+                reformatDataComponent(currentReport, c);
             }
             config.saveComponent(c, config.componentIndex);
         } else {

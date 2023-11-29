@@ -27,7 +27,8 @@ import {
     BOTTOM_RIGHT,
     getSizer,
     pixelPosToNumber,
-    COMPONENT_DRAG_DATA
+    COMPONENT_DRAG_DATA,
+    isDataComponent
 } from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
@@ -123,7 +124,7 @@ const ReportSection = (props) => {
  
             c.left = pixelsToReportUnits(currentReport.pageUnits, x - cinfo.left);
             c.top = pixelsToReportUnits(currentReport.pageUnits, y - cinfo.top);
-
+            
             setCurrentReport(cr);
         }
     };

@@ -351,7 +351,7 @@ const getDataRecordComponentValue = (component) => {
     let gridStyle = getDataRecordComponentStyle(component);
     return component.value.dataColumns.map((d, indx) => {
         return <div style={gridStyle}>
-            <div style={labelStyles[indx]}>{d.displayName + ":"}</div>
+            <div style={labelStyles[indx]}>{d.displayName}</div>
             <div style={dataStyles[indx]}>{"data[" + (indx + 1) + "]"}</div>
         </div>;  
     });
@@ -520,16 +520,22 @@ export const reformatDataComponent = (currentReport, component) => {
             gtc += (cwidth + unit + " ");
         }
     } else {
-        let maxWidth = 0;
-        for (let i = 0; i < component.value.dataColumns.length; ++i) {
-            let w = (((PIXELS_PER_POINT/2) * component.fontSettings.size) * component.value.dataColumns[i].displayName.length);
-            if (w > maxWidth) {
-                maxWidth = w;
+        if (!component.value.gridTemplateColumns) {
+            let maxWidth = 0;
+            for (let i = 0; i < component.value.dataColumns.length; ++i) {
+                let w = (((PIXELS_PER_POINT/2) * component.fontSettings.size) * component.value.dataColumns[i].displayName.length);
+                if (w > maxWidth) {
+                    maxWidth = w;
+                }
             }
+
+            let labelWidth = pixelsToReportUnits(unit, maxWidth);
+            component.width = 2 * labelWidth;
+            component.height = component.value.dataColumns.length * pixelsToReportUnits(unit, (PIXELS_PER_POINT * component.fontSettings.size) + 5);
+            gtc = labelWidth + unit + " " + labelWidth + unit;
+        } else {
+            gtc = component.value.gridTemplateColumns;
         }
-        
-        let labelWidth = pixelsToReportUnits(unit, maxWidth);
-        gtc = labelWidth + unit + " " + (component.width - labelWidth) + unit;
     }
     
     component.value.gridTemplateColumns = gtc.trim();

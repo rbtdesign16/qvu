@@ -240,8 +240,11 @@ public class Constants {
     
     public static final String DEFAULT_PAGE_SIZE = "letter";
 
-    public static final String[] PAGE_UNITS = {"inch", "mm"};
-    public static final String DEFAULT_PAGE_UNITS = "inch";
+    public static final String PAGE_UNITS_INCH = "inch";
+    public static final String PAGE_UNITS_MM = "mm";
+    
+    public static final String[] PAGE_UNITS = {PAGE_UNITS_INCH , PAGE_UNITS_MM};
+    public static final String DEFAULT_PAGE_UNITS = PAGE_UNITS_INCH ;
     public static final String REPORT_SECTION_HEADER = "header";
     public static final String REPORT_SECTION_BODY = "body";
     public static final String REPORT_SECTION_FOOTER = "footer";

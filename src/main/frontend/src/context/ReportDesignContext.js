@@ -15,6 +15,7 @@ import {
     COMPONENT_TYPE_HYPERLINK,
     COMPONENT_TYPE_PAGENUMBER,
     COMPONENT_TYPE_CURRENTDATE,
+    COMPONENT_TYPE_DATAFIELD,
     COMPONENT_TYPE_DATAGRID,
     COMPONENT_TYPE_DATARECORD,
     COMPONENT_TYPE_CHART,
@@ -174,6 +175,12 @@ export const ReportDesignProvider = ({ children }) => {
             case COMPONENT_TYPE_CURRENTDATE:
                 retval.value = {
                     format: DEFAULT_CURRENT_DATE_FORMAT
+                };
+                break;
+            case COMPONENT_TYPE_DATAFIELD:
+                retval.align="center";
+                retval.value = {
+                    dataColumns: []
                 };
                 break;
             case COMPONENT_TYPE_DATAGRID:

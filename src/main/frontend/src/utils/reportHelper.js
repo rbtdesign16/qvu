@@ -60,6 +60,7 @@ export const COMPONENT_TYPE_EMAIL = "email";
 export const COMPONENT_TYPE_HYPERLINK = "hyperlink";  
 export const COMPONENT_TYPE_PAGENUMBER = "pagenumber";  
 export const COMPONENT_TYPE_CURRENTDATE = "currentdate";   
+export const COMPONENT_TYPE_DATAFIELD = "datafield";  
 export const COMPONENT_TYPE_DATAGRID = "datagrid";  
 export const COMPONENT_TYPE_DATARECORD = "datarecord";   
 export const COMPONENT_TYPE_CHART = "chart";  
@@ -352,11 +353,21 @@ const getDataRecordComponentValue = (component) => {
     return component.value.dataColumns.map((d, indx) => {
         return <div style={gridStyle}>
             <div style={labelStyles[indx]}>{d.displayName}</div>
-            <div style={dataStyles[indx]}>{"data[" + (indx + 1) + "]"}</div>
+            <div style={dataStyles[indx]}>{getQueryDataColumnDisplay(d)}</div>
         </div>;  
     });
 };
 
+export const getQueryDataColumnDisplay = (dc) => {
+    if (dc.customSql) {
+        return dc.customSql;
+    } else if (dc.aggregateFunction) {
+        return dc.aggregateFunction + "(" + dc.tableAlias + "." + dc.columnName + ")";
+    } else {
+        return dc.tableAlias + "." + dc.columnName;
+    }
+};
+    
 export const getComponentValue = (reportSettings, currentReport, component, forExample) => {
     let myStyle = {};
     
@@ -441,6 +452,8 @@ export const getComponentValue = (reportSettings, currentReport, component, forE
             return getDataGridComponentValue(currentReport, component);
         case COMPONENT_TYPE_DATARECORD:
            return getDataRecordComponentValue(component);
+        case COMPONENT_TYPE_DATAFIELD:
+           return getQueryDataColumnDisplay(component.value.dataColumns[0]);
     }
 };
 
@@ -543,7 +556,8 @@ export const reformatDataComponent = (currentReport, component) => {
 
 export const isDataComponent = (type) => {
     return type = ((type === COMPONENT_TYPE_DATAGRID) 
-        || (type === COMPONENT_TYPE_DATARECORD));
+        || (type === COMPONENT_TYPE_DATARECORD)
+        || (type === COMPONENT_TYPE_DATAFIELD));
 };
 
 export const getDefaultComponentStyle = (reportSettings, component, unit) => {
@@ -557,7 +571,8 @@ export const getDefaultComponentStyle = (reportSettings, component, unit) => {
             zIndex: component.zindex
         };
     
-    if (!isDataComponent(component.type)) {
+    if ((component.type !== COMPONENT_TYPE_DATAGRID)
+        && (component.type !== COMPONENT_TYPE_DATARECORD)){
         if (component.fontSettings) {
             let fs = component.fontSettings;
             retval.color = fs.color,
@@ -799,6 +814,8 @@ export const getComponentTypeDisplayText = (type) => {
             return "Page Number";
         case COMPONENT_TYPE_CURRENTDATE:   
             return "Current Date";
+        case COMPONENT_TYPE_DATAFIELD:   
+            return "Data Field";
         case COMPONENT_TYPE_DATAGRID:   
             return "Data Grid";
         case COMPONENT_TYPE_DATARECORD:   

@@ -36,6 +36,7 @@ import {
     COMPONENT_TYPE_HYPERLINK,
     COMPONENT_TYPE_PAGENUMBER,
     COMPONENT_TYPE_CURRENTDATE,
+    COMPONENT_TYPE_DATAFIELD,
     COMPONENT_TYPE_DATAGRID,
     COMPONENT_TYPE_DATARECORD,
     COMPONENT_TYPE_CHART,
@@ -56,7 +57,9 @@ import {
     getPageNumberOptions,
     getCurrentDateFormatOptions,
     isDataComponent,
-    reformatDataComponent} from "../../utils/reportHelper";
+    reformatDataComponent,
+    getQueryDataColumnDisplay,
+    DEFAULT_DATA_TEXT_ALIGN} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -73,8 +76,8 @@ const AddEditComponentModal = (props) => {
     const [selectColumns, setSelectColumns] = useState([]);
     const [dataColumnCount, setDataColumnCount] = useState(0);
     
-    const getHelpText = (index) => {
-         return getColumnHelpDisplay(selectColumns[index], getText);
+    const getQueryColumnHelpText = (sc) => {
+        return getColumnHelpDisplay(sc, getText);
     };
 
     const getTitle = () => {
@@ -97,37 +100,49 @@ const AddEditComponentModal = (props) => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
         
         if (currentQuery && isDataComponent(currentComponent.type)) {
-            let cset = new Set();
-            
-            if (currentComponent.value.dataColumns) {
-                currentComponent.value.dataColumns.map(d => cset.add(d.selectIndex));
-            }
-            
-            let scols = copyObject(currentComponent.value.dataColumns);
+            if ((currentComponent.type === COMPONENT_TYPE_DATAGRID) 
+                || (currentComponent.type === COMPONENT_TYPE_DATARECORD)) {
+                let cset = new Set();
 
-            currentQuery.selectColumns.map((sc, indx) => {
-                if (!cset.has(indx) && sc.showInResults) {
-                    let c = copyObject(sc);
-                    if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
-                        c.headerTextAlign = "right";
-                        c.dataTextAlign = "left";
-                    } else {
-                        c.headerTextAlign = "center";
-                        c.dataTextAlign = "center";
-                    }
-                        
-                    c.selectIndex = indx;
-                    scols.push(c);
+                if (currentComponent.value.dataColumns) {
+                    currentComponent.value.dataColumns.map(d => cset.add(d.selectIndex));
                 }
-            });
-                
-            if (currentComponent.value.dataColumns) {
-                setDataColumnCount(currentComponent.value.dataColumns.length);
+
+                let scols = copyObject(currentComponent.value.dataColumns);
+
+                currentQuery.selectColumns.map((sc, indx) => {
+                    if (!cset.has(indx) && sc.showInResults) {
+                        let c = copyObject(sc);
+                        if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
+                            c.headerTextAlign = "right";
+                            c.dataTextAlign = "left";
+                        } else {
+                            c.headerTextAlign = "center";
+                            c.dataTextAlign = "center";
+                        }
+
+                        c.selectIndex = indx;
+                        scols.push(c);
+                    }
+                });
+
+                if (currentComponent.value.dataColumns) {
+                    setDataColumnCount(currentComponent.value.dataColumns.length);
+                } else {
+                    setDataColumnCount(0);
+                }
+
+                setSelectColumns(scols);
             } else {
-                setDataColumnCount(0);
+                if (currentComponent.value.dataColumns.length === 0) {
+                    let c = copyObject(currentComponent);
+                    let sc = copyObject(currentQuery.selectColumns[0]);
+                    sc.selectColumnIndex = 0;
+                    c.value.dataColumns.push(sc);
+                    c.value.textALign = DEFAULT_DATA_TEXT_ALIGN;
+                    setCurrentComponent(c);
+                }
             }
-                
-            setSelectColumns(scols);
         } else {
             setSelectColumns(null);
         }
@@ -173,6 +188,17 @@ const AddEditComponentModal = (props) => {
             case COMPONENT_TYPE_CURRENTDATE:
             case COMPONENT_TYPE_PAGENUMBER:
                 c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
+                break;
+            case COMPONENT_TYPE_DATAFIELD:
+                if (e.target.name === "selectColumnIndex") {
+                    let sc = currentQuery.selectColumns[e.target.selectedIndex];
+                    sc.selectColumnIndex = e.target.selectedIndex;
+                    c.value.dataColumns = [sc];
+                } else if (e.target.name === "textAlign") {
+                   c.value.textAlign = e.target.options[e.target.selectedIndex].value;
+                } else if (e.target.name === "displayFormat") {
+                   c.value.displayFormat = e.target.options[e.target.selectedIndex].value;
+                }
                 break;
         }
         
@@ -259,9 +285,9 @@ const AddEditComponentModal = (props) => {
     
     const isShapeLine = () => {
         return ((currentComponent.type === (COMPONENT_TYPE_SHAPE) 
-                && (currentComponent.value.shape === SHAPE_VERTICAL_LINE) 
-                    || (currentComponent.value.shape === SHAPE_HORIZONTAL_LINE)));
-        };
+            && (currentComponent.value.shape === SHAPE_VERTICAL_LINE) 
+                || (currentComponent.value.shape === SHAPE_HORIZONTAL_LINE)));
+    };
         
     const getShapeEntry = () => {
         if (!currentComponent.value.width) {
@@ -467,7 +493,7 @@ const AddEditComponentModal = (props) => {
                             onDrop={e => handleDrop(e)} 
                             onDragOver={e => handleDragOver(e)}>
                             <span>
-                                <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText(indx))} />
+                                <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))} />
                                 <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
                                 <span style = {{float: "right", marginRight: "15px"}}>
                                     <input key={getUUID()} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor="selected">{getText("Include Column")}</label>
@@ -508,6 +534,31 @@ const AddEditComponentModal = (props) => {
             {getQuerySelectColumns(type)}
          </div>;
     };
+    
+    const loadSelectColumnOptions = (sc) => {
+        return currentQuery.selectColumns.map((c, indx) => {
+            if (indx === sc.selectColumnIndex) {
+                return <option value={indx} selected>{getQueryDataColumnDisplay(c)}</option>
+            } else {
+                return <option value={indx}>{getQueryDataColumnDisplay(c)}</option>
+            }
+        });
+    }
+ 
+    const getDataFieldComponentEntry = () => {
+        if (currentComponent.value.dataColumns.length > 0) {
+            let sc = currentComponent.value.dataColumns[0];
+            let wantFormat = isColumnFormatAvailable(sc);
+            return <div className="entrygrid-150-300">
+                <div className="label"><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))}/>{getText("Query Column:")}</div><div><select name="selectColumnIndex" onChange={e => setValue(e)}>{loadSelectColumnOptions(sc)}</select></div>
+                <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+                {wantFormat && <div className="label">{getText("Format:")}</div>}
+                {wantFormat && <div><select name="displayFormat" onChange={e => setValue(e)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
+             </div>;
+         } else {
+             return "";
+         }
+    };
 
     const getComponentPanel = (type) => {
         if (currentComponent) {
@@ -526,6 +577,8 @@ const AddEditComponentModal = (props) => {
                     return getCurrentDateEntry();
                 case COMPONENT_TYPE_PAGENUMBER:
                     return getPageNumberEntry();
+                case COMPONENT_TYPE_DATAFIELD:
+                    return getDataFieldComponentEntry();
                 case COMPONENT_TYPE_DATAGRID:
                 case COMPONENT_TYPE_DATARECORD:
                     return getDataComponentEntry(type);
@@ -562,10 +615,10 @@ const AddEditComponentModal = (props) => {
                         {getComponentPanel(type)}
                     </Tab>
                         <Tab eventKey="font" title={getText("Font")}>
-                        {isDataComponent(type) ? getDataComponentFontPanel(type) : <FontPanel name="fontSettings"/>}
+                        {isMultiFontPanelRequired(type) ? getDataComponentFontPanel(type) : <FontPanel name="fontSettings"/>}
                      </Tab>
                     <Tab eventKey="border" title={getText("Border")}>
-                        {isDataComponent(type) ? getDataComponentBorderPanel(type) : <BorderPanel name="borderSettings"/>}
+                        {isMultiBorderPanelRequired(type) ? getDataComponentBorderPanel(type) : <BorderPanel name="borderSettings"/>}
                     </Tab>
                 </Tabs>;
             }
@@ -574,8 +627,17 @@ const AddEditComponentModal = (props) => {
         }
     };
     
+    const isMultiFontPanelRequired = (type) => {
+        return ((type === COMPONENT_TYPE_DATAGRID) || (type === COMPONENT_TYPE_DATARECORD));
+    };
+
+    const isMultiBorderPanelRequired = (type) => {
+        return ((type === COMPONENT_TYPE_DATAGRID) || (type === COMPONENT_TYPE_DATARECORD));
+    };
+
     const saveComponent = () => {
-        if (isDataComponent(currentComponent.type)) {
+        if ((currentComponent.type === COMPONENT_TYPE_DATAGRID)
+            || (currentComponent.type === COMPONENT_TYPE_DATARECORD)) {
             let c = copyObject(currentComponent);
             c.value.dataColumns = [];
             for (let i = 0; i < selectColumns.length; ++i) {
@@ -594,8 +656,7 @@ const AddEditComponentModal = (props) => {
         }
     };
     
-    return (
-        <div className="static-modal">
+    return (<div className="static-modal">
             <Modal animation={false} 
                    show={config.show} 
                    size="lg"
@@ -614,8 +675,7 @@ const AddEditComponentModal = (props) => {
                     <Button size="sm" variant="primary" type="submit" onClick={() => saveComponent()}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>
-        </div>
-        );
+        </div>);
 };
 
 AddEditComponentModal.propTypes = {

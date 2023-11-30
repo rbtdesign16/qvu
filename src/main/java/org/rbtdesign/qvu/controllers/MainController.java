@@ -407,11 +407,21 @@ public class MainController {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
-            byte[] data = reportService.generateReport(user, group, name);
-            header.setContentLength(data.length);
-            retval = new HttpEntity<>(data, header);
+            
+            OperationResult<byte[]> res  = reportService.generateReport(user, group, name);
+
+            if (res.isSuccess()) {
+                header.setContentLength(res.getResult().length);
+                retval = new HttpEntity<>(res.getResult(), header);
+            } else {
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(res.getMessage().getBytes());
+            }
         } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ex.toString().getBytes());
         }
 
         return retval;
@@ -425,11 +435,19 @@ public class MainController {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
-            byte[] data = reportService.generateReport(report);
-            header.setContentLength(data.length);
-            retval = new HttpEntity<>(data, header);
+            OperationResult<byte[]> res = reportService.generateReport(report);
+            if (res.isSuccess()) {
+                header.setContentLength(res.getResult().length);
+                retval = new HttpEntity<>(res.getResult(), header);
+            } else {
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(res.getMessage().getBytes());
+            }
         } catch (Exception ex) {
-            LOG.error(ex.toString(), ex);
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ex.toString().getBytes());
         }
 
         return retval;

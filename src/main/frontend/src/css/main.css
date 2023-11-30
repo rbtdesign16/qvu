@@ -802,6 +802,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
     cursor: none;
     background-color: var(--separator-color);
     padding: 1px;
+    height: 1px;
     margin: 5px;
 }
 

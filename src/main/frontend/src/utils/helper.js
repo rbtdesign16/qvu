@@ -10,6 +10,7 @@ export function confirm(confirmation, options = {}) {
 
 export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^" < "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
 
+export const PDF_MIME_TYPE = "application/pdf";
 export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";

@@ -545,3 +545,13 @@ export const getReportSettings = async () => {
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e};
     }
 };
+
+
+export const generateReport = async (report) => {
+    try {
+        let res = await axios.post(getApiURL() + "/report/generate", report, {...hconfig, responseType: "arraybuffer"});
+        return res.data;
+    } catch (e) {
+        console.log("error: generateReport - " + e);
+    }
+};

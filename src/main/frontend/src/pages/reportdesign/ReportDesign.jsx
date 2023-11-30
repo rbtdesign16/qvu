@@ -28,6 +28,8 @@ import {
     SMALL_ICON_SIZE,
     replaceTokens,
     copyObject,
+    showDocumentFromBlob,
+    PDF_MIME_TYPE
 } from "../../utils/helper";
 
 import {
@@ -54,7 +56,8 @@ import {
     saveDocument,
     getDocument,
     isApiError,
-    isApiSuccess
+    isApiSuccess,
+    generateReport
     } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import { BiWindowOpen, BiWindowClose  } from "react-icons/bi";
@@ -79,7 +82,8 @@ import { LiaFileInvoiceSolid,
     LiaAlignRightSolid,
     LiaWindowRestoreSolid,
     LiaCoinsSolid,
-    LiaUndoAltSolid } from "react-icons/lia";
+    LiaUndoAltSolid,
+    LiaRunningSolid} from "react-icons/lia";
 
 const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -129,6 +133,15 @@ const ReportDesign = () => {
         return isReportDesigner(authData);
     };
 
+    const onRunReport = async() => {
+        let res = await generateReport(currentReport);
+
+        let blob = new Blob([res], {
+            type: PDF_MIME_TYPE
+        });
+
+        showDocumentFromBlob(blob);
+    };
 
     const onTextAlign = (align) => {
         let cr = copyObject(currentReport);
@@ -362,6 +375,9 @@ const ReportDesign = () => {
             <div onClick={onShowReportDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
             <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
             {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
+            <hr  className="h-separator" />
+            <div onClick={onRunReport}><LiaRunningSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Run Report")}</div>
+            <hr  className="h-separator" />
             <div onClick={e => onShowQueryDocumentSelect(e)}><LiaCoinsSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Query Document")}</div>
             <hr  className="h-separator" />
             <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>

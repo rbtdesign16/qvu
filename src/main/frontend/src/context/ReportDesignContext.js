@@ -177,6 +177,7 @@ export const ReportDesignProvider = ({ children }) => {
                 };
                 break;
             case COMPONENT_TYPE_DATAGRID:
+                retval.align="left";
             case COMPONENT_TYPE_DATARECORD:
                 retval.fontSettings2 = getNewFontSettings();
                 retval.borderSettings2 = getNewBorderSettings();

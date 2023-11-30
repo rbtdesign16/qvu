@@ -182,6 +182,18 @@ const getGridComponentStyle = (component) => {
     return retval;
 };
     
+const getDataRecordComponentStyle = (component) => {
+    let retval = {
+        display: "grid",
+        gridTemplateColumns: component.value.gridTemplateColumns,
+        margin: 0,
+        padding:0,
+        gridRowGap: "5px"
+    };
+    
+    return retval;
+};
+
 const getGridHeader = (component, myStyle) => {
     let styles = [];
     
@@ -251,6 +263,98 @@ const getDataGridComponentValue = (currentReport, component) => {
         {getGridHeader(component, headerStyle)}
         {getGridData(component, getGridExampleData(currentReport, component), dataStyle)}
     </div>;
+};
+
+const getDataComponentLabelStyle = (component) => {
+     let retval = {
+        fontFamily: component.fontSettings.font,
+        fontSize: component.fontSettings.size + "pt",
+        color: component.fontSettings.color,
+        backgroundColor: component.fontSettings.backgroundColor
+        
+    };
+    
+    if (component.fontSettings.bold) {
+        retval.fontWeight = BOLD_FONT_WEIGHT;
+    }
+
+    if (component.fontSettings.italic) {
+        retval.fontStyle = ITALIC_SETTING;
+    }
+
+    if (component.fontSettings.underline) {
+        retval.textDecoration = UNDERLINE_SETTING;
+    }
+    
+    if (component.borderSettings) {
+        retval.border = component.borderSettings.border + " " + component.borderSettings.width + "px " + component.borderSettings.color;
+    }
+    
+    return retval;
+};
+
+const getDataComponentDataStyle = (component) => {
+     let retval = {
+        fontFamily: component.fontSettings2.font,
+        fontSize: component.fontSettings2.size + "pt",
+        color: component.fontSettings2.color,
+        backgroundColor: component.fontSettings2.backgroundColor,
+        paddingLeft: "5px"
+        
+    };
+    
+    if (component.fontSettings2.bold) {
+        retval.fontWeight = BOLD_FONT_WEIGHT;
+    }
+
+    if (component.fontSettings2.italic) {
+        retval.fontStyle = ITALIC_SETTING;
+    }
+
+    if (component.fontSettings2.underline) {
+        retval.textDecoration = UNDERLINE_SETTING;
+    }
+    
+    if (component.borderSettings2) {
+        retval.border = component.borderSettings2.border + " " + component.borderSettings2.width + "px " + component.borderSettings2.color;
+    }
+    
+    return retval;
+};
+
+const getDataRecordComponentValue = (component) => {
+    let labelStyle = getDataComponentLabelStyle(component);
+    let dataStyle = getDataComponentDataStyle(component);
+    let labelStyles = [];
+    let dataStyles = [];
+    
+    component.value.dataColumns.map(d => {
+        let ta = d.headerTextAlign;
+        if (!ta) {
+            ta = "right";
+        }
+        
+        let s = {...labelStyle};
+        s.textAlign = ta;
+        labelStyles.push(s);
+
+        ta = d.dataTextAlign;
+        if (!ta) {
+            ta = "left";
+        }
+        
+        s = {...dataStyle};
+        s.textAlign = ta;
+        dataStyles.push(s);
+    });
+    
+    let gridStyle = getDataRecordComponentStyle(component);
+    return component.value.dataColumns.map((d, indx) => {
+        return <div style={gridStyle}>
+            <div style={labelStyles[indx]}>{d.displayName + ":"}</div>
+            <div style={dataStyles[indx]}>{"data[" + (indx + 1) + "]"}</div>
+        </div>;  
+    });
 };
 
 export const getComponentValue = (reportSettings, currentReport, component, forExample) => {
@@ -406,15 +510,28 @@ const getShapeComponentStyle = (component, unit) => {
 };
 
 export const reformatDataComponent = (currentReport, component) => {
-    let numcols = component.value.dataColumns.length;
-    let cwidth = component.width / numcols;
-
     let gtc = "";
     let unit = currentReport.pageUnits.substring(0, 2);
-    for (let i = 0; i < numcols; ++i) {
-        gtc += (cwidth + unit + " ");
-    }
+    if (component.type === COMPONENT_TYPE_DATAGRID) {
+        let numcols = component.value.dataColumns.length;
+        let cwidth = component.width / numcols;
 
+        for (let i = 0; i < numcols; ++i) {
+            gtc += (cwidth + unit + " ");
+        }
+    } else {
+        let maxWidth = 0;
+        for (let i = 0; i < component.value.dataColumns.length; ++i) {
+            let w = (((PIXELS_PER_POINT/2) * component.fontSettings.size) * component.value.dataColumns[i].displayName.length);
+            if (w > maxWidth) {
+                maxWidth = w;
+            }
+        }
+        
+        let labelWidth = pixelsToReportUnits(unit, maxWidth);
+        gtc = labelWidth + unit + " " + (component.width - labelWidth) + unit;
+    }
+    
     component.value.gridTemplateColumns = gtc.trim();
 };
 

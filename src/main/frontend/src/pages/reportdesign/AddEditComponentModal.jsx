@@ -55,7 +55,8 @@ import {
     DEFAULT_CURRENT_DATE_FORMAT,
     getPageNumberOptions,
     getCurrentDateFormatOptions,
-    isDataComponent} from "../../utils/reportHelper";
+    isDataComponent,
+    reformatDataComponent} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -397,9 +398,13 @@ const AddEditComponentModal = (props) => {
                 c[indx].displayName = e.target.value;
                 break;
            case "displayFormat":
-           case "headerTextAlign":
-           case "dataTextAlign":
                 c[indx].displayFormat = e.target.options[e.target.selectedIndex].value;
+                break;
+           case "headerTextAlign":
+                c[indx].headerTextAlign = e.target.options[e.target.selectedIndex].value;
+                break;
+           case "dataTextAlign":
+                c[indx].dataTextAlign = e.target.options[e.target.selectedIndex].value;
                 break;
         }
         

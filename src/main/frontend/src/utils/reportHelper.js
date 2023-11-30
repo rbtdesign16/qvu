@@ -22,7 +22,7 @@ const getPPI = () => {
 
 export const PIXELS_PER_INCH = getPPI();
 export const PIXELS_PER_MM = PIXELS_PER_INCH / 25.4;
-export const PIXELS_PER_POINT = 1.3333;
+export const PIXELS_PER_POINT = 1.75;
 export const MM_TO_INCHES = 0.0393701;
 export const INCHES_TO_MM = 25.4;      
 
@@ -116,7 +116,7 @@ const getGridHeaderStyle = (component) => {
      let retval = {
         height: PIXELS_PER_POINT * Number(component.fontSettings.size),
         fontFamily: component.fontSettings.font,
-        fontSize: component.fontSettings.size,
+        fontSize: component.fontSettings.size + "pt",
         color: component.fontSettings.color,
         backgroundColor: component.fontSettings.backgroundColor
         
@@ -145,7 +145,7 @@ const getGridDataStyle = (component) => {
      let retval = {
         height: PIXELS_PER_POINT * Number(component.fontSettings2.size),
         fontFamily: component.fontSettings2.font,
-        fontSize: component.fontSettings2.size,
+        fontSize: component.fontSettings2.size + "pt",
         color: component.fontSettings2.color,
         backgroundColor: component.fontSettings2.backgroundColor
         
@@ -183,13 +183,22 @@ const getGridComponentStyle = (component) => {
 };
     
 const getGridHeader = (component, myStyle) => {
-    return component.value.dataColumns.map(c => {
-        let ta = c.headerTextAlign;
+    let styles = [];
+    
+    component.value.dataColumns.map(d => {
+        let s = {...myStyle};
+        let ta = d.headerTextAlign;
         if (!ta) {
-            ta = DEFAULT_HEADER_TEXT_ALIGN;
+            ta = DEFAULT_DATA_TEXT_ALIGN;
         }
-        myStyle.textAlign = ta;
-        return <div style={myStyle}>
+    
+        s.textALign = ta;
+        
+        styles.push(s);
+    });
+    
+   return component.value.dataColumns.map((c, indx) => {
+        return <div style={styles[indx]}>
             {c.displayName}
         </div>;
     });
@@ -214,16 +223,23 @@ const getGridExampleData = (currentReport, component) => {
 };
     
 const getGridData = (component, exampleData, myStyle) => {
+    let styles = [];
+    
+    component.value.dataColumns.map(d => {
+        let s = {...myStyle};
+        let ta = d.dataTextAlign;
+        if (!ta) {
+            ta = DEFAULT_DATA_TEXT_ALIGN;
+        }
+    
+        s.textAlign = ta;
+        
+        styles.push(s);
+    });
+    
     return exampleData.map(r => {
         return r.map((c, indx) => {
-            let ta = component.value.dataColumns[indx].dataTextAlign;
-            if (!ta) {
-                ta = DEFAULT_DATA_TEXT_ALIGN;
-            }
-            
-            myStyle.textAlign = ta;
-            
-            return <div style={myStyle}>{c}</div>;
+            return <div style={styles[indx]}>{c}</div>;
         });
     });
 };

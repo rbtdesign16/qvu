@@ -486,13 +486,13 @@ const ReportDesign = () => {
         let fcolor = gstyle.getPropertyValue('--default-font-color')
         return  <span className="cobaltBlue-f" style={{marginLeft: "10px"}}>
             <span style={{color: fcolor}}>{getText("Group", ":  ")}</span>
-            {currentReport.group} 
+            {currentReport.documentGroupName} 
             <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Report", ":  ")}</span>
             {currentReport.name}
             <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Page Size", ":  ")}</span>
             {currentReport.pageSize}
             <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Query Document", ":  ")}</span>
-            {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName : "-"}
+            {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName.replace(".json", "") : "-"}
         </span>;
     };
 

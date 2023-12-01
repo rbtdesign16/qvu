@@ -465,6 +465,7 @@ const ReportDesign = () => {
 
 
     const onNewReport = () => {
+        closeMenu();
         setNewReport();
     };
 

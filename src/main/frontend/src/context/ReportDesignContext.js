@@ -25,7 +25,9 @@ import {
     DEFAULT_MM_COMPONENT_POS,
     DEFAULT_INCH_COMPONENT_POS,
     DEFAULT_PAGE_NUMBER_FORMAT,
-    DEFAULT_CURRENT_DATE_FORMAT
+    DEFAULT_CURRENT_DATE_FORMAT,
+    GRID_LAYOUT_TABULAR,
+    GRID_LAYOUT_FREEFORM
     } from "../utils/reportHelper";
 
 export const ReportDesignContext = createContext();
@@ -184,8 +186,12 @@ export const ReportDesignProvider = ({ children }) => {
                 };
                 break;
             case COMPONENT_TYPE_DATAGRID:
-                retval.align="left";
+                retval.fontSettings2 = getNewFontSettings();
+                retval.borderSettings2 = getNewBorderSettings();
+                retval.value = {dataColumns: [], gridLayout: GRID_LAYOUT_TABULAR};
+                break;
             case COMPONENT_TYPE_DATARECORD:
+                retval.align="left";
                 retval.fontSettings2 = getNewFontSettings();
                 retval.borderSettings2 = getNewBorderSettings();
                 retval.value = {dataColumns: [], rowGap: 0};

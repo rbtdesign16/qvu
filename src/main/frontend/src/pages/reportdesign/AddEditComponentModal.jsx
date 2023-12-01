@@ -59,7 +59,8 @@ import {
     isDataComponent,
     reformatDataComponent,
     getQueryDataColumnDisplay,
-    DEFAULT_DATA_TEXT_ALIGN} from "../../utils/reportHelper";
+    DEFAULT_DATA_TEXT_ALIGN,
+    GRID_LAYOUT_OPTIONS} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -197,6 +198,11 @@ const AddEditComponentModal = (props) => {
             case COMPONENT_TYPE_CURRENTDATE:
             case COMPONENT_TYPE_PAGENUMBER:
                 c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
+                break;
+            case COMPONENT_TYPE_DATAGRID:
+                if (e.target.options) {
+                    c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
+                }
                 break;
             case COMPONENT_TYPE_DATARECORD:
                 c.value[e.target.name] = Number(e.target.value);
@@ -540,6 +546,16 @@ const AddEditComponentModal = (props) => {
             return "";
         }
     };
+    
+    const getGridLayoutOptions = () => {
+        return GRID_LAYOUT_OPTIONS.map(o => {
+            if (o === currentComponent.value.gridLayout) {
+                return <option value={o} selected>{getText(o)}</option>;
+            } else {
+                return <option value={o}>{getText(o)}</option>;
+            }
+        });
+    }
             
     const getDataComponentEntry = (type) => {
         if (type === COMPONENT_TYPE_DATARECORD) {
@@ -552,8 +568,18 @@ const AddEditComponentModal = (props) => {
                 </div>            
             </div>;
         } else {               
-            return <div className="report-query-column-select">
-                {getQuerySelectColumns(type)}
+           return <div>
+                <div className="entrygrid-125-100">
+                <div className="label">{getText("Layout:")}</div>
+                <div>
+                    <select name="gridLayout" onChange={e => setValue(e)}>
+                        {getGridLayoutOptions()}
+                    </select>
+                </div>
+                </div>
+                <div className="report-query-column-select">
+                    {getQuerySelectColumns(type)}
+                </div>            
             </div>;
         }
     };

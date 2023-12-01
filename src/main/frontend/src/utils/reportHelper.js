@@ -10,6 +10,7 @@ import {NONE_SETTING,
 export const COMPONENT_DRAG_DATA = "cinfo";
 export const MOVE_DROP_EFFECT = "move";
 export const OPACITY_OPTIONS = [1, 0.75, 0.5, 0.25];
+export const DEFAULT_BORDER_RADIUS = "10px";
     
 const getPPI = () => {
     const el = document.createElement('div');
@@ -74,6 +75,9 @@ export const SHAPE_ROUNDED_RECTANGLE = "rounded rectangle";
 export const SHAPE_RECTANGLE = "rectangle";
 
 export const DEFAULT_SHAPE = SHAPE_RECTANGLE;
+export const GRID_LAYOUT_TABULAR = "tabular";
+export const GRID_LAYOUT_FREEFORM = "freeform";
+export const GRID_LAYOUT_OPTIONS = [GRID_LAYOUT_TABULAR, GRID_LAYOUT_FREEFORM];
 
 export const PAGE_NUMBER_FORMATS = [
     "?",
@@ -113,65 +117,77 @@ export const pixelsToReportUnits = (type, pixels) => {
     }
 };
 
-const getGridHeaderStyle = (component) => {
-     let retval = {
-        height: PIXELS_PER_POINT * Number(component.fontSettings.size),
-        fontFamily: component.fontSettings.font,
-        fontSize: component.fontSettings.size + "pt",
-        color: component.fontSettings.color,
-        backgroundColor: component.fontSettings.backgroundColor
+export const updateComponentFontSettings = (component, fsame, myStyle) => {
+    myStyle.fontFamily = component[fsame].font;
+    myStyle.fontSize = component[fsame].size + "pt";
+    myStyle.color = component[fsame].color;
+    myStyle.backgroundColor = component[fsame].backgroundColor;
         
+    
+    if (component[fsame].bold) {
+        myStyle.fontWeight = BOLD_FONT_WEIGHT;
+    }
+
+    if (component[fsame].italic) {
+        myStyle.fontStyle = ITALIC_SETTING;
+    }
+
+    if (component[fsame].underline) {
+        myStyle.textDecoration = UNDERLINE_SETTING;
+    }
+ };  
+
+export const updateComponentBorderSettings = (component, bsname, myStyle) => {
+    let bs = component[bsname];
+    let bdef = bs.border + " " + bs.width + "px " + bs.color;
+    if (haveAllBorders(bs)) {
+        myStyle.border = bdef;
+    } else {
+        if (bs.left) {
+            myStyle.borderLeft = bdef;
+        }
+
+        if (bs.top) {
+            myStyle.borderTop = bdef;
+        }
+
+        if (bs.right) {
+            myStyle.borderRight = bdef;
+        }
+
+        if (bs.bottom) {
+            myStyle.borderBottom = bdef;
+        }
+    }
+
+    if (bs.rounded) {
+        myStyle.borderRadius = DEFAULT_BORDER_RADIUS;
+    }
+};
+    
+const getGridTabularHeaderStyle = (component) => {
+     let retval = {
+        height: PIXELS_PER_POINT * Number(component.fontSettings.size)
     };
     
-    if (component.fontSettings.bold) {
-        retval.fontWeight = BOLD_FONT_WEIGHT;
-    }
-
-    if (component.fontSettings.italic) {
-        retval.fontStyle = ITALIC_SETTING;
-    }
-
-    if (component.fontSettings.underline) {
-        retval.textDecoration = UNDERLINE_SETTING;
-    }
-    
-    if (component.borderSettings) {
-        retval.border = component.borderSettings.border + " " + component.borderSettings.width + "px " + component.borderSettings.color;
-    }
+    updateComponentFontSettings(component, "fontSettings", retval);
+    updateComponentBorderSettings(component, "borderSettings", retval);
     
     return retval;
 };
 
-const getGridDataStyle = (component) => {
+const getGridTabularDataStyle = (component) => {
      let retval = {
-        height: PIXELS_PER_POINT * Number(component.fontSettings2.size),
-        fontFamily: component.fontSettings2.font,
-        fontSize: component.fontSettings2.size + "pt",
-        color: component.fontSettings2.color,
-        backgroundColor: component.fontSettings2.backgroundColor
-        
+        height: PIXELS_PER_POINT * Number(component.fontSettings2.size)
     };
     
-    if (component.fontSettings2.bold) {
-        retval.fontWeight = BOLD_FONT_WEIGHT;
-    }
-
-    if (component.fontSettings2.italic) {
-        retval.fontStyle = ITALIC_SETTING;
-    }
-
-    if (component.fontSettings2.underline) {
-        retval.textDecoration = UNDERLINE_SETTING;
-    }
-    
-    if (component.borderSettings2) {
-        retval.border = component.borderSettings2.border + " " + component.borderSettings2.width + "px " + component.borderSettings2.color;
-    }
+    updateComponentFontSettings(component, "fontSettings2", retval);
+    updateComponentBorderSettings(component, "borderSettings2", retval);
     
     return retval;
 };
 
-const getGridComponentStyle = (component) => {
+const getGridComponentTabularStyle = (component) => {
     let retval = {
         display: "grid",
         gridTemplateColumns: component.value.gridTemplateColumns,
@@ -195,7 +211,7 @@ const getDataRecordComponentStyle = (component) => {
     return retval;
 };
 
-const getGridHeader = (component, myStyle) => {
+const getGridTabularHeader = (component, myStyle) => {
     let styles = [];
     
     component.value.dataColumns.map(d => {
@@ -217,7 +233,7 @@ const getGridHeader = (component, myStyle) => {
     });
 };
 
-const getGridExampleData = (currentReport, component) => {
+const getGridTabularExampleData = (currentReport, component) => {
     let retval = [];
     let headerHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
     let rowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings2.size));
@@ -235,7 +251,7 @@ const getGridExampleData = (currentReport, component) => {
      return retval;
 };
     
-const getGridData = (component, exampleData, myStyle) => {
+const getGridTabularData = (component, exampleData, myStyle) => {
     let styles = [];
     
     component.value.dataColumns.map(d => {
@@ -258,68 +274,38 @@ const getGridData = (component, exampleData, myStyle) => {
 };
     
 const getDataGridComponentValue = (currentReport, component) => {
-    let headerStyle = getGridHeaderStyle(component);
-    let dataStyle = getGridDataStyle(component);
-    return <div style={getGridComponentStyle(component)}>
-        {getGridHeader(component, headerStyle)}
-        {getGridData(component, getGridExampleData(currentReport, component), dataStyle)}
-    </div>;
+    if (component.value.gridLayout === GRID_LAYOUT_TABULAR) {
+        let headerStyle = getGridTabularHeaderStyle(component);
+        let dataStyle = getGridTabularDataStyle(component);
+        return <div style={getGridComponentTabularStyle(component)}>
+            {getGridTabularHeader(component, headerStyle)}
+            {getGridTabularData(component, getGridTabularExampleData(currentReport, component), dataStyle)}
+        </div>;
+    } else {
+        return <div>
+            this is the grid freeform style
+        </div>;
+    }
 };
 
 const getDataComponentLabelStyle = (component) => {
      let retval = {
-        fontFamily: component.fontSettings.font,
-        fontSize: component.fontSettings.size + "pt",
-        color: component.fontSettings.color,
-        backgroundColor: component.fontSettings.backgroundColor
-        
     };
     
-    if (component.fontSettings.bold) {
-        retval.fontWeight = BOLD_FONT_WEIGHT;
-    }
-
-    if (component.fontSettings.italic) {
-        retval.fontStyle = ITALIC_SETTING;
-    }
-
-    if (component.fontSettings.underline) {
-        retval.textDecoration = UNDERLINE_SETTING;
-    }
-    
-    if (component.borderSettings) {
-        retval.border = component.borderSettings.border + " " + component.borderSettings.width + "px " + component.borderSettings.color;
-    }
+    updateComponentFontSettings(component, "fontSettings", retval);
+    updateComponentBorderSettings(component, "borderSettings", retval);
     
     return retval;
 };
 
 const getDataComponentDataStyle = (component) => {
      let retval = {
-        fontFamily: component.fontSettings2.font,
-        fontSize: component.fontSettings2.size + "pt",
-        color: component.fontSettings2.color,
-        backgroundColor: component.fontSettings2.backgroundColor,
         paddingLeft: "5px"
         
     };
     
-    if (component.fontSettings2.bold) {
-        retval.fontWeight = BOLD_FONT_WEIGHT;
-    }
-
-    if (component.fontSettings2.italic) {
-        retval.fontStyle = ITALIC_SETTING;
-    }
-
-    if (component.fontSettings2.underline) {
-        retval.textDecoration = UNDERLINE_SETTING;
-    }
-    
-    if (component.borderSettings2) {
-        retval.border = component.borderSettings2.border + " " + component.borderSettings2.width + "px " + component.borderSettings2.color;
-    }
-    
+    updateComponentFontSettings(component, "fontSettings2", retval);
+    updateComponentBorderSettings(component, "borderSettings2", retval);
     return retval;
 };
 
@@ -527,10 +513,15 @@ export const reformatDataComponent = (currentReport, component) => {
     let unit = currentReport.pageUnits.substring(0, 2);
     if (component.type === COMPONENT_TYPE_DATAGRID) {
         let numcols = component.value.dataColumns.length;
-        let cwidth = component.width / numcols;
+        if (component.value.gridLayout === GRID_LAYOUT_TABULAR) {
+            let cwidth = component.width / numcols;
 
-        for (let i = 0; i < numcols; ++i) {
-            gtc += (cwidth + unit + " ");
+            for (let i = 0; i < numcols; ++i) {
+                gtc += (cwidth + unit + " ");
+            }
+        
+            component.value.gridTemplateColumns = gtc.trim();
+        } else {
         }
     } else {
         if (!component.value.gridTemplateColumns) {
@@ -550,9 +541,10 @@ export const reformatDataComponent = (currentReport, component) => {
         } else {
             gtc = component.value.gridTemplateColumns;
         }
+        
+        component.value.gridTemplateColumns = gtc.trim();
     }
     
-    component.value.gridTemplateColumns = gtc.trim();
 };
 
 export const isDataComponent = (type) => {
@@ -561,7 +553,7 @@ export const isDataComponent = (type) => {
         || (type === COMPONENT_TYPE_DATAFIELD));
 };
 
-export const getDefaultComponentStyle = (reportSettings, component, unit) => {
+export const getDefaultComponentStyle = (component, unit) => {
     let retval = {
             width: component.width + unit,
             height: component.height + unit,
@@ -575,51 +567,12 @@ export const getDefaultComponentStyle = (reportSettings, component, unit) => {
     if ((component.type !== COMPONENT_TYPE_DATAGRID)
         && (component.type !== COMPONENT_TYPE_DATARECORD)){
         if (component.fontSettings) {
-            let fs = component.fontSettings;
-            retval.color = fs.color,
-            retval.backgroundColor = fs.backgroundColor,
-            retval.fontFamilty = fs.font;
-            retval.fontSize = fs.size + "pt";
-            if (fs.italic) {
-                retval.fontStyle = ITALIC_SETTING;
-            }
-
-            if (fs.bold) {
-                retval.fontWeight = BOLD_FONT_WEIGHT;
-            }
-
-            if (fs.underline) {
-                retval.textDecoration = UNDERLINE_SETTING;
-            }
+            updateComponentFontSettings(component, "fontSettings", retval);
         }
 
         if (component.borderSettings) {
-            let bs = component.borderSettings;
-            if (haveBorder(bs)) {
-                let bdef = bs.border + " " + bs.width + "px " + bs.color;
-                if (haveAllBorders(bs)) {
-                    retval.border = bdef;
-                } else {
-                    if (bs.left) {
-                        retval.borderLeft = bdef;
-                    }
-
-                    if (bs.top) {
-                        retval.borderTop = bdef;
-                    }
-
-                    if (bs.rightt) {
-                        retval.borderRightt = bdef;
-                    }
-
-                    if (bs.bottom) {
-                        retval.borderBottom = bdef;
-                    }
-                }
-
-                if (bs.rounded) {
-                    retval.borderRadius = reportSettings.defaultBorderRadius;
-                }
+            if (haveBorder(component.borderSettings)) {
+                updateComponentBorderSettings(component, "borderSettings", retval);
             }
         }
     }
@@ -627,14 +580,14 @@ export const getDefaultComponentStyle = (reportSettings, component, unit) => {
     return retval;
 };
 
-export const getComponentStyle = (reportSettings, currentReport, component) => {
+export const getComponentStyle = (currentReport, component) => {
     let unit = currentReport.pageUnits.substring(0, 2);
 
     switch(component.type) {
         case COMPONENT_TYPE_SHAPE:
             return getShapeComponentStyle(component, unit);
         default:
-            return getDefaultComponentStyle(reportSettings, component, unit);
+            return getDefaultComponentStyle(component, unit);
     }
 };
 

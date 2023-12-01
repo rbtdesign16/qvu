@@ -43,7 +43,7 @@ const ReportComponent = (props) => {
     return <div 
         className={getComponentClassName(component)}
         draggable={true} 
-        style={getComponentStyle(reportSettings, currentReport, component)}
+        style={getComponentStyle(currentReport, component)}
         onContextMenu={e => onContextMenu(e, componentIndex, component.section)} 
         onClick={e => onComponentClick(e, 
             currentReport, 

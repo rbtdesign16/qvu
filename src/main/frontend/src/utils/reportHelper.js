@@ -544,7 +544,8 @@ export const reformatDataComponent = (currentReport, component) => {
 
             let labelWidth = pixelsToReportUnits(unit, maxWidth);
             component.width = 2 * labelWidth;
-            component.height = component.value.dataColumns.length * pixelsToReportUnits(unit, (PIXELS_PER_POINT * component.fontSettings.size) + 5);
+            component.height = component.value.dataColumns.length 
+                * pixelsToReportUnits(unit, (PIXELS_PER_POINT * component.fontSettings.size) + 5 + (component.value.rowGap ? Number(component.value.rowGap) : 0));
             gtc = labelWidth + unit + " " + labelWidth + unit;
         } else {
             gtc = component.value.gridTemplateColumns;

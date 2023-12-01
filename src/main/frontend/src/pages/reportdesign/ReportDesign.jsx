@@ -122,6 +122,9 @@ const ReportDesign = () => {
     
 
     const handleStateChange = (state) => {
+        if (state.isOpen) {
+            hideMenu();
+        }
         setMenuOpen(state.isOpen);
     };
 

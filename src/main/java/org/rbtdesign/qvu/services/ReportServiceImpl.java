@@ -79,9 +79,11 @@ public class ReportServiceImpl implements ReportService {
         int pageCount = calculatePageCount(report, queryResult);
       
         for (int i = 0; i < pageCount; ++i) {
+            retval.append("\n<div class=\"page\">");
             retval.append(getHeaderHtml(report, queryResult, i+1));
             retval.append(getBodyHtml(report, queryResult, i + 1));
             retval.append(getFooterHtml(report, queryResult, i + 1, pageCount));
+            retval.append("\n</div>");
         }
         
         retval.append(getHtmlClose());
@@ -137,36 +139,31 @@ public class ReportServiceImpl implements ReportService {
     
     private String getHtmlOpen(ReportDocument report) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<html><style>\n@page {  size: ");
-        retval.append(report.getPageSize());
-        
-        if (Constants.PAGE_ORIENTATION_LANDSCAPE.equals(report.getPageOrientation())) {
-            retval.append(" ");
-            retval.append(Constants.PAGE_ORIENTATION_LANDSCAPE);
-        }
-        
-        String units = report.getPageUnits().substring(0, 2);
+
         double width = getReportWidth(report);
         double height = getReportHeight(report);
+        String units = report.getPageUnits().substring(0, 2);
 
-        retval.append(";}\nbody {\nbackground-color: white;\nwidth: ");
+
+        retval.append("<html>\n<style>\nbody {\nbackground-color: white;\n}\n.page {");
+        retval.append("position: absolute;\nwidth: ");
         retval.append(width);
         retval.append(units);
         retval.append(";\nheight: ");
         retval.append(height);
         retval.append(units);
-        retval.append(";\n}\n");
+        retval.append(";\n}");
         
         retval.append(getSectionClass(report, "header", units, height, width));
         retval.append(getSectionClass(report, "body", units, height, width));
         retval.append(getSectionClass(report, "footer", units, height, width));
-        retval.append("</style>\n<body>\n<div>");
+        retval.append("</style>\n<body>");
         
         return retval.toString();
     }
     
     private String getHtmlClose() {
-        return "\n</div>\n</body>\n</html>";
+        return "\n</body>\n</html>";
     }
     
     private String getSectionClass(ReportDocument report, String section, String units, double height, double width) {

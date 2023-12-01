@@ -126,6 +126,15 @@ const AddEditComponentModal = (props) => {
                     }
                 });
 
+
+                if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
+                    let el = document.getElementById("rgne");
+                            
+                    if (el) {
+                        el.value = currentComponent.value.rowGap ? currentComponent.value.rowGap : 0;
+                    }
+                }
+                
                 if (currentComponent.value.dataColumns) {
                     setDataColumnCount(currentComponent.value.dataColumns.length);
                 } else {
@@ -188,6 +197,9 @@ const AddEditComponentModal = (props) => {
             case COMPONENT_TYPE_CURRENTDATE:
             case COMPONENT_TYPE_PAGENUMBER:
                 c.value[e.target.name] = e.target.options[e.target.selectedIndex].value;
+                break;
+            case COMPONENT_TYPE_DATARECORD:
+                c.value[e.target.name] = Number(e.target.value);
                 break;
             case COMPONENT_TYPE_DATAFIELD:
                 if (e.target.name === "selectColumnIndex") {
@@ -530,9 +542,20 @@ const AddEditComponentModal = (props) => {
     };
             
     const getDataComponentEntry = (type) => {
-        return <div className="report-query-column-select">
-            {getQuerySelectColumns(type)}
-         </div>;
+        if (type === COMPONENT_TYPE_DATARECORD) {
+            return <div>
+                <div className="entrygrid-125-100">
+                    <div className="label">{getText("Row Gap(pixels):")}</div><div><NumberEntry id="rgne" name="rowGap" onChange={e => setValue(e)} defaultValue={5} min={1} max={20}/></div>
+                </div>
+                <div className="report-query-column-select">
+                    {getQuerySelectColumns(type)}
+                </div>            
+            </div>;
+        } else {               
+            return <div className="report-query-column-select">
+                {getQuerySelectColumns(type)}
+            </div>;
+        }
     };
     
     const loadSelectColumnOptions = (sc) => {
@@ -650,6 +673,9 @@ const AddEditComponentModal = (props) => {
                 || (c.value.dataColumns.length !== dataColumnCount)) {
                 reformatDataComponent(currentReport, c);
             }
+    
+
+            
             config.saveComponent(c, config.componentIndex);
         } else {
             config.saveComponent(currentComponent, config.componentIndex);

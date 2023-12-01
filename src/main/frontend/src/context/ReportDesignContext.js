@@ -188,7 +188,7 @@ export const ReportDesignProvider = ({ children }) => {
             case COMPONENT_TYPE_DATARECORD:
                 retval.fontSettings2 = getNewFontSettings();
                 retval.borderSettings2 = getNewBorderSettings();
-                retval.value = {dataColumns: []};
+                retval.value = {dataColumns: [], rowGap: 0};
                 break;
         }
         

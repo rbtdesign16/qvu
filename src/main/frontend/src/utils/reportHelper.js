@@ -188,8 +188,8 @@ const getDataRecordComponentStyle = (component) => {
         display: "grid",
         gridTemplateColumns: component.value.gridTemplateColumns,
         margin: 0,
-        padding:0,
-        gridRowGap: "5px"
+        padding: (component.value.rowGap/2) + "px 0 " + (component.value.rowGap/2) + "px 0",
+        gridRowGap: 0
     };
     
     return retval;

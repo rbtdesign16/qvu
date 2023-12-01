@@ -51,7 +51,7 @@ public class ReportServiceImpl implements ReportService {
         
         if (StringUtils.isNotEmpty(report.getQueryDocumentName())) {
             QueryRunWrapper queryWrapper 
-                = new QueryRunWrapper(report.getUser(), 
+                = new QueryRunWrapper(report.getRunUser(), 
                     report.getQueryDocumentGroup(), 
                   report.getQueryDocumentName(), null);
             
@@ -81,10 +81,16 @@ public class ReportServiceImpl implements ReportService {
         for (int i = 0; i < pageCount; ++i) {
             retval.append(getHeaderHtml(report, queryResult, i+1));
             retval.append(getBodyHtml(report, queryResult, i + 1));
-            retval.append(getFooterHtml(report, queryResult, i + 1));
+            retval.append(getFooterHtml(report, queryResult, i + 1, pageCount));
         }
         
         retval.append(getHtmlClose());
+
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(retval.toString());
+        }
+        
         
         return retval.toString();
     }
@@ -92,7 +98,7 @@ public class ReportServiceImpl implements ReportService {
     private String getHeaderHtml(ReportDocument report, QueryResult queryResult, int page) {
         StringBuilder retval = new StringBuilder();
 
-        retval.append("<div class=\"sec-header\">");
+        retval.append("\n<div class=\"sec-header\">this is the header");
         
         
         retval.append("</div>");
@@ -102,17 +108,22 @@ public class ReportServiceImpl implements ReportService {
     
     private String getBodyHtml(ReportDocument report, QueryResult queryResult, int page) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<div class=\"sec-body\">");
+        retval.append("\n<div class=\"sec-body\">this is the body");
         
         
         retval.append("</div>");
         return retval.toString();
     }
     
-    private String getFooterHtml(ReportDocument report, QueryResult queryResult, int page) {
+    private String getFooterHtml(ReportDocument report, QueryResult queryResult, int page, int pageCount) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<div class=\"sec-footer\">");
         
+                        
+        if (pageCount > page) {
+            retval.append("\n<div style=\"break-after: page\" class=\"sec-footer\">this is the footer");
+        } else {
+            retval.append("\n<div class=\"sec-footer\">this is the footer");
+        }
         
         retval.append("</div>");
         
@@ -134,28 +145,35 @@ public class ReportServiceImpl implements ReportService {
             retval.append(Constants.PAGE_ORIENTATION_LANDSCAPE);
         }
         
-        retval.append(";}\n");
-        retval.append(getSectionClass(report, "header"));
-        retval.append(getSectionClass(report, "body"));
-        retval.append(getSectionClass(report, "footer"));
-        retval.append("</style><body><div>");
+        String units = report.getPageUnits().substring(0, 2);
+        double width = getReportWidth(report);
+        double height = getReportHeight(report);
+
+        retval.append(";}\nbody {\nbackground-color: white;\nwidth: ");
+        retval.append(width);
+        retval.append(units);
+        retval.append(";\nheight: ");
+        retval.append(height);
+        retval.append(units);
+        retval.append(";\n}\n");
         
+        retval.append(getSectionClass(report, "header", units, height, width));
+        retval.append(getSectionClass(report, "body", units, height, width));
+        retval.append(getSectionClass(report, "footer", units, height, width));
+        retval.append("</style>\n<body>\n<div>");
         
         return retval.toString();
     }
     
     private String getHtmlClose() {
-        return "</div></body></html>";
+        return "\n</div>\n</body>\n</html>";
     }
     
-    private String getSectionClass(ReportDocument report, String section) {
+    private String getSectionClass(ReportDocument report, String section, String units, double height, double width) {
         StringBuilder retval = new StringBuilder();
-        String units = report.getPageUnits().substring(0, 2);
         retval.append(".sec-");
         retval.append(section);
         retval.append("{\nposition: relative;\noverflow: hidden;");
-        double width = getReportWidth(report);
-        double height = getReportHeight(report);
         switch (section) {
             case Constants.REPORT_SECTION_HEADER:
                 retval.append("\nmargin: ");

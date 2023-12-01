@@ -11,7 +11,7 @@ import org.rbtdesign.qvu.util.Constants;
  * @author rbtuc
  */
 public class ReportDocument {
-    private String user;
+    private String runUser;
     private String name;
     private String path;
     private String createdBy;
@@ -175,11 +175,11 @@ public class ReportDocument {
         this.reportComponents = reportComponents;
     }
 
-    public String getUser() {
-        return user;
+    public String getRunUser() {
+        return runUser;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setRunUser(String runUser) {
+        this.runUser = runUser;
     }
-  }
+}

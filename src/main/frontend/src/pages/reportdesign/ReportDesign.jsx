@@ -134,6 +134,8 @@ const ReportDesign = () => {
     };
 
     const onRunReport = async() => {
+        let report = copyObject(currentReport);
+        report.runUser = authData.currentUser.userId;
         let res = await generateReport(currentReport);
 
         let blob = new Blob([res], {

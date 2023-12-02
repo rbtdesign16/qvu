@@ -3,12 +3,14 @@ import moment from "moment";
 import javadatefp from "moment-jdateformatparser";
 import SubComponent from "../pages/reportdesign/SubComponent";
 
-import {NONE_SETTING,
+import {
+    NONE_SETTING,
     TRANSPARENT_SETTING, 
     ITALIC_SETTING, 
     UNDERLINE_SETTING} from "./helper";
 
 export const COMPONENT_DRAG_DATA = "cinfo";
+export const SUBCOMPONENT_DRAG_DATA = "scinfo";
 export const MOVE_DROP_EFFECT = "move";
 export const OPACITY_OPTIONS = [1, 0.75, 0.5, 0.25];
 export const DEFAULT_BORDER_RADIUS = "10px";
@@ -55,6 +57,7 @@ export const TOFRONT_ACTION = "tofront";
 
 export const BORDER_STYLE_SOLID = "solid";
 
+export const COMPONENT_ID_PREFIX = "rc-";
 export const COMPONENT_TYPE_TEXT = "text";   
 export const COMPONENT_TYPE_IMAGE = "image";  
 export const COMPONENT_TYPE_SHAPE = "shape";  
@@ -276,7 +279,7 @@ const getGridTabularData = (component, exampleData, myStyle) => {
     
 const getGridSubComponents = (currentReport, component, type) => {
     return component.value.dataColumns.map((dc, indx) => {
-        return <SubComponent component={component} dataColumn={dc} dataColumnIndex={indx} type={type} units={currentReport.pageUnits}/>;
+        return <SubComponent component={component} dataColumn={dc} dataColumnIndex={indx} type={type} units={currentReport.pageUnits.substring(0, 2)}/>;
     });
 };
     
@@ -607,17 +610,30 @@ export const getComponentClassName = (comp) => {
     }
 };
 
-export const handleComponentDragStart = (e, componentIndex) => {
+export const handleComponentDragStart = (e, type, componentIndex) => {
     let rect = e.target.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
-    e.dataTransfer.setData(COMPONENT_DRAG_DATA, JSON.stringify({index: componentIndex, left: x, top: y}));
+    e.dataTransfer.setData(type, JSON.stringify({index: componentIndex, left: x, top: y}));
     e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
 };
 
 export const handleComponentDragOver = (e) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+    
+    let subtype = SUBCOMPONENT_DRAG_DATA + "-" + e.target.id;
+    // if this is the current cubcomponent parent
+    if (e.dataTransfer.types.includes(subtype)) {
+         e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+    } else {
+        // only allow component drag if not
+        // subcomponent drag (subcompoent data in types)
+        if (e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA)) < 0) {
+            e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+        } else {
+            e.dataTransfer.dropEffect = NONE_SETTING;
+        }
+    }
 };
 
 const isStopPropagationRequired = (component) => {

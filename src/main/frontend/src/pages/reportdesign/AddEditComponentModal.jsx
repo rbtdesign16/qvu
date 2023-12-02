@@ -60,7 +60,8 @@ import {
     reformatDataComponent,
     getQueryDataColumnDisplay,
     DEFAULT_DATA_TEXT_ALIGN,
-    GRID_LAYOUT_OPTIONS} from "../../utils/reportHelper";
+    GRID_LAYOUT_OPTIONS,
+    COMPONENT_ID_PREFIX} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;

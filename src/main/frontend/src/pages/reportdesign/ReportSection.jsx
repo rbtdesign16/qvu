@@ -7,7 +7,8 @@ import PropTypes from "prop-types";
 import {
     isNotEmpty,
     copyObject,
-    intersectRect
+    intersectRect,
+    NONE_SETTING
 } from "../../utils/helper";
 
 import {
@@ -28,6 +29,7 @@ import {
     getSizer,
     pixelPosToNumber,
     COMPONENT_DRAG_DATA,
+    SUBCOMPONENT_DRAG_DATA,
     isDataComponent
 } from "../../utils/reportHelper";
 
@@ -99,17 +101,23 @@ const ReportSection = (props) => {
 
     const handleDragOver = (e) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+        let pos = e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA));
+        if (pos < 0) {
+             e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+         } else {
+             let el = document.elementFromPoint(e.clientX, e.clientY);
+             
+             if (el && e.dataTransfer.types.includes(SUBCOMPONENT_DRAG_DATA + "-" + el.id)) {
+                 e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+             } else {
+                e.dataTransfer.dropEffect = NONE_SETTING;
+             }
+        }
     };
 
-    const isDropTargetSection = (tid) => {
-        return ((tid === REPORT_SECTION_BODY)
-        || (tid === REPORT_SECTION_HEADER)
-        || (tid === REPORT_SECTION_FOOTER));
-    };
-    
     const handleDrop = (e) => {
-        if (e.dataTransfer.getData(COMPONENT_DRAG_DATA)) {
+        if (e.dataTransfer.getData(SUBCOMPONENT_DRAG_DATA)) {
+        } else if (e.dataTransfer.getData(COMPONENT_DRAG_DATA)) {
             e.preventDefault();
             let cr = copyObject(currentReport);
             let cinfo = JSON.parse(e.dataTransfer.getData(COMPONENT_DRAG_DATA));

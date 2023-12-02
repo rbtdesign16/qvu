@@ -25,7 +25,9 @@ import {
     getComponentStyle,
     handleComponentDragStart,
     handleComponentDragOver,
-    onComponentClick
+    onComponentClick,
+    COMPONENT_DRAG_DATA,
+    COMPONENT_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportComponent = (props) => {
@@ -41,6 +43,7 @@ const ReportComponent = (props) => {
     } = useReportDesign();
     
     return <div 
+        id={COMPONENT_ID_PREFIX + componentIndex}
         className={getComponentClassName(component)}
         draggable={true} 
         style={getComponentStyle(currentReport, component)}
@@ -53,11 +56,11 @@ const ReportComponent = (props) => {
             lastSelectedIndex, 
             setLastSelectedIndex)} 
         onDragOver={e => handleComponentDragOver(e)}
-        onDragStart={e => handleComponentDragStart(e, componentIndex)}>
-        <SizingControl corner={TOP_LEFT} componentIndex={componentIndex} component={component}/>
-        <SizingControl corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
-        <SizingControl corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
-        <SizingControl corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
+        onDragStart={e => handleComponentDragStart(e, COMPONENT_DRAG_DATA, componentIndex)}>
+        <SizingControl type={COMPONENT_DRAG_DATA} corner={TOP_LEFT} componentIndex={componentIndex} component={component}/>
+        <SizingControl type={COMPONENT_DRAG_DATA} corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
+        <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
+        <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
         {getComponentValue(reportSettings, currentReport, component)}
     </div>; 
 };

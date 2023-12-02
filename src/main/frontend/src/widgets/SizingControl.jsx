@@ -12,19 +12,29 @@ import {
     pixelPosToNumber,
     reformatDataComponent,
     isDataComponent,
-    getSizer} from "../utils/reportHelper";
+    getSizer,
+    SUBCOMPONENT_DRAG_DATA,
+    COMPONENT_DRAG_DATA} from "../utils/reportHelper";
 
 const SizingControl = (props) => {
-    const {component, componentIndex, corner} = props;
+    const {type, component, componentIndex, corner} = props;
     const {
         currentReport,
         setCurrentReport
     } = useReportDesign();
 
+    const getCurrentSizer = () => {
+        if (type === COMPONENT_DRAG_DATA) {
+            return getSizer(component.section);
+        } else {
+            return getSizer(component.parentId);
+        }
+    };
+    
     const onHandleSize = (e) => {
         e.preventDefault();
-        let sz = getSizer(component.section);
-
+        let sz = getCurrentSizer();
+                
         let xdif = e.pageX - sz.startX;
         let ydif = e.pageY - sz.startY;
 
@@ -69,7 +79,7 @@ const SizingControl = (props) => {
 
     const onStopSize = (e) => {
         e.preventDefault();
-        let sz = getSizer(component.section);
+        let sz = getCurrentSizer();
         sz.style.display = "";
         sz.style.border = "";
         sz.startX = "";
@@ -87,17 +97,25 @@ const SizingControl = (props) => {
             reformatDataComponent(currentReport, c);
         }
         
-         let sec = document.getElementById(component.section);
-        sec.style.cursor = "crosshair";
-        sec.removeEventListener("mousemove", onHandleSize, true);
-        sec.removeEventListener("mouseup", onStopSize, true);
+        let p = getParent();
+        p.style.cursor = "crosshair";
+        p.removeEventListener("mousemove", onHandleSize, true);
+        p.removeEventListener("mouseup", onStopSize, true);
         setCurrentReport(cr);
     };
 
+    const getParent = () => {
+        if (type === COMPONENT_DRAG_DATA) {
+            return document.getElementById(component.section);
+        } else {
+            return document.getElementById(component.parentId);
+        }
+    };
+    
     const onMouseDown = (e) => {
         e.preventDefault();
         let units = currentReport.pageUnits.substring(0, 2);
-        let sz = getSizer(component.section);
+        let sz = getCurrentSizer();
         sz.style.left = reportUnitsToPixels(units, component.left) + "px";
         sz.style.top = reportUnitsToPixels(units, component.top) + "px";
         sz.style.width = reportUnitsToPixels(units, component.width) + "px";
@@ -106,20 +124,31 @@ const SizingControl = (props) => {
         sz.startX = e.pageX;
         sz.startY = e.pageY;
 
-        let sec = document.getElementById(component.section);
-        sec.style.cursor = "crosshair";
-        sec.addEventListener("mousemove", onHandleSize, true);
-        sec.addEventListener("mouseup", onStopSize, true);
+
+        let p = getParent();
+        p.style.cursor = "crosshair";
+        p.addEventListener("mousemove", onHandleSize, true);
+        p.addEventListener("mouseup", onStopSize, true);
+    };
+
+    const getStyle = () => {
+        if (type === COMPONENT_DRAG_DATA) {
+            return {zIndex: 10};
+        } else {
+            return {};
+        }
     };
 
     return (
             <div 
+                style={getStyle()}
                 onMouseDown={e => onMouseDown(e)}
                 className={"sizing-" + corner}></div>
             );
 };
 
 SizingControl.propTypes = {
+    type:  PropTypes.string.isRequired,
     component: PropTypes.object.isRequired,
     componentIndex: PropTypes.number.isRequired,
     corner: PropTypes.string.isRequired

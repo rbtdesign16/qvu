@@ -22,7 +22,8 @@ import {
     pixelsToReportUnits,
     updateComponentFontSettings,
     updateComponentBorderSettings,
-    getQueryDataColumnDisplay
+    getQueryDataColumnDisplay,
+    SUBCOMPONENT_DRAG_DATA
 } from "../../utils/reportHelper";
 
 const SubComponent = (props) => {
@@ -60,7 +61,7 @@ const SubComponent = (props) => {
             if (type === "label") {
                 return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings.size)/2) * dataColumnIndex)) + units;
             } else {
-                return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings2.size)/2) * dataColumnIndex)) + units;
+                return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings2.size)/2) * (dataColumnIndex + 1.5))) + units;
             }
         }
     };
@@ -79,7 +80,7 @@ const SubComponent = (props) => {
     };
 
     const getHeight = () => {
-        if (dataColumn.left) {
+        if (dataColumn.height) {
             return dataColumn.height + units;
         } else {
             if (type === "label") {
@@ -96,7 +97,8 @@ const SubComponent = (props) => {
             left: getLeftPosition(),
             top: getTopPosition(),
             width: getWidth(),
-            height: getHeight()
+            height: getHeight(),
+            outline: "dashed 1px blue"
         };
         
         if (type === "label") {
@@ -108,17 +110,19 @@ const SubComponent = (props) => {
             updateComponentFontSettings(component, "fontSettings2", retval);
             updateComponentBorderSettings(component, "borderSettings2", retval);
         }  
+        
+        return retval;
     };
     
     return <div 
         style={getStyle()}
         draggable={true} 
         onDragOver={e => handleComponentDragOver(e)}
-        onDragStart={e => handleComponentDragStart(e, dataColumnIndex)}>
-        <SizingControl corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex)}>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
         {getValue()}
     </div>; 
 };

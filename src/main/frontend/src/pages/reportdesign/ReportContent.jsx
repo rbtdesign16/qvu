@@ -56,7 +56,8 @@ import {
     pixelsToReportUnits,
     PIXELS_PER_KEYDOWN_MOVE,
     isQueryRequiredForReportObject,
-    getComponentTypeDisplayText
+    getComponentTypeDisplayText,
+    COMPONENT_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportContent = (props) => {
@@ -302,8 +303,16 @@ const ReportContent = (props) => {
         if (componentIndex > -1) {
             cr.reportComponents.splice(componentIndex, 1, component);
         } else {
+            componentIndex = cr.reportComponents.length;
             cr.reportComponents.push(component);
         }
+        
+        if (component.type === COMPONENT_TYPE_DATAGRID) {
+            for (let i = 0; i < component.value.dataColumns.length; ++i) {
+                component.value.dataColumns[i].parentId = COMPONENT_ID_PREFIX + componentIndex;
+            }
+        }
+        
         setCurrentComponent(null);
         setCurrentReport(cr);
     };

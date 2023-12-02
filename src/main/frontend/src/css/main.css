@@ -239,6 +239,7 @@ img {
     font-size: var(--default-label-font-size);
     font-weight: var(--default-font-weight);
     color: var(--default-label-font-color);
+    cursor: pointer;
 }
 
 

@@ -149,7 +149,7 @@ const AddEditComponentModal = (props) => {
                     let sc = copyObject(currentQuery.selectColumns[0]);
                     sc.selectColumnIndex = 0;
                     c.value.dataColumns.push(sc);
-                    c.value.textALign = DEFAULT_DATA_TEXT_ALIGN;
+                    c.value.textAlign = DEFAULT_DATA_TEXT_ALIGN;
                     setCurrentComponent(c);
                 }
             }
@@ -503,7 +503,7 @@ const AddEditComponentModal = (props) => {
                 let wantFormat = isColumnFormatAvailable(sc);
                 let isnum = isDataTypeNumeric(sc.dataType);
                 let showAddTotal = isnum && (type === COMPONENT_TYPE_DATAGRID);
-                return <div key={"sce-" + indx} className="report-query-column">
+                return <div key={getUUID()} className="report-query-column">
                         <div draggable={true} 
                             className="detail-hdr"
                             id={"scol-" + indx}  
@@ -513,10 +513,10 @@ const AddEditComponentModal = (props) => {
                             <span>
                                 <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))} />
                                 <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
-                                <span style = {{float: "right", marginRight: "15px"}}>
-                                    <input key={getUUID()} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor="selected">{getText("Include Column")}</label>
-                                    { showAddTotal && <input style={{marginLeft: "10px"}} key={getUUID()} name="addTotal" type="checkbox" checked={sc.addTotal} onChange={e => setQueryValue(e, indx)} /> }
-                                    { showAddTotal && <label className="ck-label" htmlFor="totalData">{getText("Add Total")}</label>}
+                                <span style={{float: "right", marginRight: "15px"}}>
+                                    <input id={"sel-" + indx}  name="selected" type="checkbox" defaultChecked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor={"sel-" + indx}>{getText("Include Column")}</label>
+                                    { showAddTotal && <input id={"at-" + indx} style={{marginLeft: "10px"}}  name="addTotal" type="checkbox" defaultChecked={sc.addTotal} onChange={e => setQueryValue(e, indx)} /> }
+                                    { showAddTotal && <label className="ck-label" htmlFor={"at-" + indx}>{getText("Add Total")}</label>}
                                 </span>    
                             </span>
                         </div>
@@ -699,8 +699,6 @@ const AddEditComponentModal = (props) => {
                 || (c.value.dataColumns.length !== dataColumnCount)) {
                 reformatDataComponent(currentReport, c);
             }
-    
-
             
             config.saveComponent(c, config.componentIndex);
         } else {

@@ -1,6 +1,7 @@
 import {copyObject} from "./helper";
 import moment from "moment";
 import javadatefp from "moment-jdateformatparser";
+import SubComponent from "../pages/reportdesign/SubComponent";
 
 import {NONE_SETTING,
     TRANSPARENT_SETTING, 
@@ -273,6 +274,12 @@ const getGridTabularData = (component, exampleData, myStyle) => {
     });
 };
     
+const getGridSubComponents = (currentReport, component, type) => {
+    return component.value.dataColumns.map((dc, indx) => {
+        return <SubComponent component={component} dataColumn={dc} dataColumnIndex={indx} type={type} units={currentReport.pageUnits}/>;
+    });
+};
+    
 const getDataGridComponentValue = (currentReport, component) => {
     if (component.value.gridLayout === GRID_LAYOUT_TABULAR) {
         let headerStyle = getGridTabularHeaderStyle(component);
@@ -283,7 +290,8 @@ const getDataGridComponentValue = (currentReport, component) => {
         </div>;
     } else {
         return <div>
-            this is the grid freeform style
+           {getGridSubComponents(currentReport, component, "label")}
+           {getGridSubComponents(currentReport, component, "data")}
         </div>;
     }
 };

@@ -9,7 +9,7 @@ import {
     BOTTOM_RIGHT,
     pixelsToReportUnits,
     reportUnitsToPixels,
-    pixelPosToNumber,
+    elementPosToNumber,
     reformatDataComponent,
     isDataComponent,
     getSizer,
@@ -43,10 +43,10 @@ const SizingControl = (props) => {
         sz.startY = e.pageY;
 
 
-        let top = pixelPosToNumber(pixelPosToNumber(sz.style.top));
-        let left = pixelPosToNumber(pixelPosToNumber(sz.style.left));
-        let width = pixelPosToNumber(pixelPosToNumber(sz.style.width));
-        let height = pixelPosToNumber(pixelPosToNumber(sz.style.height));
+        let top = elementPosToNumber(sz.style.top);
+        let left = elementPosToNumber(sz.style.left);
+        let width = elementPosToNumber(sz.style.width);
+        let height = elementPosToNumber(sz.style.height);
 
         switch (corner) {
             case TOP_LEFT:
@@ -92,25 +92,20 @@ const SizingControl = (props) => {
                 
                 
         let units = currentReport.pageUnits.substring(0, 2);
-        console.log("----->type=" + type + ", subType=" + subType);
 
         if (type === SUBCOMPONENT_DRAG_DATA) {
-            let pc =  cr.reportComponents[Number(component.parentId.replace(COMPONENT_ID_PREFIX, ""))];
-            c = pc.value.dataColumns[componentIndex];
-        console.log("----->2=" + JSON.stringify(c));
-            c[subType + "Left"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
-            c[subType + "Top"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
-            c[subType + "Width"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
-            c[subType + "Height"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
-        console.log("----->3=" + JSON.stringify(c));
-            reformatDataComponent(currentReport, pc);
+            let pc = cr.reportComponents[Number(component.parentId.replace(COMPONENT_ID_PREFIX, ""))];
+             c = pc.value.dataColumns[componentIndex];
+            c[subType + "Left"] = pixelsToReportUnits(units, elementPosToNumber(sz.style.left));
+            c[subType + "Top"] = pixelsToReportUnits(units, elementPosToNumber(sz.style.top));
+            c[subType + "Width"] = pixelsToReportUnits(units, elementPosToNumber(sz.style.width));
+            c[subType + "Height"] = pixelsToReportUnits(units, elementPosToNumber(sz.style.height));
         } else {
-        console.log("----->4=");
             let c = cr.reportComponents[componentIndex];
-            c.left = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
-            c.top = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
-            c.width = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
-            c.height = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
+            c.left = pixelsToReportUnits(units, elementPosToNumber(sz.style.left));
+            c.top = pixelsToReportUnits(units, elementPosToNumber(sz.style.top));
+            c.width = pixelsToReportUnits(units, elementPosToNumber(sz.style.width));
+            c.height = pixelsToReportUnits(units, elementPosToNumber(sz.style.height));
             if (isDataComponent(type)) {
                 reformatDataComponent(currentReport, c);
             }
@@ -135,12 +130,11 @@ const SizingControl = (props) => {
         e.preventDefault();
         let units = currentReport.pageUnits.substring(0, 2);
         let sz = getCurrentSizer();
-        
-        if (type === SUBCOMPONENT_DRAG_DATA) {
-            sz.style.left = reportUnitsToPixels(units, component[subType +" Left"]) + "px";
-            sz.style.top = reportUnitsToPixels(units, component[subType +" Top"]) + "px";
-            sz.style.width = reportUnitsToPixels(units, component[subType +" Width"]) + "px";
-            sz.style.height = reportUnitsToPixels(units, component[subType +" Height"]) + "px";
+        if (type && (type === SUBCOMPONENT_DRAG_DATA)) {
+            sz.style.left = reportUnitsToPixels(units, component[subType + "Left"]) + "px";
+            sz.style.top = reportUnitsToPixels(units, component[subType + "Top"]) + "px";
+            sz.style.width = reportUnitsToPixels(units, component[subType + "Width"]) + "px";
+            sz.style.height = reportUnitsToPixels(units, component[subType + "Height"]) + "px";
         } else {
             sz.style.left = reportUnitsToPixels(units, component.left) + "px";
             sz.style.top = reportUnitsToPixels(units, component.top) + "px";
@@ -169,7 +163,7 @@ const SizingControl = (props) => {
     return (
             <div 
                 style={getStyle()}
-                onMouseDown={e => onMouseDown(e)}
+                onMouseDown={e => onMouseDown(e, type)}
                 className={"sizing-" + corner}></div>
             );
 };

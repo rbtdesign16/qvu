@@ -27,7 +27,8 @@ import {
     updateComponentFontSettings,
     updateComponentBorderSettings,
     getQueryDataColumnDisplay,
-    SUBCOMPONENT_DRAG_DATA
+    SUBCOMPONENT_DRAG_DATA,
+    DATA_COLUMN_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const SubComponent = (props) => {
@@ -46,70 +47,25 @@ const SubComponent = (props) => {
         }
     };
     
-    const getLeftPosition = () => {
-        if (dataColumn[type + "Left"]) {
-            return dataColumn[type + "Left"] + units;
-        } else {
-            if (type === LABEL_TYPE) {
-                return pixelsToReportUnits(units, (5 * dataColumnIndex)) + units;
-            } else {
-                return pixelsToReportUnits(units, (5 * dataColumnIndex) + 100) + units;
-            }
-        }
-    };
-    
-    const getTopPosition = () => {
-        if (dataColumn[type + "Top"]) {
-            return dataColumn[type + "Top"] + units;
-        } else {
-            if (type === LABEL_TYPE) {
-                return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings.size)/2) * dataColumnIndex)) + units;
-            } else {
-                return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings2.size)/2) * (dataColumnIndex + 1.5))) + units;
-            }
-        }
-    };
-    
-    const getWidth = () => {
-        if (dataColumn[type + "Width"]) {
-            return dataColumn[type + "Width"] + units;
-        } else {
-            
-            if (type === LABEL_TYPE) {
-                return 1 + units;
-            } else {
-                return 1 + units;
-            }
-        }
-    };
-
-    const getHeight = () => {
-        if (dataColumn[type + "Height"]) {
-            return dataColumn[type + "Height"] + units;
-        } else {
-            if (type === LABEL_TYPE) {
-                return pixelsToReportUnits(units, PIXELS_PER_POINT * component.fontSettings.size) + units;
-            } else {
-                return pixelsToReportUnits(units, PIXELS_PER_POINT * component.fontSettings2.size) + units;
-            }
-        }
-    };
-    
     const getStyle = () => {
+        let gstyle = getComputedStyle(document.documentElement);
+
         let retval = {
             position: "absolute",
-            left: getLeftPosition(),
-            top: getTopPosition(),
-            width: getWidth(),
-            height: getHeight(),
-            outline: "dashed 1px blue"
+            left: dataColumn[type + "Left"] + units,
+            top: dataColumn[type + "Top"] + units,
+            width: dataColumn[type + "Width"] + units,
+            height: dataColumn[type + "Height"] + units,
         };
-        
+
+
         if (type === LABEL_TYPE) {
+            retval.outline = gstyle.getPropertyValue('--data-grid-label-border');
             retval.textAlign = dataColumn.headerTextAlign;
             updateComponentFontSettings(component, "fontSettings", retval);
             updateComponentBorderSettings(component, "borderSettings", retval);
         } else {
+            retval.outline = gstyle.getPropertyValue('--data-grid-data-border');
             retval.textAlign = dataColumn.dataTextAlign;
             updateComponentFontSettings(component, "fontSettings2", retval);
             updateComponentBorderSettings(component, "borderSettings2", retval);
@@ -119,6 +75,7 @@ const SubComponent = (props) => {
     };
     
     return <div 
+        id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}
         style={getStyle()}
         draggable={true} 
         onDragOver={e => handleComponentDragOver(e)}

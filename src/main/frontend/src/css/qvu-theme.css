@@ -81,4 +81,7 @@
     --sizing-rect-width-hover: 10px;
     --sizing-corner-border: solid 2px crimson;
     --sizing-border: solid 1px crimson;
+    
+    --data-grid-label-border: dashed 1px blue;
+    --data-grid-data-border: dashed 1px darkgreen;
 }

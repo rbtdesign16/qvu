@@ -10,6 +10,7 @@ import {
     UNDERLINE_SETTING,
     LABEL_TYPE,
     DATA_TYPE,
+    isNotEmpty
 } from "./helper";
 
 export const COMPONENT_DRAG_DATA = "cinfo";
@@ -61,7 +62,7 @@ export const TOBACK_ACTION = "toback";
 export const TOFRONT_ACTION = "tofront";
 
 export const BORDER_STYLE_SOLID = "solid";
-
+export const DATA_COLUMN_ID_PREFIX = "dc-";
 export const COMPONENT_ID_PREFIX = "rc-";
 export const COMPONENT_TYPE_TEXT = "text";   
 export const COMPONENT_TYPE_IMAGE = "image";  
@@ -102,9 +103,11 @@ export const DEFAULT_DATA_TEXT_ALIGN = "center";
 export const BOLD_FONT_WEIGHT = 700;
 export const STANDARD_FONT_WEIGHT = 400;
 
-export const pixelPosToNumber = (pos) => {
-    if (pos) {
-        return Number(pos.replace("px", ""));
+export const elementPosToNumber = (pos) => {
+    if (pos && pos.replace) {
+        return Number(pos.replace("px", "").replace("in", "").replace("mm", ""));
+    } else {
+        return pos;
     }
 };
 
@@ -537,8 +540,35 @@ export const reformatDataComponent = (currentReport, component) => {
             }
         
             component.value.gridTemplateColumns = gtc.trim();
-        } 
-    } else {
+        } else {
+            // new setup - set the sizes
+            if (component.value.dataColumns
+                && (component.value.dataColumns.length > 0)
+                && !component.value.dataColumns[0].labelWidth
+                && !component.value.dataColumns[0].dataWidth) {
+                for (let i = 0; i < component.value.dataColumns.length; ++i) {
+                    component.value.dataColumns[i].labelLeft = pixelsToReportUnits(unit, (5 * i));
+                    component.value.dataColumns[i].dataLeft = pixelsToReportUnits(unit, (5 * i) + 100);
+
+                    component.value.dataColumns[i].labelTop = pixelsToReportUnits(unit, (((PIXELS_PER_POINT * component.fontSettings.size)/2) * i));
+                    component.value.dataColumns[i].dataTop = pixelsToReportUnits(unit, (((PIXELS_PER_POINT * component.fontSettings2.size)/2) * (i + 1.5)));
+
+                    let haveLabel = isNotEmpty(component.value.dataColumns[i].displayName);
+
+                    if (unit === REPORT_UNITS_MM) {
+                        component.value.dataColumns[i].labelWidth = haveLabel ? 30 : 0;
+                        component.value.dataColumns[i].dataWidth = 30;
+                    } else {
+                        component.value.dataColumns[i].labelWidth = haveLabel ? 1 : 0;
+                        component.value.dataColumns[i].dataWidth = 1;
+                    }
+
+                    component.value.dataColumns[i].labelHeight = haveLabel ? pixelsToReportUnits(unit, PIXELS_PER_POINT * component.fontSettings.size) : 0;
+                    component.value.dataColumns[i].dataHeight = pixelsToReportUnits(unit, PIXELS_PER_POINT * component.fontSettings2.size);
+                }
+            }
+        }
+     } else {
         if (!component.value.gridTemplateColumns) {
             let maxWidth = 0;
             for (let i = 0; i < component.value.dataColumns.length; ++i) {

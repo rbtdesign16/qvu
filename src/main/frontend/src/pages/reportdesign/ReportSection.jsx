@@ -29,11 +29,12 @@ import {
     BOTTOM_LEFT,
     BOTTOM_RIGHT,
     getSizer,
-    pixelPosToNumber,
+    elementPosToNumber,
     COMPONENT_DRAG_DATA,
     SUBCOMPONENT_DRAG_DATA,
     isDataComponent,
-    RESIZER_ID_PREFIX
+    RESIZER_ID_PREFIX,
+    COMPONENT_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
@@ -124,9 +125,8 @@ const ReportSection = (props) => {
         if (el && e.dataTransfer.types.includes(SUBCOMPONENT_DRAG_DATA + "-" + el.id)) {
              e.preventDefault();
             let scinfo = JSON.parse(e.dataTransfer.getData(SUBCOMPONENT_DRAG_DATA + "-" + el.id));
-
             let cr = copyObject(currentReport);
-            let cindx = Number(el.id.replace("rc-", ""));
+            let cindx = Number(el.id.replace(COMPONENT_ID_PREFIX, ""));
             
             let c = cr.reportComponents[cindx];
             let sc = c.value.dataColumns[scinfo.index];
@@ -222,8 +222,8 @@ const ReportSection = (props) => {
         e.preventDefault();
         let sz = getSizer(section);
         
-        let width = pixelPosToNumber(sz.style.width);
-        let height =  pixelPosToNumber(sz.style.height);
+        let width = elementPosToNumber(sz.style.width);
+        let height =  elementPosToNumber(sz.style.height);
 
         let sec = document.getElementById(section);
         sec.style.cursor = "default";
@@ -233,10 +233,10 @@ const ReportSection = (props) => {
         if ((width >= MIN_LASSO_CHANGE) || (height >= MIN_LASSO_CHANGE)) {
             let cr = copyObject(currentReport);
  
-            let rc1 = {left: pixelPosToNumber(sz.style.left), 
-                top: pixelPosToNumber(sz.style.top), 
-                right: pixelPosToNumber(sz.style.left) + width, 
-                bottom: pixelPosToNumber(sz.style.top) +height};
+            let rc1 = {left: elementPosToNumber(sz.style.left), 
+                top: elementPosToNumber(sz.style.top), 
+                right: elementPosToNumber(sz.style.left) + width, 
+                bottom: elementPosToNumber(sz.style.top) +height};
 
             for (let i = 0; i < cr.reportComponents.length; ++i) {
                 let c = cr.reportComponents[i];
@@ -280,21 +280,23 @@ const ReportSection = (props) => {
      };
 
     const onMouseDown = (e) => {
-        if (e.target.id && (e.target.id === section)) {
-            let sz = getSizer(section);
-            let sec = document.getElementById(section);
-            let rc = sec.getBoundingClientRect();
-            sec.style.cursor = "crosshair";
-            sz.startX = e.clientX - rc.left;
-            sz.startY =  e.clientY - rc.top;
-            
-            sz.style.left = sz.startX + "px";
-            sz.style.top = sz.startY + "px";
-            sz.style.width = sz.style.height = 0;
-            sz.style.display = "inline-block";
-           
-            sec.addEventListener("mousemove", onHandleLasso, true);
-            sec.addEventListener("mouseup", onStopLasso, true);
+        if (e.target.id) {
+            if (e.target.id === section) {
+                let sz = getSizer(section);
+                let sec = document.getElementById(section);
+                let rc = sec.getBoundingClientRect();
+                sec.style.cursor = "crosshair";
+                sz.startX = e.clientX - rc.left;
+                sz.startY =  e.clientY - rc.top;
+
+                sz.style.left = sz.startX + "px";
+                sz.style.top = sz.startY + "px";
+                sz.style.width = sz.style.height = 0;
+                sz.style.display = "inline-block";
+
+                sec.addEventListener("mousemove", onHandleLasso, true);
+                sec.addEventListener("mouseup", onStopLasso, true);
+            } 
         }
     };
 

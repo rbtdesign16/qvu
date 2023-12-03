@@ -7,14 +7,17 @@ import {
     NONE_SETTING,
     TRANSPARENT_SETTING, 
     ITALIC_SETTING, 
-    UNDERLINE_SETTING} from "./helper";
+    UNDERLINE_SETTING,
+    LABEL_TYPE,
+    DATA_TYPE,
+} from "./helper";
 
 export const COMPONENT_DRAG_DATA = "cinfo";
 export const SUBCOMPONENT_DRAG_DATA = "scinfo";
 export const MOVE_DROP_EFFECT = "move";
 export const OPACITY_OPTIONS = [1, 0.75, 0.5, 0.25];
 export const DEFAULT_BORDER_RADIUS = "10px";
-    
+ 
 const getPPI = () => {
     const el = document.createElement('div');
     el.style = "width: 1in;";
@@ -44,6 +47,8 @@ export const REPORT_SECTION_FOOTER = "footer";
 export const REPORT_SECTION_BORDER = "solid 1px blue";
 
 export const MAX_UNDOS = 3;
+
+export const RESIZER_ID_PREFIX = "sz-";
 
 // use for sizing logic
 export const COMPONENT_SIZING_RECT_WIDTH = 5;
@@ -103,8 +108,8 @@ export const pixelPosToNumber = (pos) => {
     }
 };
 
-export const getSizer = (sec) => {
-    return document.getElementById("sz-" + sec);
+export const getSizer = (id) => {
+   return document.getElementById(RESIZER_ID_PREFIX + id);
 };
     
 export const pixelsToReportUnits = (type, pixels) => {
@@ -293,8 +298,8 @@ const getDataGridComponentValue = (currentReport, component) => {
         </div>;
     } else {
         return <div>
-           {getGridSubComponents(currentReport, component, "label")}
-           {getGridSubComponents(currentReport, component, "data")}
+           {getGridSubComponents(currentReport, component, LABEL_TYPE)}
+           {getGridSubComponents(currentReport, component, DATA_TYPE)}
         </div>;
     }
 };
@@ -532,8 +537,7 @@ export const reformatDataComponent = (currentReport, component) => {
             }
         
             component.value.gridTemplateColumns = gtc.trim();
-        } else {
-        }
+        } 
     } else {
         if (!component.value.gridTemplateColumns) {
             let maxWidth = 0;
@@ -559,9 +563,13 @@ export const reformatDataComponent = (currentReport, component) => {
 };
 
 export const isDataComponent = (type) => {
-    return type = ((type === COMPONENT_TYPE_DATAGRID) 
+    return ((type === COMPONENT_TYPE_DATAGRID) 
         || (type === COMPONENT_TYPE_DATARECORD)
         || (type === COMPONENT_TYPE_DATAFIELD));
+};
+
+export const isDataGridComponent = (type) => {
+    return (type === COMPONENT_TYPE_DATAGRID);
 };
 
 export const getDefaultComponentStyle = (component, unit) => {
@@ -610,11 +618,11 @@ export const getComponentClassName = (comp) => {
     }
 };
 
-export const handleComponentDragStart = (e, type, componentIndex) => {
+export const handleComponentDragStart = (e, type, componentIndex, additionalInfo) => {
     let rect = e.target.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
-    e.dataTransfer.setData(type, JSON.stringify({index: componentIndex, left: x, top: y}));
+    e.dataTransfer.setData(type, JSON.stringify({index: componentIndex, left: x, top: y, additionalInfo: additionalInfo}));
     e.dataTransfer.effectAllowed = MOVE_DROP_EFFECT;
 };
 
@@ -672,7 +680,7 @@ export const onComponentClick = (e,
 
 export const isQueryRequiredForReportObject = (type) => {
     let check = type.toLowerCase();
-    return (check.includes("data") || check.includes("chart"));
+    return (check.includes(DATA_TYPE) || check.includes("chart"));
 };
    
 export const getReportWidthInPixels = (report, reportSettings) => {

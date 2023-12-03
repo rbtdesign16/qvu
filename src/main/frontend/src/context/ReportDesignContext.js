@@ -27,7 +27,9 @@ import {
     DEFAULT_PAGE_NUMBER_FORMAT,
     DEFAULT_CURRENT_DATE_FORMAT,
     GRID_LAYOUT_TABULAR,
-    GRID_LAYOUT_FREEFORM
+    GRID_LAYOUT_FREEFORM,
+    getReportWidth,
+    getReportHeight
     } from "../utils/reportHelper";
 
 export const ReportDesignContext = createContext();
@@ -101,18 +103,43 @@ export const ReportDesignProvider = ({ children }) => {
         };
     };
     
-    const getNewComponentPosition = () => {
-        if (currentReport.pageUnits === REPORT_UNITS_MM) {
-            return DEFAULT_MM_COMPONENT_POS;
-        } else {
-            return DEFAULT_INCH_COMPONENT_POS;
+    const getNewComponentPosition = (type) => {
+        let retval;
+        switch (type) {
+            case COMPONENT_TYPE_DATAGRID:
+            case COMPONENT_TYPE_DATARECORD:
+                if (currentReport.pageUnits === REPORT_UNITS_MM) {
+                    retval = {
+                        left: 5, 
+                        top: 5, 
+                        height: getReportWidth(currentReport, reportSettings) / 4, 
+                        width: getReportWidth(currentReport, reportSettings) / 2
+                    };
+                } else {
+                    retval = {
+                        left: 0.5, 
+                        top: 0.5, 
+                        height: getReportWidth(currentReport, reportSettings) / 4, 
+                        width: getReportWidth(currentReport, reportSettings) / 2
+                    };
+                }
+                break;
+            default: 
+                if (currentReport.pageUnits === REPORT_UNITS_MM) {
+                    retval = DEFAULT_MM_COMPONENT_POS;
+                } else {
+                    retval = DEFAULT_INCH_COMPONENT_POS;
+                }
+                break;
         }
-    };
+        
+        return retval;
+};
     
     const getNewComponent = (section, type, value, pos) => {
         
         if (!pos) {
-            pos = getNewComponentPosition();
+            pos = getNewComponentPosition(type);
         }
         
         let retval =  {

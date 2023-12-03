@@ -27,7 +27,9 @@ import {
     handleComponentDragOver,
     onComponentClick,
     COMPONENT_DRAG_DATA,
-    COMPONENT_ID_PREFIX
+    COMPONENT_ID_PREFIX,
+    isDataGridComponent,
+    RESIZER_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportComponent = (props) => {
@@ -61,6 +63,7 @@ const ReportComponent = (props) => {
         <SizingControl type={COMPONENT_DRAG_DATA} corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
         <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
         <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
+        {isDataGridComponent(component.type) && <div id={RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + componentIndex} className="resizer"></div>}
         {getComponentValue(reportSettings, currentReport, component)}
     </div>; 
 };

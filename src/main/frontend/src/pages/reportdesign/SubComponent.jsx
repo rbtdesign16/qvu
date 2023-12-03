@@ -3,7 +3,11 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import SizingControl from "../../widgets/SizingControl"
 import useReportDesign from "../../context/ReportDesignContext";
-import { copyObject } from "../../utils/helper";
+import { 
+    copyObject,
+    DATA_TYPE,
+    LABEL_TYPE
+} from "../../utils/helper";
 
 import {
     MOVE_DROP_EFFECT,
@@ -27,7 +31,7 @@ import {
 } from "../../utils/reportHelper";
 
 const SubComponent = (props) => {
-    const {component, dataColumn, dataColumnIndex, type, units} = props;
+    const {component, componentIndex, dataColumn, dataColumnIndex, type, units} = props;
     const {
         reportSettings,
         currentReport,
@@ -35,7 +39,7 @@ const SubComponent = (props) => {
      } = useReportDesign();
     
     const getValue = () => {
-        if (type === "label") {
+        if (type === LABEL_TYPE) {
             return dataColumn.displayName;
         } else {
             return getQueryDataColumnDisplay(dataColumn);
@@ -43,22 +47,22 @@ const SubComponent = (props) => {
     };
     
     const getLeftPosition = () => {
-        if (dataColumn.left) {
-            return dataColumn.left + units;
+        if (dataColumn[type + "Left"]) {
+            return dataColumn[type + "Left"] + units;
         } else {
-            if (type === "label") {
+            if (type === LABEL_TYPE) {
                 return pixelsToReportUnits(units, (5 * dataColumnIndex)) + units;
             } else {
-                return pixelsToReportUnits(units, (5 * dataColumnIndex) + 20) + units;
+                return pixelsToReportUnits(units, (5 * dataColumnIndex) + 100) + units;
             }
         }
     };
     
     const getTopPosition = () => {
-        if (dataColumn.left) {
-            return dataColumn.top + units;
+        if (dataColumn[type + "Top"]) {
+            return dataColumn[type + "Top"] + units;
         } else {
-            if (type === "label") {
+            if (type === LABEL_TYPE) {
                 return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings.size)/2) * dataColumnIndex)) + units;
             } else {
                 return pixelsToReportUnits(units, (((PIXELS_PER_POINT * component.fontSettings2.size)/2) * (dataColumnIndex + 1.5))) + units;
@@ -67,11 +71,11 @@ const SubComponent = (props) => {
     };
     
     const getWidth = () => {
-        if (dataColumn.left) {
-            return dataColumn.height + units;
+        if (dataColumn[type + "Width"]) {
+            return dataColumn[type + "Width"] + units;
         } else {
             
-            if (type === "label") {
+            if (type === LABEL_TYPE) {
                 return 1 + units;
             } else {
                 return 1 + units;
@@ -80,10 +84,10 @@ const SubComponent = (props) => {
     };
 
     const getHeight = () => {
-        if (dataColumn.height) {
-            return dataColumn.height + units;
+        if (dataColumn[type + "Height"]) {
+            return dataColumn[type + "Height"] + units;
         } else {
-            if (type === "label") {
+            if (type === LABEL_TYPE) {
                 return pixelsToReportUnits(units, PIXELS_PER_POINT * component.fontSettings.size) + units;
             } else {
                 return pixelsToReportUnits(units, PIXELS_PER_POINT * component.fontSettings2.size) + units;
@@ -101,7 +105,7 @@ const SubComponent = (props) => {
             outline: "dashed 1px blue"
         };
         
-        if (type === "label") {
+        if (type === LABEL_TYPE) {
             retval.textAlign = dataColumn.headerTextAlign;
             updateComponentFontSettings(component, "fontSettings", retval);
             updateComponentBorderSettings(component, "borderSettings", retval);
@@ -118,11 +122,11 @@ const SubComponent = (props) => {
         style={getStyle()}
         draggable={true} 
         onDragOver={e => handleComponentDragOver(e)}
-        onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex)}>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex, type)}>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
         {getValue()}
     </div>; 
 };

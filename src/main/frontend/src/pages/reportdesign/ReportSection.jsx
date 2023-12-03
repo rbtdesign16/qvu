@@ -8,7 +8,9 @@ import {
     isNotEmpty,
     copyObject,
     intersectRect,
-    NONE_SETTING
+    NONE_SETTING,
+    DATA_TYPE,
+    LABEL_TYPE
 } from "../../utils/helper";
 
 import {
@@ -30,7 +32,8 @@ import {
     pixelPosToNumber,
     COMPONENT_DRAG_DATA,
     SUBCOMPONENT_DRAG_DATA,
-    isDataComponent
+    isDataComponent,
+    RESIZER_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
@@ -116,7 +119,33 @@ const ReportSection = (props) => {
     };
 
     const handleDrop = (e) => {
-        if (e.dataTransfer.getData(SUBCOMPONENT_DRAG_DATA)) {
+        let el = document.elementFromPoint(e.clientX, e.clientY);
+
+        if (el && e.dataTransfer.types.includes(SUBCOMPONENT_DRAG_DATA + "-" + el.id)) {
+             e.preventDefault();
+            let scinfo = JSON.parse(e.dataTransfer.getData(SUBCOMPONENT_DRAG_DATA + "-" + el.id));
+
+            let cr = copyObject(currentReport);
+            let cindx = Number(el.id.replace("rc-", ""));
+            
+            let c = cr.reportComponents[cindx];
+            let sc = c.value.dataColumns[scinfo.index];
+            
+            let rect = document.getElementById(sc.parentId).getBoundingClientRect();
+
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+ 
+            if (scinfo.additionalInfo === DATA_TYPE) {
+                sc.dataLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
+                sc.dataTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
+            } else {
+                sc.labelLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
+                sc.labelTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
+            }
+            
+            setCurrentReport(cr);
+            
         } else if (e.dataTransfer.getData(COMPONENT_DRAG_DATA)) {
             e.preventDefault();
             let cr = copyObject(currentReport);
@@ -275,7 +304,7 @@ const ReportSection = (props) => {
          onMouseDown={e => onMouseDown(e)}
          onContextMenu={e => onContextMenu(e, -1, section)} 
          style={getStyle()}>
-             <div id={"sz-" + section} className="resizer"></div>
+             <div id={RESIZER_ID_PREFIX + section} className="resizer"></div>
             {loadComponents()}
         </div>;
 };

@@ -14,10 +14,11 @@ import {
     isDataComponent,
     getSizer,
     SUBCOMPONENT_DRAG_DATA,
-    COMPONENT_DRAG_DATA} from "../utils/reportHelper";
+    COMPONENT_DRAG_DATA,
+    COMPONENT_ID_PREFIX} from "../utils/reportHelper";
 
 const SizingControl = (props) => {
-    const {type, component, componentIndex, corner} = props;
+    const {type, subType, component, componentIndex, corner} = props;
     const {
         currentReport,
         setCurrentReport
@@ -34,17 +35,18 @@ const SizingControl = (props) => {
     const onHandleSize = (e) => {
         e.preventDefault();
         let sz = getCurrentSizer();
-                
+        
         let xdif = e.pageX - sz.startX;
         let ydif = e.pageY - sz.startY;
 
         sz.startX = e.pageX;
         sz.startY = e.pageY;
 
-        let top = pixelPosToNumber(sz.style.top);
-        let left = pixelPosToNumber(sz.style.left);
-        let width = pixelPosToNumber(sz.style.width);
-        let height = pixelPosToNumber(sz.style.height);
+
+        let top = pixelPosToNumber(pixelPosToNumber(sz.style.top));
+        let left = pixelPosToNumber(pixelPosToNumber(sz.style.left));
+        let width = pixelPosToNumber(pixelPosToNumber(sz.style.width));
+        let height = pixelPosToNumber(pixelPosToNumber(sz.style.height));
 
         switch (corner) {
             case TOP_LEFT:
@@ -86,15 +88,32 @@ const SizingControl = (props) => {
         sz.startY = "";
 
         let cr = copyObject(currentReport);
-        let c = cr.reportComponents[componentIndex];
+        let c;
+                
+                
         let units = currentReport.pageUnits.substring(0, 2);
-        c.left = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
-        c.top = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
-        c.width = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
-        c.height = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
-        
-        if (isDataComponent(c.type)) {
-            reformatDataComponent(currentReport, c);
+        console.log("----->type=" + type + ", subType=" + subType);
+
+        if (type === SUBCOMPONENT_DRAG_DATA) {
+            let pc =  cr.reportComponents[Number(component.parentId.replace(COMPONENT_ID_PREFIX, ""))];
+            c = pc.value.dataColumns[componentIndex];
+        console.log("----->2=" + JSON.stringify(c));
+            c[subType + "Left"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
+            c[subType + "Top"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
+            c[subType + "Width"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
+            c[subType + "Height"] = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
+        console.log("----->3=" + JSON.stringify(c));
+            reformatDataComponent(currentReport, pc);
+        } else {
+        console.log("----->4=");
+            let c = cr.reportComponents[componentIndex];
+            c.left = pixelsToReportUnits(units, pixelPosToNumber(sz.style.left));
+            c.top = pixelsToReportUnits(units, pixelPosToNumber(sz.style.top));
+            c.width = pixelsToReportUnits(units, pixelPosToNumber(sz.style.width));
+            c.height = pixelsToReportUnits(units, pixelPosToNumber(sz.style.height));
+            if (isDataComponent(type)) {
+                reformatDataComponent(currentReport, c);
+            }
         }
         
         let p = getParent();
@@ -112,14 +131,22 @@ const SizingControl = (props) => {
         }
     };
     
-    const onMouseDown = (e) => {
+    const onMouseDown = (e, type) => {
         e.preventDefault();
         let units = currentReport.pageUnits.substring(0, 2);
         let sz = getCurrentSizer();
-        sz.style.left = reportUnitsToPixels(units, component.left) + "px";
-        sz.style.top = reportUnitsToPixels(units, component.top) + "px";
-        sz.style.width = reportUnitsToPixels(units, component.width) + "px";
-        sz.style.height = reportUnitsToPixels(units, component.height) + "px";
+        
+        if (type === SUBCOMPONENT_DRAG_DATA) {
+            sz.style.left = reportUnitsToPixels(units, component[subType +" Left"]) + "px";
+            sz.style.top = reportUnitsToPixels(units, component[subType +" Top"]) + "px";
+            sz.style.width = reportUnitsToPixels(units, component[subType +" Width"]) + "px";
+            sz.style.height = reportUnitsToPixels(units, component[subType +" Height"]) + "px";
+        } else {
+            sz.style.left = reportUnitsToPixels(units, component.left) + "px";
+            sz.style.top = reportUnitsToPixels(units, component.top) + "px";
+            sz.style.width = reportUnitsToPixels(units, component.width) + "px";
+            sz.style.height = reportUnitsToPixels(units, component.height) + "px";
+        }
         sz.style.display = "inline-block";
         sz.startX = e.pageX;
         sz.startY = e.pageY;
@@ -149,6 +176,7 @@ const SizingControl = (props) => {
 
 SizingControl.propTypes = {
     type:  PropTypes.string.isRequired,
+    subType: PropTypes.string,
     component: PropTypes.object.isRequired,
     componentIndex: PropTypes.number.isRequired,
     corner: PropTypes.string.isRequired

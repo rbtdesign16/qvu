@@ -5,7 +5,8 @@ import {
     isEmpty,
     DEFAULT_NEW_DOCUMENT_NAME,
     DEFAULT_DOCUMENT_GROUP,
-    COLOR_BLACK
+    COLOR_BLACK,
+    copyObject
 } from "../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
@@ -59,11 +60,33 @@ export const ReportDesignProvider = ({ children }) => {
         setReport(report);
     };  
     
-    const haveSelectedComponents = () => {
+   const haveSelectedComponents = () => {
         if (currentReport && currentReport.reportComponents) {
             return (currentReport.reportComponents.findIndex((r) => r.selected) > -1);
         }
     };
+
+    const getComponentIndexWithSelectedSubComponents = () => {
+        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+            let cr = currentReport.reportComponents[i];
+            if ((cr.type === COMPONENT_TYPE_DATAGRID) && (cr.value.layout === GRID_LAYOUT_TABULAR)) {
+                if (cr.value.dataColumns.findIndex(c => (c.dataSelected || c.labelSelected)) > -1) {
+                    return i;
+                }
+            }
+        }
+        
+        return -1;
+    };
+
+    
+    const clearSelectedComponents = () => {
+        if (haveSelectedComponents()) {
+            let cr = copyObject(currentReport);
+            cr.reportComponents.map(c => (c.selected = false));
+            setCurrentReport(cr);
+        }
+    }
     
     const canUndo = () => {
         return (saveReports.reports.length > 0);
@@ -267,7 +290,9 @@ export const ReportDesignProvider = ({ children }) => {
                     currentComponent,
                     setCurrentComponent,
                     setCurrentQuery,
-                    currentQuery}}>
+                    currentQuery,
+                    clearSelectedComponents,
+                    getComponentIndexWithSelectedSubComponents}}>
                 {children}
             </ReportDesignContext.Provider>
             );

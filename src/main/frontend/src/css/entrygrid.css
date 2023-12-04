@@ -33,6 +33,13 @@
     grid-row-gap: 6px;
 }
 
+.entrygrid-125-75-175-50 {
+    display: grid;
+    grid-template-columns: 125px 75px 175px 50px;;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
 .entrygrid-125-125 {
     display: grid;
     grid-template-columns: 125px 125px;

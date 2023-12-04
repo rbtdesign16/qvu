@@ -50,6 +50,8 @@ export const REPORT_SECTION_BORDER = "solid 1px blue";
 export const MAX_UNDOS = 3;
 
 export const RESIZER_ID_PREFIX = "sz-";
+export const TABULAR_LAYOUT = "tabular";
+
 
 // use for sizing logic
 export const COMPONENT_SIZING_RECT_WIDTH = 5;
@@ -265,22 +267,36 @@ const getGridTabularExampleData = (currentReport, component) => {
     
 const getGridTabularData = (component, exampleData, myStyle) => {
     let styles = [];
-    
-    component.value.dataColumns.map(d => {
+    let styles2;
+    component.value.dataColumns.map((d) => {
         let s = {...myStyle};
         let ta = d.dataTextAlign;
+        
         if (!ta) {
             ta = DEFAULT_DATA_TEXT_ALIGN;
         }
-    
+
         s.textAlign = ta;
-        
+    
         styles.push(s);
+        if (component.value.altrowcolor) {
+            if (!styles2) {
+                styles2 = [];
+            }
+            
+            styles2.push({...s, backgroundColor: component.value.altrowcolor});
+        }
     });
     
-    return exampleData.map(r => {
-        return r.map((c, indx) => {
-            return <div style={styles[indx]}>{c}</div>;
+    return exampleData.map((r, indx1) => {
+        let rowStyles = styles;
+        
+        if ((((indx1 + 1) % 2) === 0) && styles2) {
+            rowStyles = styles2;
+        }
+        
+        return r.map((c, indx2) => {
+            return <div style={rowStyles[indx2]}>{c}</div>;
         });
     });
 };
@@ -648,6 +664,14 @@ export const getComponentClassName = (comp) => {
     }
 };
 
+export const getSubComponentClassName = (subcomp, type) => {
+    if (subcomp[type + "Selected"]) {
+        return "report-component-sel";
+    } else {
+        return "report-component";
+    }
+};
+
 export const handleComponentDragStart = (e, type, componentIndex, additionalInfo) => {
     let rect = e.target.getBoundingClientRect();
     let x = e.clientX - rect.left;
@@ -661,7 +685,9 @@ export const handleComponentDragOver = (e) => {
     
     let subtype = SUBCOMPONENT_DRAG_DATA + "-" + e.target.id;
     // if this is the current cubcomponent parent
-    if (e.dataTransfer.types.includes(subtype)) {
+    if (e.target.id 
+        && (e.target.id.startsWith(DATA_COLUMN_ID_PREFIX) 
+            || e.dataTransfer.types.includes(subtype))) {
          e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
     } else {
         // only allow component drag if not
@@ -683,30 +709,40 @@ const isStopPropagationRequired = (component) => {
 export const onComponentClick = (e, 
     currentReport, 
     setCurrentReport, 
-    component, 
     componentIndex, 
     lastSelectedIndex,
-    setLastSelectedIndex) => {
+    setLastSelectedIndex,
+    clearSelectedComponents) => {
+
+    let curc = currentReport.reportComponents[componentIndex];
+
     if (e.ctrlKey) {
         e.preventDefault();
-        let c = copyObject(component);
         let cr = copyObject(currentReport);
+        let c = cr.reportComponents[componentIndex];
         let sindx = componentIndex;
-
         // if this was the last selected index and we are deselecting
         // set lastSelectedIndex to -1
         if (c.selected && (componentIndex === lastSelectedIndex)) {
             sindx = -1;
         }
 
-        c.selected = !c.selected;
-        cr.reportComponents[componentIndex] = c;
+        if (e.target.id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+            let parts = e.target.id.split("-");
+            let sc = c.value.dataColumns[Number(parts[3])];
+            sc[parts[4] + "Selected"] = !sc[parts[4] + "Selected"];
+            // if we are selecting sub component
+            // clear any selected components
+            cr.reportComponents.map(c => (c.selected = false));
+        } else {
+            c.selected = !c.selected;
+        }
         setCurrentReport(cr);
         setLastSelectedIndex(sindx);
-    } else if (isStopPropagationRequired(component)) {
+    } else if (isStopPropagationRequired(curc)) {
         e.stopPropagation();
     }
-};
+ };
 
 export const isQueryRequiredForReportObject = (type) => {
     let check = type.toLowerCase();

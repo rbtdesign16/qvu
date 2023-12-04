@@ -28,7 +28,9 @@ import {
     updateComponentBorderSettings,
     getQueryDataColumnDisplay,
     SUBCOMPONENT_DRAG_DATA,
-    DATA_COLUMN_ID_PREFIX
+    DATA_COLUMN_ID_PREFIX,
+    onSubComponentClick,
+    getSubComponentClassName
 } from "../../utils/reportHelper";
 
 const SubComponent = (props) => {
@@ -60,25 +62,32 @@ const SubComponent = (props) => {
 
 
         if (type === LABEL_TYPE) {
-            retval.outline = gstyle.getPropertyValue('--data-grid-label-border');
+            if (!dataColumn[type + "Selected"]) {
+                retval.outline = gstyle.getPropertyValue('--data-grid-label-border');
+            }
             retval.textAlign = dataColumn.headerTextAlign;
             updateComponentFontSettings(component, "fontSettings", retval);
             updateComponentBorderSettings(component, "borderSettings", retval);
         } else {
-            retval.outline = gstyle.getPropertyValue('--data-grid-data-border');
+            if (!dataColumn[type + "Selected"]) {
+                retval.outline = gstyle.getPropertyValue('--data-grid-data-border');
+            }
             retval.textAlign = dataColumn.dataTextAlign;
             updateComponentFontSettings(component, "fontSettings2", retval);
             updateComponentBorderSettings(component, "borderSettings2", retval);
         }  
         
+       
         return retval;
     };
-    
+
+    //        onDragOver={e => handleComponentDragOver(e)}
+
     return <div 
+        className={getSubComponentClassName(dataColumn, type)}
         id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}
         style={getStyle()}
         draggable={true} 
-        onDragOver={e => handleComponentDragOver(e)}
         onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex, type)}>
         <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
         <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>

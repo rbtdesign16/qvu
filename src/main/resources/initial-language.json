@@ -19,6 +19,7 @@
         "All": "All",
         "all": "all",
         "allowServiceSave-help": "If a custom security service is configured then checking this will allow the service to save and delete users and roles",
+        "Alternate Row Color:": "Alternate Row Color:",
         "Apr": "Apr",    
         "April": "April",    
         "Apply": "Apply",

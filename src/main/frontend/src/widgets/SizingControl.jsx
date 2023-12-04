@@ -89,8 +89,7 @@ const SizingControl = (props) => {
 
         let cr = copyObject(currentReport);
         let c;
-                
-                
+                 
         let units = currentReport.pageUnits.substring(0, 2);
 
         if (type === SUBCOMPONENT_DRAG_DATA) {
@@ -112,7 +111,7 @@ const SizingControl = (props) => {
         }
         
         let p = getParent();
-        p.style.cursor = "crosshair";
+        p.style.cursor = "";
         p.removeEventListener("mousemove", onHandleSize, true);
         p.removeEventListener("mouseup", onStopSize, true);
         setCurrentReport(cr);

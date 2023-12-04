@@ -570,13 +570,17 @@ const AddEditComponentModal = (props) => {
             </div>;
         } else {               
            return <div>
-                <div className="entrygrid-125-100">
-                <div className="label">{getText("Layout:")}</div>
-                <div>
-                    <select name="gridLayout" onChange={e => setValue(e)}>
-                        {getGridLayoutOptions()}
-                    </select>
-                </div>
+                <div className="entrygrid-125-75-175-50">
+                    <div className="label">{getText("Layout:")}</div>
+                    <div>
+                        <select name="gridLayout" onChange={e => setValue(e)}>
+                            {getGridLayoutOptions()}
+                        </select>
+                    </div>
+                    <div className="label">{getText("Alternate Row Color:")}</div>
+                    <div>
+                        <ColorPicker name="altrowcolor" color={currentComponent.value.altrowcolor} setColor={setColorValue}/>                 
+                    </div>
                 </div>
                 <div className="report-query-column-select">
                     {getQuerySelectColumns(type)}
@@ -593,7 +597,7 @@ const AddEditComponentModal = (props) => {
                 return <option value={indx}>{getQueryDataColumnDisplay(c)}</option>
             }
         });
-    }
+    };
  
     const getDataFieldComponentEntry = () => {
         if (currentComponent.value.dataColumns.length > 0) {

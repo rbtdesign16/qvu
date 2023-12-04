@@ -810,8 +810,9 @@ Note: Beware of modifying this element as it can break the animations - you shou
 
 .color-picker {
     border: var(--query-results-table-border); 
-    height: 20px;
+    height: 24px;
     width: 30px;
+    margin-top: 3px;
 }
 
 .shape-example {

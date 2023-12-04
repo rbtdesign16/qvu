@@ -91,6 +91,18 @@ export const ReportDesignProvider = ({ children }) => {
         return false;
     };
     
+    const deselectAllSubComponents = (c) => {
+        if (c && c.value && c.value.dataColumns) {
+            for (let i = 0; i < c.value.dataColumns.length; ++i) {
+                c.value.dataColumns[i].dataSelected = false;
+                c.value.dataColumns[i].labelSelected = false;
+            }
+
+            setLastSelectedSubIndex(-1);
+        }
+    };
+
+    
     const getComponentIndexWithSelectedSubComponents = () => {
         for (let i = 0; i < currentReport.reportComponents.length; ++i) {
             if ((currentReport.reportComponents[i].type === COMPONENT_TYPE_DATAGRID) 
@@ -311,7 +323,8 @@ export const ReportDesignProvider = ({ children }) => {
                     lastSelectedSubIndex, 
                     setLastSelectedSubIndex,
                     getComponentIndexWithSelectedSubComponents,
-                    componentHasSelectedSubComponents
+                    componentHasSelectedSubComponents,
+                    deselectAllSubComponents
                 }}>
                 {children}
             </ReportDesignContext.Provider>

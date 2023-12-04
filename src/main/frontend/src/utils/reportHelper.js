@@ -710,10 +710,12 @@ export const onComponentClick = (e,
     currentReport, 
     setCurrentReport, 
     componentIndex, 
-    lastSelectedIndex,
+    lastSelectedIndex, 
     setLastSelectedIndex,
     lastSelectedSubIndex, 
-    setLastSelectedSubIndex) => {
+    setLastSelectedSubIndex,
+    deselectAllSubComponents,
+    componentHasSelectedSubComponents) => {
 
     let curc = currentReport.reportComponents[componentIndex];
 
@@ -736,6 +738,7 @@ export const onComponentClick = (e,
             
             if (sc[parts[4] + "Selected"]) {
                 setLastSelectedSubIndex(dcindx);
+                cr.reportComponents.map(curc => (curc.selected = false));
             } 
             
             // if we are selecting sub component
@@ -743,6 +746,9 @@ export const onComponentClick = (e,
             cr.reportComponents.map(c => (c.selected = false));
         } else {
             c.selected = !c.selected;
+           if (c.selected && componentHasSelectedSubComponents(c)) {
+                deselectAllSubComponents(c);
+            }
             setLastSelectedIndex(sindx);
         }
         setCurrentReport(cr);

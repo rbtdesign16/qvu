@@ -77,7 +77,8 @@ const ReportContent = (props) => {
         lastSelectedSubIndex,
         setLastSelectedSubIndex,
         haveSelectedComponents,
-        haveSelectedSubComponents
+        haveSelectedSubComponents,
+        deselectAllSubComponents
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -211,6 +212,10 @@ const ReportContent = (props) => {
             if (cr.reportComponents[i].section === section) {
                 cr.reportComponents[i].selected = sel;
             }
+            
+            if (componentHasSelectedSubComponents(cr.reportComponents[i])) {
+                deselectAllSubComponents(cr.reportComponents[i]);
+            }
         }
         
         if (!sel) {
@@ -257,6 +262,7 @@ const ReportContent = (props) => {
         cr.reportComponents[componentIndex].selected = select;
         if (select) {
             setLastSelectedIndex(componentIndex);
+            deselectAllSubComponents(cr.reportComponents[componentIndex]);
         } else if (lastSelectedIndex === componentIndex) {
             setLastSelectedIndex(-1);
         }

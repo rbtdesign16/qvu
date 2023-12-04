@@ -532,8 +532,8 @@ const AddEditComponentModal = (props) => {
                             <div className="entrygrid-50p-50p">
                                 <div className="entrygrid-100-175">
                                     <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
-                                    {wantFormat && <div className="label">{getText("Format:")}</div>}
-                                    {wantFormat && <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
+                                    {wantFormat ? <div className="label">{getText("Format:")}</div> : <div style={{height: "30px"}}></div>}
+                                    {wantFormat ? <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div> : <div></div>}
                                 </div> 
                                 <div className="entrygrid-175-100">
                                      <div className="label">{alignLabel}</div><div><select name="headerTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "headerTextAlign")}</select></div>

@@ -14,29 +14,29 @@ isNotEmpty,
         } from "../../utils/helper";
 
 import {
-MIN_LASSO_CHANGE,
-        REPORT_SECTION_HEADER,
-        REPORT_SECTION_BODY,
-        REPORT_SECTION_FOOTER,
-        REPORT_SECTION_BORDER,
-        pixelsToReportUnits,
-        reportUnitsToPixels,
-        getReportWidth,
-        getReportHeight,
-        MOVE_DROP_EFFECT,
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT,
-        getSizer,
-        elementPosToNumber,
-        COMPONENT_DRAG_DATA,
-        SUBCOMPONENT_DRAG_DATA,
-        isDataComponent,
-        RESIZER_ID_PREFIX,
-        COMPONENT_ID_PREFIX,
-        DATA_COLUMN_ID_PREFIX
-        } from "../../utils/reportHelper";
+    MIN_LASSO_CHANGE,
+    REPORT_SECTION_HEADER,
+    REPORT_SECTION_BODY,
+    REPORT_SECTION_FOOTER,
+    REPORT_SECTION_BORDER,
+    pixelsToReportUnits,
+    reportUnitsToPixels,
+    getReportWidth,
+    getReportHeight,
+    MOVE_DROP_EFFECT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT,
+    getSizer,
+    elementPosToNumber,
+    COMPONENT_DRAG_DATA,
+    SUBCOMPONENT_DRAG_DATA,
+    isDataComponent,
+    RESIZER_ID_PREFIX,
+    COMPONENT_ID_PREFIX,
+    DATA_COLUMN_ID_PREFIX
+    } from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
     const {
@@ -44,7 +44,9 @@ const ReportSection = (props) => {
         currentReport,
         setCurrentReport,
         setLastSelectedIndex,
-        lastSelectedIndex
+        lastSelectedIndex,
+        componentHasSelectedSubComponents,
+        deselectAllSubComponents
     } = useReportDesign();
 
     const {section, onContextMenu} = props;
@@ -265,6 +267,10 @@ const ReportSection = (props) => {
                         right: reportUnitsToPixels(cr.pageUnits, c.left + c.width),
                         bottom: reportUnitsToPixels(cr.pageUnits, c.top + c.height)};
                     c.selected = intersectRect(rc1, rc2);
+                    
+                    if (c.selected && componentHasSelectedSubComponents(c)) {
+                        deselectAllSubComponents(c);
+                    }
                 } else {
                     c.selected = false;
                 }

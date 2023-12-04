@@ -44,7 +44,9 @@ const ReportComponent = (props) => {
         setLastSelectedIndex,
         clearSelectedComponents,
         lastSelectedSubIndex, 
-        setLastSelectedSubIndex
+        setLastSelectedSubIndex,
+        deselectAllSubComponents,
+        componentHasSelectedSubComponents
     } = useReportDesign();
     
     return <div 
@@ -60,7 +62,9 @@ const ReportComponent = (props) => {
             lastSelectedIndex, 
             setLastSelectedIndex,
             lastSelectedSubIndex, 
-            setLastSelectedSubIndex)} 
+            setLastSelectedSubIndex,
+            deselectAllSubComponents,
+            componentHasSelectedSubComponents)} 
         onDragOver={e => handleComponentDragOver(e)}
         onDragStart={e => handleComponentDragStart(e, COMPONENT_DRAG_DATA, componentIndex)}>
         <SizingControl type={COMPONENT_DRAG_DATA} corner={TOP_LEFT} componentIndex={componentIndex} component={component}/>

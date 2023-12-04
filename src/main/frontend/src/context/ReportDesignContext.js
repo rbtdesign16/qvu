@@ -43,6 +43,7 @@ export const ReportDesignProvider = ({ children }) => {
     const [currentQuery, setCurrentQuery] = useState(null);
     const [saveReports, setSaveReports] = useState({reports: [], lastSelectedIndex: -1});
     const [lastSelectedIndex, setLastSelectedIndex] = useState(-1);
+    const [lastSelectedSubIndex, setLastSelectedSubIndex] = useState(-1);
     
     const initializeReportSettings = async (settings) => {
         setReportSettings(settings);
@@ -81,7 +82,28 @@ export const ReportDesignProvider = ({ children }) => {
         
         return false; 
     };
-
+    
+    const componentHasSelectedSubComponents = (c) => {
+        if (c.value && c.value.dataColumns) {
+            return (c.value.dataColumns.findIndex(dc => (dc.dataSelected || dc.labelSelected)) > -1);
+        }
+        
+        return false;
+    };
+    
+    const getComponentIndexWithSelectedSubComponents = () => {
+        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+            if ((currentReport.reportComponents[i].type === COMPONENT_TYPE_DATAGRID) 
+                && (currentReport.reportComponents[i].value.gridLayout === GRID_LAYOUT_FREEFORM)) {
+                if (componentHasSelectedSubComponents(currentReport.reportComponents[i])) {
+                    return i;
+                }
+            }
+        }
+        
+        return -1;
+    };
+    
     const canUndo = () => {
         return (saveReports.reports.length > 0);
     };
@@ -286,6 +308,10 @@ export const ReportDesignProvider = ({ children }) => {
                     setCurrentComponent,
                     setCurrentQuery,
                     currentQuery,
+                    lastSelectedSubIndex, 
+                    setLastSelectedSubIndex,
+                    getComponentIndexWithSelectedSubComponents,
+                    componentHasSelectedSubComponents
                 }}>
                 {children}
             </ReportDesignContext.Provider>

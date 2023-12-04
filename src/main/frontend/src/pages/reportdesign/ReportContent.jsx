@@ -60,7 +60,8 @@ import {
     isQueryRequiredForReportObject,
     getComponentTypeDisplayText,
     COMPONENT_ID_PREFIX,
-    GRID_LAYOUT_FREEFORM
+    GRID_LAYOUT_FREEFORM,
+    DATA_COLUMN_ID_PREFIX
 } from "../../utils/reportHelper";
 
 const ReportContent = (props) => {
@@ -73,6 +74,8 @@ const ReportContent = (props) => {
         getNewComponent,
         lastSelectedIndex,
         setLastSelectedIndex,
+        lastSelectedSubIndex,
+        setLastSelectedSubIndex,
         haveSelectedComponents,
         haveSelectedSubComponents
     } = useReportDesign();
@@ -122,6 +125,48 @@ const ReportContent = (props) => {
  
         return retval;
     };
+
+    const getSubComponentContextMenuItems = (componentIndex, scid) => {
+        let retval = [];
+        
+        retval.push({
+            text: getText("Delete Component"),
+            action: DELETE_ACTION
+        },
+        {
+            separator: true
+        },
+        {
+            text: getText("Push to Back"),
+            action: TOBACK_ACTION
+        },
+        {
+            text: getText("Move to Front"),
+            action: TOFRONT_ACTION
+         },
+        {
+            separator: true
+        });
+    
+        let parts = scid.split("-");
+        let dc = currentReport.reportComponents[componentIndex].value.dataColumns[Number(parts[3])];
+        let type = parts[4];
+    
+        if (!dc[type + "Selected"]) {
+           retval.push({
+                text: getText("Select Component"),
+                action: SELECT_ACTION
+            });
+        } else {
+            retval.push({
+                text: getText("Deselect Component"),
+                action: DESELECT_ACTION
+            });
+        }
+ 
+        return retval;
+    };
+
 
     const getSectionContextMenuItems = () => {
         let retval = [{group: replaceTokens(getText("Add Component"), getText("Report"))}];
@@ -183,17 +228,21 @@ const ReportContent = (props) => {
             e.preventDefault();
             e.stopPropagation();
             let menuItems;
-
+            let id = componentIndex;
             if (componentIndex < 0) {
                 menuItems = getSectionContextMenuItems();
-            } else {
+            } else if (e.target.id && e.target.id.startsWith(DATA_COLUMN_ID_PREFIX)){
+                menuItems = getSubComponentContextMenuItems(componentIndex, e.target.id);
+                id = e.target.id;
+            } else {    
                 menuItems = getComponentContextMenuItems(componentIndex);
             }
+            
             showMenu({
                 show: true,
                 x: e.pageX,
                 y: e.pageY,
-                id: componentIndex,
+                id: id,
                 section: section,
                 menuItems: menuItems,
                 handleContextMenu: handleContextMenu});
@@ -214,17 +263,50 @@ const ReportContent = (props) => {
         setCurrentReport(cr);
     };
 
-    const getMaxZindex = () => {
+    const setSubComponentSelected = (id, select) => {
+        let parts = id.split("-");
+        let cr = copyObject(currentReport);
+        let c = cr.reportComponents[Number(parts[2])];
+        let sc = c.value.dataColumns[Number(parts[3])];
+        let dcindx = Number(parts[3]);
+        sc[parts[4] + "Selected"] = select;
+        if (select) {
+            setLastSelectedSubIndex(dcindx);
+        } else if (lastSelectedSubIndex === dcindx) {
+            setLastSelectedSubIndex(-1);
+        }
+        setCurrentReport(cr);
+    };
+
+    const getMaxZindex = (c) => {
         let retval = 0;
-        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
-            if (currentReport.reportComponents[i].zindex) {
-                let z = Number(currentReport.reportComponents[i].zindex);
-                if (retval < z) {
-                    retval = z;
+        if (c) {
+             for (let i = 0; i < c.value.dataColumns.length; ++i) {
+                 let dc = c.value.dataColumns[i];
+                 if (dc.dataZindex) {
+                     let z = Number(dc.dataIndex);
+                     if (retval < z) {
+                         retval = z;
+                     }
+                 }
+                if (dc.labelZindex) {
+                     let z = Number(dc.labelIndex);
+                     if (retval < z) {
+                         retval = z;
+                     }
+                 }
+             }
+         } else {
+            for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+                if (currentReport.reportComponents[i].zindex) {
+                    let z = Number(currentReport.reportComponents[i].zindex);
+                    if (retval < z) {
+                        retval = z;
+                    }
                 }
             }
-        }
-
+         }
+         
         if (retval === 0) {
             retval = 1;
         }
@@ -232,13 +314,33 @@ const ReportContent = (props) => {
         return retval;
     };
 
-    const getMinZindex = () => {
+    const getMinZindex = (c) => {
         let retval = 100;
-        for (let i = 0; i < currentReport.reportComponents.length; ++i) {
-            if (currentReport.reportComponents[i].zindex) {
-                let z = Number(currentReport.reportComponents[i].zindex);
-                if (retval > z) {
-                    retval = z;
+        
+        // if c (component) then we need to look for subcomponent
+        if (c) {
+            for (let i = 0; i < c.value.dataColumns.length; ++i) {
+                let dc = c.value.dataColumns[i];
+                if (dc.dataZindex) {
+                    let z = Number(dc.dataIndex);
+                    if (retval > z) {
+                        retval = z;
+                    }
+                }
+               if (dc.labelZindex) {
+                    let z = Number(dc.labelIndex);
+                    if (retval > z) {
+                        retval = z;
+                    }
+                }
+            }
+        } else {
+            for (let i = 0; i < currentReport.reportComponents.length; ++i) {
+                if (currentReport.reportComponents[i].zindex) {
+                    let z = Number(currentReport.reportComponents[i].zindex);
+                    if (retval > z) {
+                        retval = z;
+                    }
                 }
             }
         }
@@ -264,12 +366,38 @@ const ReportContent = (props) => {
         setCurrentReport(cr);
     };
     
+    const moveSubComponentToBack = (id) => {
+        let parts = id.split("-");
+        let dcindx = Number(parts[3]);
+        let cr = copyObject(currentReport);
+        let c = cr.reportComponents[Number(parts[2])];
+        let minz = getMinZindex(c);
+        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= minz - 1;
+        setCurrentReport(cr);
+    };
+
+    const moveSubComponentToFront = (id) => {
+        let parts = id.split("-");
+        let dcindx = Number(parts[3]);
+        let cr = copyObject(currentReport);
+        let c = cr.reportComponents[Number(parts[2])];
+        let maxz = getMaxZindex(c);
+        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= maxz + 1;
+        setCurrentReport(cr);
+    };
+
     const onDeleteComponent = async (componentIndex) => {
         if (await confirm(getText("delete-component-prompt"))) {
             deleteComponent(componentIndex);
         }
     };
     
+    const onDeleteSubComponent = async (id) => {
+        if (await confirm(getText("delete-subcomponent-prompt"))) {
+            deleteSubComponent(id);
+        }
+    };
+
     const deleteComponent = (componentIndex) => {
         let cr = copyObject(currentReport);
         let c = [];
@@ -281,6 +409,25 @@ const ReportContent = (props) => {
         cr.reportComponents = c;
         if (lastSelectedIndex === componentIndex) {
             setLastSelectedIndex(-1);
+        }
+
+        setCurrentReport(cr);
+    };
+    
+    const deleteSubComponent = (id) => {
+        let parts = id.split("-");
+        let cr = copyObject(currentReport);
+        let c = cr.reportComponents[Number(parts[2])];
+        let dcindx = Number(parts[3]);
+        let dc = [];
+        for (let i = 0; i < c.value.dataColumns.length; ++i) {
+            if (i !== dcindx) {
+                dc.push(c.value.dataColumns[i]);
+            }
+        }
+        c.value.dataColumns = dc;
+        if (lastSelectedSubIndex === dcindx) {
+            setLastSelectedSubIndex(-1);
         }
 
         setCurrentReport(cr);
@@ -342,19 +489,39 @@ const ReportContent = (props) => {
                 editComponent(id);
                 break;
             case DELETE_ACTION:
-                onDeleteComponent(id);
+                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                    onDeleteSubComponent(id);
+                } else {
+                    onDeleteComponent(id);
+                }
                 break;
             case SELECT_ACTION:
-                setComponentSelected(id, true);
+                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                    setSubComponentSelected(id, true);
+                } else {
+                    setComponentSelected(id, true);
+                }
                 break;
             case DESELECT_ACTION:
-                setComponentSelected(id, false);
+                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                    setSubComponentSelected(id, false);
+                } else {
+                    setComponentSelected(id, false);
+                }
                 break;
             case TOFRONT_ACTION:
-                moveComponentToFront(id);
+                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                    moveSubComponentToFront(id);
+                } else {
+                    moveComponentToFront(id);
+                }
                 break;
             case TOBACK_ACTION:
-                moveComponentToBack(id);
+                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                    moveSubComponentToBack(id);
+                } else {
+                    moveComponentToBack(id);
+                }
                 break;
             case SELECTALL_ACTION:
                 onSelectAll(true, section);

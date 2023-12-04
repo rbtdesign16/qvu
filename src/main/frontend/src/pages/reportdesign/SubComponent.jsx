@@ -21,7 +21,6 @@ import {
     REPORT_COMPONENT_CONTAINER_BORDER_SELECTED,
     handleComponentDragStart,
     handleComponentDragOver,
-    onComponentClick,
     PIXELS_PER_POINT,
     pixelsToReportUnits,
     updateComponentFontSettings,
@@ -60,6 +59,9 @@ const SubComponent = (props) => {
             height: dataColumn[type + "Height"] + units,
         };
 
+        if (dataColumn[type + "Zindex"]) {
+            retval.zIndex = dataColumn[type + "Zindex"];
+        }
 
         if (type === LABEL_TYPE) {
             if (!dataColumn[type + "Selected"]) {

@@ -19,71 +19,73 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
 import {
-    SUCCESS,
-    WARN,
-    INFO,
-    ERROR,
-    REPORT_DOCUMENT_TYPE,
-    QUERY_DOCUMENT_TYPE,
-    SMALL_ICON_SIZE,
-    replaceTokens,
-    copyObject,
-    showDocumentFromBlob,
-    PDF_MIME_TYPE
-} from "../../utils/helper";
+SUCCESS,
+        WARN,
+        INFO,
+        ERROR,
+        REPORT_DOCUMENT_TYPE,
+        QUERY_DOCUMENT_TYPE,
+        SMALL_ICON_SIZE,
+        replaceTokens,
+        copyObject,
+        showDocumentFromBlob,
+        PDF_MIME_TYPE,
+        LABEL_TYPE,
+        DATA_TYPE
+        } from "../../utils/helper";
 
 import {
-    HORIZONTAL_KEY,
-    VERTICAL_KEY,
-    getReportWidthInPixels,
-    getReportHeightInPixels,
-    LEFT,
-    TOP,
-    RIGHT,
-    CENTER,
-    BOTTOM,
-    RULER_WIDTH,
-    isQueryRequiredForReportObject,
-    REPORT_UNITS_MM,
-    INCHES_TO_MM,
-    MM_TO_INCHES,
-    REPORT_SECTION_BODY
-} from "../../utils/reportHelper";
+HORIZONTAL_KEY,
+        VERTICAL_KEY,
+        getReportWidthInPixels,
+        getReportHeightInPixels,
+        LEFT,
+        TOP,
+        RIGHT,
+        CENTER,
+        BOTTOM,
+        RULER_WIDTH,
+        isQueryRequiredForReportObject,
+        REPORT_UNITS_MM,
+        INCHES_TO_MM,
+        MM_TO_INCHES,
+        REPORT_SECTION_BODY
+        } from "../../utils/reportHelper";
 
 import {
-    getReportSettings,
-    getAvailableDocuments,
-    saveDocument,
-    getDocument,
-    isApiError,
-    isApiSuccess,
-    generateReport
-    } from "../../utils/apiHelper";
+getReportSettings,
+        getAvailableDocuments,
+        saveDocument,
+        getDocument,
+        isApiError,
+        isApiSuccess,
+        generateReport
+} from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import { BiWindowOpen, BiWindowClose  } from "react-icons/bi";
-import { RxAlignLeft, 
-    RxAlignTop, 
-    RxAlignBottom, 
-    RxAlignRight,
-    RxSpaceBetweenVertically,
-    RxSpaceBetweenHorizontally 
-} from "react-icons/rx";
+import { RxAlignLeft,
+        RxAlignTop,
+        RxAlignBottom,
+        RxAlignRight,
+        RxSpaceBetweenVertically,
+        RxSpaceBetweenHorizontally
+        } from "react-icons/rx";
 import {
-    AiOutlineFontSize,
-    AiOutlineBarChart,
-    AiOutlineBorder
-    }  from "react-icons/ai";
+AiOutlineFontSize,
+        AiOutlineBarChart,
+        AiOutlineBorder
+}  from "react-icons/ai";
 import { LiaFileInvoiceSolid,
-    LiaFileMedicalSolid,
-    LiaFileUploadSolid,
-    LiaThListSolid,
-    LiaAlignCenterSolid,
-    LiaAlignLeftSolid,
-    LiaAlignRightSolid,
-    LiaWindowRestoreSolid,
-    LiaCoinsSolid,
-    LiaUndoAltSolid,
-    LiaRunningSolid} from "react-icons/lia";
+        LiaFileMedicalSolid,
+        LiaFileUploadSolid,
+        LiaThListSolid,
+        LiaAlignCenterSolid,
+        LiaAlignLeftSolid,
+        LiaAlignRightSolid,
+        LiaWindowRestoreSolid,
+        LiaCoinsSolid,
+        LiaUndoAltSolid,
+        LiaRunningSolid} from "react-icons/lia";
 
 const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -106,20 +108,24 @@ const ReportDesign = () => {
         setNewReport,
         initializeReportSettings,
         haveSelectedComponents,
+        haveSelectedSubComponents,
         getNewFontSettings,
         getNewBorderSettings,
         lastSelectedIndex,
         setLastSelectedIndex,
+        lastSelectedSubIndex,
+        setLastSelectedSubIndex,
         undo,
         canUndo,
-        setCurrentQuery} = useReportDesign();
+        setCurrentQuery,
+        getComponentIndexWithSelectedSubComponents} = useReportDesign();
 
     const onUndo = (e) => {
         e.preventDefault();
         setMenuOpen(false);
         undo();
     };
-    
+
 
     const handleStateChange = (state) => {
         if (state.isOpen) {
@@ -150,17 +156,17 @@ const ReportDesign = () => {
 
     const onTextAlign = (align) => {
         let cr = copyObject(currentReport);
-        
+
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (cr.reportComponents[i].selected) {
                 cr.reportComponents[i].align = align;
             }
         }
-        
+
         closeMenu();
         setCurrentReport(cr, true);
     };
-    
+
     const onComponentSize = (ver) => {
         let cr = copyObject(currentReport);
         let basec = cr.reportComponents[lastSelectedIndex];
@@ -170,10 +176,10 @@ const ReportDesign = () => {
                     cr.reportComponents[i].height = basec.height;
                 } else {
                     cr.reportComponents[i].width = basec.width;
-                }   
+                }
             }
         }
-        
+
         closeMenu();
         setCurrentReport(cr);
     };
@@ -185,7 +191,7 @@ const ReportDesign = () => {
     const hideBorderSettings = () => {
         setShowBorderSelect({show: false});
     };
-    
+
     const saveFontSettings = (fs) => {
         hideFontSettings();
 
@@ -202,7 +208,7 @@ const ReportDesign = () => {
             setCurrentReport(cr);
         }
     };
-    
+
     const saveBorderSettings = (bs) => {
         hideBorderSettings();
 
@@ -226,7 +232,7 @@ const ReportDesign = () => {
             show: true,
             hide: hideFontSettings,
             save: saveFontSettings
-         });
+        });
     };
 
     const onSetBorder = () => {
@@ -240,17 +246,60 @@ const ReportDesign = () => {
 
     const onComponentAlign = (align) => {
         closeMenu();
-        
-        if (currentReport.reportComponents 
-            && (lastSelectedIndex >= 0) 
-            && (lastSelectedIndex < currentReport.reportComponents.length)) {
+
+        if (haveSelectedSubComponents() && (lastSelectedSubIndex > -1)) {
+            let cindx = getComponentIndexWithSelectedSubComponents();
+
+            if (cindx > -1) {
+                let cr = copyObject(currentReport);
+                let types = [LABEL_TYPE, DATA_TYPE];
+                let basesc = cr.reportComponents[cindx].value.dataColumns[lastSelectedSubIndex];
+
+                let baseType;
+
+                if (basesc[LABEL_TYPE + "Selected"]) {
+                    baseType = LABEL_TYPE;
+                } else {
+                    baseType = DATA_TYPE;
+                }
+
+                let dcols = cr.reportComponents[cindx].value.dataColumns;
+                for (let i = 0; i < dcols.length; ++i) {
+                   if (i !== lastSelectedSubIndex) {
+                        for (let j = 0; j < types.length; ++j) {
+                            if (dcols[i][types[j] + "Selected"]) {
+                                switch (align) {
+                                    case LEFT:
+                                        dcols[i][types[j] + "Left"] = basesc[baseType + "Left"];
+                                        break;
+                                    case TOP:
+                                        dcols[i][types[j] + "Top"] = basesc[baseType + "Top"];
+                                        break;
+                                    case RIGHT:
+                                        dcols[i][types[j] + "Left"] = (basesc[baseType + "Left"] + basesc[baseType + "Width"]) - dcols[i][types[j] + "Width"];
+                                        break;
+                                    case BOTTOM:
+                                       dcols[i][types[j] + "Top"]  = (basesc[baseType + "Top"] + basesc[baseType + "Height"]) - dcols[i][types[j] + "Height"];
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }            
+                
+                setCurrentReport(cr);
+            }
+        } else if (currentReport.reportComponents
+                && (lastSelectedIndex >= 0)
+                && (lastSelectedIndex < currentReport.reportComponents.length)) {
             let cr = copyObject(currentReport);
 
             let basecr = cr.reportComponents[lastSelectedIndex];
 
             for (let i = 0; i < cr.reportComponents.length; ++i) {
-                if ((i !== lastSelectedIndex) 
-                     && (basecr.section === cr.reportComponents[i].section)) {
+                if (cr.reportComponents[i].selected 
+                    && (i !== lastSelectedIndex)
+                    && (basecr.section === cr.reportComponents[i].section)) {
                     switch (align) {
                         case LEFT:
                             cr.reportComponents[i].left = basecr.left;
@@ -259,10 +308,10 @@ const ReportDesign = () => {
                             cr.reportComponents[i].top = basecr.top;
                             break;
                         case RIGHT:
-                            cr.reportComponents[i].left = cr.reportComponents[i].left = (basecr.left + basecr.width) - cr.reportComponents[i].width; 
+                            cr.reportComponents[i].left = (basecr.left + basecr.width) - cr.reportComponents[i].width;
                             break;
                         case BOTTOM:
-                            cr.reportComponents[i].top = cr.reportComponents[i].top = (basecr.top + basecr.height) - cr.reportComponents[i].height; 
+                            cr.reportComponents[i].top = (basecr.top + basecr.height) - cr.reportComponents[i].height;
                             break;
                     }
                 }
@@ -285,16 +334,17 @@ const ReportDesign = () => {
             if (cr.pageUnits === REPORT_UNITS_MM) {
                 convFactor = MM_TO_INCHES;
             } else {
-                convFactor = INCHES_TO_MM;;
+                convFactor = INCHES_TO_MM;
+                ;
             }
         }
-        
+
         cr.pageUnits = settings.pageUnits;
-        cr.pageBorder = [Number(settings.borderLeft), 
-            Number(settings.borderTop), 
-            Number(settings.borderRight), 
+        cr.pageBorder = [Number(settings.borderLeft),
+            Number(settings.borderTop),
+            Number(settings.borderRight),
             Number(settings.borderBottom)];
-        
+
         if (convFactor !== 1) {
             cr.headerHeight *= convFactor;
             cr.footerHeight *= convFactor;
@@ -305,7 +355,7 @@ const ReportDesign = () => {
                 cr.reportComponents[i].height *= convFactor;
             }
         }
-        
+
         setCurrentReport(cr);
         setShowReportSettings({show: false});
     };
@@ -316,45 +366,45 @@ const ReportDesign = () => {
     };
 
     const loadQueryDocument = async (group, name) => {
-        showMessage(INFO, getText("Loading document",  name), null, true);
+        showMessage(INFO, getText("Loading document", name), null, true);
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
             hideMessage();
             return res.result;
-       }
+        }
     };
-    
+
     const setQueryDocument = async (group, name) => {
         hideDocumentSelect();
         let cr = copyObject(currentReport);
         cr.queryDocumentGroup = group;
         cr.queryDocumentName = name;
-         
+
         let qdoc = await loadQueryDocument(group, name);
-        
+
         if (qdoc) {
             if (cr.reportComponents && (cr.reportComponents.length > 0)) {
                 // if we have changed query document then clear any
                 // query-related components from report
-               if ((group !== cr.getQueryDocuentGroup) || (name !== cr.queryDocumentName)) {
-                   let c = [];
+                if ((group !== cr.getQueryDocuentGroup) || (name !== cr.queryDocumentName)) {
+                    let c = [];
 
-                   for (let i = 0; i < cr.reportComponents.length; ++i) {
-                       if (!isQueryRequiredForReportObject(cr.reportComponents[i].type)) {
-                           c.push(cr.reportComponents[i]);
-                       }
-                   }
+                    for (let i = 0; i < cr.reportComponents.length; ++i) {
+                        if (!isQueryRequiredForReportObject(cr.reportComponents[i].type)) {
+                            c.push(cr.reportComponents[i]);
+                        }
+                    }
 
-                   cr.reportComponents = c;
-               }
-           }
+                    cr.reportComponents = c;
+                }
+            }
 
-           setCurrentQuery(qdoc);
-           setCurrentReport(cr);
+            setCurrentQuery(qdoc);
+            setCurrentReport(cr);
         }
-     };
+    };
 
     const onShowQueryDocumentSelect = async (e) => {
         closeMenu();
@@ -372,37 +422,37 @@ const ReportDesign = () => {
     };
 
     const getMenu = () => {
-        let sel = haveSelectedComponents();
+        let sel = haveSelectedComponents() || haveSelectedSubComponents();
 
         return <Menu width={ 230 } 
-              isOpen={menuOpen} 
-              onStateChange={(state) => handleStateChange(state)}>
-            <div onClick={onShowReportDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
-            <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
-            {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
-            <hr  className="h-separator" />
-            <div onClick={onRunReport}><LiaRunningSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Run Report")}</div>
-            <hr  className="h-separator" />
-            <div onClick={e => onShowQueryDocumentSelect(e)}><LiaCoinsSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Query Document")}</div>
-            <hr  className="h-separator" />
-            <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
-            <hr className="h-separator" />
-            {canUndo() && <div onClick={e => onUndo(e)}><LiaUndoAltSolid   size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Undo Last Change")}</div>}
-            {sel && <hr  className="h-separator" />}
-            {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
-            {sel && <div onClick={onSetBorder}><AiOutlineBorder size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Border")}</div>}
-            {sel && <hr  className="h-separator" />}
-            {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
-            {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
-            {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
-            {sel && <hr  className="h-separator" />}
-            {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
-            {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
-            {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
-            {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
-            {sel && <div onClick={e => onComponentSize(true)}><RxSpaceBetweenVertically size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Height")}</div>}
-            {sel && <div onClick={e => onComponentSize(false)}><RxSpaceBetweenHorizontally size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Width")}</div>}
-        </Menu>;
+      isOpen={menuOpen} 
+      onStateChange={(state) => handleStateChange(state)}>
+    <div onClick={onShowReportDocumentSelect}><LiaFileInvoiceSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Load Report")}</div>
+    <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
+    {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
+    <hr  className="h-separator" />
+    <div onClick={onRunReport}><LiaRunningSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Run Report")}</div>
+    <hr  className="h-separator" />
+    <div onClick={e => onShowQueryDocumentSelect(e)}><LiaCoinsSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Query Document")}</div>
+    <hr  className="h-separator" />
+    <div onClick={onReportSettings}><LiaWindowRestoreSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Page Settings")}</div>
+    <hr className="h-separator" />
+    {canUndo() && <div onClick={e => onUndo(e)}><LiaUndoAltSolid   size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Undo Last Change")}</div>}
+    {sel && <hr  className="h-separator" />}
+    {sel && <div onClick={onSetFont}><AiOutlineFontSize size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Font")}</div>}
+    {sel && <div onClick={onSetBorder}><AiOutlineBorder size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Border")}</div>}
+    {sel && <hr  className="h-separator" />}
+    {sel && <div onClick={e => onTextAlign(LEFT)}><LiaAlignLeftSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Left")}</div>}
+    {sel && <div onClick={e => onTextAlign(CENTER)}><LiaAlignCenterSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Center")}</div>}
+    {sel && <div onClick={e => onTextAlign(RIGHT)}><LiaAlignRightSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Text Align Right")}</div>}
+    {sel && <hr  className="h-separator" />}
+    {sel && <div onClick={e => onComponentAlign(LEFT)}><RxAlignLeft size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Left")}</div>}
+    {sel && <div onClick={e => onComponentAlign(TOP)}><RxAlignTop size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Top")}</div>}
+    {sel && <div onClick={e => onComponentAlign(RIGHT)}><RxAlignRight size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Right")}</div>}
+    {sel && <div onClick={e => onComponentAlign(BOTTOM)}><RxAlignBottom size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Component Align Bottom")}</div>}
+    {sel && <div onClick={e => onComponentSize(true)}><RxSpaceBetweenVertically size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Height")}</div>}
+    {sel && <div onClick={e => onComponentSize(false)}><RxSpaceBetweenHorizontally size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Size Component Width")}</div>}
+</Menu>;
     };
 
     const hideDocumentSelect = () => {
@@ -433,15 +483,15 @@ const ReportDesign = () => {
         let userId = authData.currentUser.userId;
         let actionTimestamp = new Date().toISOString();
         let cr = copyObject(currentReport);
-        
+
         if (name !== cr.name) {
             cr.newRecord = true;
         }
-        
+
         cr.name = name;
         cr.documentGroupName = group;
         showMessage(INFO, replaceTokens(getText("Saving document", "..."), [name]), null, true);
-        
+
         let docWrapper = {
             user: userId,
             actionTimestamp: actionTimestamp,
@@ -486,7 +536,7 @@ const ReportDesign = () => {
             if (doc.queryDocumentName) {
                 qdoc = await loadQueryDocument(doc.queryDocumentGroup, doc.queryDocumentName);
             }
-            
+
             if (!doc.queryDocumentName || qdoc) {
                 setNewReport();
                 setCurrentComponent(null);
@@ -505,17 +555,17 @@ const ReportDesign = () => {
 
     const getReportInfo = () => {
         let gstyle = getComputedStyle(document.documentElement);
-        let fcolor = gstyle.getPropertyValue('--default-font-color')
+        let fcolor = gstyle.getPropertyValue('--default-font-color');
         return  <span className="cobaltBlue-f" style={{marginLeft: "10px"}}>
-            <span style={{color: fcolor}}>{getText("Group", ":  ")}</span>
-            {currentReport.documentGroupName} 
-            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Report", ":  ")}</span>
-            {currentReport.name}
-            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Page Size", ":  ")}</span>
-            {currentReport.pageSize}
-            <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Query Document", ":  ")}</span>
-            {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName.replace(".json", "") : "-"}
-        </span>;
+    <span style={{color: fcolor}}>{getText("Group", ":  ")}</span>
+    {currentReport.documentGroupName} 
+    <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Report", ":  ")}</span>
+    {currentReport.name}
+    <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Page Size", ":  ")}</span>
+    {currentReport.pageSize}
+    <span style={{paddingLeft: "15px", color: fcolor}}>{getText("Query Document", ":  ")}</span>
+    {currentReport.queryDocumentName ? currentReport.queryDocumentGroup + ":" + currentReport.queryDocumentName.replace(".json", "") : "-"}
+</span>;
     };
 
     const loadReportSettings = async () => {
@@ -537,7 +587,7 @@ const ReportDesign = () => {
             loadReportSettings();
         }
     });
-    
+
     if (reportSettings && currentReport) {
         return (
                 <div className="report-design-tab" style={{top: "40px", width: "100%"}} >

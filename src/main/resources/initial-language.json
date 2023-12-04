@@ -115,6 +115,7 @@
         "delete group prompt": "delete group $1?",
         "delete role prompt": "delete role $1?",
         "Delete role": "Delete role",
+        "delete-subcomponent-prompt": "Delete current subcomponent?",
         "Delete user": "Delete user",
         "delete user prompt": "Delete user $1?",
         "Deleted user": "Deleted user $1",

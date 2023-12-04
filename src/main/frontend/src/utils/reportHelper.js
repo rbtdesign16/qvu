@@ -711,7 +711,9 @@ export const onComponentClick = (e,
     setCurrentReport, 
     componentIndex, 
     lastSelectedIndex,
-    setLastSelectedIndex) => {
+    setLastSelectedIndex,
+    lastSelectedSubIndex, 
+    setLastSelectedSubIndex) => {
 
     let curc = currentReport.reportComponents[componentIndex];
 
@@ -728,16 +730,22 @@ export const onComponentClick = (e,
 
         if (e.target.id.startsWith(DATA_COLUMN_ID_PREFIX)) {
             let parts = e.target.id.split("-");
-            let sc = c.value.dataColumns[Number(parts[3])];
+            let dcindx = Number(parts[3]);
+            let sc = c.value.dataColumns[dcindx];
             sc[parts[4] + "Selected"] = !sc[parts[4] + "Selected"];
+            
+            if (sc[parts[4] + "Selected"]) {
+                setLastSelectedSubIndex(dcindx);
+            } 
+            
             // if we are selecting sub component
             // clear any selected components
             cr.reportComponents.map(c => (c.selected = false));
         } else {
             c.selected = !c.selected;
+            setLastSelectedIndex(sindx);
         }
         setCurrentReport(cr);
-        setLastSelectedIndex(sindx);
     } else if (isStopPropagationRequired(curc)) {
         e.stopPropagation();
     }

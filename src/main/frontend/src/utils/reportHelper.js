@@ -711,8 +711,7 @@ export const onComponentClick = (e,
     setCurrentReport, 
     componentIndex, 
     lastSelectedIndex,
-    setLastSelectedIndex,
-    clearSelectedComponents) => {
+    setLastSelectedIndex) => {
 
     let curc = currentReport.reportComponents[componentIndex];
 

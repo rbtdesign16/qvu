@@ -81,8 +81,6 @@ const SubComponent = (props) => {
         return retval;
     };
 
-    //        onDragOver={e => handleComponentDragOver(e)}
-
     return <div 
         className={getSubComponentClassName(dataColumn, type)}
         id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}

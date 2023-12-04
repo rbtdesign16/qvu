@@ -23,7 +23,9 @@ import {
     ARROW_RIGHT_KEY,
     confirm,
     NONE_SETTING,
-    replaceTokens
+    replaceTokens,
+    LABEL_TYPE,
+    DATA_TYPE
 } from "../../utils/helper";
 
 import {
@@ -57,7 +59,8 @@ import {
     PIXELS_PER_KEYDOWN_MOVE,
     isQueryRequiredForReportObject,
     getComponentTypeDisplayText,
-    COMPONENT_ID_PREFIX
+    COMPONENT_ID_PREFIX,
+    GRID_LAYOUT_FREEFORM
 } from "../../utils/reportHelper";
 
 const ReportContent = (props) => {
@@ -70,7 +73,8 @@ const ReportContent = (props) => {
         getNewComponent,
         lastSelectedIndex,
         setLastSelectedIndex,
-        haveSelectedComponents
+        haveSelectedComponents,
+        haveSelectedSubComponents
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -481,63 +485,166 @@ const ReportContent = (props) => {
         return retval;
     };
 
+    const subComponentCanMove = (c, key, pos) => {
+        let retval = false;
+        switch (key) {
+            case ARROW_UP_KEY:
+                retval = (pos > 0);
+                break;
+            case ARROW_DOWN_KEY:
+                retval = (pos < c.height);
+                break;
+            case ARROW_LEFT_KEY:
+                retval = (pos > 0);
+                break;
+            case ARROW_RIGHT_KEY:
+                retval = (pos < c.width);
+                break;
+        }
+        
+        return retval
+    };
+    
+    const handleComponentPosition = (e, c) => {
+        let retval = false;
+        let delta = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_KEYDOWN_MOVE);
+
+        if (!e.shiftKey) {
+            let code = e.code.toLowerCase();
+            switch (code) {
+                case ARROW_UP_KEY:
+                    if (componentCanMove(c.section, code, (c.top - delta))) {
+                        c.top -= delta;
+                        retval = true;
+                    }
+                    break;
+                case ARROW_DOWN_KEY:
+                    if (componentCanMove(c.section, code, (c.top + delta))) {
+                        c.top += delta;
+                        retval = true;
+                    }
+                    break;
+                case ARROW_LEFT_KEY:
+                    if (componentCanMove(c.section, code, (c.left - delta))) {
+                        c.left -= delta;
+                        retval = true;
+                    }
+                    break;
+                case ARROW_RIGHT_KEY:
+                    if (componentCanMove(c.section, code, (c.left + delta))) {
+                        c.left += delta;
+                        retval = true;
+                    }
+                    break;
+            }
+        } else {
+            retval = true;
+            switch (e.code.toLowerCase()) {
+                case ARROW_UP_KEY:
+                    c.height -= delta;
+                    break;
+                case ARROW_DOWN_KEY:
+                    c.height += delta;
+                    break;
+                case ARROW_LEFT_KEY:
+                    c.width -= delta;
+                    break;
+                case ARROW_RIGHT_KEY:
+                    c.width += delta;
+                    break;
+            }
+        }
+        
+        return retval;
+    };
+    
+    const handleSubComponentPosition = (e, c) => {
+        let retval = false;
+        let delta = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_KEYDOWN_MOVE);
+
+        for (let i = 0; i < c.value.dataColumns.length; ++i) {
+            let dc = c.value.dataColumns[i];
+            let types = [LABEL_TYPE, DATA_TYPE];
+            for (let j = 0; j < types.length; ++j) {
+                if (dc[types[j] + "Selected"]) {
+                     if (!e.shiftKey) {
+                        let code = e.code.toLowerCase();
+                        switch (code) {
+                            case ARROW_UP_KEY:
+                                if (subComponentCanMove(c, code, (dc[types[j] + "Top"] - delta))) {
+                                    dc[types[j] + "Top"] -= delta;
+                                    retval = true;
+                                }
+                                break;
+                            case ARROW_DOWN_KEY:
+                                if (subComponentCanMove(c, code, (dc[types[j] + "Top"] + delta))) {
+                                    dc[types[j] + "Top"] += delta;
+                                    retval = true;
+                                }
+                                break;
+                            case ARROW_LEFT_KEY:
+                                if (subComponentCanMove(c, code, (dc[types[j] + "Left"] - delta))) {
+                                    dc[types[j] + "Left"] -= delta;
+                                    retval = true;
+                                }
+                                break;
+                            case ARROW_RIGHT_KEY:
+                                if (subComponentCanMove(c, code, (dc[types[j] + "Left"] + delta))) {
+                                    dc[types[j] + "Left"] += delta;
+                                    retval = true;
+                                }
+                                break;
+                        }
+                    } else {
+                        retval = true;
+                        switch (e.code.toLowerCase()) {
+                            case ARROW_UP_KEY:
+                                dc[types[j] +"Height"] -= delta;
+                                break;
+                            case ARROW_DOWN_KEY:
+                                dc[types[j] +"Height"] += delta;
+                                break;
+                            case ARROW_LEFT_KEY:
+                                dc[types[j] +"Weight"] -= delta;
+                                break;
+                            case ARROW_RIGHT_KEY:
+                                dc[types[j] + "Width"] += delta;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return retval;
+    };
+    
+    const hasSelectedSubComponents = (c) => {
+        if ((c.type === COMPONENT_TYPE_DATAGRID) && (c.value.gridLayout === GRID_LAYOUT_FREEFORM)) {
+            return (c.value.dataColumns.findIndex(dc => (dc.labelSelected || dc.dataSelected)) > -1);
+        }
+    };
+    
     const onKeyDown = (e) => {
-        if (isArrowKey(e) && haveSelectedComponents()) {
+        if (isArrowKey(e) 
+            && (haveSelectedComponents() 
+                || haveSelectedSubComponents())) {
             e.preventDefault();
+
             let cr = copyObject(currentReport);
             let updated = false;
             for (let i = 0; i < cr.reportComponents.length; ++i) {
                 let c = cr.reportComponents[i];
 
                 if (c.selected) {
-                    let delta = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_KEYDOWN_MOVE);
-
-                    if (!e.shiftKey) {
-                        let code = e.code.toLowerCase();
-                        switch (code) {
-                            case ARROW_UP_KEY:
-                                if (componentCanMove(c.section, code, (c.top - delta))) {
-                                    c.top -= delta;
-                                    updated = true;
-                                }
-                                break;
-                            case ARROW_DOWN_KEY:
-                                if (componentCanMove(c.section, code, (c.top + delta))) {
-                                    c.top += delta;
-                                    updated = true;
-                                }
-                                break;
-                            case ARROW_LEFT_KEY:
-                                if (componentCanMove(c.section, code, (c.left - delta))) {
-                                    c.left -= delta;
-                                    updated = true;
-                                }
-                                break;
-                            case ARROW_RIGHT_KEY:
-                                if (componentCanMove(c.section, code, (c.left + delta))) {
-                                    c.left += delta;
-                                    updated = true;
-                                }
-                                break;
-                        }
-                    } else {
+                    if (handleComponentPosition(e, c)) {
                         updated = true;
-                        switch (e.code.toLowerCase()) {
-                            case ARROW_UP_KEY:
-                                c.height -= delta;
-                                break;
-                            case ARROW_DOWN_KEY:
-                                c.height += delta;
-                                break;
-                            case ARROW_LEFT_KEY:
-                                c.width -= delta;
-                                break;
-                            case ARROW_RIGHT_KEY:
-                                c.width += delta;
-                                break;
-                        }
                     }
-                }
+                } else if (hasSelectedSubComponents(c)) {
+                   if (handleSubComponentPosition(e, c)) {
+                        updated = true;
+                   }
+               }    
             }
 
             if (updated) {

@@ -65,29 +65,23 @@ export const ReportDesignProvider = ({ children }) => {
             return (currentReport.reportComponents.findIndex((r) => r.selected) > -1);
         }
     };
-
-    const getComponentIndexWithSelectedSubComponents = () => {
+    
+    const haveSelectedSubComponents = () => {
         for (let i = 0; i < currentReport.reportComponents.length; ++i) {
-            let cr = currentReport.reportComponents[i];
-            if ((cr.type === COMPONENT_TYPE_DATAGRID) && (cr.value.layout === GRID_LAYOUT_TABULAR)) {
-                if (cr.value.dataColumns.findIndex(c => (c.dataSelected || c.labelSelected)) > -1) {
-                    return i;
+            if ((currentReport.reportComponents[i].type === COMPONENT_TYPE_DATAGRID)
+                && (currentReport.reportComponents[i].value.gridLayout === GRID_LAYOUT_FREEFORM)) {
+                let dcols = currentReport.reportComponents[i].value.dataColumns;
+                let dcindex = dcols.findIndex(dc => (dc.dataSelected || dc.labelSelected));
+                
+                if (dcindex > -1) {
+                    return true;
                 }
-            }
+             }
         }
         
-        return -1;
+        return false; 
     };
 
-    
-    const clearSelectedComponents = () => {
-        if (haveSelectedComponents()) {
-            let cr = copyObject(currentReport);
-            cr.reportComponents.map(c => (c.selected = false));
-            setCurrentReport(cr);
-        }
-    }
-    
     const canUndo = () => {
         return (saveReports.reports.length > 0);
     };
@@ -281,6 +275,7 @@ export const ReportDesignProvider = ({ children }) => {
                     setNewReport,
                     getNewComponent,
                     haveSelectedComponents,
+                    haveSelectedSubComponents,
                     getNewFontSettings,
                     getNewBorderSettings,
                     lastSelectedIndex, 
@@ -291,8 +286,7 @@ export const ReportDesignProvider = ({ children }) => {
                     setCurrentComponent,
                     setCurrentQuery,
                     currentQuery,
-                    clearSelectedComponents,
-                    getComponentIndexWithSelectedSubComponents}}>
+                }}>
                 {children}
             </ReportDesignContext.Provider>
             );

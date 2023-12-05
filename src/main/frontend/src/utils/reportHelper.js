@@ -228,7 +228,7 @@ const getDataRecordComponentStyle = (component) => {
     return retval;
 };
 
-const getGridTabularHeader = (currentReport, component, myStyle) => {
+const getGridTabularHeader = (currentReport, component, componentIndex, myStyle) => {
     let styles = [];
     
     component.value.dataColumns.map(d => {
@@ -247,8 +247,8 @@ const getGridTabularHeader = (currentReport, component, myStyle) => {
        let units = currentReport.pageUnits.substring(0, 2);
         return <div style={styles[indx]}>
             {c.displayName}
-            <GridSizer type="width" row="header" column={indx} component={component} units={units}/>
-            <GridSizer type="height" row="header" column={indx} component={component}  units={units}/>
+            <GridSizer type="width" row="header" column={indx} component={component} componentIndex={componentIndex} units={units}/>
+            <GridSizer type="height" row="header" column={indx} component={component}  componentIndex={componentIndex} units={units}/>
         </div>;
     });
 };
@@ -271,7 +271,7 @@ const getGridTabularExampleData = (currentReport, component) => {
      return retval;
 };
     
-const getGridTabularData = (currentReport, component, exampleData, myStyle) => {
+const getGridTabularData = (currentReport, component, componentIndex, exampleData, myStyle) => {
     let styles = [];
     let styles2;
     let units = currentReport.pageUnits.substring(0, 2);
@@ -305,8 +305,8 @@ const getGridTabularData = (currentReport, component, exampleData, myStyle) => {
         return r.map((c, indx2) => {
             if (indx1 === 0) {
                 return <div style={rowStyles[indx2]}>{c}
-                    <GridSizer type="width" row="data" column={indx2} component={component} units={units}/>
-                    <GridSizer type="height" row="data" column={indx2} component={component}  units={units}/>
+                    <GridSizer type="width" row="data" column={indx2} component={component} componentIndex={componentIndex} units={units}/>
+                    <GridSizer type="height" row="data" column={indx2} component={component} componentIndex={componentIndex} units={units}/>
                 </div>;
            } else {
                 return <div style={rowStyles[indx2]}>{c}</div>;
@@ -321,14 +321,14 @@ const getGridSubComponents = (currentReport, component, type) => {
     });
 };
     
-const getDataGridComponentValue = (currentReport, component) => {
+const getDataGridComponentValue = (currentReport, component, componentIndex) => {
     if (component.value.gridLayout === GRID_LAYOUT_TABULAR) {
         let headerStyle = getGridTabularHeaderStyle(currentReport, component);
         let dataStyle = getGridTabularDataStyle(currentReport, component);
         return <div style={getGridComponentTabularStyle(component)}>
-            {getGridTabularHeader(currentReport, component, headerStyle)}
-            {getGridTabularData(currentReport, component, getGridTabularExampleData(currentReport, component), dataStyle)}
-        </div>;
+            {getGridTabularHeader(currentReport, component, componentIndex, headerStyle)}
+            {getGridTabularData(currentReport, component, componentIndex, getGridTabularExampleData(currentReport, component), dataStyle)}
+         </div>;
     } else {
         return <div>
            {getGridSubComponents(currentReport, component, LABEL_TYPE)}
@@ -403,7 +403,7 @@ export const getQueryDataColumnDisplay = (dc) => {
     }
 };
     
-export const getComponentValue = (reportSettings, currentReport, component, forExample) => {
+export const getComponentValue = (reportSettings, currentReport, component, componentIndex, forExample) => {
     let myStyle = {};
     
     switch (component.type) {
@@ -484,7 +484,7 @@ export const getComponentValue = (reportSettings, currentReport, component, forE
         case COMPONENT_TYPE_PAGENUMBER:
             return component.value.format.replace("?", "1");
         case COMPONENT_TYPE_DATAGRID:
-            return getDataGridComponentValue(currentReport, component);
+            return getDataGridComponentValue(currentReport, component, componentIndex);
         case COMPONENT_TYPE_DATARECORD:
            return getDataRecordComponentValue(component);
         case COMPONENT_TYPE_DATAFIELD:
@@ -630,6 +630,14 @@ export const isDataComponent = (type) => {
 
 export const isDataGridComponent = (type) => {
     return (type === COMPONENT_TYPE_DATAGRID);
+};
+
+export const isTabularDataGridComponent = (component) => {
+    if (isDataGridComponent(component.type)) {
+        return (component.value && (component.value.gridLayout === TABULAR_LAYOUT));
+    } 
+    
+    return false;
 };
 
 export const getDefaultComponentStyle = (component, unit) => {

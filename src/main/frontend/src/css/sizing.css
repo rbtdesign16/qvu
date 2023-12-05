@@ -83,6 +83,28 @@
     z-index: 100
 }
 
+.grid-resizer-hor {
+    display: none;
+    left: 0;
+    width: 100%;
+    border-bottom: var(--grid-resizer-border);
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    z-index: 100
+}
+
+.grid-resizer-ver {
+    display: none;
+    top: 0;
+    height: 100%;
+    position: relative;
+    background: transparent;
+    cursor: pointer;
+    border-right: var(--grid-resizer-border);
+    z-index: 100
+}
+
 .col-sizer {
     float: right;
     width: 3px;

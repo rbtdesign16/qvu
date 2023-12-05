@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useReportDesign from "../context/ReportDesignContext";
 import {copyObject} from "../utils/helper";
-import {RESIZER_ID_PREFIX} from "../utils/reportHelper";
+import {RESIZER_ID_PREFIX, COMPONENT_ID_PREFIX} from "../utils/reportHelper";
 
 const GridSizer = (props) => {
-    const {type, row, column, component, units} = props;
+    const {type, row, column, component, componentIndex, units} = props;
     const {
         currentReport,
         setCurrentReport
@@ -19,34 +19,22 @@ const GridSizer = (props) => {
         e.preventDefault();
     };
 
-    const getResizer = (e) => {
-        let retval = document.createElement("div");
-        if (retval) {
-            if (type === "width") {
-                retval.position = "absolute";
-                retval.style.width = "10px";
-                retval.style.height = "200px";
-                retval.style.left = "100px";
-                retval.style.top = "200px";
-            } else {
-                retval.style.width = "2px";
-                retval.style.height = component.height + units;
-                retval.style.top = 0;
-                retval.style.left = e.clientX + "px";
-            }
-
-            retval.style.background = "red";
-            retval.display = "inline-block";
-            retval.cursor = "pointer";
+    const showResizer = (e) => {
+        if (type === "width") {
+            let el = document.getElementById(RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "ver-" + componentIndex);
+            el.style.display = "block";
+            el.style.left = e.clientX;
+        } else {
+            let el = document.getElementById(RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "hor-" + componentIndex);
+            el.style.display = "block";
+            el.style.top = e.clienty;
         }
-        
-        return retval;
-    }
+    };
         
     const onMouseDown = (e) => {
         e.preventDefault();
 
-        let sizer = getResizer(e);
+        showResizer(e);
         
 
     };
@@ -69,6 +57,7 @@ GridSizer.propTypes = {
     row: PropTypes.string.isRequired,
     column: PropTypes.number.isRequired,
     component: PropTypes.object.isRequired,
+    componentIndex: PropTypes.number.isRequired,
     units: PropTypes.string.isRequired
 };
 

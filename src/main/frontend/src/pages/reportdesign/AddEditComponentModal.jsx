@@ -348,7 +348,7 @@ const AddEditComponentModal = (props) => {
                     <div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
                 </div>    
                 <div className="tb-border">{getText("Example:")}</div>    
-                <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent)}</div></div>
+                <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent, -1)}</div></div>
             </div>;
         } else {
            if (!currentComponent.value.fillcolor) {
@@ -369,7 +369,7 @@ const AddEditComponentModal = (props) => {
                         <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
                     </div>
                     <div className="tb-border">{getText("Example:")}</div>    
-                    <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent, true)}</div></div>
+                    <div className="ta-center w-100"><div className="shape-example">{getComponentValue(reportSettings, currentReport, currentComponent, -1, true)}</div></div>
                 </div>;
          }
     };

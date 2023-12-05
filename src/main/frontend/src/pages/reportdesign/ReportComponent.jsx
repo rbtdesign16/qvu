@@ -29,7 +29,8 @@ import {
     COMPONENT_DRAG_DATA,
     COMPONENT_ID_PREFIX,
     isDataGridComponent,
-    RESIZER_ID_PREFIX
+    RESIZER_ID_PREFIX,
+    isTabularDataGridComponent
 } from "../../utils/reportHelper";
 
 const ReportComponent = (props) => {
@@ -49,6 +50,22 @@ const ReportComponent = (props) => {
         componentHasSelectedSubComponents
     } = useReportDesign();
     
+    const getVerticalResizerIfRequired = () => {
+        if (isTabularDataGridComponent(component)) {
+            return <div id={RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "ver-" + componentIndex} className="grid-resizer-ver"></div>;
+        } else {
+            return "";
+        }
+    };
+    
+    const getHorizontalResizerIfRequired = () => {
+        if (isDataGridComponent(component.type)) {
+            return <div id={RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "hor-" + componentIndex} className="grid-resizer-hor"></div>;
+        } else {
+            return "";
+        }
+    };
+
     return <div 
         id={COMPONENT_ID_PREFIX + componentIndex}
         className={getComponentClassName(component)}
@@ -71,8 +88,9 @@ const ReportComponent = (props) => {
         <SizingControl type={COMPONENT_DRAG_DATA} corner={TOP_RIGHT} componentIndex={componentIndex} component={component}/>
         <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_LEFT} componentIndex={componentIndex} component={component}/>
         <SizingControl type={COMPONENT_DRAG_DATA} corner={BOTTOM_RIGHT} componentIndex={componentIndex} component={component}/>
-        {isDataGridComponent(component.type) && <div id={RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + componentIndex} className="resizer"></div>}
-        {getComponentValue(reportSettings, currentReport, component)}
+        {getVerticalResizerIfRequired()}
+        {getHorizontalResizerIfRequired()}
+        {getComponentValue(reportSettings, currentReport, component, componentIndex)}
     </div>; 
 };
 

@@ -30,6 +30,7 @@ export const BASIC_SECURITY_TYPE = "basic";
 
 export const DATA_TYPE = "data";
 export const LABEL_TYPE = "label";
+export const WIDTH_TYPE = "width";
 
 export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING"];
 

@@ -27,7 +27,8 @@ import {MODAL_TITLE_SIZE,
     isDataTypeInt,
     isDataTypeFloat,
     isDataTypeNumeric,
-    isDataTypeDateTime} from "../../utils/helper";
+    isDataTypeDateTime,
+    WIDTH_TYPE} from "../../utils/helper";
 import {
     COMPONENT_TYPE_TEXT,  
     COMPONENT_TYPE_IMAGE, 
@@ -337,7 +338,7 @@ const AddEditComponentModal = (props) => {
                     <div className="label">{getText("Style:")}</div>
                     <div><select name="border" onChange={e => setValue(e)}>{getBorderStyleOptions(reportSettings, currentComponent.value, true)}</select></div>
                     <div className="label">{getText("Width:")}</div>
-                    <div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select> </div>
+                    <div><select name={WIDTH_TYPE} onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select> </div>
                     <div className="label">{getText("Color")}</div>
                     <div><ColorPicker name="bordercolor" color={currentComponent.value.bordercolor} setColor={setColorValue}/> </div>                  
                 </div>        
@@ -365,7 +366,7 @@ const AddEditComponentModal = (props) => {
                     </div>
                     <div className="tb-border">{getText("Line:")}</div>    
                     <div className="entrygrid-125-125">
-                        <div className="label">{getText("Width:")}</div><div><select name="width" onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
+                        <div className="label">{getText("Width:")}</div><div><select name={WIDTH_TYPE} onChange={e => setValue(e)}>{getBorderWidthOptions(reportSettings, currentComponent.value)}</select></div>
                         <div className="label">{getText("Color:")}</div><div><ColorPicker name="fillcolor" color={currentComponent.value.fillcolor} setColor={setColorValue}/></div>
                     </div>
                     <div className="tb-border">{getText("Example:")}</div>    

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import useReportDesign from "../context/ReportDesignContext";
-import {copyObject} from "../utils/helper";
+import {copyObject, WIDTH_TYPE} from "../utils/helper";
 import {
     RESIZER_ID_PREFIX,
     COMPONENT_ID_PREFIX,
@@ -35,7 +35,7 @@ const GridSizer = (props) => {
             let rc = cel.getBoundingClientRect();
             let cr = copyObject(currentReport);
             let c = cr.reportComponents[componentIndex];
-            if (type === "width") {
+            if (type === WIDTH_TYPE) {
                 let newpos = (e.clientX - rc.left);
 
                 let parts = component.value.gridTemplateColumns.split(" ");
@@ -52,11 +52,16 @@ const GridSizer = (props) => {
                if (newpos > positions[column]) {
                    let diff = (newpos - positions[column]);
                    sizes[column] += diff; 
-                   sizes[column + 1] -= diff;
+                  if (column < (sizes.length - 1)) {
+                    sizes[column + 1] -= diff;
+                    }
                } else {
                   let diff = (positions[column] - newpos);
                   sizes[column] -= diff;
-                  sizes[column + 1] += diff;
+                  
+                  if (column < (sizes.length - 1)) {
+                    sizes[column + 1] += diff;
+                  }
                }
                
                let gtl = "";
@@ -78,7 +83,7 @@ const GridSizer = (props) => {
     };
 
     const getSizerElement = (type) => {
-        if (type === "width") {
+        if (type === WIDTH_TYPE) {
             return document.getElementById(RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "ver-" + componentIndex);
         } else {
             return document.getElementById(RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + "hor-" + componentIndex);
@@ -91,7 +96,7 @@ const GridSizer = (props) => {
         if (el) {
             el.style.cursor = "";
             el.style.display = "";
-            if (type === "width") {
+            if (type === WIDTH_TYPE) {
                 el.style.left = 0;
             } else {
                 el.style.top = 0;
@@ -118,7 +123,15 @@ const GridSizer = (props) => {
                 min += sizes[i];
             }
 
-            setSizeBounds({min: min + PIXELS_PER_KEYDOWN_MOVE, max: (min + sizes[column] + (sizes[column + 1] - PIXELS_PER_KEYDOWN_MOVE))});
+            let max;
+            
+            if (column < (sizes.length - 1)) {
+                max = (min + sizes[column] + (sizes[column + 1] - PIXELS_PER_KEYDOWN_MOVE));
+            } else {
+                max = reportUnitsToPixels(units, component.width);
+            }
+            
+            setSizeBounds({min: min + PIXELS_PER_KEYDOWN_MOVE, max: max});
         }
     };
 
@@ -133,7 +146,7 @@ const GridSizer = (props) => {
             let rc = cel.getBoundingClientRect();
             let init = !el.style.display;
             el.style.display = "block";
-            if (type === "width") {
+            if (type === WIDTH_TYPE) {
                 el.style.cursor = "col-resize";
                 let newpos = (e.clientX - rc.left);
                 if (canResize(newpos)) {
@@ -163,7 +176,7 @@ const GridSizer = (props) => {
     };
 
     const getClass = () => {
-        if (type === "width") {
+        if (type === WIDTH_TYPE) {
             return "col-sizer";
         } else {
             return "row-sizer";
@@ -171,7 +184,7 @@ const GridSizer = (props) => {
     };
 
     const getStyle = () => {
-        if (type === "width") {
+        if (type === WIDTH_TYPE) {
             return {};
         } else {
             if (row === "header") {

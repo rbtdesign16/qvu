@@ -89,7 +89,7 @@
     width: 100%;
     border-bottom: var(--grid-resizer-border);
     background: transparent;
-    position: relative;
+    position: absolute;
     cursor: pointer;
     z-index: 100
 }
@@ -98,7 +98,7 @@
     display: none;
     top: 0;
     height: 100%;
-    position: relative;
+    position: absolute;
     background: transparent;
     cursor: pointer;
     border-right: var(--grid-resizer-border);

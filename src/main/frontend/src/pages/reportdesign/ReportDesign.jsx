@@ -483,6 +483,18 @@ const ReportDesign = () => {
         let userId = authData.currentUser.userId;
         let actionTimestamp = new Date().toISOString();
         let cr = copyObject(currentReport);
+        
+        
+        // remove any UI-based "selected" settings for save
+        cr.reportComponents.map(c => {
+            if (c.value && c.value.dataColumns) {
+                c.value.dataColumns.map(dc => {
+                    delete dc.labelSelected;
+                    delete dc.dataSelected;
+                    delete dc.selected;
+                });
+            }
+        });
 
         if (name !== cr.name) {
             cr.newRecord = true;

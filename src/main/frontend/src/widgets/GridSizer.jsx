@@ -7,12 +7,14 @@ import {
     COMPONENT_ID_PREFIX,
     PIXELS_PER_KEYDOWN_MOVE,
     elementPosToNumber,
-    reportUnitsToPixels
+    reportUnitsToPixels,
+    pixelsToReportUnits
 } from "../utils/reportHelper";
 
 const GridSizer = (props) => {
-    const {type, row, column, component, componentIndex, units} = props;
+    const {type, row, column, component, componentIndex} = props;
     const [sizeBounds, setSizeBounds] = useState({min: 0, max: 0});
+    const [units, setUnits] = useState(null);
     const {
         currentReport,
         setCurrentReport
@@ -27,9 +29,52 @@ const GridSizer = (props) => {
         e.preventDefault();
         let cel = document.getElementById(COMPONENT_ID_PREFIX + componentIndex);
         hideResizer();
-        cel.removeEventListener("mousemove", onHandleSize, true);
-        cel.removeEventListener("mouseup", onStopSize, true);
+        if (cel) {
+            cel.removeEventListener("mousemove", onHandleSize, true);
+            cel.removeEventListener("mouseup", onStopSize, true);
+            let rc = cel.getBoundingClientRect();
+            let cr = copyObject(currentReport);
+            let c = cr.reportComponents[componentIndex];
+            if (type === "width") {
+                let newpos = (e.clientX - rc.left);
 
+                let parts = component.value.gridTemplateColumns.split(" ");
+                let positions = [];
+                let sizes = [];
+                let position = 0;
+                for (let i = 0; i < parts.length; ++i) {
+                    let size = Number(reportUnitsToPixels(units, elementPosToNumber(parts[i])));
+                    position += size;
+                    sizes.push(size);
+                    positions.push(position);
+               }
+               
+               if (newpos > positions[column]) {
+                   let diff = (newpos - positions[column]);
+                   sizes[column] += diff; 
+                   sizes[column + 1] -= diff;
+               } else {
+                  let diff = (positions[column] - newpos);
+                  sizes[column] -= diff;
+                  sizes[column + 1] += diff;
+               }
+               
+               let gtl = "";
+               for (let i = 0; i < sizes.length; ++i) {
+                   gtl += pixelsToReportUnits(units, sizes[i]) + units + " ";
+               }
+               
+               c.value.gridTemplateColumns = gtl.trim();
+            } else {
+                if (row === "header") {
+                    c.value.headerRowHeight = pixelsToReportUnits(units, (e.clientY - rc.top));
+                } else {
+                   c.value.dataRowHeight =  pixelsToReportUnits(units, (e.clientY - rc.top)) - c.value.headerRowHeight;
+                }
+            }
+            
+            setCurrentReport(cr);
+        }
     };
 
     const getSizerElement = (type) => {
@@ -63,7 +108,7 @@ const GridSizer = (props) => {
     const updateHorizontalSizeBounds = () => {
         if (component.value && component.value.gridTemplateColumns) {
             let parts = component.value.gridTemplateColumns.split(" ");
-             let sizes = [];
+            let sizes = [];
             for (let i = 0; i < parts.length; ++i) {
                 sizes.push(reportUnitsToPixels(units, elementPosToNumber(parts[i])));
             }
@@ -125,11 +170,24 @@ const GridSizer = (props) => {
         }
     };
 
+    const getStyle = () => {
+        if (type === "width") {
+            return {};
+        } else {
+            if (row === "header") {
+                return {top: component.value.headerRowHeight + units};
+            } else {
+                return {top: (component.value.headerRowHeight + component.value.dataRowHeight) + units};
+            }
+        }
+    };
+    
     useEffect(() => {
         updateHorizontalSizeBounds();
+        setUnits(currentReport.pageUnits.substring(0, 2));
     }, [sizeBounds]);
 
-    return <div className={getClass()} onMouseDown={e => onMouseDown(e, type)}></div>;
+    return <div style={getStyle()} className={getClass()} onMouseDown={e => onMouseDown(e, type)}></div>;
 };
 
 GridSizer.propTypes = {

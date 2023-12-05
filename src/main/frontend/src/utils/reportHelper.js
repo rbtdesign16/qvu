@@ -247,8 +247,8 @@ const getGridTabularHeader = (currentReport, component, componentIndex, myStyle)
        let units = currentReport.pageUnits.substring(0, 2);
        return <div style={styles[indx]}>
             {c.displayName}
-            {!isLastDataColumn(component.value.dataColumns, indx) && <GridSizer type="width" row="header" column={indx} component={component} componentIndex={componentIndex} units={units}/>}
-            <GridSizer type="height" row="header" column={indx} component={component}  componentIndex={componentIndex} units={units}/>
+            {!isLastDataColumn(component.value.dataColumns, indx) && <GridSizer type="width" row="header" column={indx} component={component} componentIndex={componentIndex}/>}
+            <GridSizer type="height" row="header" column={indx} component={component}  componentIndex={componentIndex}/>
         </div>;
     });
 };
@@ -309,7 +309,7 @@ const getGridTabularData = (currentReport, component, componentIndex, exampleDat
         return r.map((c, indx2) => {
             if (indx1 === 0) {
                 return <div style={rowStyles[indx2]}>{c}
-                    <GridSizer type="height" row="data" column={indx2} component={component} componentIndex={componentIndex} units={units}/>
+                    <GridSizer type="height" row="data" column={indx2} component={component} componentIndex={componentIndex}/>
                 </div>;
            } else {
                 return <div style={rowStyles[indx2]}>{c}</div>;

@@ -61,7 +61,9 @@ import {
     getComponentTypeDisplayText,
     COMPONENT_ID_PREFIX,
     GRID_LAYOUT_FREEFORM,
-    DATA_COLUMN_ID_PREFIX
+    DATA_COLUMN_ID_PREFIX,
+    TABULAR_LAYOUT,
+    PIXELS_PER_POINT
 } from "../../utils/reportHelper";
 
 const ReportContent = (props) => {
@@ -467,6 +469,13 @@ const ReportContent = (props) => {
         if (component.type === COMPONENT_TYPE_DATAGRID) {
             for (let i = 0; i < component.value.dataColumns.length; ++i) {
                 component.value.dataColumns[i].parentId = COMPONENT_ID_PREFIX + componentIndex;
+            }
+            
+            if (component.value.gridLayout === TABULAR_LAYOUT) {
+                if (!component.value.headerRowHeight) {
+                    component.value.headerRowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
+                    component.value.dataRowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
+                }
             }
         }
         

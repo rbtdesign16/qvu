@@ -2,6 +2,7 @@ import {copyObject} from "./helper";
 import moment from "moment";
 import javadatefp from "moment-jdateformatparser";
 import SubComponent from "../pages/reportdesign/SubComponent";
+import GridSizer from "../widgets/GridSizer";
 
 import {
     NONE_SETTING,
@@ -179,9 +180,10 @@ export const updateComponentBorderSettings = (component, bsname, myStyle) => {
     }
 };
     
-const getGridTabularHeaderStyle = (component) => {
+const getGridTabularHeaderStyle = (currentReport, component) => {
      let retval = {
-        height: PIXELS_PER_POINT * Number(component.fontSettings.size)
+        overflow: "hidden",
+        height: component.value.headerRowHeight + currentReport.pageUnits.substring(0, 2)
     };
     
     updateComponentFontSettings(component, "fontSettings", retval);
@@ -190,9 +192,10 @@ const getGridTabularHeaderStyle = (component) => {
     return retval;
 };
 
-const getGridTabularDataStyle = (component) => {
-     let retval = {
-        height: PIXELS_PER_POINT * Number(component.fontSettings2.size)
+const getGridTabularDataStyle = (currentReport, component) => {
+    let retval = {
+        overflow: "hidden",
+        height: component.value.dataRowHeight + currentReport.pageUnits.substring(0, 2)
     };
     
     updateComponentFontSettings(component, "fontSettings2", retval);
@@ -225,7 +228,7 @@ const getDataRecordComponentStyle = (component) => {
     return retval;
 };
 
-const getGridTabularHeader = (component, myStyle) => {
+const getGridTabularHeader = (currentReport, component, myStyle) => {
     let styles = [];
     
     component.value.dataColumns.map(d => {
@@ -241,8 +244,11 @@ const getGridTabularHeader = (component, myStyle) => {
     });
     
    return component.value.dataColumns.map((c, indx) => {
+       let units = currentReport.pageUnits.substring(0, 2);
         return <div style={styles[indx]}>
             {c.displayName}
+            <GridSizer type="width" row="header" column={indx} component={component} units={units}/>
+            <GridSizer type="height" row="header" column={indx} component={component}  units={units}/>
         </div>;
     });
 };
@@ -265,9 +271,10 @@ const getGridTabularExampleData = (currentReport, component) => {
      return retval;
 };
     
-const getGridTabularData = (component, exampleData, myStyle) => {
+const getGridTabularData = (currentReport, component, exampleData, myStyle) => {
     let styles = [];
     let styles2;
+    let units = currentReport.pageUnits.substring(0, 2);
     component.value.dataColumns.map((d) => {
         let s = {...myStyle};
         let ta = d.dataTextAlign;
@@ -296,7 +303,14 @@ const getGridTabularData = (component, exampleData, myStyle) => {
         }
         
         return r.map((c, indx2) => {
-            return <div style={rowStyles[indx2]}>{c}</div>;
+            if (indx1 === 0) {
+                return <div style={rowStyles[indx2]}>{c}
+                    <GridSizer type="width" row="data" column={indx2} component={component} units={units}/>
+                    <GridSizer type="height" row="data" column={indx2} component={component}  units={units}/>
+                </div>;
+           } else {
+                return <div style={rowStyles[indx2]}>{c}</div>;
+           }   
         });
     });
 };
@@ -309,11 +323,11 @@ const getGridSubComponents = (currentReport, component, type) => {
     
 const getDataGridComponentValue = (currentReport, component) => {
     if (component.value.gridLayout === GRID_LAYOUT_TABULAR) {
-        let headerStyle = getGridTabularHeaderStyle(component);
-        let dataStyle = getGridTabularDataStyle(component);
+        let headerStyle = getGridTabularHeaderStyle(currentReport, component);
+        let dataStyle = getGridTabularDataStyle(currentReport, component);
         return <div style={getGridComponentTabularStyle(component)}>
-            {getGridTabularHeader(component, headerStyle)}
-            {getGridTabularData(component, getGridTabularExampleData(currentReport, component), dataStyle)}
+            {getGridTabularHeader(currentReport, component, headerStyle)}
+            {getGridTabularData(currentReport, component, getGridTabularExampleData(currentReport, component), dataStyle)}
         </div>;
     } else {
         return <div>

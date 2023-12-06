@@ -25,7 +25,9 @@ import {
     NONE_SETTING,
     replaceTokens,
     LABEL_TYPE,
-    DATA_TYPE
+    DATA_TYPE,
+    isNotEmpty,
+    isString
 } from "../../utils/helper";
 
 import {
@@ -291,14 +293,14 @@ const ReportContent = (props) => {
         if (c) {
              for (let i = 0; i < c.value.dataColumns.length; ++i) {
                  let dc = c.value.dataColumns[i];
-                 if (dc.dataZindex) {
-                     let z = Number(dc.dataIndex);
+                 if (isNotEmpty(dc.dataZindex)) {
+                     let z = Number(dc.dataZindex);
                      if (retval < z) {
                          retval = z;
                      }
                  }
-                if (dc.labelZindex) {
-                     let z = Number(dc.labelIndex);
+                if (isNotEmpty(dc.labelZindex)) {
+                     let z = Number(dc.labelZindex);
                      if (retval < z) {
                          retval = z;
                      }
@@ -306,7 +308,7 @@ const ReportContent = (props) => {
              }
          } else {
             for (let i = 0; i < currentReport.reportComponents.length; ++i) {
-                if (currentReport.reportComponents[i].zindex) {
+                if (isNotEmpty(currentReport.reportComponents[i].zindex)) {
                     let z = Number(currentReport.reportComponents[i].zindex);
                     if (retval < z) {
                         retval = z;
@@ -329,14 +331,15 @@ const ReportContent = (props) => {
         if (c) {
             for (let i = 0; i < c.value.dataColumns.length; ++i) {
                 let dc = c.value.dataColumns[i];
-                if (dc.dataZindex) {
-                    let z = Number(dc.dataIndex);
+                if (isNotEmpty(dc.dataZindex)) {
+                    let z = Number(dc.dataZindex);
                     if (retval > z) {
                         retval = z;
                     }
                 }
-               if (dc.labelZindex) {
-                    let z = Number(dc.labelIndex);
+                
+                if (isNotEmpty(dc.labelZindex)) {
+                    let z = Number(dc.labelZindex);
                     if (retval > z) {
                         retval = z;
                     }
@@ -344,7 +347,7 @@ const ReportContent = (props) => {
             }
         } else {
             for (let i = 0; i < currentReport.reportComponents.length; ++i) {
-                if (currentReport.reportComponents[i].zindex) {
+                if (isNotEmpty(currentReport.reportComponents[i].zindex)) {
                     let z = Number(currentReport.reportComponents[i].zindex);
                     if (retval > z) {
                         retval = z;
@@ -363,14 +366,14 @@ const ReportContent = (props) => {
     const moveComponentToBack = (componentIndex) => {
         let minz = getMinZindex();
         let cr = copyObject(currentReport);
-        cr.reportComponents[componentIndex].zindex = minz - 1;
+        cr.reportComponents[componentIndex].zindex = minz - 10;
         setCurrentReport(cr);
     };
 
     const moveComponentToFront = (componentIndex) => {
         let maxz = getMaxZindex();
         let cr = copyObject(currentReport);
-        cr.reportComponents[componentIndex].zindex = maxz + 1;
+        cr.reportComponents[componentIndex].zindex = maxz + 10;
         setCurrentReport(cr);
     };
     
@@ -380,7 +383,7 @@ const ReportContent = (props) => {
         let cr = copyObject(currentReport);
         let c = cr.reportComponents[Number(parts[2])];
         let minz = getMinZindex(c);
-        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= minz - 1;
+        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= minz - 10;
         setCurrentReport(cr);
     };
 
@@ -390,7 +393,7 @@ const ReportContent = (props) => {
         let cr = copyObject(currentReport);
         let c = cr.reportComponents[Number(parts[2])];
         let maxz = getMaxZindex(c);
-        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= maxz + 1;
+        c.value.dataColumns[dcindx][parts[4] + "Zindex"]= maxz + 10;
         setCurrentReport(cr);
     };
 
@@ -527,35 +530,35 @@ const ReportContent = (props) => {
                 editComponent(id);
                 break;
             case DELETE_ACTION:
-                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                if (isString(id) && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
                     onDeleteSubComponent(id);
                 } else {
                     onDeleteComponent(id);
                 }
                 break;
             case SELECT_ACTION:
-                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                if (isString(id) && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
                     setSubComponentSelected(id, true);
                 } else {
                     setComponentSelected(id, true);
                 }
                 break;
             case DESELECT_ACTION:
-                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                if (isString(id) && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
                     setSubComponentSelected(id, false);
                 } else {
                     setComponentSelected(id, false);
                 }
                 break;
             case TOFRONT_ACTION:
-                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                if (isString(id) && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
                     moveSubComponentToFront(id);
                 } else {
                     moveComponentToFront(id);
                 }
                 break;
             case TOBACK_ACTION:
-                if ((typeof id === "string") && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
+                if (isString(id) && id.startsWith(DATA_COLUMN_ID_PREFIX)) {
                     moveSubComponentToBack(id);
                 } else {
                     moveComponentToBack(id);

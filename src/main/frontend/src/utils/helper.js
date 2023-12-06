@@ -738,26 +738,29 @@ export const getColumnHelpDisplay = (columnData, getText) => {
 };
 
  export const formatPathForDisplay = (path, noColumnDisplay) => {
-        let l = path.split("|");
-        
-        let end = l.length;
-        
-        if (noColumnDisplay) {
-            end -= 1;
+    let l = path.split("|");
+
+    let end = l.length;
+
+    if (noColumnDisplay) {
+        end -= 1;
+    }
+
+    for (let i = 0; i < end; ++i) {
+        if (l[i].includes("{")) {
+            let pos1 = l[i].indexOf("{");
+            let pos2 = l[i].indexOf("}");
+            let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
+            l[i] = fkcols.replace("?", "");
         }
-        
-        for (let i = 0; i < end; ++i) {
-            if (l[i].includes("{")) {
-                let pos1 = l[i].indexOf("{");
-                let pos2 = l[i].indexOf("}");
-                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
-                l[i] = fkcols.replace("?", "");
-            }
-        }
+    }
 
 
 
-        return l.join("->");
-    };
+    return l.join("->");
+};
 
+export const isString = (input) => {
+    return (input && (typeof input === "string"));
+};
 

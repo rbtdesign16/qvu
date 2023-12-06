@@ -108,23 +108,6 @@ const ReportSection = (props) => {
         return retval;
     };
 
-/*
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        let pos = e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA));
-        if (pos < 0) {
-            e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
-        } else {
-            let el = document.elementFromPoint(e.clientX, e.clientY);
-            if (el && (el.id.startsWith(DATA_COLUMN_ID_PREFIX)
-                    || el.id.startsWith(FREEFORM_GRID_CONTAINER_ID_PREFIX))) {
-                e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
-            } else {
-                e.dataTransfer.dropEffect = NONE_SETTING;
-            }
-        }
-    };
-*/
     const handleDrop = (e) => {
         let el = document.elementFromPoint(e.clientX, e.clientY);
 

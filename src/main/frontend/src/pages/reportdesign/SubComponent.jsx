@@ -6,7 +6,8 @@ import useReportDesign from "../../context/ReportDesignContext";
 import { 
     copyObject,
     DATA_TYPE,
-    LABEL_TYPE
+    LABEL_TYPE,
+    isNotEmpty
 } from "../../utils/helper";
 
 import {
@@ -56,10 +57,10 @@ const SubComponent = (props) => {
             left: dataColumn[type + "Left"] + units,
             top: dataColumn[type + "Top"] + units,
             width: dataColumn[type + "Width"] + units,
-            height: dataColumn[type + "Height"] + units,
+            height: dataColumn[type + "Height"] + units
         };
 
-        if (dataColumn[type + "Zindex"]) {
+        if (isNotEmpty(dataColumn[type + "Zindex"])) {
             retval.zIndex = dataColumn[type + "Zindex"];
         }
 

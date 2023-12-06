@@ -226,7 +226,7 @@ const getGridComponentFreeformStyle = (currentReport, component, row) => {
         width: "100%"
     };
     
-    if (component.value.altrowcolor && ((row %2) === 0)) {
+    if (component.value.altrowcolor && (((row + 1) % 2) === 0)) {
         retval.backgroundColor = component.value.altrowcolor;
     }
     
@@ -358,9 +358,10 @@ const getDataGridComponentValue = (currentReport, component, componentIndex) => 
         return rows.map(r => {
             return <div 
                 id={FREEFORM_GRID_CONTAINER_ID_PREFIX + componentIndex} 
-                style={getGridComponentFreeformStyle(currentReport, component, r+1)}>
+                style={getGridComponentFreeformStyle(currentReport, component, r)}>
                 {getGridSubComponents(currentReport, component, LABEL_TYPE, r)}
                 {getGridSubComponents(currentReport, component, DATA_TYPE, r)}
+                {(r === 0) && <div id={RESIZER_ID_PREFIX + COMPONENT_ID_PREFIX + componentIndex} className="resizer"></div>}
                 {(r === 0) && <GridSizer type="height" row="data" column={-1} component={component}  componentIndex={componentIndex}/>}
             </div>;
         });

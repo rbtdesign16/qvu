@@ -66,16 +66,18 @@ const SubComponent = (props) => {
         }
 
         if (type === LABEL_TYPE) {
-            if ((row === 0) && !dataColumn[type + "Selected"]) {
+            if ((row > 0) || !dataColumn[type + "Selected"]) {
                 retval.outline = gstyle.getPropertyValue('--data-grid-label-border');
             }
+            
             retval.textAlign = dataColumn.headerTextAlign;
             updateComponentFontSettings(component, "fontSettings", retval);
             updateComponentBorderSettings(component, "borderSettings", retval);
         } else {
-            if ((row === 0) && !dataColumn[type + "Selected"]) {
+            if ((row > 0) || !dataColumn[type + "Selected"]) {
                 retval.outline = gstyle.getPropertyValue('--data-grid-data-border');
             }
+            
             retval.textAlign = dataColumn.dataTextAlign;
             updateComponentFontSettings(component, "fontSettings2", retval);
             updateComponentBorderSettings(component, "borderSettings2", retval);
@@ -96,7 +98,7 @@ const SubComponent = (props) => {
         </div>; 
     } else {
         return <div 
-            className={getSubComponentClassName(dataColumn, type)}
+            className={getSubComponentClassName(dataColumn, type, row)}
             id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}
             style={getStyle()}
             draggable={true} 

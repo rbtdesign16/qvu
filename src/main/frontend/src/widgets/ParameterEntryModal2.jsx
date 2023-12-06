@@ -4,8 +4,6 @@ import Button from "react-bootstrap/Button"
 import useMessage from "../context/MessageContext";
 import useAuth from "../context/AuthContext";
 import useLang from "../context/LangContext";
-import useQueryDesign from "../context/QueryDesignContext";
-import useDataHandler from "../context/DataHandlerContext";
 import TextEntry from "./TextEntry";
 import PropTypes from "prop-types";
 import {
@@ -20,15 +18,14 @@ import {
     getFilterComparisonInput} from "../utils/helper";
 
 
-const ParameterEntryModal = (props) => {
+const ParameterEntryModal2 = (props) => {
     const {config} = props;
-    const {filterColumns} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [parameters, setParameters] = useState(null);
     
     const getTitle = () => {
-        return getText("Run query");
+        return getText("Run Report");
     };
     
     const onHide = () => {
@@ -51,11 +48,10 @@ const ParameterEntryModal = (props) => {
 
     const getRequiredEntryFields = () => {
         let retval = [];
-        
-        for (let i = 0; i < filterColumns.length; ++i) {
-            if (!UNARY_COMPARISON_OPERATORS.includes(filterColumns[i].comparisonOperator) 
-                    && isEmpty(filterColumns[i].comparisonValue)) {
-                retval.push(filterColumns[i]);
+        for (let i = 0; i < config.filterColumns.length; ++i) {
+            if (!UNARY_COMPARISON_OPERATORS.includes(config.filterColumns[i].comparisonOperator) 
+                    && isEmpty(config.filterColumns[i].comparisonValue)) {
+                retval.push(config.filterColumns[i]);
             }
         }
         return retval;
@@ -75,21 +71,25 @@ const ParameterEntryModal = (props) => {
     };
     
     const getParameterInputFields = () => {
-       let entryFields = getRequiredEntryFields();
-        return entryFields.map((f, indx) => { 
-            return <div className="entrygrid-225-225">
-                <div className="label">{getLabel(f)}</div><div>{getFilterComparisonInput(f, indx, onChange)}</div>
-            </div>;
-        });
+        if (config && config.filterColumns) {
+            let entryFields = getRequiredEntryFields();
+            return entryFields.map((f, indx) => { 
+                return <div className="entrygrid-225-225">
+                    <div className="label">{getLabel(f)}</div><div>{getFilterComparisonInput(f, indx, onChange)}</div>
+                </div>;
+            });
+        } else {
+            return "";
+        }
     };
     
-    const runQuery = () => {
+    const runReport = () => {
         let params = [];
         for (let i = 0; i < parameters.length; ++i) {
             params.push(parameters[i]);
         }
         
-        config.runQuery(params);
+        config.runReport(params);
     };
     
     const onShow = () => {
@@ -118,15 +118,15 @@ const ParameterEntryModal = (props) => {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                        <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => runQuery()}>{getText("Run")}</Button>
+                        <Button size="sm" variant="primary" disabled={!canRun()}  type="submit" onClick={() => runReport()}>{getText("Run")}</Button>
                     </Modal.Footer>
                 </Modal>
             </div>
             );
 };
 
-ParameterEntryModal.propTypes = {
+ParameterEntryModal2.propTypes = {
     config: PropTypes.object.isRequired
 };
 
-export default ParameterEntryModal;
+export default ParameterEntryModal2;

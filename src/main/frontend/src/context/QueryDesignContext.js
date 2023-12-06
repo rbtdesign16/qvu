@@ -388,25 +388,6 @@ export const QueryDesignProvider = ({ children }) => {
         }
     };
 
-    const getFilterComparisonInput = (filter, indx, onChange) => {
-        let id = "f-" + indx;
-        if (isDataTypeString(filter.dataType)) {
-            return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-        } else if (isDataTypeNumeric(filter.dataType)) {
-            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
-                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-            } else {
-                return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
-            }
-        } else if (isDataTypeDateTime(filter.dataType)) {
-            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
-                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-            } else {
-                return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
-            }
-        }
-    };
-
     const buildRunDocument = (docname) => {
         return {
             name: docname,
@@ -505,7 +486,6 @@ export const QueryDesignProvider = ({ children }) => {
                                 splitter1Sizes,
                                 setSplitter1Sizes,
                                 isParameterEntryRequired,
-                                getFilterComparisonInput,
                                 buildRunDocument,
                                 queryResults,
                                 setQueryResults,

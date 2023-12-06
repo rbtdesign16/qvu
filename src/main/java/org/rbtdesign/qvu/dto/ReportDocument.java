@@ -30,7 +30,8 @@ public class ReportDocument {
     private Double footerHeight = Constants.DEFAULT_FOOTER_HEIGHT;
     private List<Double> pageBorder = Arrays.asList(Constants.DEFAULT_PAGE_BORDER );
     private List<ReportComponent> reportComponents = new ArrayList<>();
-
+    private List<String> queryParameters = new ArrayList<>();
+    
     public String getName() {
         return name;
     }
@@ -182,4 +183,14 @@ public class ReportDocument {
     public void setRunUser(String runUser) {
         this.runUser = runUser;
     }
+
+    public List<String> getQueryParameters() {
+        return queryParameters;
+    }
+
+    public void setQueryParameters(List<String> queryParameters) {
+        this.queryParameters = queryParameters;
+    }
+    
+    
 }

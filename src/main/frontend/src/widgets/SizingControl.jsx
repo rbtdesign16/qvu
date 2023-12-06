@@ -28,7 +28,6 @@ const SizingControl = (props) => {
         if (type === COMPONENT_DRAG_DATA) {
             return getSizer(component.section);
         } else {
-            console.log("---------->" + component.parentId);
             return getSizer(component.parentId);
         }
     };

@@ -17,7 +17,8 @@ import {
     COMPARISON_OPERATOR_IN,
     copyObject,
     formatPathForDisplay,
-    getColumnHelpDisplay
+    getColumnHelpDisplay,
+    getFilterComparisonInput
     } from "../../utils/helper";
 
 const FilterEntry = (props) => {
@@ -29,7 +30,6 @@ const FilterEntry = (props) => {
         setFilterColumns,
         selectColumns,
         setSelectColumns,
-        getFilterComparisonInput,
         getColumnNameForDisplay
     } = useQueryDesign();
 

@@ -10,6 +10,7 @@ import useMenu from "../../context/MenuContext";
 import ContextMenu from "../../widgets/ContextMenu";
 import useReportDesign from "../../context/ReportDesignContext";
 import FontSelectModal from "../../widgets/FontSelectModal";
+import ParameterEntryModal2 from "../../widgets/ParameterEntryModal2";
 import BorderSelectModal from "../../widgets/BorderSelectModal";
 import SaveDocumentModal from "../../widgets/SaveDocumentModal";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
@@ -19,73 +20,78 @@ import { flattenTree } from "react-accessible-treeview";
 import { hasRoleAccess } from "../../utils/authHelper";
 import PropTypes from "prop-types";
 import {
-SUCCESS,
-        WARN,
-        INFO,
-        ERROR,
-        REPORT_DOCUMENT_TYPE,
-        QUERY_DOCUMENT_TYPE,
-        SMALL_ICON_SIZE,
-        replaceTokens,
-        copyObject,
-        showDocumentFromBlob,
-        PDF_MIME_TYPE,
-        LABEL_TYPE,
-        DATA_TYPE
-        } from "../../utils/helper";
+    SUCCESS,
+    WARN,
+    INFO,
+    ERROR,
+    REPORT_DOCUMENT_TYPE,
+    QUERY_DOCUMENT_TYPE,
+    SMALL_ICON_SIZE,
+    replaceTokens,
+    copyObject,
+    showDocumentFromBlob,
+    PDF_MIME_TYPE,
+    LABEL_TYPE,
+    DATA_TYPE,
+    UNARY_COMPARISON_OPERATORS,
+    isEmpty
+} from "../../utils/helper";
 
 import {
-HORIZONTAL_KEY,
-        VERTICAL_KEY,
-        getReportWidthInPixels,
-        getReportHeightInPixels,
-        LEFT,
-        TOP,
-        RIGHT,
-        CENTER,
-        BOTTOM,
-        RULER_WIDTH,
-        isQueryRequiredForReportObject,
-        REPORT_UNITS_MM,
-        INCHES_TO_MM,
-        MM_TO_INCHES,
-        REPORT_SECTION_BODY
-        } from "../../utils/reportHelper";
+    HORIZONTAL_KEY,
+    VERTICAL_KEY,
+    getReportWidthInPixels,
+    getReportHeightInPixels,
+    LEFT,
+    TOP,
+    RIGHT,
+    CENTER,
+    BOTTOM,
+    RULER_WIDTH,
+    isQueryRequiredForReportObject,
+    REPORT_UNITS_MM,
+    INCHES_TO_MM,
+    MM_TO_INCHES,
+    REPORT_SECTION_BODY
+} from "../../utils/reportHelper";
 
 import {
-getReportSettings,
-        getAvailableDocuments,
-        saveDocument,
-        getDocument,
-        isApiError,
-        isApiSuccess,
-        generateReport
+    getReportSettings,
+    getAvailableDocuments,
+    saveDocument,
+    getDocument,
+    isApiError,
+    isApiSuccess,
+    generateReport
 } from "../../utils/apiHelper";
 import { isQueryDesigner, isReportDesigner } from "../../utils/authHelper";
 import { BiWindowOpen, BiWindowClose  } from "react-icons/bi";
-import { RxAlignLeft,
-        RxAlignTop,
-        RxAlignBottom,
-        RxAlignRight,
-        RxSpaceBetweenVertically,
-        RxSpaceBetweenHorizontally
-        } from "react-icons/rx";
+import { 
+    RxAlignLeft,
+    RxAlignTop,
+    RxAlignBottom,
+    RxAlignRight,
+    RxSpaceBetweenVertically,
+    RxSpaceBetweenHorizontally
+} from "react-icons/rx";
 import {
-AiOutlineFontSize,
-        AiOutlineBarChart,
-        AiOutlineBorder
+    AiOutlineFontSize,
+    AiOutlineBarChart,
+    AiOutlineBorder
 }  from "react-icons/ai";
-import { LiaFileInvoiceSolid,
-        LiaFileMedicalSolid,
-        LiaFileUploadSolid,
-        LiaThListSolid,
-        LiaAlignCenterSolid,
-        LiaAlignLeftSolid,
-        LiaAlignRightSolid,
-        LiaWindowRestoreSolid,
-        LiaCoinsSolid,
-        LiaUndoAltSolid,
-        LiaRunningSolid} from "react-icons/lia";
+import { 
+    LiaFileInvoiceSolid,
+    LiaFileMedicalSolid,
+    LiaFileUploadSolid,
+    LiaThListSolid,
+    LiaAlignCenterSolid,
+    LiaAlignLeftSolid,
+    LiaAlignRightSolid,
+    LiaWindowRestoreSolid,
+    LiaCoinsSolid,
+    LiaUndoAltSolid,
+    LiaRunningSolid
+} from "react-icons/lia";
 
 const ReportDesign = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -96,6 +102,7 @@ const ReportDesign = () => {
     const [showReportSettings, setShowReportSettings] = useState({show: false});
     const [showSaveDocument, setShowSaveDocument] = useState({show: false, type: REPORT_DOCUMENT_TYPE});
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false});
+    const [showParameterEntry, setShowParameterEntry] = useState({show: false});
     const {authData, setAuthData} = useAuth();
     const {showMessage, hideMessage} = useMessage();
     const {showHelp} = useHelp();
@@ -118,6 +125,7 @@ const ReportDesign = () => {
         undo,
         canUndo,
         setCurrentQuery,
+        currentQuery,
         getComponentIndexWithSelectedSubComponents} = useReportDesign();
 
     const onUndo = (e) => {
@@ -141,17 +149,47 @@ const ReportDesign = () => {
     const canSave = () => {
         return isReportDesigner(authData);
     };
+    
+    const isParameterEntryRequired = () => {
+        if (currentQuery && currentQuery.filterColumns) {
+            for (let i = 0; i < currentQuery.filterColumns.length; ++i) {
+                if (!UNARY_COMPARISON_OPERATORS.includes(currentQuery.filterColumns[i].comparisonOperator) 
+                        && isEmpty(currentQuery.filterColumns[i].comparisonValue)) {
+                    return true;
+                }
+            }
+        }
+    };
 
-    const onRunReport = async() => {
-        let report = copyObject(currentReport);
-        report.runUser = authData.currentUser.userId;
-        let res = await generateReport(currentReport);
+    const hideParameterEntry = () => {
+        setShowParameterEntry({show: false});
+    };
 
-        let blob = new Blob([res], {
-            type: PDF_MIME_TYPE
-        });
+    const showParamEntry = () => {
+        setShowParameterEntry({show: true, hide: hideParameterEntry, runReport: onRunReport, filterColumns: currentQuery.filterColumns});
+    };
 
-        showDocumentFromBlob(blob);
+
+    const onRunReport = async(params) => {
+        if (currentReport.queryDocumentName 
+            && isParameterEntryRequired() 
+            && (!params || (params.length === 0))) {
+            showParamEntry();
+        } else {
+            let report = copyObject(currentReport);
+            if (params && (params.length > 0)) {
+                report.queryParamters = params;
+            }
+            
+            report.runUser = authData.currentUser.userId;
+            let res = await generateReport(currentReport);
+
+            let blob = new Blob([res], {
+                type: PDF_MIME_TYPE
+            });
+
+            showDocumentFromBlob(blob);
+        }
     };
 
     const onTextAlign = (align) => {
@@ -431,7 +469,7 @@ const ReportDesign = () => {
     <div onClick={onNewReport}><LiaFileMedicalSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("New Report")}</div>
     {canSave() && <div onClick={onSaveDocument}><LiaFileUploadSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Save Report")}</div>}
     <hr  className="h-separator" />
-    <div onClick={onRunReport}><LiaRunningSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Run Report")}</div>
+    <div onClick={e => onRunReport()}><LiaRunningSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Run Report")}</div>
     <hr  className="h-separator" />
     <div onClick={e => onShowQueryDocumentSelect(e)}><LiaCoinsSolid size={SMALL_ICON_SIZE} className="icon cobaltBlue-f"/>{getText("Set Query Document")}</div>
     <hr  className="h-separator" />
@@ -602,6 +640,7 @@ const ReportDesign = () => {
     if (reportSettings && currentReport) {
         return (
                 <div className="report-design-tab" style={{top: "40px", width: "100%"}} >
+                    <ParameterEntryModal2 config={showParameterEntry}/>
                     <ContextMenu />
                     <FontSelectModal config={showFontSelect}/>
                     <BorderSelectModal config={showBorderSelect}/>

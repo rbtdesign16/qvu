@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import ReportSection from "./ReportSection";
 import SizingControl from "../../widgets/SizingControl"
+import PropTypes from "prop-types";
 import useReportDesign from "../../context/ReportDesignContext";
 import { 
     copyObject,
@@ -34,7 +35,7 @@ import {
 } from "../../utils/reportHelper";
 
 const SubComponent = (props) => {
-    const {component, componentIndex, dataColumn, dataColumnIndex, type, units} = props;
+    const {component, componentIndex, dataColumn, dataColumnIndex, type, units, row} = props;
     const {
         reportSettings,
         currentReport,
@@ -55,9 +56,10 @@ const SubComponent = (props) => {
         let retval = {
             position: "absolute",
             left: dataColumn[type + "Left"] + units,
-            top: dataColumn[type + "Top"] + units,
+            top: ((component.value.dataRowHeight * row) + dataColumn[type + "Top"]) + units,
             width: dataColumn[type + "Width"] + units,
-            height: dataColumn[type + "Height"] + units
+            height: dataColumn[type + "Height"] + units,
+            background: "transparent"
         };
 
         if (isNotEmpty(dataColumn[type + "Zindex"])) {
@@ -84,18 +86,34 @@ const SubComponent = (props) => {
         return retval;
     };
 
-    return <div 
-        className={getSubComponentClassName(dataColumn, type)}
-        id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}
-        style={getStyle()}
-        draggable={true} 
-        onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex, type)}>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
-        {getValue()}
-    </div>; 
+    if (row > 0) {
+        return <div className={getSubComponentClassName(dataColumn, type)} style={getStyle()}>
+            {getValue()}
+        </div>; 
+    } else {
+        return <div 
+            className={getSubComponentClassName(dataColumn, type)}
+            id={DATA_COLUMN_ID_PREFIX + dataColumn.parentId + "-" + dataColumnIndex + "-" + type}
+            style={getStyle()}
+            draggable={true} 
+            onDragStart={e => handleComponentDragStart(e, SUBCOMPONENT_DRAG_DATA + "-" + dataColumn.parentId, dataColumnIndex, type)}>
+            <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+            <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={TOP_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+            <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_LEFT} componentIndex={dataColumnIndex} component={dataColumn}/>
+            <SizingControl type={SUBCOMPONENT_DRAG_DATA} subType={type} corner={BOTTOM_RIGHT} componentIndex={dataColumnIndex} component={dataColumn}/>
+            {getValue()}
+        </div>; 
+    }
+};
+
+SubComponent.propTypes = {
+    type: PropTypes.string.isRequired,
+    row: PropTypes.number.isRequired,
+    component: PropTypes.object.isRequired,
+    componentIndex: PropTypes.number.isRequired,
+    dataColumn: PropTypes.object.isRequired,
+    dataColumnIndex: PropTypes.number.isRequired,
+    units: PropTypes.string.isRequired
 };
 
 export default SubComponent;

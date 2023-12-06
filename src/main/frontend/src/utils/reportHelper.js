@@ -219,12 +219,16 @@ const getGridComponentTabularStyle = (component) => {
     return retval;
 };
 
-const getGridComponentFreeformStyle = (currentReport, component) => {
+const getGridComponentFreeformStyle = (currentReport, component, row) => {
     let retval = {
         overflow: "hidden",
         height: component.value.dataRowHeight + currentReport.pageUnits.substring(0, 2),
         width: "100%"
     };
+    
+    if (component.value.altrowcolor && ((row %2) === 0)) {
+        retval.backgroundColor = component.value.altrowcolor;
+    }
     
     updateComponentBorderSettings(component, "borderSettings3", retval);
     return retval;
@@ -330,9 +334,9 @@ const getGridTabularData = (currentReport, component, componentIndex, exampleDat
     });
 };
     
-const getGridSubComponents = (currentReport, component, type) => {
+const getGridSubComponents = (currentReport, component, type, row) => {
     return component.value.dataColumns.map((dc, indx) => {
-        return <SubComponent component={component} dataColumn={dc} dataColumnIndex={indx} type={type} units={currentReport.pageUnits.substring(0, 2)}/>;
+        return <SubComponent component={component} dataColumn={dc} dataColumnIndex={indx} type={type} units={currentReport.pageUnits.substring(0, 2)} row={row}/>;
     });
 };
     
@@ -345,12 +349,21 @@ const getDataGridComponentValue = (currentReport, component, componentIndex) => 
             {getGridTabularData(currentReport, component, componentIndex, getGridTabularExampleData(currentReport, component), dataStyle)}
          </div>;
     } else {
-        return <div 
-            id={FREEFORM_GRID_CONTAINER_ID_PREFIX + componentIndex} 
-            style={getGridComponentFreeformStyle(currentReport, component)}>
-           {getGridSubComponents(currentReport, component, LABEL_TYPE)}
-           {getGridSubComponents(currentReport, component, DATA_TYPE)}
-        </div>;
+        let numRows = Math.floor(component.height / component.value.dataRowHeight);
+        let rows = [];
+        for (let i = 0; i < numRows; ++i) {
+            rows.push(i);
+        }
+        
+        return rows.map(r => {
+            return <div 
+                id={FREEFORM_GRID_CONTAINER_ID_PREFIX + componentIndex} 
+                style={getGridComponentFreeformStyle(currentReport, component, r+1)}>
+                {getGridSubComponents(currentReport, component, LABEL_TYPE, r)}
+               {getGridSubComponents(currentReport, component, DATA_TYPE, r)}
+               {(r === 0) && <GridSizer type="height" row="data" column={-1} component={component}  componentIndex={componentIndex}/>}
+            </div>;
+        });
     }
 };
 

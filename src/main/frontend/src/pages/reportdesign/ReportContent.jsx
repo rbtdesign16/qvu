@@ -476,6 +476,29 @@ const ReportContent = (props) => {
                     component.value.headerRowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
                     component.value.dataRowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
                 }
+            } else {
+                if (!component.value.dataRowHeight) {
+                    let max = 0;
+                    if (component.value.dataColumns) {
+                        component.value.dataColumns.map(dc => {
+                            if (dc.dataTop > max) {
+                                max = dc.dataTop;
+                            }
+                            
+                            if (dc.labelTop > max) {
+                                max = dc.labelTop;
+                            }
+                        });
+                    }
+                    
+                    if (max > 0) {
+                        max += Math.max(pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size)),
+                            pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size)));
+                    }
+                
+                    component.value.dataRowHeight = max;
+                    component.value.headerRowHeight = 0;
+                }
             }
         }
         
@@ -684,7 +707,7 @@ const ReportContent = (props) => {
                 break;
         }
         
-        return retval
+        return retval;
     };
     
     const handleComponentPosition = (e, c) => {

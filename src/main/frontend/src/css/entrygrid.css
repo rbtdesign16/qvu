@@ -19,6 +19,13 @@
     grid-row-gap: 0;
 }
 
+.entrygrid-33p-33p-33p {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    margin: 0;
+    grid-row-gap: 0;
+}
+
 .entrygrid-75-75 {
     display: grid;
     grid-template-columns: 75px 75px;

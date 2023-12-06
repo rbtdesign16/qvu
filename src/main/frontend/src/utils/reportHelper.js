@@ -52,7 +52,8 @@ export const MAX_UNDOS = 3;
 
 export const RESIZER_ID_PREFIX = "sz-";
 export const TABULAR_LAYOUT = "tabular";
-
+export const FREEFORM_LAYOUT = "freeform";
+export const FREEFORM_GRID_CONTAINER_ID_PREFIX = "ffgc-";
 
 // use for sizing logic
 export const COMPONENT_SIZING_RECT_WIDTH = 5;
@@ -154,29 +155,31 @@ export const updateComponentFontSettings = (component, fsame, myStyle) => {
 
 export const updateComponentBorderSettings = (component, bsname, myStyle) => {
     let bs = component[bsname];
-    let bdef = bs.border + " " + bs.width + "px " + bs.color;
-    if (haveAllBorders(bs)) {
-        myStyle.border = bdef;
-    } else {
-        if (bs.left) {
-            myStyle.borderLeft = bdef;
+    if (bs) {
+        let bdef = bs.border + " " + bs.width + "px " + bs.color;
+        if (haveAllBorders(bs)) {
+            myStyle.border = bdef;
+        } else {
+            if (bs.left) {
+                myStyle.borderLeft = bdef;
+            }
+
+            if (bs.top) {
+                myStyle.borderTop = bdef;
+            }
+
+            if (bs.right) {
+                myStyle.borderRight = bdef;
+            }
+
+            if (bs.bottom) {
+                myStyle.borderBottom = bdef;
+            }
         }
 
-        if (bs.top) {
-            myStyle.borderTop = bdef;
+        if (bs.rounded) {
+            myStyle.borderRadius = DEFAULT_BORDER_RADIUS;
         }
-
-        if (bs.right) {
-            myStyle.borderRight = bdef;
-        }
-
-        if (bs.bottom) {
-            myStyle.borderBottom = bdef;
-        }
-    }
-
-    if (bs.rounded) {
-        myStyle.borderRadius = DEFAULT_BORDER_RADIUS;
     }
 };
     
@@ -213,6 +216,17 @@ const getGridComponentTabularStyle = (component) => {
         gridRowGap: 0
     };
     
+    return retval;
+};
+
+const getGridComponentFreeformStyle = (currentReport, component) => {
+    let retval = {
+        overflow: "hidden",
+        height: component.value.dataRowHeight + currentReport.pageUnits.substring(0, 2),
+        width: "100%"
+    };
+    
+    updateComponentBorderSettings(component, "borderSettings3", retval);
     return retval;
 };
     
@@ -331,7 +345,9 @@ const getDataGridComponentValue = (currentReport, component, componentIndex) => 
             {getGridTabularData(currentReport, component, componentIndex, getGridTabularExampleData(currentReport, component), dataStyle)}
          </div>;
     } else {
-        return <div>
+        return <div 
+            id={FREEFORM_GRID_CONTAINER_ID_PREFIX + componentIndex} 
+            style={getGridComponentFreeformStyle(currentReport, component)}>
            {getGridSubComponents(currentReport, component, LABEL_TYPE)}
            {getGridSubComponents(currentReport, component, DATA_TYPE)}
         </div>;
@@ -706,16 +722,13 @@ export const handleComponentDragStart = (e, type, componentIndex, additionalInfo
 export const handleComponentDragOver = (e) => {
     e.preventDefault();
     
-    let subtype = SUBCOMPONENT_DRAG_DATA + "-" + e.target.id;
-    // if this is the current cubcomponent parent
-    if (e.target.id 
-        && (e.target.id.startsWith(DATA_COLUMN_ID_PREFIX) 
-            || e.dataTransfer.types.includes(subtype))) {
-         e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
+    // if this is the current subcomponent parent
+    let pos = e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA));
+    if (pos < 0) {
+        e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
     } else {
-        // only allow component drag if not
-        // subcomponent drag (subcompoent data in types)
-        if (e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA)) < 0) {
+        if (e.target.id && (e.target.id.startsWith(DATA_COLUMN_ID_PREFIX) 
+            || e.target.id.startsWith(FREEFORM_GRID_CONTAINER_ID_PREFIX))) {
             e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
         } else {
             e.dataTransfer.dropEffect = NONE_SETTING;

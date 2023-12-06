@@ -491,7 +491,6 @@ const ReportDesign = () => {
                 c.value.dataColumns.map(dc => {
                     delete dc.labelSelected;
                     delete dc.dataSelected;
-                    delete dc.selected;
                 });
             }
         });

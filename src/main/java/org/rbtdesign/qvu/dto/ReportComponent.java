@@ -18,6 +18,7 @@ public class ReportComponent {
     private FontSettings fontSettings2;
     private BorderSettings borderSettings;
     private BorderSettings borderSettings2;
+    private BorderSettings borderSettings3;
     private Object value;
     private int zindex = 0;
     public String getType() {
@@ -122,6 +123,14 @@ public class ReportComponent {
 
     public void setBorderSettings2(BorderSettings borderSettings2) {
         this.borderSettings2 = borderSettings2;
+    }
+
+    public BorderSettings getBorderSettings3() {
+        return borderSettings3;
+    }
+
+    public void setBorderSettings3(BorderSettings borderSettings3) {
+        this.borderSettings3 = borderSettings3;
     }
     
     

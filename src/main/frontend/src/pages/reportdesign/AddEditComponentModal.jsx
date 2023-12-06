@@ -62,7 +62,9 @@ import {
     getQueryDataColumnDisplay,
     DEFAULT_DATA_TEXT_ALIGN,
     GRID_LAYOUT_OPTIONS,
-    COMPONENT_ID_PREFIX} from "../../utils/reportHelper";
+    COMPONENT_ID_PREFIX,
+    FREEFORM_LAYOUT,
+    isTabularDataGridComponent} from "../../utils/reportHelper";
 
 const AddEditComponentModal = (props) => {
     const {config} = props;
@@ -74,7 +76,8 @@ const AddEditComponentModal = (props) => {
         currentComponent, 
         setCurrentComponent,
         currentQuery,
-        setCurrentQuery} = useReportDesign();
+        setCurrentQuery,
+        getNewBorderSettings} = useReportDesign();
  
     const [selectColumns, setSelectColumns] = useState([]);
     const [dataColumnCount, setDataColumnCount] = useState(0);
@@ -504,7 +507,7 @@ const AddEditComponentModal = (props) => {
             return selectColumns.map((sc, indx) => {
                 let wantFormat = isColumnFormatAvailable(sc);
                 let isnum = isDataTypeNumeric(sc.dataType);
-                let showAddTotal = isnum && (type === COMPONENT_TYPE_DATAGRID);
+                let showAddTotal = isnum && isTabularDataGridComponent(currentComponent);
                 return <div key={getUUID()} className="report-query-column">
                         <div draggable={true} 
                             className="detail-hdr"
@@ -557,7 +560,7 @@ const AddEditComponentModal = (props) => {
                 return <option value={o}>{getText(o)}</option>;
             }
         });
-    }
+    };
             
     const getDataComponentEntry = (type) => {
         if (type === COMPONENT_TYPE_DATARECORD) {
@@ -641,20 +644,42 @@ const AddEditComponentModal = (props) => {
         }
     };
     
-    const getDataComponentFontPanel = (type) => {
+    const getDataComponentFontPanel = () => {
+        let fontLabel = getText("Label Font");
+        if ((currentComponent.type === COMPONENT_TYPE_DATAGRID)
+            && (currentComponent.value.gridLayout !== FREEFORM_LAYOUT)) {
+            fontLabel = getText("Header Font");
+        }
+        
         return <div className="entrygrid-50p-50p">
-            <div className="ta-center tb-border">{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Font") : getText("Label Font")}</div>
+            <div className="ta-center tb-border">{fontLabel}</div>
             <div className="ta-center tb-border">{getText("Data Font")}</div>
             <FontPanel name="fontSettings"/><FontPanel name="fontSettings2"/>
         </div>;
     };
     
-    const getDataComponentBorderPanel = (type) => {
-        return <div className="entrygrid-50p-50p">
-             <div className="ta-center tb-border">{(type === COMPONENT_TYPE_DATAGRID) ? getText("Header Border") : getText("Label Border")}</div>
-             <div className="ta-center tb-border">{getText("Data Border")}</div>
-             <BorderPanel name="borderSettings"/><BorderPanel name="borderSettings2"/>
-         </div>;
+    const getDataComponentBorderPanel = () => {
+        if (isTabularDataGridComponent(currentComponent)) {
+            if (currentComponent.borderSettings3) {
+                delete currentComponent.borderSettings3;
+            }
+            return <div className="entrygrid-50p-50p">
+                <div className="ta-center tb-border">{getText("Header Border")}</div>
+                <div className="ta-center tb-border">{getText("Data Border")}</div>
+                <BorderPanel name="borderSettings"/><BorderPanel name="borderSettings2"/>
+             </div>;
+        } else {
+            if (!currentComponent.borderSettings3) {
+                currentComponent.borderSettings3 = getNewBorderSettings();
+            }
+            
+            return <div className="entrygrid-33p-33p-33p">
+                <div className="ta-center tb-border">{getText("Label Border")}</div>
+                <div className="ta-center tb-border">{getText("Data Border")}</div>
+                <div className="ta-center tb-border">{getText("Container Border")}</div>
+                <BorderPanel name="borderSettings"/><BorderPanel name="borderSettings2"/><BorderPanel name="borderSettings3"/>
+             </div>;
+         }
    };
 
     const getTabs = () => {
@@ -670,10 +695,10 @@ const AddEditComponentModal = (props) => {
                         {getComponentPanel(type)}
                     </Tab>
                         <Tab eventKey="font" title={getText("Font")}>
-                        {isMultiFontPanelRequired(type) ? getDataComponentFontPanel(type) : <FontPanel name="fontSettings"/>}
+                        {isMultiFontPanelRequired(type) ? getDataComponentFontPanel() : <FontPanel name="fontSettings"/>}
                      </Tab>
                     <Tab eventKey="border" title={getText("Border")}>
-                        {isMultiBorderPanelRequired(type) ? getDataComponentBorderPanel(type) : <BorderPanel name="borderSettings"/>}
+                        {isMultiBorderPanelRequired(type) ? getDataComponentBorderPanel() : <BorderPanel name="borderSettings"/>}
                     </Tab>
                 </Tabs>;
             }

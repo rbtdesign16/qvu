@@ -35,7 +35,9 @@ import {
     isDataComponent,
     RESIZER_ID_PREFIX,
     COMPONENT_ID_PREFIX,
-    DATA_COLUMN_ID_PREFIX
+    DATA_COLUMN_ID_PREFIX,
+    FREEFORM_GRID_CONTAINER_ID_PREFIX,
+    handleComponentDragOver
     } from "../../utils/reportHelper";
 
 const ReportSection = (props) => {
@@ -106,6 +108,7 @@ const ReportSection = (props) => {
         return retval;
     };
 
+/*
     const handleDragOver = (e) => {
         e.preventDefault();
         let pos = e.dataTransfer.types.findIndex((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA));
@@ -114,57 +117,49 @@ const ReportSection = (props) => {
         } else {
             let el = document.elementFromPoint(e.clientX, e.clientY);
             if (el && (el.id.startsWith(DATA_COLUMN_ID_PREFIX)
-                    || e.dataTransfer.types.includes(SUBCOMPONENT_DRAG_DATA + "-" + el.id))) {
+                    || el.id.startsWith(FREEFORM_GRID_CONTAINER_ID_PREFIX))) {
                 e.dataTransfer.dropEffect = MOVE_DROP_EFFECT;
             } else {
                 e.dataTransfer.dropEffect = NONE_SETTING;
             }
         }
     };
-
+*/
     const handleDrop = (e) => {
         let el = document.elementFromPoint(e.clientX, e.clientY);
 
-        if (el &&
-                (el.id.startsWith(DATA_COLUMN_ID_PREFIX)
-                        || e.dataTransfer.types.includes(SUBCOMPONENT_DRAG_DATA + "-" + el.id))) {
+        if (el && (el.id.startsWith(DATA_COLUMN_ID_PREFIX)
+            || el.id.startsWith(FREEFORM_GRID_CONTAINER_ID_PREFIX))) {
             e.preventDefault();
+            let dataid = e.dataTransfer.types.find((type) => type.startsWith(SUBCOMPONENT_DRAG_DATA));
+            if (dataid) {
+                // if coming in from subcomponent drag with
+                // scinfo prefix - split out parts to build
+                // valid data id
+                let parts = dataid.split("-");
+                let data = e.dataTransfer.getData(dataid);
+                if (data) {
+                    let scinfo = JSON.parse(data);
+                    let cr = copyObject(currentReport);
+                    let c = cr.reportComponents[Number(parts[2])];
+                    let sc = c.value.dataColumns[scinfo.index];
 
-            let dataid = SUBCOMPONENT_DRAG_DATA + "-" + el.id;
-            let cindx;
+                    let rect = document.getElementById(sc.parentId).getBoundingClientRect();
 
-            
-            // if coming in from subcomponent drag with
-            // scinfo prefix - split out parts to build
-            // valid data id
-            if (el.id.startsWith(DATA_COLUMN_ID_PREFIX)) {
-                let parts = el.id.split("-");
-                dataid = SUBCOMPONENT_DRAG_DATA + "-" + parts[1] + "-" + parts[2];
-                cindx = Number(parts[2]);
-            } else {
-                cindx = Number(el.id.replace(COMPONENT_ID_PREFIX, ""));
+                    let x = e.clientX - rect.left;
+                    let y = e.clientY - rect.top;
+
+                    if (scinfo.additionalInfo === DATA_TYPE) {
+                        sc.dataLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
+                        sc.dataTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
+                    } else {
+                        sc.labelLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
+                        sc.labelTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
+                    }
+
+                    setCurrentReport(cr);
+                }
             }
- 
-            let scinfo = JSON.parse(e.dataTransfer.getData(dataid));
-            let cr = copyObject(currentReport);
-            let c = cr.reportComponents[cindx];
-            let sc = c.value.dataColumns[scinfo.index];
-
-            let rect = document.getElementById(sc.parentId).getBoundingClientRect();
-
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
-
-            if (scinfo.additionalInfo === DATA_TYPE) {
-                sc.dataLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
-                sc.dataTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
-            } else {
-                sc.labelLeft = pixelsToReportUnits(currentReport.pageUnits, x - scinfo.left);
-                sc.labelTop = pixelsToReportUnits(currentReport.pageUnits, y - scinfo.top);
-            }
-
-            setCurrentReport(cr);
-
         } else if (e.dataTransfer.getData(COMPONENT_DRAG_DATA)) {
             e.preventDefault();
             let cr = copyObject(currentReport);
@@ -326,7 +321,7 @@ const ReportSection = (props) => {
 
     return <div id={section} 
      onDrop={e => handleDrop(e)} 
-     onDragOver={e => handleDragOver(e)}
+     onDragOver={e => handleComponentDragOver(e)}
      onMouseDown={e => onMouseDown(e)}
      onContextMenu={e => onContextMenu(e, -1, section)} 
      style={getStyle()}>

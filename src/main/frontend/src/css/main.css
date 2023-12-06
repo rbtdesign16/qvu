@@ -822,8 +822,8 @@ Note: Beware of modifying this element as it can break the animations - you shou
 }
 
 .shape-example {
-    height: 50px;
-    margin: 10px 75px 0 75px;
+    height: 75px;
+    margin: 10px 150px 0 150px;
  }
 
 .ta-center {

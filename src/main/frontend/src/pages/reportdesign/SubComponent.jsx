@@ -59,7 +59,6 @@ const SubComponent = (props) => {
             top: ((component.value.dataRowHeight * row) + dataColumn[type + "Top"]) + units,
             width: dataColumn[type + "Width"] + units,
             height: dataColumn[type + "Height"] + units,
-            background: "transparent"
         };
 
         if (isNotEmpty(dataColumn[type + "Zindex"])) {
@@ -67,14 +66,14 @@ const SubComponent = (props) => {
         }
 
         if (type === LABEL_TYPE) {
-            if (!dataColumn[type + "Selected"]) {
+            if ((row === 0) && !dataColumn[type + "Selected"]) {
                 retval.outline = gstyle.getPropertyValue('--data-grid-label-border');
             }
             retval.textAlign = dataColumn.headerTextAlign;
             updateComponentFontSettings(component, "fontSettings", retval);
             updateComponentBorderSettings(component, "borderSettings", retval);
         } else {
-            if (!dataColumn[type + "Selected"]) {
+            if ((row === 0) && !dataColumn[type + "Selected"]) {
                 retval.outline = gstyle.getPropertyValue('--data-grid-data-border');
             }
             retval.textAlign = dataColumn.dataTextAlign;
@@ -82,12 +81,17 @@ const SubComponent = (props) => {
             updateComponentBorderSettings(component, "borderSettings2", retval);
         }  
         
-       
+        if (component.value.altrowcolor && (((row + 1) % 2 ) === 0)) {
+            retval.backgroundColor = component.value.altrowcolor;
+        }
+        
         return retval;
     };
 
     if (row > 0) {
-        return <div className={getSubComponentClassName(dataColumn, type)} style={getStyle()}>
+        return <div className={getSubComponentClassName(dataColumn, type, row)} 
+            style={getStyle()}
+            onClick={e => e.preventDefault()}>
             {getValue()}
         </div>; 
     } else {

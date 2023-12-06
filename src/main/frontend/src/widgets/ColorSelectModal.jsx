@@ -5,7 +5,7 @@ import useMessage from "../context/MessageContext";
 import { SketchPicker } from 'react-color';
 import useLang from "../context/LangContext";
 import PropTypes from "prop-types";
-import {MODAL_TITLE_SIZE} from "../utils/helper";
+import {MODAL_TITLE_SIZE, TRANSPARENT_SETTING} from "../utils/helper";
 
 const ColorSelectModal = (props) => {
     const {config} = props;
@@ -34,6 +34,7 @@ const ColorSelectModal = (props) => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
+                    <Button size="sm" onClick={() => setColor(TRANSPARENT_SETTING)}>{getText("Clear")}</Button>
                     <Button size="sm" variant="primary" type="submit" onClick={() => config.saveColor(color.hex)}>{getText("Save")}</Button>
                 </Modal.Footer>
             </Modal>

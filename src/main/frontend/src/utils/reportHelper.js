@@ -360,8 +360,8 @@ const getDataGridComponentValue = (currentReport, component, componentIndex) => 
                 id={FREEFORM_GRID_CONTAINER_ID_PREFIX + componentIndex} 
                 style={getGridComponentFreeformStyle(currentReport, component, r+1)}>
                 {getGridSubComponents(currentReport, component, LABEL_TYPE, r)}
-               {getGridSubComponents(currentReport, component, DATA_TYPE, r)}
-               {(r === 0) && <GridSizer type="height" row="data" column={-1} component={component}  componentIndex={componentIndex}/>}
+                {getGridSubComponents(currentReport, component, DATA_TYPE, r)}
+                {(r === 0) && <GridSizer type="height" row="data" column={-1} component={component}  componentIndex={componentIndex}/>}
             </div>;
         });
     }
@@ -716,11 +716,15 @@ export const getComponentClassName = (comp) => {
     }
 };
 
-export const getSubComponentClassName = (subcomp, type) => {
-    if (subcomp[type + "Selected"]) {
-        return "report-component-sel";
+export const getSubComponentClassName = (subcomp, type, row) => {
+    if (row === 0) {
+        if (subcomp[type + "Selected"]) {
+            return "report-component-sel";
+        } else {
+            return "report-component";
+        }
     } else {
-        return "report-component";
+        return "read-only-subcomponent";
     }
 };
 

@@ -134,7 +134,7 @@ export const ReportDesignProvider = ({ children }) => {
             font: reportSettings.defaultFont,
             size: reportSettings.defaultFontSize,
             color: reportSettings.defaultForegroundColor,
-            backgroundColor: "white",
+            backgroundColor: reportSettings.defaultBackgroundColor,
             bold: false,
             italic: false,
             underline: false

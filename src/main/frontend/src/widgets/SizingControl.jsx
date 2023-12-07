@@ -11,7 +11,6 @@ import {
     reportUnitsToPixels,
     elementPosToNumber,
     reformatDataComponent,
-    isDataComponent,
     getSizer,
     SUBCOMPONENT_DRAG_DATA,
     COMPONENT_DRAG_DATA,
@@ -89,7 +88,6 @@ const SizingControl = (props) => {
 
         let cr = copyObject(currentReport);
         let c;
-                 
         let units = currentReport.pageUnits.substring(0, 2);
 
         if (type === SUBCOMPONENT_DRAG_DATA) {
@@ -105,7 +103,7 @@ const SizingControl = (props) => {
             c.top = pixelsToReportUnits(units, elementPosToNumber(sz.style.top));
             c.width = pixelsToReportUnits(units, elementPosToNumber(sz.style.width));
             c.height = pixelsToReportUnits(units, elementPosToNumber(sz.style.height));
-            if (isDataComponent(type)) {
+            if (COMPONENT_DRAG_DATA === type) {
                 reformatDataComponent(currentReport, c);
             }
         }

@@ -274,10 +274,10 @@ const isLastDataColumn = (dataColumns, indx) => {
     return (indx === (dataColumns.length - 1));
 };
 
-const getGridTabularExampleData = (currentReport, component) => {
+const getGridTabularExampleData = (component) => {
     let retval = [];
-    let headerHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings.size));
-    let rowHeight = pixelsToReportUnits(currentReport.pageUnits, PIXELS_PER_POINT * Number(component.fontSettings2.size));
+    let headerHeight = component.value.headerRowHeight;
+    let rowHeight = component.value.dataRowHeight;
     let numRows = Math.floor(((component.height - headerHeight) / rowHeight));
     
      for (let i = 0; i < numRows; ++i) {
@@ -346,7 +346,7 @@ const getDataGridComponentValue = (currentReport, component, componentIndex) => 
         let dataStyle = getGridTabularDataStyle(currentReport, component);
         return <div style={getGridComponentTabularStyle(component)}>
             {getGridTabularHeader(currentReport, component, componentIndex, headerStyle)}
-            {getGridTabularData(currentReport, component, componentIndex, getGridTabularExampleData(currentReport, component), dataStyle)}
+            {getGridTabularData(currentReport, component, componentIndex, getGridTabularExampleData(component), dataStyle)}
          </div>;
     } else {
         let numRows = Math.floor(component.height / component.value.dataRowHeight);
@@ -597,7 +597,11 @@ export const reformatDataComponent = (currentReport, component) => {
             let cwidth = component.width / numcols;
 
             for (let i = 0; i < numcols; ++i) {
-                gtc += (cwidth + unit + " ");
+                if (i === (numcols - 1)) {
+                    gtc += ((cwidth - pixelsToReportUnits(unit, 2)) + unit);
+                } else {
+                    gtc += (cwidth + unit + " ");
+                }
             }
         
             component.value.gridTemplateColumns = gtc.trim();

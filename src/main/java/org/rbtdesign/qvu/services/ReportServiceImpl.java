@@ -1,10 +1,14 @@
 package org.rbtdesign.qvu.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
+import org.rbtdesign.qvu.dto.ReportComponent;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.ReportDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.ReportRunWrapper;
@@ -71,6 +75,12 @@ public class ReportServiceImpl implements ReportService {
             }
             
             String html = generateHtml(report, queryResult);
+            
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("------------------ generated html -----------------");
+                LOG.debug(html);
+                LOG.debug("--------------------------------- -----------------");
+            }
         }
         
  
@@ -80,15 +90,35 @@ public class ReportServiceImpl implements ReportService {
     private String generateHtml(ReportDocument report, QueryResult queryResult) {
         StringBuilder retval = new StringBuilder();
         
-        retval.append(getHtmlOpen(report));
-        
+        double pageWidth = getReportWidth(report);
+        double pageHeight = getReportHeight(report);
+        String units = report.getPageUnits().substring(0, 2);
         int pageCount = calculatePageCount(report, queryResult);
+
+        retval.append(getHtmlOpen(report, pageWidth, pageHeight, units, pageCount));
+        List<ReportComponent> headerComponents = new ArrayList<>();
+        List<ReportComponent> bodyComponents = new ArrayList<>();
+        List<ReportComponent> footerComponents = new ArrayList<>();
       
+        for (ReportComponent c : report.getReportComponents()) {
+            switch(c.getSection()) {
+                case Constants.REPORT_SECTION_HEADER:
+                    headerComponents.add(c);
+                    break;
+                case Constants.REPORT_SECTION_BODY:
+                    bodyComponents.add(c);
+                    break;
+                case Constants.REPORT_SECTION_FOOTER:
+                    footerComponents.add(c);
+                    break;
+            }
+        }
+        
         for (int i = 0; i < pageCount; ++i) {
             retval.append("\n<div class=\"page\">");
-            retval.append(getHeaderHtml(report, queryResult, i+1));
-            retval.append(getBodyHtml(report, queryResult, i + 1));
-            retval.append(getFooterHtml(report, queryResult, i + 1, pageCount));
+            retval.append(getHeaderHtml(report, queryResult, headerComponents, pageWidth, pageHeight, units, pageCount, i));
+            retval.append(getBodyHtml(report, queryResult, bodyComponents, pageWidth, pageHeight, units, pageCount, i));
+            retval.append(getFooterHtml(report, queryResult, footerComponents, pageWidth, pageHeight, units, pageCount, i));
             retval.append("\n</div>");
         }
         
@@ -103,66 +133,247 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
-    private String getHeaderHtml(ReportDocument report, QueryResult queryResult, int page) {
+    private String getHeaderHtml(ReportDocument report, 
+        QueryResult queryResult, 
+        List <ReportComponent> components,
+        double pageWidth, 
+        double pageHeight, 
+        String units, 
+        int pageCount, 
+        int currentPage) {
         StringBuilder retval = new StringBuilder();
 
-        retval.append("\n<div class=\"sec-header\">this is the header");
+        double top = pageHeight * currentPage;
+        retval.append("\n<div style=\"");
+        retval.append("top: ");
+        retval.append(top);
+        retval.append(units);
+        retval.append(";\" class=\"sec-header\">");
         
+        // header components
+        int cindx = 0;
+        for (ReportComponent c : components) {
+            retval.append("<div ");
+            retval.append("class=\"");
+            retval.append("header-comp-");
+            retval.append(cindx++);
+            retval.append("\" ");
+            retval.append(getComponentStyle(report, c, top, units));
+            retval.append(">\n");
+            
+            retval.append("</div>\n");
+        }
         
-        retval.append("</div>");
+        retval.append("</div>\n");
         
         return retval.toString();
      }
     
-    private String getBodyHtml(ReportDocument report, QueryResult queryResult, int page) {
+    private String getBodyHtml(ReportDocument report, 
+        QueryResult queryResult, 
+        List <ReportComponent> components,
+        double pageWidth, 
+        double pageHeight, 
+        String units, 
+        int pageCount, 
+        int currentPage) {
+     
+        double top = (pageHeight * currentPage) + report.getHeaderHeight();
+
         StringBuilder retval = new StringBuilder();
-        retval.append("\n<div class=\"sec-body\">this is the body");
+        retval.append("\n<div style=\"");
+        retval.append("top: ");
+        retval.append(top);
+        retval.append(units);
+        retval.append(";\" class=\"sec-body\">");
         
-        
-        retval.append("</div>");
-        return retval.toString();
-    }
-    
-    private String getFooterHtml(ReportDocument report, QueryResult queryResult, int page, int pageCount) {
-        StringBuilder retval = new StringBuilder();
-        
-                        
-        if (pageCount > page) {
-            retval.append("\n<div style=\"break-after: page\" class=\"sec-footer\">this is the footer");
-        } else {
-            retval.append("\n<div class=\"sec-footer\">this is the footer");
+        // body components
+        int cindx = 0;
+        for (ReportComponent c : components) {
+            retval.append("<div ");
+            retval.append("class=\"");
+            retval.append("body-comp-");
+            retval.append(cindx++);
+            retval.append("\" ");
+            retval.append(getComponentStyle(report, c, top, units));
+            retval.append(">\n");
+            
+            retval.append("</div>\n");
         }
         
-        retval.append("</div>");
+        retval.append("</div>\n");
+        
+        return retval.toString();
+    }
+    
+    private String getFooterHtml(ReportDocument report, 
+        QueryResult queryResult, 
+        List <ReportComponent> components,
+        double pageWidth, 
+        double pageHeight, 
+        String units, 
+        int pageCount, 
+        int currentPage) {
+        StringBuilder retval = new StringBuilder();
+        
+        double top = (pageHeight * currentPage) + (pageHeight - report.getFooterHeight());
+        retval.append("\n<div style=\"");
+        retval.append("top: ");
+        retval.append(top);
+        retval.append(units);
+ 
+                        
+        if (pageCount > (currentPage + 1)) {
+            retval.append("; break-after: page\"");
+        } 
+        
+        retval.append(" class=\"sec-footer\">");
+        
+        // footer components
+        int cindx = 0;
+        for (ReportComponent c : components) {
+            retval.append("<div ");
+            retval.append("class=\"");
+            retval.append("footer-comp-");
+            retval.append(cindx++);
+            retval.append("\" ");
+            retval.append(getComponentStyle(report, c, top, units));
+            retval.append(">\n");
+            
+            retval.append("</div>\n");
+         }
+        
+        retval.append("</div>\n");
         
         return retval.toString();
     }
 
-    private int calculatePageCount(ReportDocument report, QueryResult queryResult) {
-        return 1;
+    private String getComponentStyle(ReportDocument report, ReportComponent c, double top, String units) {
+        StringBuilder retval = new StringBuilder();
+        retval.append("style=\" top: ");
+        retval.append(top + c.getTop());
+        retval.append(units);
+               
+        return retval.toString();
     }
     
+    private boolean isDataGridComponent(ReportComponent c) {
+        return Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID.equals(c.getType());
+    }
     
-    private String getHtmlOpen(ReportDocument report) {
+    private boolean hasGridComponent(ReportDocument report) {
+        boolean retval = false;
+        for (ReportComponent c : report.getReportComponents()) {
+            if (isDataGridComponent(c)) {
+                retval = true;
+                break;
+            }
+        }
+        
+        return retval;
+    }
+    
+    private double gitDataGridRowSpan(ReportDocument report) {
+        double retval = 1.0;
+        
+        for (ReportComponent c : report.getReportComponents()) {
+            if (isDataGridComponent(c)) {
+                Map<String, Object> m = (Map<String, Object>)c.getValue();
+                String layout = (String)m.get("gridLayout");
+                Double drh = (Double)m.get("dataRowHeight");
+                Double hrh = (Double)m.get("headerRowHeight");
+                
+                if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
+                    if (((c.getHeight() - hrh) / drh) > retval) {
+                        retval = ((c.getHeight() - hrh) / drh);
+                    }
+                }
+            }
+        }
+        
+        return retval;
+     }
+    
+    private int calculatePageCount(ReportDocument report, QueryResult queryResult) {
+        int retval = 1;
+        
+        if (queryResult != null) {
+            if (hasGridComponent(report)) {
+                retval = (int)Math.floor(queryResult.getRowCount() / gitDataGridRowSpan(report));
+            } else {
+                retval = queryResult.getRowCount();
+            }
+        }
+        
+        return retval;
+    }
+    
+    private String getBorderCss(ReportComponent c) {
+        if (c.getBorderSettings() != null) {
+            return c.getBorderSettings().getBorderCss();
+        } else {
+            return "";
+        }
+    }
+    
+    private String getFontCss(ReportComponent c) {
+        if (c.getFontSettings() != null) {
+            return c.getFontSettings().getFontCss();
+        } else {
+            return "";
+        }
+    }
+
+    private String getHtmlOpen(ReportDocument report, double pageWidth, double pageHeight, String units, int pageCount) {
         StringBuilder retval = new StringBuilder();
-
-        double width = getReportWidth(report);
-        double height = getReportHeight(report);
-        String units = report.getPageUnits().substring(0, 2);
-
 
         retval.append("<html>\n<style>\nbody {\nbackground-color: white;\n}\n.page {");
         retval.append("position: absolute;\nwidth: ");
-        retval.append(width);
+        retval.append(pageWidth);
         retval.append(units);
         retval.append(";\nheight: ");
-        retval.append(height);
+        retval.append(pageHeight);
         retval.append(units);
         retval.append(";\n}");
         
-        retval.append(getSectionClass(report, "header", units, height, width));
-        retval.append(getSectionClass(report, "body", units, height, width));
-        retval.append(getSectionClass(report, "footer", units, height, width));
+        retval.append(getSectionClass(report, "header", units, pageHeight, pageWidth));
+        retval.append(getSectionClass(report, "body", units, pageHeight, pageWidth));
+        retval.append(getSectionClass(report, "footer", units, pageHeight, pageWidth));
+        
+        int chindx = 0;
+        int cbindx = 0;
+        int cfindx=0;
+        
+        for (int i = 0; i < report.getReportComponents().size(); ++i) {
+            ReportComponent c = report.getReportComponents().get(i);
+            retval.append(".");
+            retval.append(c.getSection());
+            retval.append("-comp-");
+            switch(c.getSection()) {
+                case Constants.REPORT_SECTION_HEADER:
+                    retval.append(chindx++);
+                    break;
+                case Constants.REPORT_SECTION_BODY:
+                    retval.append(cbindx++);
+                    break;
+                case Constants.REPORT_SECTION_FOOTER:
+                    retval.append(cfindx++);
+                    break;
+            }
+            retval.append(" {\nleft: ");
+            retval.append(report.getPageBorder().get(0) + c.getLeft());
+            retval.append(units);
+            retval.append("; width: ");
+            retval.append(c.getWidth());
+            retval.append(units);
+            retval.append("; height:");
+            retval.append(c.getHeight());
+            retval.append(units);
+            retval.append(getFontCss(c));
+            retval.append(getBorderCss(c));
+            retval.append(";\n}\n");
+        }
+        
         retval.append("</style>\n<body>");
         
         return retval.toString();
@@ -172,7 +383,7 @@ public class ReportServiceImpl implements ReportService {
         return "\n</body>\n</html>";
     }
     
-    private String getSectionClass(ReportDocument report, String section, String units, double height, double width) {
+    private String getSectionClass(ReportDocument report, String section, String units, double pageHeight, double pageWidth) {
         StringBuilder retval = new StringBuilder();
         retval.append(".sec-");
         retval.append(section);
@@ -188,12 +399,13 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(0));
                 retval.append(units);
-                retval.append(";\n");
-                retval.append("width: ");
-                retval.append(width - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
+                retval.append(";\nleft: ");
+                retval.append(report.getPageBorder().get(0));
                 retval.append(units);
-                retval.append(";\n");
-                retval.append("height: ");
+                retval.append(";\nwidth: ");
+                retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
+                retval.append(units);
+                retval.append(";\nheight: ");
                 retval.append(report.getHeaderHeight() - report.getPageBorder().get(1));
                 retval.append(units);
                 retval.append(";\n");
@@ -205,13 +417,15 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(3));
                 retval.append(units);
-                retval.append(";\n");
-                retval.append("width: ");
-                retval.append(width - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
+                retval.append(";\nleft: ");
+                retval.append(report.getPageBorder().get(0));
+                retval.append(units);
+                retval.append(";\nwidth: ");
+                retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
                 retval.append(units);
                 retval.append(";\n");
                 retval.append("height: ");
-                retval.append(height - (report.getHeaderHeight() + report.getFooterHeight()));
+                retval.append(pageHeight - (report.getHeaderHeight() + report.getFooterHeight()));
                 retval.append(units);
                 retval.append(";\n");
                break;
@@ -226,13 +440,15 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(" ");
                 retval.append(report.getPageBorder().get(0));
                 retval.append(units);
-                retval.append(";\n");
-                retval.append("width: ");
-                retval.append(width - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
+                retval.append(";\nleft: ");
+                retval.append(report.getPageBorder().get(0));
+                retval.append(units);
+                retval.append(";\nwidth: ");
+                retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
                 retval.append(units);
                 retval.append(";\n");
                 retval.append("height: ");
-                retval.append(height - report.getPageBorder().get(3));
+                retval.append(pageHeight - report.getPageBorder().get(3));
                 retval.append(units);
                 retval.append(";\n");
                 break;

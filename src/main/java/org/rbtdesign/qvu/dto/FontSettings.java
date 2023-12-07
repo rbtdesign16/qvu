@@ -1,5 +1,6 @@
 package org.rbtdesign.qvu.dto;
 
+import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.util.Constants;
 
 /**
@@ -72,6 +73,41 @@ public class FontSettings {
         this.backgroundColor = backgroundColor;
     }
     
-    
-   
+   public String getFontCss() {
+       StringBuilder retval = new StringBuilder();
+       
+       if (StringUtils.isNotEmpty(font)) {
+           retval.append("font-family: ");
+           retval.append(font);
+           retval.append(";\n");
+           retval.append("font-size: ");
+           retval.append(size);
+           retval.append("pt;\n");
+           
+           retval.append("font-weight: ");
+           if (isBold()) {
+               retval.append("700;\n");
+           } else {
+               retval.append("400;\n");
+           }
+           
+           if (isItalic()) {
+               retval.append("font-style: italic;\n");
+           }
+           
+           if (isUnderline()) {
+               retval.append("text-decoration: underline;\n");
+           }
+           
+           retval.append("color: ");
+           retval.append(color);
+           retval.append(";\n");
+           
+           retval.append("backgroundColor: ");
+           retval.append(backgroundColor);
+           retval.append(";\n");
+        }
+       
+       return retval.toString();
+   }
 }

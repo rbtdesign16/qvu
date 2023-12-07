@@ -18,6 +18,9 @@ public class Constants {
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    public static final String NONE = "none";
+    public static final String DEFAULT_BORDER_RADIUS = "10px";
+    
     // security authentication types supported
     public static final String BASIC_SECURITY_TYPE = "basic";
     public static final String OIDC_SECURITY_TYPE = "oidc";
@@ -258,6 +261,21 @@ public class Constants {
         REPORT_SECTION_BODY,
         REPORT_SECTION_FOOTER
     };
+    
+    public static final String GRID_LAYOUT_FREEFORM = "freeform";
+    
+    public static final String REPORT_COMPONENT_TYPE_TEXT_ID = "text";
+    public static final String REPORT_COMPONENT_TYPE_IMAGE_ID = "image";
+    public static final String REPORT_COMPONENT_TYPE_SHAPE_ID = "shape";
+    public static final String REPORT_COMPONENT_TYPE_EMAIL_ID = "email";
+    public static final String REPORT_COMPONENT_TYPE_HYPERLINK_ID = "hyperlink";
+    public static final String REPORT_COMPONENT_TYPE_PAGE_NUMBER_ID = "pagenumber";
+    public static final String REPORT_COMPONENT_TYPE_CURRENT_DATE_ID = "currentdate";
+    public static final String REPORT_COMPONENT_TYPE_DATA_FIELD_ID = "datafield";
+    public static final String REPORT_COMPONENT_TYPE_DATA_GRID_ID = "datagrid";
+    public static final String REPORT_COMPONENT_TYPE_DATA_RECORD_ID = "datarecord";
+    public static final String REPORT_COMPONENT_TYPE_CHART_ID = "chart";
+    public static final String REPORT_COMPONENT_TYPE_SUBREPORT_ID = "subreport";
     
     public static final String REPORT_COMPONENT_TYPE_TEXT = "Text";
     public static final String REPORT_COMPONENT_TYPE_IMAGE = "Image";

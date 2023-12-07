@@ -37,7 +37,7 @@ public class ReportDesignSettings {
     private String defaultBorderColor = Constants.DEFAULT_BORDER_COLOR;
     private List<Integer> borderWidths = new ArrayList<>(Arrays.asList(Constants.BORDER_WIDTHS));
     private Map<String, double[]> pageSizeSettings;
-    private String defaultBorderRadius = "10px";
+    private String defaultBorderRadius = Constants.DEFAULT_BORDER_RADIUS;
     
     public String getDefaultPageUnits() {
         return defaultPageUnits;

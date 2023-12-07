@@ -79,4 +79,66 @@ public class BorderSettings {
     public void setRounded(boolean rounded) {
         this.rounded = rounded;
     }
+    
+    public String getBorderCss() {
+        StringBuilder retval = new StringBuilder();
+        
+        if (isTop() && isRight() && isBottom() && isLeft()) {
+            retval.append("border: ");
+            retval.append(border);
+            retval.append(" ");
+            retval.append(width);
+            retval.append("px ");
+            retval.append(color);
+            retval.append(";\n");
+        } else {
+            if (isTop()) {
+                retval.append("border-top: ");
+                retval.append(border);
+                retval.append(" ");
+                retval.append(width);
+                retval.append("px ");
+                retval.append(color);
+                retval.append(";\n");
+            }  
+        
+             if (isRight()) {
+                retval.append("border-right: ");
+                retval.append(border);
+                retval.append(" ");
+                retval.append(width);
+                retval.append("px ");
+                retval.append(color);
+                retval.append(";\n");
+            }  
+             
+            if (isBottom()) {
+                retval.append("border-bottom: ");
+                retval.append(border);
+                retval.append(" ");
+                retval.append(width);
+                retval.append("px ");
+                retval.append(color);
+                retval.append(";\n");
+            }  
+            
+            if (isLeft()) {
+                retval.append("border-left: ");
+                retval.append(border);
+                retval.append(" ");
+                retval.append(width);
+                retval.append("px ");
+                retval.append(color);
+                retval.append(";\n");
+            }  
+        }
+        
+        if (isRounded()) {
+            retval.append("border-radius: ");
+            retval.append(Constants.DEFAULT_BORDER_RADIUS);
+            retval.append(";\n");
+        }
+        
+        return retval.toString();
+    }
 }

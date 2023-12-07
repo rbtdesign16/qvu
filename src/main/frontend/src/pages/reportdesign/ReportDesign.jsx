@@ -177,12 +177,16 @@ const ReportDesign = () => {
             showParamEntry();
         } else {
             let report = copyObject(currentReport);
+            let wrapper = {
+                document: report
+            };
+            
             if (params && (params.length > 0)) {
-                report.queryParamters = params;
+                wrapper.queryParameters = params;
             }
             
             report.runUser = authData.currentUser.userId;
-            let res = await generateReport(currentReport);
+            let res = await generateReport(wrapper);
 
             let blob = new Blob([res], {
                 type: PDF_MIME_TYPE

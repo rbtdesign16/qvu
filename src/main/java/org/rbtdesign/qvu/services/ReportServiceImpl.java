@@ -6,6 +6,8 @@ import org.rbtdesign.qvu.client.utils.OperationResult;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.ReportDocumentRunWrapper;
+import org.rbtdesign.qvu.dto.ReportRunWrapper;
 import org.rbtdesign.qvu.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +32,15 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public OperationResult<byte[]> generateReport(String user, String group, String name) {
+    public OperationResult<byte[]> generateReport(ReportRunWrapper reportWrapper) {
         OperationResult<byte[]> retval = new OperationResult();
-        OperationResult <ReportDocument> res = mainService.getDocument(Constants.DOCUMENT_TYPE_REPORT, group, name);
+        OperationResult <ReportDocument> res = mainService.getDocument(Constants.DOCUMENT_TYPE_REPORT, reportWrapper.getGroupName(), reportWrapper.getDocumentName());
         
         if (res.isSuccess()) {
-            retval = generateReport(res.getResult());
+            ReportDocumentRunWrapper rw = new ReportDocumentRunWrapper();
+            rw.setDocument(res.getResult());
+            rw.setParameters(reportWrapper.getParameters());
+            retval = generateReport(rw);
         } else {
             retval.setErrorCode(res.getErrorCode());
             retval.setMessage(res.getMessage());
@@ -46,14 +51,15 @@ public class ReportServiceImpl implements ReportService {
     
 
     @Override
-    public OperationResult<byte[]> generateReport(ReportDocument report) {
+    public OperationResult<byte[]> generateReport(ReportDocumentRunWrapper reportWrapper) {
         OperationResult<QueryResult> qres = null;
         
+        ReportDocument report = reportWrapper.getDocument();
         if (StringUtils.isNotEmpty(report.getQueryDocumentName())) {
             QueryRunWrapper queryWrapper 
                 = new QueryRunWrapper(report.getRunUser(), 
                     report.getQueryDocumentGroup(), 
-                  report.getQueryDocumentName(), null);
+                  report.getQueryDocumentName(), reportWrapper.getParameters());
             
              qres = mainService.runQuery(queryWrapper);
         }

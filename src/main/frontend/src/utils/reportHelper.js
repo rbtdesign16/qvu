@@ -263,7 +263,7 @@ const getGridTabularHeader = (currentReport, component, componentIndex, myStyle)
     
    return component.value.dataColumns.map((c, indx) => {
        return <div style={styles[indx]}>
-            {c.displayName}
+            <div className="grid-header-text">{c.displayName}</div>
             <GridSizer type="width" row="header" column={indx} component={component} componentIndex={componentIndex}/>
             <GridSizer type="height" row="header" column={indx} component={component}  componentIndex={componentIndex}/>
         </div>;

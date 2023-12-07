@@ -124,3 +124,10 @@
     position: absolute;
     z-index: 10;
 }
+
+
+.grid-header-text {
+    width: calc (100% - 5px);
+    overflow: hidden;
+    display: inline-block;
+}

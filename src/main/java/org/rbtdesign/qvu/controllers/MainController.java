@@ -30,7 +30,8 @@ import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDesignSettings;
-import org.rbtdesign.qvu.dto.ReportDocument;
+import org.rbtdesign.qvu.dto.ReportDocumentRunWrapper;
+import org.rbtdesign.qvu.dto.ReportRunWrapper;
 import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
@@ -399,16 +400,16 @@ public class MainController {
         return service.getReportDesignSettings();
     }
     
-    @GetMapping("api/v1/report/generate/{user}/{group}/{name}")
-    public HttpEntity<byte[]> generateReport(@PathVariable String user, @PathVariable String group, @PathVariable String name) {
-        LOG.debug("in generateReport(" + user + ", " + group + ", " + name + ")");
+    @PostMapping("api/v1/report/run")
+    public HttpEntity<byte[]> generateReport(@RequestBody ReportRunWrapper reportWrapper) {
+        LOG.debug("in generateReport()");
         HttpEntity<byte[]> retval = null;
         try {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
             
-            OperationResult<byte[]> res  = reportService.generateReport(user, group, name);
+            OperationResult<byte[]> res  = reportService.generateReport(reportWrapper);
 
             if (res.isSuccess()) {
                 header.setContentLength(res.getResult().length);
@@ -427,15 +428,15 @@ public class MainController {
         return retval;
     }
 
-    @PostMapping("api/v1/report/generate")
-    public HttpEntity<byte[]> generateReport(@RequestBody ReportDocument report) {
+    @PostMapping("api/v1/report/document/run")
+    public HttpEntity<byte[]> generateReport(@RequestBody ReportDocumentRunWrapper reportWrapper) {
         LOG.debug("in generateReport()");
         HttpEntity<byte[]> retval = null;
         try {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
-            OperationResult<byte[]> res = reportService.generateReport(report);
+            OperationResult<byte[]> res = reportService.generateReport(reportWrapper);
             if (res.isSuccess()) {
                 header.setContentLength(res.getResult().length);
                 retval = new HttpEntity<>(res.getResult(), header);

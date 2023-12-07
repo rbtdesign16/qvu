@@ -24,7 +24,6 @@ public class FontSettings {
         this.font = font;
     }
 
-
     public int getSize() {
         return size;
     }
@@ -72,42 +71,44 @@ public class FontSettings {
     public void setBackgroundColor(String backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
-    
-   public String getFontCss() {
-       StringBuilder retval = new StringBuilder();
-       
-       if (StringUtils.isNotEmpty(font)) {
-           retval.append("font-family: ");
-           retval.append(font);
-           retval.append(";\n");
-           retval.append("font-size: ");
-           retval.append(size);
-           retval.append("pt;\n");
-           
-           retval.append("font-weight: ");
-           if (isBold()) {
-               retval.append("700;\n");
-           } else {
-               retval.append("400;\n");
-           }
-           
-           if (isItalic()) {
-               retval.append("font-style: italic;\n");
-           }
-           
-           if (isUnderline()) {
-               retval.append("text-decoration: underline;\n");
-           }
-           
-           retval.append("color: ");
-           retval.append(color);
-           retval.append(";\n");
-           
-           retval.append("backgroundColor: ");
-           retval.append(backgroundColor);
-           retval.append(";\n");
+
+    public String getFontCss() {
+        StringBuilder retval = new StringBuilder("");
+
+        if (StringUtils.isNotEmpty(font)) {
+            retval.append("\t\tfont-family: ");
+            retval.append(font);
+            retval.append(";\n");
+            retval.append("\t\tfont-size: ");
+            retval.append(size);
+            retval.append("pt;\n");
+
+            retval.append("\t\tfont-weight: ");
+            if (isBold()) {
+                retval.append(Constants.FONT_WEIGHT_BOLD);
+            } else {
+                retval.append(Constants.FONT_WEIGHT_NORMAL);
+            }
+
+            retval.append(";\n");
+
+            if (isItalic()) {
+                retval.append("\t\tfont-style: italic;\n");
+            }
+
+            if (isUnderline()) {
+                retval.append("\t\ttext-decoration: underline;\n");
+            }
+
+            retval.append("\t\tcolor: ");
+            retval.append(color);
+            retval.append(";\n");
+
+            retval.append("\t\tbackground-color: ");
+            retval.append(backgroundColor);
+            retval.append(";\n");
         }
-       
-       return retval.toString();
-   }
+
+        return retval.toString();
+    }
 }

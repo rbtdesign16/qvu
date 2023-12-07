@@ -20,6 +20,8 @@ public class Constants {
 
     public static final String NONE = "none";
     public static final String DEFAULT_BORDER_RADIUS = "10px";
+    public static final int FONT_WEIGHT_BOLD = 700;
+    public static final int FONT_WEIGHT_NORMAL = 400;
     
     // security authentication types supported
     public static final String BASIC_SECURITY_TYPE = "basic";

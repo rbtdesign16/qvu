@@ -420,9 +420,10 @@ public class MainController {
                     .body(res.getMessage().getBytes());
             }
         } catch (Exception ex) {
-                retval = ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ex.toString().getBytes());
+            LOG.error(ex.toString(), ex);
+            retval = ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.toString().getBytes());
         }
 
         return retval;
@@ -446,9 +447,10 @@ public class MainController {
                     .body(res.getMessage().getBytes());
             }
         } catch (Exception ex) {
-                retval = ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ex.toString().getBytes());
+            LOG.error(ex.toString(), ex);
+            retval = ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.toString().getBytes());
         }
 
         return retval;

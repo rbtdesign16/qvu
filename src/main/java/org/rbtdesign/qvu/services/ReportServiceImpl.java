@@ -57,7 +57,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public OperationResult<byte[]> generateReport(ReportDocumentRunWrapper reportWrapper) {
         OperationResult<QueryResult> qres = null;
-        
+        System.out.println("--------->1");
         ReportDocument report = reportWrapper.getDocument();
         if (StringUtils.isNotEmpty(report.getQueryDocumentName())) {
             QueryRunWrapper queryWrapper 
@@ -67,6 +67,7 @@ public class ReportServiceImpl implements ReportService {
             
              qres = mainService.runQuery(queryWrapper);
         }
+        System.out.println("--------->2");
         
         if ((qres == null) || qres.isSuccess()) {
             QueryResult queryResult = null;
@@ -75,6 +76,7 @@ public class ReportServiceImpl implements ReportService {
             }
             
             String html = generateHtml(report, queryResult);
+        System.out.println("--------->html=" + html);
             
             if (LOG.isDebugEnabled()) {
                 LOG.debug("------------------ generated html -----------------");

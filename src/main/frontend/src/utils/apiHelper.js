@@ -549,7 +549,7 @@ export const getReportSettings = async () => {
 
 export const generateReport = async (reportWrapper) => {
     try {
-        let res = await axios.post(getApiURL() + "/report/run/document", reportWrapper, {...hconfig, responseType: "arraybuffer"});
+        let res = await axios.post(getApiURL() + "/report/document/run", reportWrapper, {...hconfig, responseType: "arraybuffer"});
         return res.data;
     } catch (e) {
         console.log("error: generateReport - " + e);

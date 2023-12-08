@@ -124,6 +124,7 @@ public class Constants {
         }
     }
     
+    public static final String GRID_FORMAT_TABLULAR = "tabular";
     public static final String DOCUMENT_TYPE_QUERY = "query";
     public static final String DOCUMENT_TYPE_REPORT = "report";
     public static final String TABLE_CACHE_NAME = "table.cache";

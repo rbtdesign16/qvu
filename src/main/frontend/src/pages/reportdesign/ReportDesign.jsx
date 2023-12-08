@@ -176,6 +176,8 @@ const ReportDesign = () => {
             && (!params || (params.length === 0))) {
             showParamEntry();
         } else {
+            showMessage(INFO, replaceTokens(getText("Running report", "..."), [currentReport.name]), null, true);
+
             let report = copyObject(currentReport);
             let wrapper = {
                 document: report
@@ -191,6 +193,8 @@ const ReportDesign = () => {
             let blob = new Blob([res], {
                 type: PDF_MIME_TYPE
             });
+
+            hideMessage();
 
             showDocumentFromBlob(blob);
         }

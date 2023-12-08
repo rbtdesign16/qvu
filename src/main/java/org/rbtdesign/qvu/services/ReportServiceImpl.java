@@ -1,5 +1,6 @@
 package org.rbtdesign.qvu.services;
 
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,13 +10,16 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.dto.QueryDocument;
+import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryResult;
-import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.ReportComponent;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.ReportDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.ReportRunWrapper;
+import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.util.Constants;
+import org.rbtdesign.qvu.util.FileHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,10 @@ public class ReportServiceImpl implements ReportService {
     
     @Autowired
     private MainService mainService;
+    
+    @Autowired
+    private FileHandler fileHandler;
+
     
     @PostConstruct
     private void init() {
@@ -59,33 +67,54 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public OperationResult<byte[]> generateReport(ReportDocumentRunWrapper reportWrapper) {
+        OperationResult<byte[]> retval = new OperationResult();
         OperationResult<QueryResult> qres = null;
-
+        Map <String, Integer> queryColumnIndexMap = new HashMap<>();
+        
         ReportDocument report = reportWrapper.getDocument();
         if (StringUtils.isNotEmpty(report.getQueryDocumentName())) {
-            QueryRunWrapper queryWrapper 
-                = new QueryRunWrapper(report.getRunUser(), 
-                    report.getQueryDocumentGroup(), 
-                  report.getQueryDocumentName(), reportWrapper.getParameters());
+            OperationResult <QueryDocument> dres = fileHandler.getQueryDocument(report.getQueryDocumentGroup(), report.getRunUser(), report.getQueryDocumentName());
             
-             qres = mainService.runQuery(queryWrapper);
-        }
-        
-        if ((qres == null) || qres.isSuccess()) {
-            QueryResult queryResult = null;
-            if (qres != null) {
-                queryResult = qres.getResult();
+            if (dres.isSuccess()) {
+                QueryDocument qdoc = dres.getResult();
+                
+                int indx = 0;
+                for (SqlSelectColumn sc : qdoc.getSelectColumns()) {
+                    if (sc.isShowInResults()) {
+                        queryColumnIndexMap.put(getQueryColumnKey(sc), indx);
+                    }
+                    indx++;
+                }
+                
+                QueryDocumentRunWrapper queryWrapper 
+                    = new QueryDocumentRunWrapper(qdoc, reportWrapper.getParameters());
+            
+                qres = mainService.runQuery(queryWrapper);
+            } else {
+                retval.setErrorCode(dres.getErrorCode());
+                retval.setMessage(dres.getMessage());
             }
-            
-            String html = generateHtml(report, queryResult);
-            
         }
         
+        if (retval.isSuccess()) {
+            if ((qres == null) || qres.isSuccess()) {
+                QueryResult queryResult = null;
+                if (qres != null) {
+                    queryResult = qres.getResult();
+                }
+
+                String html = generateHtml(report, queryColumnIndexMap, queryResult);
+
+            } else if (!qres.isSuccess()) {
+                retval.setErrorCode(qres.getErrorCode());
+                retval.setMessage(qres.getMessage());
+            }
+        }
  
-        return null;
+        return retval;
     }
     
-    private String generateHtml(ReportDocument report, QueryResult queryResult) {
+    private String generateHtml(ReportDocument report, Map <String, Integer> queryColumnIndexMap, QueryResult queryResult) {
         StringBuilder retval = new StringBuilder();
         
         double pageWidth = getReportWidth(report);
@@ -93,14 +122,29 @@ public class ReportServiceImpl implements ReportService {
         String units = report.getPageUnits().substring(0, 2);
         int pageCount = calculatePageCount(report, queryResult);
 
-        Map<String, SimpleDateFormat> dateFormats = new HashMap<>();
+        Map<String, Format> formatCache = new HashMap<>();
         
-        retval.append(getHtmlOpen(report, pageWidth, pageHeight, units));
+        retval.append("<html>\n");
+        retval.append(getStyleSection(report, pageWidth, pageHeight, units));
+        retval.append("<body>");
+
+        LOG.debug("pageCount: " + pageCount);
+        
+        LOG.debug(retval.toString());
         List<ReportComponent> headerComponents = new ArrayList<>();
         List<ReportComponent> bodyComponents = new ArrayList<>();
         List<ReportComponent> footerComponents = new ArrayList<>();
-      
+         
         for (ReportComponent c : report.getReportComponents()) {
+            if (isDataComponent(c.getType())) {
+                Map <String, Object> value = (Map <String, Object>)c.getValue();
+                List<Map<String, Object>> dcols = (List<Map<String, Object>>)value.get("dataColumns");
+                for (Map<String, Object> dc : dcols) {
+                    Integer indx = queryColumnIndexMap.get(this.getQueryColumnKey(dc));
+                    dc.put("selectIndex", indx + 1);
+                }
+            }
+            
             switch(c.getSection()) {
                 case Constants.REPORT_SECTION_HEADER:
                     headerComponents.add(c);
@@ -114,29 +158,26 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         
-        pageCount = 10;
         // use a map to save static compononts so
         // we do not need to recreate on each page
-        Map<String, String> cmap = new HashMap<>();
+        Map<String, String> staticComponentCache = new HashMap<>();
         for (int i = 0; i < pageCount; ++i) {
             retval.append("\n<div style=\"top: ");
             retval.append(i * pageHeight);
             retval.append(units);
             retval.append(";\" class=\"page\">");
-            retval.append(getHeaderHtml(report, queryResult, headerComponents, pageHeight, units, pageCount, i, dateFormats, cmap));
-            retval.append(getBodyHtml(report, queryResult, bodyComponents, pageHeight, units,  pageCount, i, dateFormats, cmap));
-            retval.append(getFooterHtml(report, queryResult, footerComponents, pageHeight, units, pageCount, i, dateFormats, cmap));
+            retval.append(getHeaderHtml(report, queryResult, headerComponents, pageHeight, units, pageCount, i, formatCache, staticComponentCache));
+            retval.append(getBodyHtml(report, queryResult, bodyComponents, pageHeight, units,  pageCount, i, formatCache, staticComponentCache));
+            retval.append(getFooterHtml(report, queryResult, footerComponents, pageHeight, units, pageCount, i, formatCache, staticComponentCache));
             retval.append("\n</div>");
         }
         
-        retval.append(getHtmlClose());
+        retval.append("\n</body>\n</html>");
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("------------------ generated html -----------------");
-            LOG.debug(retval.toString());
-            LOG.debug("--------------------------------- -----------------");
-        }
-        
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(retval.toString());
+         }
+ 
         return retval.toString();
     }
     
@@ -147,7 +188,7 @@ public class ReportServiceImpl implements ReportService {
         QueryResult queryResult,
         int currentPage, 
         int componentIndex,
-        Map<String, SimpleDateFormat> dateFormats) {
+        Map<String, Format> formatCache) {
         StringBuilder retval = new StringBuilder("");
         
         switch(c.getType()) {
@@ -170,16 +211,16 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getPageNumberHtml(c, currentPage));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_CURRENT_DATE_ID:
-                retval.append(getCurrentDateHtml(c, dateFormats));
+                retval.append(getCurrentDateHtml(c, formatCache));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID:
-                retval.append(getDataFieldHtml(c, queryResult));
+                retval.append(getDataFieldHtml(c, queryResult, formatCache));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
-                retval.append(getDataGridHtml(c, queryResult));
+                retval.append(getDataGridHtml(c, queryResult, formatCache));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
-                retval.append(getDataRecordHtml(c, queryResult));
+                retval.append(getDataRecordHtml(c, queryResult, formatCache));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_CHART_ID:
                 break;
@@ -192,10 +233,14 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
-    private boolean isCacheableComponent(String typeid) {
-        return !(Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(typeid)
+    private boolean isDataComponent(String typeid) {
+        return (Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(typeid)
             || Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID.equals(typeid)
-            || Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID.equals(typeid)
+            || Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID.equals(typeid));
+    }
+    
+    private boolean isCacheableComponent(String typeid) {
+        return !(isDataComponent(typeid)
             || Constants.REPORT_COMPONENT_TYPE_PAGE_NUMBER_ID.equals(typeid));
     }
     
@@ -206,8 +251,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount, 
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats,
-        Map<String, String> cmap) {
+        Map<String, Format> formatCache,
+        Map<String, String> staticComponentCache) {
         StringBuilder retval = new StringBuilder();
 
         double top = pageHeight * currentPage;
@@ -221,7 +266,7 @@ public class ReportServiceImpl implements ReportService {
             
             boolean cacheable = isCacheableComponent(c.getType());
             if (cacheable) {
-                html = cmap.get(cid);
+                html = staticComponentCache.get(cid);
             }
             
             if (StringUtils.isNotEmpty(html)) {
@@ -234,13 +279,13 @@ public class ReportServiceImpl implements ReportService {
                 buf.append("\" ");
                 buf.append(getComponentStyle(report, c, top, units));
                 buf.append(">\n");
-                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, formatCache));
                 buf.append("\t\t</div>\n");
                 
                 retval.append(buf);
                 
                 if (cacheable) {
-                    cmap.put(cid, buf.toString());
+                    staticComponentCache.put(cid, buf.toString());
                 }
             }
                 
@@ -259,8 +304,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount,
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats,
-        Map<String, String> cmap) {
+        Map<String, Format> formatCache,
+        Map<String, String> staticComponentCache) {
      
         double top = (pageHeight * currentPage) + report.getHeaderHeight();
 
@@ -277,7 +322,7 @@ public class ReportServiceImpl implements ReportService {
             
             boolean cacheable = isCacheableComponent(c.getType());
             if (cacheable) {
-                html = cmap.get(cid);
+                html = staticComponentCache.get(cid);
             }
             
             if (StringUtils.isNotEmpty(html)) {
@@ -290,13 +335,13 @@ public class ReportServiceImpl implements ReportService {
                 buf.append("\" ");
                 buf.append(getComponentStyle(report, c, top, units));
                 buf.append(">\n");
-                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, formatCache));
                 buf.append("\t\t</div>\n");
                 
                 retval.append(buf);
                 
                 if (cacheable) {
-                    cmap.put(cid, buf.toString());
+                    staticComponentCache.put(cid, buf.toString());
                 }
             }
                 
@@ -315,8 +360,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount, 
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats,
-        Map<String, String> cmap) {
+        Map<String, Format> formatCache,
+        Map<String, String> staticComponentCache) {
         StringBuilder retval = new StringBuilder();
         
         double top = (pageHeight * currentPage) + (pageHeight - report.getFooterHeight());
@@ -337,7 +382,7 @@ public class ReportServiceImpl implements ReportService {
             
             boolean cacheable = isCacheableComponent(c.getType());
             if (cacheable) {
-                html = cmap.get(cid);
+                html = staticComponentCache.get(cid);
             }
             
             if (StringUtils.isNotEmpty(html)) {
@@ -350,13 +395,13 @@ public class ReportServiceImpl implements ReportService {
                 buf.append("\" ");
                 buf.append(getComponentStyle(report, c, top, units));
                 buf.append(">\n\t\t\t");
-                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, formatCache));
                 buf.append("\t\t</div>\n");
                 
                 retval.append(buf.toString());
                 
                 if (cacheable) {
-                    cmap.put(cid, buf.toString());
+                    staticComponentCache.put(cid, buf.toString());
                 }
             }
             
@@ -378,14 +423,14 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
-    private boolean isDataGridComponent(ReportComponent c) {
-        return Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID.equals(c.getType());
+    private boolean isDataGridComponent(String typeid) {
+        return Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID.equals(typeid);
     }
     
     private boolean hasGridComponent(ReportDocument report) {
         boolean retval = false;
         for (ReportComponent c : report.getReportComponents()) {
-            if (isDataGridComponent(c)) {
+            if (isDataGridComponent(c.getType())) {
                 retval = true;
                 break;
             }
@@ -398,11 +443,11 @@ public class ReportServiceImpl implements ReportService {
         double retval = 1.0;
         
         for (ReportComponent c : report.getReportComponents()) {
-            if (isDataGridComponent(c)) {
+            if (isDataGridComponent(c.getType())) {
                 Map<String, Object> m = (Map<String, Object>)c.getValue();
                 String layout = (String)m.get("gridLayout");
-                Double drh = (Double)m.get("dataRowHeight");
-                Double hrh = (Double)m.get("headerRowHeight");
+                Double drh = getDoubleMapValue("dataRowHeight", m);
+                Double hrh = getDoubleMapValue("headerRowHeight", m);
                 
                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
                     if (((c.getHeight() - hrh) / drh) > retval) {
@@ -444,11 +489,10 @@ public class ReportServiceImpl implements ReportService {
             return "";
         }
     }
-
-    private String getHtmlOpen(ReportDocument report, double pageWidth, double pageHeight, String units) {
+    
+    private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
         StringBuilder retval = new StringBuilder();
-
-        retval.append("<html>\n<style>\n\tbody {\n\t\tbackground-color: white;\n\t}\n\t.page {\n");
+        retval.append("<style>\n\tbody {\n\t\tbackground-color: white;\n\t}\n\t.page {\n");
         retval.append("\t\tposition: absolute;\n\t\twidth: ");
         retval.append(pageWidth);
         retval.append(units);
@@ -473,101 +517,118 @@ public class ReportServiceImpl implements ReportService {
         
         for (int i = 0; i < report.getReportComponents().size(); ++i) {
             ReportComponent c = report.getReportComponents().get(i);
-            retval.append("\t.");
-            retval.append(c.getSection());
-            retval.append("-comp-");
+            if (!isDataComponent(c.getType())) {
+                retval.append("\t.");
+                retval.append(c.getSection());
+                retval.append("-comp-");
+                switch(c.getSection()) {
+                    case Constants.REPORT_SECTION_HEADER:
+                        retval.append(chindx);
+                        break;
+                    case Constants.REPORT_SECTION_BODY:
+                        retval.append(cbindx);
+                        break;
+                    case Constants.REPORT_SECTION_FOOTER:
+                        retval.append(cfindx);
+                        break;
+                }
+                retval.append(" {\n\t\tleft: ");
+                retval.append(c.getLeft());
+                retval.append(units);
+                retval.append(";\n\t\twidth: ");
+                retval.append(c.getWidth());
+                retval.append(units);
+                retval.append(";\n\t\theight:");
+                retval.append(c.getHeight());
+                retval.append(units);
+                retval.append(";\n\t\tposition: absolute;\n\t\tz-index: 1;\n\t\ttext-align: ");
+                retval.append(c.getAlign());
+                retval.append(";\n");
+                retval.append(getFontCss(c));
+                retval.append(getBorderCss(c));
+                retval.append("\n\t}\n");
+
+                switch(c.getType()) {
+                    case Constants.REPORT_COMPONENT_TYPE_SHAPE_ID:
+                        switch(c.getSection()) {
+                            case Constants.REPORT_SECTION_HEADER:
+                                retval.append(this.getShapeClass(c, chindx));
+                                break;
+                            case Constants.REPORT_SECTION_BODY:
+                                retval.append(this.getShapeClass(c, cbindx));
+                                break;
+                            case Constants.REPORT_SECTION_FOOTER:
+                                retval.append(this.getShapeClass(c, cfindx));
+                                 break;
+                        }
+                        break;
+                    case Constants.REPORT_COMPONENT_TYPE_IMAGE_ID:
+                       switch(c.getSection()) {
+                            case Constants.REPORT_SECTION_HEADER:
+                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + chindx));
+                                break;
+                            case Constants.REPORT_SECTION_BODY:
+                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + cbindx));
+                                break;
+                            case Constants.REPORT_SECTION_FOOTER:
+                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + cfindx));
+                                 break;
+                        }
+                       break;
+                   case Constants.REPORT_COMPONENT_TYPE_EMAIL_ID:
+                       switch(c.getSection()) {
+                            case Constants.REPORT_SECTION_HEADER:
+                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + chindx));
+                                break;
+                            case Constants.REPORT_SECTION_BODY:
+                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + cbindx));
+                                break;
+                            case Constants.REPORT_SECTION_FOOTER:
+                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + cfindx));
+                                 break;
+                        }
+                       break;
+                   case Constants.REPORT_COMPONENT_TYPE_HYPERLINK_ID:
+                       switch(c.getSection()) {
+                            case Constants.REPORT_SECTION_HEADER:
+                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + chindx));
+                                break;
+                            case Constants.REPORT_SECTION_BODY:
+                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + cbindx));
+                                break;
+                            case Constants.REPORT_SECTION_FOOTER:
+                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + cfindx));
+                                 break;
+                        }
+                       break;
+                }
+            } else {
+                retval.append(getDataComponentCss(report, c, chindx, cbindx, cfindx));
+            }
+            
             switch(c.getSection()) {
                 case Constants.REPORT_SECTION_HEADER:
-                    retval.append(chindx++);
+                    chindx++;
                     break;
                 case Constants.REPORT_SECTION_BODY:
-                    retval.append(cbindx++);
+                    cbindx++;
                     break;
                 case Constants.REPORT_SECTION_FOOTER:
-                    retval.append(cfindx++);
+                    cfindx++;
                     break;
             }
-            retval.append(" {\n\t\tleft: ");
-            retval.append(c.getLeft());
-            retval.append(units);
-            retval.append(";\n\t\twidth: ");
-            retval.append(c.getWidth());
-            retval.append(units);
-            retval.append(";\n\t\theight:");
-            retval.append(c.getHeight());
-            retval.append(units);
-            retval.append(";\n\t\tposition: absolute;\n\t\tz-index: 1;\n\t\ttext-align: ");
-            retval.append(c.getAlign());
-            retval.append(";\n");
-            retval.append(getFontCss(c));
-            retval.append(getBorderCss(c));
-            retval.append("\n\t}\n");
-            
-            switch(c.getType()) {
-                case Constants.REPORT_COMPONENT_TYPE_SHAPE_ID:
-                    switch(c.getSection()) {
-                        case Constants.REPORT_SECTION_HEADER:
-                            retval.append(this.getShapeClass(c, chindx - 1));
-                            break;
-                        case Constants.REPORT_SECTION_BODY:
-                            retval.append(this.getShapeClass(c, cbindx - 1));
-                            break;
-                        case Constants.REPORT_SECTION_FOOTER:
-                            retval.append(this.getShapeClass(c, cfindx - 1));
-                             break;
-                    }
-                    break;
-                case Constants.REPORT_COMPONENT_TYPE_IMAGE_ID:
-                   switch(c.getSection()) {
-                        case Constants.REPORT_SECTION_HEADER:
-                            retval.append(this.getImageClass(c, c.getSection() + "-comp-" + (chindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_BODY:
-                            retval.append(this.getImageClass(c, c.getSection() + "-comp-" + (cbindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_FOOTER:
-                            retval.append(this.getImageClass(c, c.getSection() + "-comp-" + (cfindx - 1)));
-                             break;
-                    }
-                   break;
-               case Constants.REPORT_COMPONENT_TYPE_EMAIL_ID:
-                   switch(c.getSection()) {
-                        case Constants.REPORT_SECTION_HEADER:
-                            retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + (chindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_BODY:
-                            retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + (cbindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_FOOTER:
-                            retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + (cfindx - 1)));
-                             break;
-                    }
-                   break;
-               case Constants.REPORT_COMPONENT_TYPE_HYPERLINK_ID:
-                   switch(c.getSection()) {
-                        case Constants.REPORT_SECTION_HEADER:
-                            retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + (chindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_BODY:
-                            retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + (cbindx - 1)));
-                            break;
-                        case Constants.REPORT_SECTION_FOOTER:
-                            retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + (cfindx - 1)));
-                             break;
-                    }
-                   break;
-            }
+
         }
         
-        retval.append("</style>\n<body>");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(retval.toString());
+        }
+        
+        retval.append("</style>\n");
         
         return retval.toString();
     }
-    
-    private String getHtmlClose() {
-        return "\n</body>\n</html>";
-    }
-    
+
     private String getSectionClass(ReportDocument report, String section, String units, double pageHeight, double pageWidth) {
         StringBuilder retval = new StringBuilder();
         retval.append("\n\t.sec-");
@@ -912,31 +973,31 @@ public class ReportServiceImpl implements ReportService {
         return format.replace("?", "" + (currentPage + 1));
     }
 
-    private String getCurrentDateHtml(ReportComponent c, Map<String, SimpleDateFormat> dateFormats) {
+    private String getCurrentDateHtml(ReportComponent c, Map<String, Format> formatCache) {
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         String format = getStringMapValue("format", m);
         
-        SimpleDateFormat df = dateFormats.get(format);
+        SimpleDateFormat df = (SimpleDateFormat)formatCache.get(format);
         if (df == null) {
-            dateFormats.put(format, df = new SimpleDateFormat(format));
+            formatCache.put(format, df = new SimpleDateFormat(format));
         }
         
         return df.format(new Date());
     }
 
-    private String getDataFieldHtml(ReportComponent c, QueryResult queryResult) {
+    private String getDataFieldHtml(ReportComponent c, QueryResult queryResult, Map<String, Format> formatCache) {
         StringBuilder retval = new StringBuilder();
         
         return retval.toString();
     }
  
-    private String getDataGridHtml(ReportComponent c, QueryResult queryResult) {
+    private String getDataGridHtml(ReportComponent c, QueryResult queryResult, Map<String, Format> formatCache) {
         StringBuilder retval = new StringBuilder();
         
         return retval.toString();
     }
 
-    private String getDataRecordHtml(ReportComponent c, QueryResult queryResult) {
+    private String getDataRecordHtml(ReportComponent c, QueryResult queryResult, Map<String, Format> formatCache) {
         StringBuilder retval = new StringBuilder();
         
         return retval.toString();
@@ -964,5 +1025,227 @@ public class ReportServiceImpl implements ReportService {
         return retval;
     
     }
+    
+    private Double getDoubleMapValue(String key, Map<String, Object> m) {
+        Double retval = 0.0;
+        
+        if (m.containsKey(key)) {
+            retval = Double.parseDouble(m.get(key).toString());
+        }
+        
+        return retval;
+    
+    }
 
+    
+    private String getQueryColumnKey(Map<String, Object> m) {
+        String customSql = m.containsKey("customSql") ? m.get("customSql").toString() : "";
+        String aggregateFunction = m.containsKey("aggregateFunction") ? m.get("aggregateFunction").toString() : "";
+        return (customSql + aggregateFunction + (String)m.get("path"));
+    };
+
+    private String getQueryColumnKey (SqlSelectColumn sc) {
+        String customSql = StringUtils.isNotEmpty(sc.getCustomSql()) ? sc.getCustomSql() : "";
+        String aggregateFunction = StringUtils.isNotEmpty(sc.getAggregateFunction()) ?sc.getAggregateFunction() : "";
+        return (customSql + aggregateFunction + sc.getPath());
+    };
+
+    private boolean isFreeformGridComponent(ReportComponent c) {
+        boolean retval = false;
+        
+        if (isDataGridComponent(c.getType())) {
+            Map<String, Object> m = (Map<String, Object>)c.getValue();
+            String layout = getStringMapValue("gridLayout", m);
+            retval = Constants.GRID_LAYOUT_FREEFORM.equals(layout);
+        }
+        
+        return retval;
+    }
+
+            
+    private String getDataComponentContainerCss(ReportComponent c, int cindx, String units) {
+        StringBuilder retval = new StringBuilder();
+        
+        Map<String, Object> m = (Map<String, Object>)c.getValue();
+        retval.append("\n\t.");
+        retval.append(c.getSection());
+        retval.append("-comp-");
+        retval.append(cindx);
+        retval.append(" {\n\t\ttop: ");
+        retval.append(c.getTop());
+        retval.append(units);
+        retval.append(";\n\t\tleft: ");
+        retval.append(c.getLeft());
+        retval.append(units);
+        retval.append(";\n\t\twidth: ");
+        retval.append(c.getWidth());
+        retval.append(units);
+        retval.append(";\n\t\theight: ");
+        retval.append(c.getHeight());
+        retval.append(units);
+        retval.append(";\n\t\ttext-align: ");
+        retval.append(c.getAlign());
+        retval.append(";");
+        String val = getStringMapValue("gridTemplateColumns", m);
+        if (StringUtils.isNotEmpty(val)) {
+            retval.append("\n\t\tdisplay: grid\n\t\tgrid-template-columns: ");
+            retval.append(val);
+            retval.append(";\n\t\tgrid-row-gap: 0;\n");
+            val = getStringMapValue("rowGap", m);
+            if (StringUtils.isNotEmpty(val)) {
+                Double d = Double.parseDouble(val);
+                retval.append("\n\t\tpadding: ");
+                retval.append(d/2);
+                retval.append("px 0 ");
+                retval.append(d/2);
+                retval.append("px 0;\n");
+            }
+        }
+        
+        if (Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(c.getType())) {
+            retval.append(c.getFontSettings().getFontCss());
+            retval.append(c.getBorderSettings().getBorderCss());
+        }
+        
+        retval.append("\t}\n");
+
+        if (isFreeformGridComponent(c)) {
+            retval.append("\n\t.");
+            retval.append(c.getSection());
+            retval.append("-scomp-");
+            retval.append(cindx);
+            retval.append("-cont {\n");
+            retval.append("\t\theight: ");
+            retval.append(getStringMapValue("dataRowHeight", m));
+            retval.append(units);
+            retval.append(";\n\t\twidth: 100%;\n");
+            retval.append(c.getBorderSettings3().getBorderCss());
+            retval.append("\n\t}\n");
+        }   
+        
+        return retval.toString();
+    };
+    
+    private String getDataRecordCss(ReportComponent c, int cindx, String units) {
+        StringBuilder retval = new StringBuilder();
+        Map<String, Object> m = (Map<String, Object>)c.getValue();
+        List<Map<String, Object>> dcols = (List<Map<String, Object>>)m.get("dataColumns");
+        
+        int dindx = 0;
+        for (Map<String, Object> dc : dcols) {
+            retval.append("\t.");
+            retval.append(c.getSection());
+            retval.append("-scomp-");
+            retval.append(cindx);
+            retval.append("-h");
+            retval.append(dindx);
+            retval.append(" {\n\t\t");
+             retval.append(";\n\t\ttext-align: ");
+            retval.append(getStringMapValue("headerTextAlign", dc));
+            retval.append(";\n");
+            retval.append(c.getFontSettings().getFontCss());
+            retval.append(c.getBorderSettings().getBorderCss());
+            retval.append("\t}\n");
+
+            retval.append("\t.");
+            retval.append(c.getSection());
+            retval.append("-scomp-");
+            retval.append(cindx);
+            retval.append("-d");
+            retval.append(dindx);
+            retval.append(" {\n\t\tpadding-left: 5px;\n\t\ttext-align: ");
+            retval.append(getStringMapValue("dataTextAlign", dc));
+            retval.append(";\n");
+            retval.append(c.getFontSettings2().getFontCss());
+            retval.append(c.getBorderSettings2().getBorderCss());
+            retval.append("\t}\n");
+       }
+        
+        return retval.toString();
+    }
+    
+    private String getDataGridCss(ReportComponent c, int cindx, String units) {
+        StringBuilder retval = new StringBuilder();
+        Map<String, Object> m = (Map<String, Object>)c.getValue();
+        List<Map<String, Object>> dcols = (List<Map<String, Object>>)m.get("dataColumns");
+        
+        int dindx = 0;
+        for (Map<String, Object> dc : dcols) {
+            if (Constants.GRID_FORMAT_TABLULAR.equals(getStringMapValue("gridFormat", m))) {
+                retval.append("\t.");
+                retval.append(c.getSection());
+                retval.append("-scomp-");
+                retval.append(cindx);
+                retval.append("-h");
+                retval.append(dindx);
+                retval.append(" {\n\t\t");
+                retval.append("height: ");
+                retval.append(this.getStringMapValue("headerRowHeight", m));
+                retval.append(units);
+                retval.append(";\n\t\ttext-align: ");
+                retval.append(getStringMapValue("textAlign", m));
+                retval.append(c.getFontSettings().getFontCss());
+                retval.append(c.getBorderSettings().getBorderCss());
+                retval.append("\t}\n");
+
+                retval.append("\t.");
+                retval.append(c.getSection());
+                retval.append("-scomp-");
+                retval.append(cindx);
+                retval.append("-d");
+                retval.append(dindx);
+                retval.append(" {\n\t\t");
+                retval.append("height: ");
+                retval.append(this.getStringMapValue("dataRowHeight", m));
+                retval.append(units);
+                retval.append(";\n\t\ttext-align: ");
+                retval.append(this.getStringMapValue("dataTextALign", dc));
+                retval.append(";\n");
+                retval.append(c.getFontSettings2().getFontCss());
+                retval.append(c.getBorderSettings2().getBorderCss());
+                retval.append("\t}\n");
+            } else {
+                retval.append("\t.");
+                retval.append(c.getSection());
+                retval.append("-scomp-");
+                retval.append(cindx);
+                retval.append("-d");
+                retval.append(dindx);
+                retval.append(" {\n\t\t");
+                retval.append("height: ");
+                retval.append(this.getStringMapValue("dataRowHeight", m));
+                retval.append(units);
+                retval.append(";\n\t\ttext-align: ");
+                retval.append(this.getStringMapValue("dataTextALign", dc));
+                retval.append(";\n");
+                retval.append(c.getFontSettings2().getFontCss());
+                retval.append(c.getBorderSettings2().getBorderCss());
+                retval.append("\t}\n");
+            }
+            
+            dindx++;
+        }
+        
+        return retval.toString();
+    }
+    
+    private String getDataComponentCss(ReportDocument report, ReportComponent c, int chindx, int cbindx, int cfindx) {
+        StringBuilder retval = new StringBuilder();
+        String units = report.getPageUnits().substring(0, 2);
+        
+        switch (c.getType()) {
+            case Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID:
+                retval.append(getDataComponentContainerCss(c, chindx, units));
+                break;
+            case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
+                retval.append(getDataComponentContainerCss(c, cbindx, units));
+                retval.append(getDataRecordCss(c, cbindx, units));
+                break;
+            case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
+                retval.append(getDataComponentContainerCss(c, cfindx, units));
+                retval.append(getDataGridCss(c, cbindx, units));
+                break;
+        }
+        return retval.toString();
+    }
 }

@@ -440,7 +440,7 @@ public class ReportServiceImpl implements ReportService {
     }
     
     private double gitDataGridRowSpan(ReportDocument report) {
-        double retval = 1.0;
+        Double retval = Double.MAX_VALUE;
         
         for (ReportComponent c : report.getReportComponents()) {
             if (isDataGridComponent(c.getType())) {
@@ -450,11 +450,15 @@ public class ReportServiceImpl implements ReportService {
                 Double hrh = getDoubleMapValue("headerRowHeight", m);
                 
                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
-                    if (((c.getHeight() - hrh) / drh) > retval) {
+                    if (((c.getHeight() - hrh) / drh) < retval) {
                         retval = ((c.getHeight() - hrh) / drh);
                     }
                 }
             }
+        }
+        
+        if (retval == Double.MAX_VALUE) {
+            retval = 1.0;
         }
         
         return retval;
@@ -1140,7 +1144,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append("-h");
             retval.append(dindx);
             retval.append(" {\n\t\t");
-             retval.append(";\n\t\ttext-align: ");
+            retval.append(";\n\t\ttext-align: ");
             retval.append(getStringMapValue("headerTextAlign", dc));
             retval.append(";\n");
             retval.append(c.getFontSettings().getFontCss());
@@ -1199,7 +1203,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(this.getStringMapValue("dataRowHeight", m));
                 retval.append(units);
                 retval.append(";\n\t\ttext-align: ");
-                retval.append(this.getStringMapValue("dataTextALign", dc));
+                retval.append(this.getStringMapValue("dataTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());
                 retval.append(c.getBorderSettings2().getBorderCss());
@@ -1209,14 +1213,50 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(c.getSection());
                 retval.append("-scomp-");
                 retval.append(cindx);
+                retval.append("-h");
+                retval.append(dindx);
+                retval.append(" {\n\t\t");
+                retval.append("left: ");
+                retval.append(this.getStringMapValue("labelLeft", dc));
+                retval.append(units);
+                retval.append(";\n\t\theight: ");
+                retval.append(this.getStringMapValue("labelHeight", dc));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(this.getStringMapValue("labelTop", dc));
+                retval.append(units);
+                retval.append(";\n\t\theight: ");
+                retval.append(this.getStringMapValue("labelWidth", dc));
+                retval.append(units);
+                retval.append(";\n\t\ttext-align: ");
+                retval.append(this.getStringMapValue("labelTextAlign", dc));
+                retval.append(";\n");
+                retval.append(c.getFontSettings().getFontCss());
+                retval.append(c.getBorderSettings().getBorderCss());
+                retval.append("\t}\n");
+
+                
+                retval.append("\t.");
+                retval.append(c.getSection());
+                retval.append("-scomp-");
+                retval.append(cindx);
                 retval.append("-d");
                 retval.append(dindx);
                 retval.append(" {\n\t\t");
-                retval.append("height: ");
-                retval.append(this.getStringMapValue("dataRowHeight", m));
+                retval.append("left: ");
+                retval.append(this.getStringMapValue("dataLeft", dc));
+                retval.append(units);
+                retval.append(";\n\t\theight: ");
+                retval.append(this.getStringMapValue("dataHeight", dc));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(this.getStringMapValue("dataTop", dc));
+                retval.append(units);
+                retval.append(";\n\t\twidth: ");
+                retval.append(this.getStringMapValue("dataWidth", dc));
                 retval.append(units);
                 retval.append(";\n\t\ttext-align: ");
-                retval.append(this.getStringMapValue("dataTextALign", dc));
+                retval.append(this.getStringMapValue("dataTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());
                 retval.append(c.getBorderSettings2().getBorderCss());

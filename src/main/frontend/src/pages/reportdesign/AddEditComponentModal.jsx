@@ -102,6 +102,12 @@ const AddEditComponentModal = (props) => {
         config.hide();
     };
 
+    const getQueryColumnKey = (c) => {
+        return ((c.customSql ? c.customSql : "")
+            + (c.aggregateFunction ? c.aggregateFunction : "")
+            + c.path);
+    };
+    
     const onShow = () => {
         setTypeDisplay(getText(getComponentTypeDisplayText(currentComponent.type)));
         
@@ -111,13 +117,13 @@ const AddEditComponentModal = (props) => {
                 let cset = new Set();
 
                 if (currentComponent.value.dataColumns) {
-                    currentComponent.value.dataColumns.map(d => cset.add(d.selectIndex));
+                    currentComponent.value.dataColumns.map(d => cset.add(getQueryColumnKey(d)));
                 }
 
                 let scols = copyObject(currentComponent.value.dataColumns);
 
                 currentQuery.selectColumns.map((sc, indx) => {
-                    if (!cset.has(indx) && sc.showInResults) {
+                    if (!cset.has(getQueryColumnKey(sc)) && sc.showInResults) {
                         let c = copyObject(sc);
                         if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
                             c.headerTextAlign = "right";

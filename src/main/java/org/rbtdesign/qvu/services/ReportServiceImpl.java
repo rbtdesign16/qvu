@@ -114,14 +114,18 @@ public class ReportServiceImpl implements ReportService {
             }
         }
         
+        pageCount = 10;
+        // use a map to save static compononts so
+        // we do not need to recreate on each page
+        Map<String, String> cmap = new HashMap<>();
         for (int i = 0; i < pageCount; ++i) {
             retval.append("\n<div style=\"top: ");
             retval.append(i * pageHeight);
             retval.append(units);
             retval.append(";\" class=\"page\">");
-            retval.append(getHeaderHtml(report, queryResult, headerComponents, pageHeight, units, pageCount, i, dateFormats));
-            retval.append(getBodyHtml(report, queryResult, bodyComponents, pageHeight, units,  pageCount, i, dateFormats));
-            retval.append(getFooterHtml(report, queryResult, footerComponents, pageHeight, units, pageCount, i, dateFormats));
+            retval.append(getHeaderHtml(report, queryResult, headerComponents, pageHeight, units, pageCount, i, dateFormats, cmap));
+            retval.append(getBodyHtml(report, queryResult, bodyComponents, pageHeight, units,  pageCount, i, dateFormats, cmap));
+            retval.append(getFooterHtml(report, queryResult, footerComponents, pageHeight, units, pageCount, i, dateFormats, cmap));
             retval.append("\n</div>");
         }
         
@@ -188,6 +192,13 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
+    private boolean isCacheableComponent(String typeid) {
+        return !(Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(typeid)
+            || Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID.equals(typeid)
+            || Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID.equals(typeid)
+            || Constants.REPORT_COMPONENT_TYPE_PAGE_NUMBER_ID.equals(typeid));
+    }
+    
     private String getHeaderHtml(ReportDocument report, 
         QueryResult queryResult, 
         List <ReportComponent> components,
@@ -195,7 +206,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount, 
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats) {
+        Map<String, SimpleDateFormat> dateFormats,
+        Map<String, String> cmap) {
         StringBuilder retval = new StringBuilder();
 
         double top = pageHeight * currentPage;
@@ -204,15 +216,35 @@ public class ReportServiceImpl implements ReportService {
         // header components
         int cindx = 0;
         for (ReportComponent c : components) {
-            retval.append("\n\t\t<div ");
-            retval.append("class=\"");
-            retval.append("header-comp-");
-            retval.append(cindx++);
-            retval.append("\" ");
-            retval.append(getComponentStyle(report, c, top, units));
-            retval.append(">\n");
-            retval.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx - 1, dateFormats));
-            retval.append("\t\t</div>\n");
+            String cid = "header-comp-" + cindx;
+            String html = null;
+            
+            boolean cacheable = isCacheableComponent(c.getType());
+            if (cacheable) {
+                html = cmap.get(cid);
+            }
+            
+            if (StringUtils.isNotEmpty(html)) {
+                retval.append(html);
+            } else {
+                StringBuilder buf = new StringBuilder();
+                buf.append("\n\t\t<div ");
+                buf.append("class=\"");
+                buf.append(cid);
+                buf.append("\" ");
+                buf.append(getComponentStyle(report, c, top, units));
+                buf.append(">\n");
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append("\t\t</div>\n");
+                
+                retval.append(buf);
+                
+                if (cacheable) {
+                    cmap.put(cid, buf.toString());
+                }
+            }
+                
+            cindx++;
         }
         
         retval.append("\t</div>\n");
@@ -227,7 +259,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount,
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats) {
+        Map<String, SimpleDateFormat> dateFormats,
+        Map<String, String> cmap) {
      
         double top = (pageHeight * currentPage) + report.getHeaderHeight();
 
@@ -236,16 +269,39 @@ public class ReportServiceImpl implements ReportService {
         
         // body components
         int cindx = 0;
+        
+        
         for (ReportComponent c : components) {
-            retval.append("\n\t\t<div ");
-            retval.append("class=\"body-comp-");
-            retval.append(cindx++);
-            retval.append("\" ");
-            retval.append(getComponentStyle(report, c, top, units));
-            retval.append(">\n");
-            retval.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx - 1, dateFormats));
-            retval.append("\t\t</div>\n");
-        }
+            String cid = "body-comp-" + cindx;
+            String html = null;
+            
+            boolean cacheable = isCacheableComponent(c.getType());
+            if (cacheable) {
+                html = cmap.get(cid);
+            }
+            
+            if (StringUtils.isNotEmpty(html)) {
+                retval.append(html);
+            } else {
+                StringBuilder buf = new StringBuilder();
+                buf.append("\n\t\t<div ");
+                buf.append("class=\"body-comp-");
+                buf.append(cindx);
+                buf.append("\" ");
+                buf.append(getComponentStyle(report, c, top, units));
+                buf.append(">\n");
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append("\t\t</div>\n");
+                
+                retval.append(buf);
+                
+                if (cacheable) {
+                    cmap.put(cid, buf.toString());
+                }
+            }
+                
+            cindx++;
+       }
         
         retval.append("\t</div>\n");
         
@@ -259,7 +315,8 @@ public class ReportServiceImpl implements ReportService {
         String units, 
         int pageCount, 
         int currentPage,
-        Map<String, SimpleDateFormat> dateFormats) {
+        Map<String, SimpleDateFormat> dateFormats,
+        Map<String, String> cmap) {
         StringBuilder retval = new StringBuilder();
         
         double top = (pageHeight * currentPage) + (pageHeight - report.getFooterHeight());
@@ -275,14 +332,35 @@ public class ReportServiceImpl implements ReportService {
         // footer components
         int cindx = 0;
         for (ReportComponent c : components) {
-            retval.append("\n\t\t<div ");
-            retval.append("class=\"footer-comp-");
-            retval.append(cindx++);
-            retval.append("\" ");
-            retval.append(getComponentStyle(report, c, top, units));
-            retval.append(">\n\t\t\t");
-            retval.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx - 1, dateFormats));
-            retval.append("\t\t</div>\n");
+            String cid = "footer-comp-" + cindx;
+            String html = null;
+            
+            boolean cacheable = isCacheableComponent(c.getType());
+            if (cacheable) {
+                html = cmap.get(cid);
+            }
+            
+            if (StringUtils.isNotEmpty(html)) {
+                retval.append(html);
+            } else {
+                StringBuilder buf = new StringBuilder();
+                buf.append("\n\t\t<div ");
+                buf.append("class=\"footer-comp-");
+                buf.append(cindx);
+                buf.append("\" ");
+                buf.append(getComponentStyle(report, c, top, units));
+                buf.append(">\n\t\t\t");
+                buf.append(getComponentValue(report, c, top, units, queryResult, currentPage, cindx, dateFormats));
+                buf.append("\t\t</div>\n");
+                
+                retval.append(buf.toString());
+                
+                if (cacheable) {
+                    cmap.put(cid, buf.toString());
+                }
+            }
+            
+            cindx++;
          }
         
         retval.append("\t</div>\n");

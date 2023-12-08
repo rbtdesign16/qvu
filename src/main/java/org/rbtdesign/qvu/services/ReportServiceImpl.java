@@ -199,11 +199,7 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder retval = new StringBuilder();
 
         double top = pageHeight * currentPage;
-        retval.append("\n\t<div style=\"");
-        retval.append("top: ");
-        retval.append(top);
-        retval.append(units);
-        retval.append(";\" class=\"sec-header\">");
+        retval.append("\n\t<div class=\"sec-header\">");
         
         // header components
         int cindx = 0;
@@ -236,11 +232,7 @@ public class ReportServiceImpl implements ReportService {
         double top = (pageHeight * currentPage) + report.getHeaderHeight();
 
         StringBuilder retval = new StringBuilder();
-        retval.append("\n\t<div style=\"");
-        retval.append("top: ");
-        retval.append(top);
-        retval.append(units);
-        retval.append(";\" class=\"sec-body\">");
+        retval.append("\n\t<div class=\"sec-body\">");
         
         // body components
         int cindx = 0;
@@ -271,14 +263,11 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder retval = new StringBuilder();
         
         double top = (pageHeight * currentPage) + (pageHeight - report.getFooterHeight());
-        retval.append("\n\t<div class=\"sec-footer\" style=\"");
-        retval.append("top: ");
-        retval.append(top + (pageHeight - report.getFooterHeight()));
-        retval.append(units);
+        retval.append("\n\t<div class=\"sec-footer\" ");
  
                         
         if (pageCount > (currentPage + 1)) {
-            retval.append("; break-after: page;\"");
+            retval.append("style=\"break-after: page;\"");
         } 
         
         retval.append(">\n");
@@ -304,7 +293,7 @@ public class ReportServiceImpl implements ReportService {
     private String getComponentStyle(ReportDocument report, ReportComponent c, double top, String units) {
         StringBuilder retval = new StringBuilder();
         retval.append("style=\"top: ");
-        retval.append(top + c.getTop());
+        retval.append(c.getTop());
         retval.append(units);
         retval.append(";\"");
                
@@ -391,7 +380,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(";\n");
         
         if (System.getProperty("dev.mode") != null) {
-            retval.append("\n\t\tborder: solid 1px blue;\n");
+            retval.append("\t\tborder: solid 1px blue;\n");
         }
         
         retval.append("\t}\n");
@@ -429,8 +418,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(";\n\t\theight:");
             retval.append(c.getHeight());
             retval.append(units);
-            retval.append(";\n\t\tposition: absolute;\n\t\tz-index: 1;\n");
-            retval.append("\n\t\ttext-align: ");
+            retval.append(";\n\t\tposition: absolute;\n\t\tz-index: 1;\n\t\ttext-align: ");
             retval.append(c.getAlign());
             retval.append(";\n");
             retval.append(getFontCss(c));
@@ -518,7 +506,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(0));
                 retval.append(units);
-                retval.append(";\n\t\twidth: ");
+                retval.append(";\n\t\ttop: 0;\n\t\twidth: ");
                 retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
                 retval.append(units);
                 retval.append(";\n\t\theight: ");
@@ -532,6 +520,9 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(units);
                 retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(3));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(report.getHeaderHeight());
                 retval.append(units);
                 retval.append(";\n\t\twidth: ");
                 retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
@@ -551,6 +542,9 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(units);
                 retval.append(" ");
                 retval.append(report.getPageBorder().get(0));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(pageHeight - report.getFooterHeight());
                 retval.append(units);
                 retval.append(";\n\t\twidth: ");
                 retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
@@ -663,7 +657,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\" /></a>");
             }
         } else {
-            retval.append("<img ");
+            retval.append("\t\t\t<img ");
             
             if (StringUtils.isNotEmpty(alttext)) {
                 retval.append("alt=\"");
@@ -773,11 +767,11 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder retval = new StringBuilder("");
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         Boolean underline = getBooleanMapValue("underline", m);
-        if ((underline == null)|| !underline) {
+        if ((underline == null) || !underline) {
             retval.append("\t.");
             retval.append(parentClass);
             retval.append(" a {\n");
-            retval.append("\t\ttext-decoration: none;\n}\n");
+            retval.append("\t\ttext-decoration: none;\n\t}\n");
         }
         
         return retval.toString();
@@ -808,11 +802,11 @@ public class ReportServiceImpl implements ReportService {
         StringBuilder retval = new StringBuilder("");
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         Boolean underline = getBooleanMapValue("underline", m);
-        if ((underline == null)|| !underline) {
+        if ((underline == null) || !underline) {
             retval.append("\t.");
             retval.append(parentClass);
             retval.append(" a {\n");
-            retval.append("\t\ttext-decoration: none;\n}\n");
+            retval.append("\t\ttext-decoration: none;\n\t}\n");
         }
         
         return retval.toString();
@@ -823,7 +817,7 @@ public class ReportServiceImpl implements ReportService {
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         String text = getStringMapValue("text", m);
         String url = getStringMapValue("url", m);
-        retval.append("<a ");
+        retval.append("\t\t\t<a ");
         
         retval.append("href=\"");
         retval.append(url);

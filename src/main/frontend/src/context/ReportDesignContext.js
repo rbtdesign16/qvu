@@ -249,12 +249,12 @@ export const ReportDesignProvider = ({ children }) => {
                 break;
             case COMPONENT_TYPE_PAGENUMBER:
                 retval.value = {
-                    format: DEFAULT_PAGE_NUMBER_FORMAT
+                    displayFormat: DEFAULT_PAGE_NUMBER_FORMAT
                 };
                 break;
             case COMPONENT_TYPE_CURRENTDATE:
                 retval.value = {
-                    format: DEFAULT_CURRENT_DATE_FORMAT
+                    displayFormat: DEFAULT_CURRENT_DATE_FORMAT
                 };
                 break;
             case COMPONENT_TYPE_DATAFIELD:

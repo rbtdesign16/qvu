@@ -222,10 +222,8 @@ const AddEditComponentModal = (props) => {
                     let sc = currentQuery.selectColumns[e.target.selectedIndex];
                     sc.selectColumnIndex = e.target.selectedIndex;
                     c.value.dataColumns = [sc];
-                } else if (e.target.name === "textAlign") {
-                    c.value.textAlign = e.target.options[e.target.selectedIndex].value;
                 } else if (e.target.name === "displayFormat") {
-                   c.value.displayFormat = e.target.options[e.target.selectedIndex].value;
+                   c.value.dataColumns[0].displayFormat = e.target.options[e.target.selectedIndex].value;
                 }
                 break;
         }
@@ -614,7 +612,7 @@ const AddEditComponentModal = (props) => {
             let wantFormat = isColumnFormatAvailable(sc);
             return <div className="entrygrid-150-300">
                 <div className="label"><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))}/>{getText("Query Column:")}</div><div><select name="selectColumnIndex" onChange={e => setValue(e)}>{loadSelectColumnOptions(sc)}</select></div>
-                <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setValue(e)}>{loadTextAlignOptions()}</select></div>
+                <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
                 {wantFormat && <div className="label">{getText("Format:")}</div>}
                 {wantFormat && <div><select name="displayFormat" onChange={e => setValue(e)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
              </div>;

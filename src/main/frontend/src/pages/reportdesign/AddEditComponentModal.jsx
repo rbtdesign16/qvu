@@ -19,7 +19,6 @@ import {MODAL_TITLE_SIZE,
     NONE_SETTING,
     TRANSPARENT_SETTING,
     UNDERLINE_SETTING,
-    FORMAT_SETTING,
     SMALL_ICON_SIZE,
     replaceTokens,
     getColumnHelpDisplay,
@@ -224,7 +223,7 @@ const AddEditComponentModal = (props) => {
                     sc.selectColumnIndex = e.target.selectedIndex;
                     c.value.dataColumns = [sc];
                 } else if (e.target.name === "textAlign") {
-                   c.value.textAlign = e.target.options[e.target.selectedIndex].value;
+                    c.value.textAlign = e.target.options[e.target.selectedIndex].value;
                 } else if (e.target.name === "displayFormat") {
                    c.value.displayFormat = e.target.options[e.target.selectedIndex].value;
                 }
@@ -389,7 +388,7 @@ const AddEditComponentModal = (props) => {
             currentComponent.value.format = DEFAULT_CURRENT_DATE_FORMAT;
         }
         return <div className="entrygrid-125-125">
-            <div className="label">{getText("Format:")}</div><div><select name="format" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(reportSettings, currentComponent.value)}</select></div>
+            <div className="label">{getText("Format:")}</div><div><select name="displayFormat" onChange={e => setValue(e)}>{getCurrentDateFormatOptions(reportSettings, currentComponent.value)}</select></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
         </div>;
     };
@@ -400,7 +399,7 @@ const AddEditComponentModal = (props) => {
         }
         
         return <div className="entrygrid-125-125">
-            <div className="label">{getText("Format:")}</div><div><select name={FORMAT_SETTING} onChange={e => setValue(e)}>{getPageNumberOptions(currentComponent.value)}</select></div>
+            <div className="label">{getText("Format:")}</div><div><select name="displayFormat" onChange={e => setValue(e)}>{getPageNumberOptions(currentComponent.value)}</select></div>
             <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
         </div>;
     };
@@ -452,7 +451,7 @@ const AddEditComponentModal = (props) => {
             case "displayName":
                 c[indx].displayName = e.target.value;
                 break;
-           case "displayFormat":
+           case FORMAT_SETTING:
                 c[indx].displayFormat = e.target.options[e.target.selectedIndex].value;
                 break;
            case "headerTextAlign":
@@ -615,7 +614,7 @@ const AddEditComponentModal = (props) => {
             let wantFormat = isColumnFormatAvailable(sc);
             return <div className="entrygrid-150-300">
                 <div className="label"><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))}/>{getText("Query Column:")}</div><div><select name="selectColumnIndex" onChange={e => setValue(e)}>{loadSelectColumnOptions(sc)}</select></div>
-                <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setTextAlign(e)}>{loadTextAlignOptions()}</select></div>
+                <div className="label">{getText("Text Align:")}</div><div><select onChange={e => setValue(e)}>{loadTextAlignOptions()}</select></div>
                 {wantFormat && <div className="label">{getText("Format:")}</div>}
                 {wantFormat && <div><select name="displayFormat" onChange={e => setValue(e)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div>}
              </div>;

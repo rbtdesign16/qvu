@@ -48,7 +48,7 @@ export const NONE_SETTING = "none";
 export const TRANSPARENT_SETTING = "transparent";
 export const ITALIC_SETTING = "italic";
 export const UNDERLINE_SETTING = "underline";
-export const FORMAT_SETTING = "format";
+export const FORMAT_SETTING = "displayFormat";
 
 export const MODAL_TITLE_SIZE = "h5";
 export const SPLITTER_GUTTER_SIZE = 8;

@@ -513,7 +513,7 @@ export const getComponentValue = (reportSettings, currentReport, component, comp
         case COMPONENT_TYPE_CURRENTDATE:
             return moment().formatWithJDF(component.value.format); 
         case COMPONENT_TYPE_PAGENUMBER:
-            return component.value.format.replace("?", "1");
+            return component.value.displayFormat.replace("?", "1");
         case COMPONENT_TYPE_DATAGRID:
             return getDataGridComponentValue(currentReport, component, componentIndex);
         case COMPONENT_TYPE_DATARECORD:
@@ -633,7 +633,7 @@ export const reformatDataComponent = (currentReport, component) => {
                 }
             }
         }
-     } else {
+     } else if (component.type === COMPONENT_TYPE_DATARECORD) {
         if (!component.value.gridTemplateColumns) {
             let maxWidth = 0;
             for (let i = 0; i < component.value.dataColumns.length; ++i) {
@@ -952,7 +952,7 @@ export const getComponentTypeDisplayText = (type) => {
 
 export const getPageNumberOptions = (valueObject) => {
     return PAGE_NUMBER_FORMATS.map(f => {
-        if (valueObject.format === f) {
+        if (valueObject.displayFormat === f) {
             return <option value={f} selected>{f.replace("?", "1")}</option>;
         } else {
             return <option value={f}>{f.replace("?", "1")}</option>;
@@ -963,7 +963,7 @@ export const getPageNumberOptions = (valueObject) => {
 export const getCurrentDateFormatOptions = (reportSettings, valueObject) => {
     let dt = moment();
     return reportSettings.defaultDateFormats.map(df => {
-        if (valueObject.format === df) {
+        if (valueObject.displayFormat === df) {
             return <option value={df} selected>{dt.formatWithJDF(df)}</option>;
         } else {
             return <option value={df}>{dt.formatWithJDF(df)}</option>;

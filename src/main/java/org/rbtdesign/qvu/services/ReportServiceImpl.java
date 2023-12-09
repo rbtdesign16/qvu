@@ -107,6 +107,7 @@ public class ReportServiceImpl implements ReportService {
 
                 String html = generateHtml(report, queryColumnIndexMap, queryResult);
 
+                
             } else if (!qres.isSuccess()) {
                 retval.setErrorCode(qres.getErrorCode());
                 retval.setMessage(qres.getMessage());
@@ -194,8 +195,8 @@ public class ReportServiceImpl implements ReportService {
         
         retval.append("\n</body>\n</html>");
         
-        if (LOG.isTraceEnabled()) {
-            LOG.trace(retval.toString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(retval.toString());
          }
  
         return retval.toString();
@@ -639,10 +640,6 @@ public class ReportServiceImpl implements ReportService {
 
         }
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(retval.toString());
-        }
-        
         retval.append("</style>\n");
         
         return retval.toString();
@@ -988,13 +985,13 @@ public class ReportServiceImpl implements ReportService {
 
     private String getPageNumberHtml(ReportComponent c, int currentPage) {
         Map<String, Object> m = (Map<String, Object>)c.getValue();
-        String format = getStringMapValue("format", m);
+        String format = getStringMapValue("displayFormat", m);
         return format.replace("?", "" + (currentPage + 1));
     }
 
     private String getCurrentDateHtml(ReportComponent c, Map<String, Format> formatCache) {
         Map<String, Object> m = (Map<String, Object>)c.getValue();
-        String format = getStringMapValue("format", m);
+        String format = getStringMapValue("displayFormat", m);
         
         SimpleDateFormat df = (SimpleDateFormat)formatCache.get(format);
         if (df == null) {
@@ -1007,7 +1004,7 @@ public class ReportServiceImpl implements ReportService {
     private String getDataFieldHtml(ReportComponent c, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
         String retval = "";
         Map<String, Object> dc = dataColumns.get(0);
-        String format = getStringMapValue("format", dc);
+        String format = getStringMapValue("displayFormat", dc);
         int row = queryResult.getCurrentRow();
         Integer col = getIntegerMapValue("selectIndex", dc);
         List<Object> dataRow = queryResult.getData().get(row);
@@ -1061,7 +1058,7 @@ public class ReportServiceImpl implements ReportService {
             int dindx = 0;
             List<Object> dataRow = queryResult.getData().get(currow + i);
             for (Map<String, Object> dc : dataColumns) {
-                String format = getStringMapValue("format", dc);
+                String format = getStringMapValue("displayFormat", dc);
                 Integer col = getIntegerMapValue("selectIndex", dc);
                 retval.append("\t\t<div class=\"");
                 retval.append(c.getSection());
@@ -1112,7 +1109,7 @@ public class ReportServiceImpl implements ReportService {
 
         int dindx = 0;
         for (Map<String, Object> dc : dataColumns) {
-            String format = getStringMapValue("format", dc);
+            String format = getStringMapValue("displayFormat", dc);
             Integer col = getIntegerMapValue("selectIndex", dc);
             retval.append("\t\t<div class=\"");
             retval.append(c.getSection());
@@ -1240,7 +1237,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";");
+        retval.append(";\n\t\tposition: absolute;");
         String val = getStringMapValue("gridTemplateColumns", m);
         if (StringUtils.isNotEmpty(val)) {
             retval.append("\n\t\tdisplay: grid\n\t\tgrid-template-columns: ");

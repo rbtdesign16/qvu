@@ -107,6 +107,10 @@ public class ReportServiceImpl implements ReportService {
 
                 String html = generateHtml(report, queryColumnIndexMap, queryResult);
 
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(html);
+                }
+ 
                 
             } else if (!qres.isSuccess()) {
                 retval.setErrorCode(qres.getErrorCode());
@@ -143,7 +147,6 @@ public class ReportServiceImpl implements ReportService {
 
         LOG.debug("pageCount: " + pageCount);
         
-        LOG.debug(retval.toString());
         List<ReportComponent> headerComponents = new ArrayList<>();
         List<ReportComponent> bodyComponents = new ArrayList<>();
         List<ReportComponent> footerComponents = new ArrayList<>();
@@ -195,10 +198,6 @@ public class ReportServiceImpl implements ReportService {
         
         retval.append("\n</body>\n</html>");
         
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(retval.toString());
-         }
- 
         return retval.toString();
     }
     
@@ -444,11 +443,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private String getComponentStyle(ReportDocument report, ReportComponent c, double top, String units) {
-        StringBuilder retval = new StringBuilder();
-        retval.append("style=\"top: ");
-        retval.append(c.getTop());
-        retval.append(units);
-        retval.append(";\"");
+        StringBuilder retval = new StringBuilder("");
+//        retval.append("style=\"top: ");
+ //       retval.append(c.getTop());
+ //       retval.append(units);
+  //      retval.append(";\"");
                
         return retval.toString();
     }
@@ -541,17 +540,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\t.");
                 retval.append(c.getSection());
                 retval.append("-comp-");
-                switch(c.getSection()) {
-                    case Constants.REPORT_SECTION_HEADER:
-                        retval.append(chindx);
-                        break;
-                    case Constants.REPORT_SECTION_BODY:
-                        retval.append(cbindx);
-                        break;
-                    case Constants.REPORT_SECTION_FOOTER:
-                        retval.append(cfindx);
-                        break;
-                }
+                retval.append(i);
                 retval.append(" {\n\t\tleft: ");
                 retval.append(c.getLeft());
                 retval.append(units);
@@ -570,60 +559,20 @@ public class ReportServiceImpl implements ReportService {
 
                 switch(c.getType()) {
                     case Constants.REPORT_COMPONENT_TYPE_SHAPE_ID:
-                        switch(c.getSection()) {
-                            case Constants.REPORT_SECTION_HEADER:
-                                retval.append(this.getShapeClass(c, chindx));
-                                break;
-                            case Constants.REPORT_SECTION_BODY:
-                                retval.append(this.getShapeClass(c, cbindx));
-                                break;
-                            case Constants.REPORT_SECTION_FOOTER:
-                                retval.append(this.getShapeClass(c, cfindx));
-                                 break;
-                        }
+                        retval.append(this.getShapeClass(c, i));
                         break;
                     case Constants.REPORT_COMPONENT_TYPE_IMAGE_ID:
-                       switch(c.getSection()) {
-                            case Constants.REPORT_SECTION_HEADER:
-                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + chindx));
-                                break;
-                            case Constants.REPORT_SECTION_BODY:
-                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + cbindx));
-                                break;
-                            case Constants.REPORT_SECTION_FOOTER:
-                                retval.append(this.getImageClass(c, c.getSection() + "-comp-" + cfindx));
-                                 break;
-                        }
-                       break;
+                        retval.append(this.getImageClass(c, c.getSection() + "-comp-" + i));
+                        break;
                    case Constants.REPORT_COMPONENT_TYPE_EMAIL_ID:
-                       switch(c.getSection()) {
-                            case Constants.REPORT_SECTION_HEADER:
-                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + chindx));
-                                break;
-                            case Constants.REPORT_SECTION_BODY:
-                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + cbindx));
-                                break;
-                            case Constants.REPORT_SECTION_FOOTER:
-                                retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + cfindx));
-                                 break;
-                        }
-                       break;
+                        retval.append(this.getEmailClass(c, c.getSection() + "-comp-" + i));
+                        break;
                    case Constants.REPORT_COMPONENT_TYPE_HYPERLINK_ID:
-                       switch(c.getSection()) {
-                            case Constants.REPORT_SECTION_HEADER:
-                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + chindx));
-                                break;
-                            case Constants.REPORT_SECTION_BODY:
-                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + cbindx));
-                                break;
-                            case Constants.REPORT_SECTION_FOOTER:
-                                retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + cfindx));
-                                 break;
-                        }
+                        retval.append(this.getHyperlinkClass(c, c.getSection() + "-comp-" + i));
                        break;
                 }
             } else {
-                retval.append(getDataComponentCss(report, c, chindx, cbindx, cfindx));
+                retval.append(getDataComponentCss(report, c, i));
             }
             
             switch(c.getSection()) {
@@ -1417,21 +1366,21 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
-    private String getDataComponentCss(ReportDocument report, ReportComponent c, int chindx, int cbindx, int cfindx) {
+    private String getDataComponentCss(ReportDocument report, ReportComponent c, int cindx) {
         StringBuilder retval = new StringBuilder();
         String units = report.getPageUnits().substring(0, 2);
         
         switch (c.getType()) {
             case Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID:
-                retval.append(getDataComponentContainerCss(c, chindx, units));
+                retval.append(getDataComponentContainerCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
-                retval.append(getDataComponentContainerCss(c, cbindx, units));
-                retval.append(getDataRecordCss(c, cbindx, units));
+                retval.append(getDataComponentContainerCss(c, cindx, units));
+                retval.append(getDataRecordCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
-                retval.append(getDataComponentContainerCss(c, cfindx, units));
-                retval.append(getDataGridCss(c, cbindx, units));
+                retval.append(getDataComponentContainerCss(c, cindx, units));
+                retval.append(getDataGridCss(c, cindx, units));
                 break;
         }
         return retval.toString();

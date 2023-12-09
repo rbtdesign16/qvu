@@ -374,7 +374,11 @@ public class ReportServiceImpl implements ReportService {
     
     private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<style>\n\tbody {\n\t\tbackground-color: white;\n\t}\n\t.page {\n");
+        retval.append("<style>\n\t@page {\n\t\tsize: ");
+        retval.append(report.getPageSize());
+        retval.append(" ");
+        retval.append(report.getPageOrientation());
+        retval.append(";\n\t}\n\tbody {\n\t\tbackground-color: white;\n\t}\n\t.page {\n");
         retval.append("\t\tposition: absolute;\n\t\twidth: ");
         retval.append(pageWidth);
         retval.append(units);
@@ -1010,8 +1014,7 @@ public class ReportServiceImpl implements ReportService {
         
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         retval.append("\n\t.");
-        retval.append(c.getSection());
-        retval.append("-comp-");
+        retval.append("comp-");
         retval.append(cindx);
         retval.append(" {\n\t\ttop: ");
         retval.append(c.getTop());
@@ -1045,6 +1048,7 @@ public class ReportServiceImpl implements ReportService {
         }
         
         if (Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(c.getType())) {
+            retval.append("\n");
             retval.append(c.getFontSettings().getFontCss());
             retval.append(c.getBorderSettings().getBorderCss());
         }
@@ -1126,6 +1130,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(units);
                 retval.append(";\n\t\ttext-align: ");
                 retval.append(getStringMapValue("textAlign", m));
+                retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
                 retval.append(c.getBorderSettings().getBorderCss());
                 retval.append("\t}\n");

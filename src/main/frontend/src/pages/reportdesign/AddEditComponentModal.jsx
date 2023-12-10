@@ -80,7 +80,7 @@ const AddEditComponentModal = (props) => {
  
     const [selectColumns, setSelectColumns] = useState([]);
     const [dataColumnCount, setDataColumnCount] = useState(0);
-    
+ 
     const getQueryColumnHelpText = (sc) => {
         return getColumnHelpDisplay(sc, getText);
     };
@@ -137,15 +137,6 @@ const AddEditComponentModal = (props) => {
                     }
                 });
 
-
-                if (currentComponent.type === COMPONENT_TYPE_DATARECORD) {
-                    let el = document.getElementById("rgne");
-                            
-                    if (el) {
-                        el.value = currentComponent.value.rowGap ? currentComponent.value.rowGap : 0;
-                    }
-                }
-                
                 if (currentComponent.value.dataColumns) {
                     setDataColumnCount(currentComponent.value.dataColumns.length);
                 } else {
@@ -406,30 +397,6 @@ const AddEditComponentModal = (props) => {
         return getText("Table Alias:", " ") + sc.tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(sc.path);
     };
 
-    const handleDragStart = (e) => {
-        e.dataTransfer.setData("text/plain",e.target.id.replace("scol-", ""));
-        e.dataTransfer.effectAllowed = "move";
-    };
-
-    const handleDrop = (e) => {
-        let el = document.elementFromPoint(e.clientX, e.clientY);
-         if (el && el.id && el.id.startsWith("scol-")) {
-            let dindx = Number(el.id.replace("scol-", ""));
-            let sindx = Number(e.dataTransfer.getData("text/plain"));
-           if (sindx !== dindx) {
-                let sc = copyObject(selectColumns);
-                let col = sc[sindx];
-                sc.splice(sindx, 1);
-                sc.splice(dindx, 0, col);
-                setSelectColumns(sc);
-            }
-        }
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-    };
 
     const setQueryValue = (e, indx) => {
         let c = copyObject(selectColumns);
@@ -449,7 +416,7 @@ const AddEditComponentModal = (props) => {
             case "displayName":
                 c[indx].displayName = e.target.value;
                 break;
-           case FORMAT_SETTING:
+           case "displayFormat":
                 c[indx].displayFormat = e.target.options[e.target.selectedIndex].value;
                 break;
            case "headerTextAlign":
@@ -465,6 +432,52 @@ const AddEditComponentModal = (props) => {
     
     const isColumnFormatAvailable = (sc) => {
         return (isDataTypeNumeric(sc.dataType) || isDataTypeDateTime(sc.dataType));
+    };
+    
+    const getGridSelectColumn = (sc, indx, nameLabel, alignLabel, colcnt) => {
+        let wantFormat = isColumnFormatAvailable(sc);
+        let isnum = isDataTypeNumeric(sc.dataType);
+        let showAddTotal = isnum && isTabularDataGridComponent(currentComponent);
+  
+        return (<div className="report-query-column">
+            <div draggable={true} 
+                className="detail-hdr"
+                id={"scol-" + indx}  
+                onDragStart={e => handleDragStart(e)} 
+                onDrop={e => handleDrop(e)} 
+                onDragOver={e => handleDragOver(e)}>
+                <span>
+                    <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))} />
+                    <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
+                    <div style={{float: "right", marginRight: "15px", display: "inline-block"}} >
+                        <input key={getUUID()} id={"sel-" + indx} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)}/>
+                        <label className="ck-label" htmlFor={"sel-" + indx}>{getText("Include Column")}</label>
+                        { showAddTotal && <input key={getUUID()} id={"at-" + indx} style={{marginLeft: "10px"}}  name="addTotal" type="checkbox" defaultChecked={!!sc.addTotal} onChange={e => setQueryValue(e, indx)}/> }
+                        { showAddTotal && <label className="ck-label" htmlFor={"at-" + indx}>{getText("Add Total")}</label>}
+                    </div>    
+                </span>
+            </div>
+            <div className="tab platinum-b">
+                <div style={{paddingTop: "10%"}}>
+                    {(indx > 0) && <span title={getText("Move up")}><AiOutlineCaretUp className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnUp(indx)} /></span>}
+                    {(indx < (colcnt - 1)) && <span title={getText("Move down")}><AiOutlineCaretDown className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnDown(indx)} /></span>}
+                </div>
+            </div>
+
+            <div className="detail">
+                <div className="entrygrid-50p-50p">
+                    <div className="entrygrid-100-325">
+                        <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
+                        {wantFormat ? <div className="label">{getText("Format:")}</div> : <div style={{height: "30px"}}></div>}
+                        {wantFormat ? <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div> : <div></div>}
+                    </div> 
+                    <div className="entrygrid-100-75">
+                        <div className="label">{alignLabel}</div><div><select name="headerTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "headerTextAlign")}</select></div>
+                        <div className="label">{getText("Data Align:")}</div><div><select name="dataTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "dataTextAlign")}</select></div>
+                    </div> 
+                </div>    
+            </div>
+        </div>);
     };
     
     const getQueryColumnFormatOptions = (sc) => {
@@ -508,48 +521,8 @@ const AddEditComponentModal = (props) => {
 
             let colcnt = selectColumns.length;
             return selectColumns.map((sc, indx) => {
-                let wantFormat = isColumnFormatAvailable(sc);
-                let isnum = isDataTypeNumeric(sc.dataType);
-                let showAddTotal = isnum && isTabularDataGridComponent(currentComponent);
-                return <div key={getUUID()} className="report-query-column">
-                        <div draggable={true} 
-                            className="detail-hdr"
-                            id={"scol-" + indx}  
-                            onDragStart={e => handleDragStart(e)} 
-                            onDrop={e => handleDrop(e)} 
-                            onDragOver={e => handleDragOver(e)}>
-                            <span>
-                                <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))} />
-                                <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
-                                <span style={{float: "right", marginRight: "15px"}}>
-                                    <input id={"sel-" + indx}  name="selected" type="checkbox" defaultChecked={sc.selected} onChange={e => setQueryValue(e, indx)} /><label className="ck-label" htmlFor={"sel-" + indx}>{getText("Include Column")}</label>
-                                    { showAddTotal && <input id={"at-" + indx} style={{marginLeft: "10px"}}  name="addTotal" type="checkbox" defaultChecked={sc.addTotal} onChange={e => setQueryValue(e, indx)} /> }
-                                    { showAddTotal && <label className="ck-label" htmlFor={"at-" + indx}>{getText("Add Total")}</label>}
-                                </span>    
-                            </span>
-                        </div>
-                        <div className="tab platinum-b">
-                            <div style={{paddingTop: "10%"}}>
-                                {(indx > 0) && <span title={getText("Move up")}><AiOutlineCaretUp className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnUp(indx)} /></span>}
-                                {(indx < (colcnt - 1)) && <span title={getText("Move down")}><AiOutlineCaretDown className="icon cobaltBlue-f" size={SMALL_ICON_SIZE} onClick={(e) => moveSelectColumnDown(indx)} /></span>}
-                            </div>
-                        </div>
-
-                        <div className="detail">
-                            <div className="entrygrid-50p-50p">
-                                <div className="entrygrid-100-175">
-                                    <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
-                                    {wantFormat ? <div className="label">{getText("Format:")}</div> : <div style={{height: "30px"}}></div>}
-                                    {wantFormat ? <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div> : <div></div>}
-                                </div> 
-                                <div className="entrygrid-175-100">
-                                     <div className="label">{alignLabel}</div><div><select name="headerTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "headerTextAlign")}</select></div>
-                                    <div className="label">{getText("Data Align:")}</div><div><select name="dataTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "dataTextAlign")}</select></div>
-                                </div> 
-                            </div>    
-                        </div>
-                    </div>;  
-                });
+                return getGridSelectColumn(sc, indx, nameLabel, alignLabel, colcnt);
+            });
         } else {
             return "";
         }
@@ -568,9 +541,6 @@ const AddEditComponentModal = (props) => {
     const getDataComponentEntry = (type) => {
         if (type === COMPONENT_TYPE_DATARECORD) {
             return <div>
-                <div className="entrygrid-125-100">
-                    <div className="label">{getText("Row Gap(pixels):")}</div><div><NumberEntry id="rgne" name="rowGap" onChange={e => setValue(e)} defaultValue={5} min={1} max={20}/></div>
-                </div>
                 <div className="report-query-column-select">
                     {getQuerySelectColumns(type)}
                 </div>            

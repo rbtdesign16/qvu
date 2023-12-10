@@ -234,12 +234,15 @@ const getGridComponentFreeformStyle = (currentReport, component, row) => {
     return retval;
 };
     
-const getDataRecordComponentStyle = (component) => {
+const getDataRecordComponentStyle = (currentReport, component) => {
+    let units = currentReport.pageUnits.substring(0, 2);
     let retval = {
         display: "grid",
+        height: component.height + units,
+        width: currentReport.width + units,
         gridTemplateColumns: component.value.gridTemplateColumns,
         margin: 0,
-        padding: (component.value.rowGap/2) + "px 0 " + (component.value.rowGap/2) + "px 0",
+        padding: 0,
         gridRowGap: 0
     };
     
@@ -389,7 +392,7 @@ const getDataComponentDataStyle = (component) => {
     return retval;
 };
 
-const getDataRecordComponentValue = (component) => {
+const getDataRecordComponentValue = (currentReport, component) => {
     let labelStyle = getDataComponentLabelStyle(component);
     let dataStyle = getDataComponentDataStyle(component);
     let labelStyles = [];
@@ -415,13 +418,15 @@ const getDataRecordComponentValue = (component) => {
         dataStyles.push(s);
     });
     
-    let gridStyle = getDataRecordComponentStyle(component);
-    return component.value.dataColumns.map((d, indx) => {
-        return <div style={gridStyle}>
-            <div style={labelStyles[indx]}>{d.displayName}</div>
-            <div style={dataStyles[indx]}>{getQueryDataColumnDisplay(d)}</div>
-        </div>;  
+    let gridStyle = getDataRecordComponentStyle(currentReport, component);
+    let items = [];
+
+    component.value.dataColumns.map((d, indx) => {
+        items.push(<div style={labelStyles[indx]}>{d.displayName}</div>);
+        items.push(<div style={dataStyles[indx]}>{getQueryDataColumnDisplay(d)}</div>);
     });
+
+    return <div style={gridStyle}>{items.map(i => i)}</div>;  
 };
 
 export const getQueryDataColumnDisplay = (dc) => {
@@ -517,7 +522,7 @@ export const getComponentValue = (reportSettings, currentReport, component, comp
         case COMPONENT_TYPE_DATAGRID:
             return getDataGridComponentValue(currentReport, component, componentIndex);
         case COMPONENT_TYPE_DATARECORD:
-           return getDataRecordComponentValue(component);
+           return getDataRecordComponentValue(currentReport, component);
         case COMPONENT_TYPE_DATAFIELD:
            return getQueryDataColumnDisplay(component.value.dataColumns[0]);
     }
@@ -635,19 +640,7 @@ export const reformatDataComponent = (currentReport, component) => {
         }
      } else if (component.type === COMPONENT_TYPE_DATARECORD) {
         if (!component.value.gridTemplateColumns) {
-            let maxWidth = 0;
-            for (let i = 0; i < component.value.dataColumns.length; ++i) {
-                let w = (((PIXELS_PER_POINT/2) * component.fontSettings.size) * component.value.dataColumns[i].displayName.length);
-                if (w > maxWidth) {
-                    maxWidth = w;
-                }
-            }
-
-            let labelWidth = pixelsToReportUnits(unit, maxWidth);
-            component.width = 2 * labelWidth;
-            component.height = component.value.dataColumns.length 
-                * pixelsToReportUnits(unit, (PIXELS_PER_POINT * component.fontSettings.size) + 5 + (component.value.rowGap ? Number(component.value.rowGap) : 0));
-            gtc = labelWidth + unit + " " + labelWidth + unit;
+            gtc = "40% 60%";
         } else {
             gtc = component.value.gridTemplateColumns;
         }

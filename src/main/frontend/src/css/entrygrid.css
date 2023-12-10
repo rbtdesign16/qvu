@@ -171,6 +171,20 @@
     margin: 5px;
 }
 
+.entrygrid-100-75 {
+    display: grid;
+    grid-template-columns: 100px 75px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
+.entrygrid-100-325 {
+    display: grid;
+    grid-template-columns: 100px 325px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
 .entrygrid-100-400 {
     display: grid;
     grid-template-columns: 100px 400px;

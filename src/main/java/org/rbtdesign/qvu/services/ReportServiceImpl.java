@@ -855,8 +855,7 @@ public class ReportServiceImpl implements ReportService {
                 String format = getStringMapValue("displayFormat", dc);
                 Integer col = getIntegerMapValue("selectIndex", dc);
                 retval.append("\t\t<div class=\"");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(componentIndex);
                 retval.append("-h");
                 retval.append(dindx);
@@ -865,8 +864,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("</div>\n");
 
                 retval.append("\t\t<div class=\"");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(componentIndex);
                 retval.append("-d");
                 retval.append(dindx);
@@ -905,23 +903,21 @@ public class ReportServiceImpl implements ReportService {
         for (Map<String, Object> dc : dataColumns) {
             String format = getStringMapValue("displayFormat", dc);
             Integer col = getIntegerMapValue("selectIndex", dc);
-            retval.append("\t\t<div class=\"");
-            retval.append(c.getSection());
-            retval.append("-scomp-");
+            retval.append("\t\t\t<div class=\"");
+            retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-h");
             retval.append(dindx);
-            retval.append(">");
+            retval.append("\">");
             retval.append(getStringMapValue("displayName", dc));
             retval.append("</div>\n");
             
             retval.append("\t\t<div class=\"");
-            retval.append(c.getSection());
-            retval.append("-scomp-");
+            retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-d");
             retval.append(dindx);
-            retval.append(">");
+            retval.append("\">");
             if (col != null) {
                 Object o = dataRow.get(col);
                 if (o != null) {
@@ -1030,25 +1026,15 @@ public class ReportServiceImpl implements ReportService {
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;");
+        retval.append(";\n\t\tposition: absolute;\n");
         String val = getStringMapValue("gridTemplateColumns", m);
         if (StringUtils.isNotEmpty(val)) {
-            retval.append("\n\t\tdisplay: grid\n\t\tgrid-template-columns: ");
+            retval.append("\t\tdisplay: grid;\n\t\tgrid-template-columns: ");
             retval.append(val);
             retval.append(";\n\t\tgrid-row-gap: 0;\n");
-            val = getStringMapValue("rowGap", m);
-            if (StringUtils.isNotEmpty(val)) {
-                Double d = Double.parseDouble(val);
-                retval.append("\n\t\tpadding: ");
-                retval.append(d/2);
-                retval.append("px 0 ");
-                retval.append(d/2);
-                retval.append("px 0;\n");
-            }
         }
         
         if (Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID.equals(c.getType())) {
-            retval.append("\n");
             retval.append(c.getFontSettings().getFontCss());
             retval.append(c.getBorderSettings().getBorderCss());
         }
@@ -1057,8 +1043,7 @@ public class ReportServiceImpl implements ReportService {
 
         if (isFreeformGridComponent(c)) {
             retval.append("\n\t.");
-            retval.append(c.getSection());
-            retval.append("-scomp-");
+            retval.append("scomp-");
             retval.append(cindx);
             retval.append("-cont {\n");
             retval.append("\t\theight: ");
@@ -1080,13 +1065,11 @@ public class ReportServiceImpl implements ReportService {
         int dindx = 0;
         for (Map<String, Object> dc : dcols) {
             retval.append("\t.");
-            retval.append(c.getSection());
-            retval.append("-scomp-");
+            retval.append("scomp-");
             retval.append(cindx);
             retval.append("-h");
             retval.append(dindx);
-            retval.append(" {\n\t\t");
-            retval.append(";\n\t\ttext-align: ");
+            retval.append(" {\n\t\ttext-align: ");
             retval.append(getStringMapValue("headerTextAlign", dc));
             retval.append(";\n");
             retval.append(c.getFontSettings().getFontCss());
@@ -1094,8 +1077,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append("\t}\n");
 
             retval.append("\t.");
-            retval.append(c.getSection());
-            retval.append("-scomp-");
+            retval.append("scomp-");
             retval.append(cindx);
             retval.append("-d");
             retval.append(dindx);
@@ -1105,6 +1087,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(c.getFontSettings2().getFontCss());
             retval.append(c.getBorderSettings2().getBorderCss());
             retval.append("\t}\n");
+            dindx++;
        }
         
         return retval.toString();
@@ -1119,8 +1102,7 @@ public class ReportServiceImpl implements ReportService {
         for (Map<String, Object> dc : dcols) {
             if (Constants.GRID_FORMAT_TABLULAR.equals(getStringMapValue("gridFormat", m))) {
                 retval.append("\t.");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(cindx);
                 retval.append("-h");
                 retval.append(dindx);
@@ -1136,8 +1118,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\t}\n");
 
                 retval.append("\t.");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(cindx);
                 retval.append("-d");
                 retval.append(dindx);
@@ -1153,52 +1134,23 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\t}\n");
             } else {
                 retval.append("\t.");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(cindx);
                 retval.append("-h");
                 retval.append(dindx);
-                retval.append(" {\n\t\t");
-                retval.append("left: ");
-                retval.append(this.getStringMapValue("labelLeft", dc));
-                retval.append(units);
-                retval.append(";\n\t\theight: ");
-                retval.append(this.getStringMapValue("labelHeight", dc));
-                retval.append(units);
-                retval.append(";\n\t\ttop: ");
-                retval.append(this.getStringMapValue("labelTop", dc));
-                retval.append(units);
-                retval.append(";\n\t\theight: ");
-                retval.append(this.getStringMapValue("labelWidth", dc));
-                retval.append(units);
-                retval.append(";\n\t\ttext-align: ");
+                retval.append(" {\n\t\ttext-align: ");
                 retval.append(this.getStringMapValue("labelTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
                 retval.append(c.getBorderSettings().getBorderCss());
                 retval.append("\t}\n");
 
-                
                 retval.append("\t.");
-                retval.append(c.getSection());
-                retval.append("-scomp-");
+                retval.append("scomp-");
                 retval.append(cindx);
                 retval.append("-d");
                 retval.append(dindx);
-                retval.append(" {\n\t\t");
-                retval.append("left: ");
-                retval.append(this.getStringMapValue("dataLeft", dc));
-                retval.append(units);
-                retval.append(";\n\t\theight: ");
-                retval.append(this.getStringMapValue("dataHeight", dc));
-                retval.append(units);
-                retval.append(";\n\t\ttop: ");
-                retval.append(this.getStringMapValue("dataTop", dc));
-                retval.append(units);
-                retval.append(";\n\t\twidth: ");
-                retval.append(this.getStringMapValue("dataWidth", dc));
-                retval.append(units);
-                retval.append(";\n\t\ttext-align: ");
+                retval.append(" {\n\t\tpadding-left: 5px;\n\t\ttext-align: ");
                 retval.append(this.getStringMapValue("dataTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());

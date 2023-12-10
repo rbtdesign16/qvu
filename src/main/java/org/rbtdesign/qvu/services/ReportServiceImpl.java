@@ -340,9 +340,9 @@ public class ReportServiceImpl implements ReportService {
                 String layout = (String)m.get("gridLayout");
                 Double drh = getDoubleMapValue("dataRowHeight", m);
                 Double hrh = getDoubleMapValue("headerRowHeight", m);
-                
+  
                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
-                    if (((c.getHeight() - hrh) / drh) < retval) {
+                    if (((c.getHeight() - hrh) / drh) < d) {
                         d = ((c.getHeight() - hrh) / drh);
                     }
                 }
@@ -351,6 +351,10 @@ public class ReportServiceImpl implements ReportService {
         
         if (d != Double.MAX_VALUE) {
             retval = d.intValue();
+        }
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("grid row span: " + retval);
         }
         
         return retval;
@@ -378,7 +382,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(report.getPageSize());
         retval.append(" ");
         retval.append(report.getPageOrientation());
-        retval.append(";\n\t}\n\tbody {\n\t\tbackground-color: white;\n\t}\n\t.page {\n");
+        retval.append(";\n\t}\n\tbody {\n\t\tbackground-color: transparent;\n\t}\n\t.page {\n");
         retval.append("\t\tposition: absolute;\n\t\twidth: ");
         retval.append(pageWidth);
         retval.append(units);
@@ -848,26 +852,43 @@ public class ReportServiceImpl implements ReportService {
         
         int currow = queryResult.getCurrentRow();
         
-        for (int i = 0; i < gridRowSpan; ++i) {
-            int dindx = 0;
-            List<Object> dataRow = queryResult.getData().get(currow + i);
+        int dindx = 0;
+        for (Map<String, Object> dc : dataColumns) {
+             if (dindx > 0) {
+                 retval.append("\t\t\t");
+             }
+
+             retval.append("<div class=\"");
+             retval.append("scomp-");
+             retval.append(componentIndex);
+             retval.append("-h");
+             retval.append(dindx);
+             retval.append("\">");
+             retval.append(getStringMapValue("displayName", dc));
+             retval.append("</div>\n");
+             dindx++;
+        }
+        
+        String altrowcolor = getStringMapValue("altrowcolor", (Map<String, Object>)c.getValue());
+        for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
+            List<Object> dataRow = queryResult.getData().get(currow);
+            dindx = 0;
             for (Map<String, Object> dc : dataColumns) {
                 String format = getStringMapValue("displayFormat", dc);
                 Integer col = getIntegerMapValue("selectIndex", dc);
-                retval.append("\t\t<div class=\"");
-                retval.append("scomp-");
-                retval.append(componentIndex);
-                retval.append("-h");
-                retval.append(dindx);
-                retval.append(">");
-                retval.append(getStringMapValue("displayName", dc));
-                retval.append("</div>\n");
-
-                retval.append("\t\t<div class=\"");
+                retval.append("\t\t\t<div class=\"");
                 retval.append("scomp-");
                 retval.append(componentIndex);
                 retval.append("-d");
                 retval.append(dindx);
+                retval.append("\"");
+                
+                if (StringUtils.isNotEmpty(altrowcolor) && (((i + 1) % 2) == 0)) {
+                    retval.append(" style=\"background-color: ");
+                    retval.append(altrowcolor);
+                    retval.append(";\"");
+                }  
+                
                 retval.append(">");
                 if (col != null) {
                     Object o = dataRow.get(col);
@@ -879,15 +900,13 @@ public class ReportServiceImpl implements ReportService {
                         }
                     }
                 }   
+                
                 retval.append("</div>\n");
 
                 dindx++;
             }
                
             currow++;
-            if ((currow >= queryResult.getRowCount()) || (i > gridRowSpan)) {
-                break;
-            }
         }
         
         return retval.toString();
@@ -903,7 +922,10 @@ public class ReportServiceImpl implements ReportService {
         for (Map<String, Object> dc : dataColumns) {
             String format = getStringMapValue("displayFormat", dc);
             Integer col = getIntegerMapValue("selectIndex", dc);
-            retval.append("\t\t\t<div class=\"");
+            if (dindx > 0) {
+                retval.append("\t\t\t");
+            }
+            retval.append("<div class=\"");
             retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-h");
@@ -912,7 +934,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(getStringMapValue("displayName", dc));
             retval.append("</div>\n");
             
-            retval.append("\t\t<div class=\"");
+            retval.append("\t\t\t<div class=\"");
             retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-d");
@@ -1100,7 +1122,7 @@ public class ReportServiceImpl implements ReportService {
         
         int dindx = 0;
         for (Map<String, Object> dc : dcols) {
-            if (Constants.GRID_FORMAT_TABLULAR.equals(getStringMapValue("gridFormat", m))) {
+            if (Constants.GRID_FORMAT_TABLULAR.equals(getStringMapValue("gridLayout", m))) {
                 retval.append("\t.");
                 retval.append("scomp-");
                 retval.append(cindx);
@@ -1110,8 +1132,8 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("height: ");
                 retval.append(this.getStringMapValue("headerRowHeight", m));
                 retval.append(units);
-                retval.append(";\n\t\ttext-align: ");
-                retval.append(getStringMapValue("textAlign", m));
+                retval.append(";\n\t\toverflow: hidden;\n\t\ttext-align: ");
+                retval.append(getStringMapValue("headerTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
                 retval.append(c.getBorderSettings().getBorderCss());
@@ -1126,7 +1148,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("height: ");
                 retval.append(this.getStringMapValue("dataRowHeight", m));
                 retval.append(units);
-                retval.append(";\n\t\ttext-align: ");
+                retval.append(";\n\t\toverflow: hidden;\n\t\ttext-align: ");
                 retval.append(this.getStringMapValue("dataTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());

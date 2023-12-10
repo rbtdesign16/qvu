@@ -342,8 +342,9 @@ public class ReportServiceImpl implements ReportService {
                 Double hrh = getDoubleMapValue("headerRowHeight", m);
   
                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
-                    if (((c.getHeight() - hrh) / drh) < d) {
-                        d = ((c.getHeight() - hrh) / drh);
+                    double dataHeight = c.getHeight() - hrh;
+                    if (Math.floor(dataHeight / drh) < d) {
+                        d = Math.floor(dataHeight / drh);
                     }
                 }
             }
@@ -822,7 +823,7 @@ public class ReportServiceImpl implements ReportService {
     }
     
     private String formatData(Map<String, Object> dc, Map<String, Format> formatCache, String format, Object value) {
-        String retval;
+        String retval = "";
         Format formatter = formatCache.get(format);
         
         if (formatter == null) {
@@ -835,9 +836,9 @@ public class ReportServiceImpl implements ReportService {
         
         if (formatter != null) {
             retval = formatter.format(value);
-        } else {
+        } else if (value != null) {
             retval = value.toString();
-        }
+        } 
         
         return retval;
     }
@@ -1048,11 +1049,17 @@ public class ReportServiceImpl implements ReportService {
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;\n");
+        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n");
         String val = getStringMapValue("gridTemplateColumns", m);
         if (StringUtils.isNotEmpty(val)) {
             retval.append("\t\tdisplay: grid;\n\t\tgrid-template-columns: ");
             retval.append(val);
+            retval.append(";\n\t\tgrid-template-rows: ");
+            retval.append(getStringMapValue("headerRowHeight", m));
+            retval.append(units);
+            retval.append(";\n\t\tgrid-auto-rows: ");
+            retval.append(getStringMapValue("dataRowHeight", m));
+            retval.append(units);
             retval.append(";\n\t\tgrid-row-gap: 0;\n");
         }
         
@@ -1128,11 +1135,11 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(cindx);
                 retval.append("-h");
                 retval.append(dindx);
-                retval.append(" {\n\t\t");
-                retval.append("height: ");
-                retval.append(this.getStringMapValue("headerRowHeight", m));
-                retval.append(units);
-                retval.append(";\n\t\toverflow: hidden;\n\t\ttext-align: ");
+    //            retval.append(" {\n\t\t");
+     //           retval.append("height: ");
+           //     retval.append(this.getStringMapValue("headerRowHeight", m));
+          //      retval.append(units);
+                retval.append("{\n\t\toverflow: hidden;\n\t\ttext-align: ");
                 retval.append(getStringMapValue("headerTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
@@ -1144,11 +1151,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(cindx);
                 retval.append("-d");
                 retval.append(dindx);
-                retval.append(" {\n\t\t");
-                retval.append("height: ");
-                retval.append(this.getStringMapValue("dataRowHeight", m));
-                retval.append(units);
-                retval.append(";\n\t\toverflow: hidden;\n\t\ttext-align: ");
+                retval.append("{\n\t\toverflow: hidden;\n\t\ttext-align: ");
                 retval.append(this.getStringMapValue("dataTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());

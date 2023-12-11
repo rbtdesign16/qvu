@@ -471,7 +471,7 @@ const AddEditComponentModal = (props) => {
                         {wantFormat ? <div className="label">{getText("Format:")}</div> : <div style={{height: "30px"}}></div>}
                         {wantFormat ? <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div> : <div></div>}
                     </div> 
-                    <div className="entrygrid-100-75">
+                    <div className="entrygrid-125-75">
                         <div className="label">{alignLabel}</div><div><select name="headerTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "headerTextAlign")}</select></div>
                         <div className="label">{getText("Data Align:")}</div><div><select name="dataTextAlign" onChange={e => setQueryValue(e, indx)}>{loadQueryColumnTextAlignOptions(sc, "dataTextAlign")}</select></div>
                     </div> 
@@ -514,7 +514,8 @@ const AddEditComponentModal = (props) => {
          if (currentQuery && selectColumns) {
             let nameLabel = getText("Header:");
             let alignLabel = getText("Header Align:");
-            if (type === COMPONENT_TYPE_DATARECORD) {
+            if ((currentComponent.value.gridLayout === FREEFORM_LAYOUT)
+                || (type === COMPONENT_TYPE_DATARECORD)) {
                 nameLabel = getText("Label:");
                 alignLabel = getText("Label Align:");
             }

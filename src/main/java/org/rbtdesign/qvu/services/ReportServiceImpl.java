@@ -166,7 +166,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(units);
             retval.append(";\" class=\"page\">");
             for (String section : Constants.REPORT_SECTIONS) {
-                retval.append(getSectionHtml(report, section, queryResult, pageHeight, pageCount, i, formatCache, staticComponentCache, gridRowSpan));
+                retval.append(getSectionHtml(report, section, queryResult, pageHeight, pageCount, i, formatCache, staticComponentCache, gridRowSpan, units));
             }
             retval.append("\n</div>");
             if (queryResult != null) {
@@ -190,7 +190,8 @@ public class ReportServiceImpl implements ReportService {
         int currentPage, 
         int componentIndex,
         Map<String, Format> formatCache, 
-        int gridRowSpan) {
+        int gridRowSpan,
+        String units) {
         StringBuilder retval = new StringBuilder("");
         List<Map<String, Object>> dataColumns = null;
         if (isDataComponent(c.getType())) {
@@ -224,7 +225,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getDataFieldHtml(c, queryResult, formatCache, dataColumns));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
-                retval.append(getDataGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan));
+                retval.append(getDataGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
                 retval.append(getDataRecordHtml(c, componentIndex, queryResult, formatCache, dataColumns));
@@ -259,7 +260,8 @@ public class ReportServiceImpl implements ReportService {
         int currentPage,
         Map<String, Format> formatCache,
         Map<String, String> staticComponentCache,
-        int gridRowSpan) {
+        int gridRowSpan,
+        String units) {
         StringBuilder retval = new StringBuilder();
         
                 
@@ -296,7 +298,7 @@ public class ReportServiceImpl implements ReportService {
                     buf.append("class=\"");
                     buf.append(clazz);
                     buf.append("\">\n\t\t\t");
-                    buf.append(getComponentValue(c, queryResult, currentPage, cindx, formatCache, gridRowSpan));
+                    buf.append(getComponentValue(c, queryResult, currentPage, cindx, formatCache, gridRowSpan, units));
                     buf.append("\n\t\t</div>\n");
 
                     retval.append(buf.toString());
@@ -848,33 +850,59 @@ public class ReportServiceImpl implements ReportService {
         QueryResult queryResult, 
         Map<String, Format> formatCache, 
         List<Map<String, Object>> dataColumns, 
-        int gridRowSpan) {
+        int gridRowSpan,
+        String units) {
         StringBuilder retval = new StringBuilder(""); 
         
         int currow = queryResult.getCurrentRow();
         
         int dindx = 0;
-        for (Map<String, Object> dc : dataColumns) {
-             if (dindx > 0) {
-                 retval.append("\t\t\t");
-             }
-
-             retval.append("<div class=\"");
-             retval.append("scomp-");
-             retval.append(componentIndex);
-             retval.append("-h");
-             retval.append(dindx);
-             retval.append("\">");
-             retval.append(getStringMapValue("displayName", dc));
-             retval.append("</div>\n");
-             dindx++;
-        }
+        if (isTablularGridComponent(c)) {
+            for (Map<String, Object> dc : dataColumns) {
+                if (dindx > 0) {
+                    retval.append("\t\t\t");
+                }
+                retval.append("<div class=\"");
+                retval.append("scomp-");
+                retval.append(componentIndex);
+                retval.append("-h");
+                retval.append(dindx);
+                retval.append("\">");
+                retval.append(getStringMapValue("displayName", dc));
+                retval.append("</div>\n");
+                dindx++;
+            }
+        } 
         
-        String altrowcolor = getStringMapValue("altrowcolor", (Map<String, Object>)c.getValue());
+        
+        Map<String, Object> m = (Map<String, Object>)c.getValue();
+        String altrowcolor = getStringMapValue("altrowcolor", m);
+        Double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
         for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
             List<Object> dataRow = queryResult.getData().get(currow);
+            if (isFreeformGridComponent(c)) {
+                double top = i * dataRowHeight;
+                retval.append("\t\t<div class=\"scomp-");
+                retval.append(componentIndex);
+                retval.append("-cont\" style=\"top: ");
+                retval.append(top);
+                retval.append(units);
+                retval.append(";\">\n");
+            } 
+            
             dindx = 0;
             for (Map<String, Object> dc : dataColumns) {
+                if (isFreeformGridComponent(c)) {
+                     retval.append("\t\t\t<div class=\"");
+                     retval.append("scomp-");
+                     retval.append(componentIndex);
+                     retval.append("-h");
+                     retval.append(dindx);
+                     retval.append("\">");
+                     retval.append(getStringMapValue("displayName", dc));
+                     retval.append("</div>\n");
+                } 
+ 
                 String format = getStringMapValue("displayFormat", dc);
                 Integer col = getIntegerMapValue("selectIndex", dc);
                 retval.append("\t\t\t<div class=\"");
@@ -906,7 +934,11 @@ public class ReportServiceImpl implements ReportService {
 
                 dindx++;
             }
-               
+            
+            if (isFreeformGridComponent(c)) {
+                retval.append("\t\t</div>\n");
+            } 
+
             currow++;
         }
         
@@ -1027,6 +1059,17 @@ public class ReportServiceImpl implements ReportService {
         return retval;
     }
 
+    private boolean isTablularGridComponent(ReportComponent c) {
+        boolean retval = false;
+        
+        if (isDataGridComponent(c.getType())) {
+            Map<String, Object> m = (Map<String, Object>)c.getValue();
+            String layout = getStringMapValue("gridLayout", m);
+            retval = Constants.GRID_LAYOUT_TABULAR.equals(layout);
+        }
+        
+        return retval;
+    }
             
     private String getDataComponentContainerCss(ReportComponent c, int cindx, String units) {
         StringBuilder retval = new StringBuilder();
@@ -1075,10 +1118,10 @@ public class ReportServiceImpl implements ReportService {
             retval.append("scomp-");
             retval.append(cindx);
             retval.append("-cont {\n");
-            retval.append("\t\theight: ");
+            retval.append("\t\toverflow: hidden;\n\t\tposition: absolute;\n\t\ttop: 0;\n\t\tleft: 0;width: 100%;\n\t\theight: ");
             retval.append(getStringMapValue("dataRowHeight", m));
             retval.append(units);
-            retval.append(";\n\t\twidth: 100%;\n");
+            retval.append(";\n");
             retval.append(c.getBorderSettings3().getBorderCss());
             retval.append("\n\t}\n");
         }   
@@ -1135,17 +1178,12 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(cindx);
                 retval.append("-h");
                 retval.append(dindx);
-    //            retval.append(" {\n\t\t");
-     //           retval.append("height: ");
-           //     retval.append(this.getStringMapValue("headerRowHeight", m));
-          //      retval.append(units);
                 retval.append("{\n\t\toverflow: hidden;\n\t\ttext-align: ");
                 retval.append(getStringMapValue("headerTextAlign", dc));
                 retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
                 retval.append(c.getBorderSettings().getBorderCss());
                 retval.append("\t}\n");
-
                 retval.append("\t.");
                 retval.append("scomp-");
                 retval.append(cindx);
@@ -1164,12 +1202,23 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("-h");
                 retval.append(dindx);
                 retval.append(" {\n\t\ttext-align: ");
-                retval.append(this.getStringMapValue("labelTextAlign", dc));
+                retval.append(this.getStringMapValue("headerTextAlign", dc));
+                retval.append(";\n\t\tposition: absolute;\n\t\tleft: ");
+                retval.append(this.getStringMapValue("labelLeft", dc));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(this.getStringMapValue("labelTop", dc));
+                retval.append(units);
+                retval.append(";\n\t\twidth: ");
+                retval.append(this.getStringMapValue("labelWidth", dc));
+                retval.append(units);
+                retval.append(";\n\t\theight: ");
+                retval.append(this.getStringMapValue("labelHeight", dc));
+                retval.append(units);
                 retval.append(";\n");
                 retval.append(c.getFontSettings().getFontCss());
                 retval.append(c.getBorderSettings().getBorderCss());
                 retval.append("\t}\n");
-
                 retval.append("\t.");
                 retval.append("scomp-");
                 retval.append(cindx);
@@ -1177,6 +1226,18 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(dindx);
                 retval.append(" {\n\t\tpadding-left: 5px;\n\t\ttext-align: ");
                 retval.append(this.getStringMapValue("dataTextAlign", dc));
+                retval.append(";\n\t\tposition: absolute;\n\t\tleft: ");
+                retval.append(this.getStringMapValue("dataLeft", dc));
+                retval.append(units);
+                retval.append(";\n\t\ttop: ");
+                retval.append(this.getStringMapValue("dataTop", dc));
+                retval.append(units);
+                retval.append(";\n\t\twidth: ");
+                retval.append(this.getStringMapValue("dataWidth", dc));
+                retval.append(units);
+                retval.append(";\n\t\theight: ");
+                retval.append(this.getStringMapValue("dataHeight", dc));
+                retval.append(units);
                 retval.append(";\n");
                 retval.append(c.getFontSettings2().getFontCss());
                 retval.append(c.getBorderSettings2().getBorderCss());

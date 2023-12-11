@@ -269,6 +269,7 @@ public class Constants {
     };
     
     public static final String GRID_LAYOUT_FREEFORM = "freeform";
+    public static final String GRID_LAYOUT_TABULAR = "tabular";
     
     public static final String REPORT_COMPONENT_TYPE_TEXT_ID = "text";
     public static final String REPORT_COMPONENT_TYPE_IMAGE_ID = "image";

@@ -127,7 +127,7 @@ public class ReportServiceImpl implements ReportService {
         double pageWidth = getReportWidth(report);
         double pageHeight = getReportHeight(report);
         String units = report.getPageUnits().substring(0, 2);
-        int pageCount = 3;
+        int pageCount = 1;
         int gridRowSpan = 1;
         
         if (queryResult != null) {
@@ -167,7 +167,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(units);
             retval.append(";\" class=\"page\">");
             for (String section : Constants.REPORT_SECTIONS) {
-                retval.append(getSectionHtml(report, section, queryResult, pageHeight, pageCount, i, formatCache, staticComponentCache, gridRowSpan, units));
+                retval.append(getSectionHtml(report, section, queryResult, pageCount, i, formatCache, staticComponentCache, gridRowSpan, units));
             }
             retval.append("\n</div>");
             if (queryResult != null) {
@@ -208,7 +208,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getImageHtml(c));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_SHAPE_ID:
-                retval.append(getShapeHtml(c, componentIndex));
+                retval.append("<div></div>");
                 break;
             case Constants.REPORT_COMPONENT_TYPE_EMAIL_ID:
                 retval.append(getEmailHtml(c));
@@ -223,13 +223,13 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getCurrentDateHtml(c, formatCache));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_FIELD_ID:
-                retval.append(getDataFieldHtml(c, queryResult, formatCache, dataColumns));
+                retval.append(getDataFieldHtml(queryResult, formatCache, dataColumns));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
                 retval.append(getDataGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
-                retval.append(getDataRecordHtml(c, componentIndex, queryResult, formatCache, dataColumns));
+                retval.append(getDataRecordHtml(componentIndex, queryResult, formatCache, dataColumns));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_CHART_ID:
                 break;
@@ -256,7 +256,6 @@ public class ReportServiceImpl implements ReportService {
     private String getSectionHtml(ReportDocument report, 
         String section,
         QueryResult queryResult, 
-        double pageHeight, 
         int pageCount, 
         int currentPage,
         Map<String, Format> formatCache,
@@ -526,7 +525,7 @@ public class ReportServiceImpl implements ReportService {
     };
     
     private double getReportWidth(ReportDocument report) {
-        double retval = 0;
+        double retval;
         double[] size = Constants.PAGE_SIZE_MAP.get(report.getPageSize());
      
         if (Constants.PAGE_ORIENTATION_LANDSCAPE.equals(report.getPageOrientation())) {
@@ -547,7 +546,7 @@ public class ReportServiceImpl implements ReportService {
     }
     
     private double getReportHeight(ReportDocument report) {
-        double retval = 0;
+        double retval;
         double[] size = Constants.PAGE_SIZE_MAP.get(report.getPageSize());
      
         if (Constants.PAGE_ORIENTATION_LANDSCAPE.equals(report.getPageOrientation())) {
@@ -633,14 +632,7 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
     
-    private String getShapeHtml(ReportComponent c, int indx) {
-        StringBuilder retval = new StringBuilder();
-        
-        retval.append("<div></div>");
-        
-        return retval.toString();
-    }
-    
+ 
     private String getShapeClass(ReportComponent c, int indx) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>)c.getValue();
@@ -803,7 +795,7 @@ public class ReportServiceImpl implements ReportService {
         return df.format(new Date());
     }
 
-    private String getDataFieldHtml(ReportComponent c, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
+    private String getDataFieldHtml(QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
         String retval = "";
         Map<String, Object> dc = dataColumns.get(0);
         String format = getStringMapValue("displayFormat", dc);
@@ -815,7 +807,7 @@ public class ReportServiceImpl implements ReportService {
             Object o = dataRow.get(col);
             if (o != null) {
                 if (StringUtils.isNotEmpty(format)) {
-                    retval = formatData(dc, formatCache, format, o);
+                    retval = formatData(formatCache, format, o);
                 } else {
                     retval = o.toString();
                 }
@@ -825,7 +817,7 @@ public class ReportServiceImpl implements ReportService {
         return retval;
     }
     
-    private String formatData(Map<String, Object> dc, Map<String, Format> formatCache, String format, Object value) {
+    private String formatData(Map<String, Format> formatCache, String format, Object value) {
         String retval = "";
         Format formatter = formatCache.get(format);
         
@@ -924,7 +916,7 @@ public class ReportServiceImpl implements ReportService {
                     Object o = dataRow.get(col);
                     if (o != null) {
                         if (StringUtils.isNotEmpty(format)) {
-                            retval.append(formatData(dc, formatCache, format, o));
+                            retval.append(formatData(formatCache, format, o));
                         } else {
                             retval.append(o.toString());
                         }
@@ -946,7 +938,7 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    private String getDataRecordHtml(ReportComponent c, int componentIndex, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
+    private String getDataRecordHtml(int componentIndex, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
         StringBuilder retval = new StringBuilder("");
 
         int row = queryResult.getCurrentRow();
@@ -978,7 +970,7 @@ public class ReportServiceImpl implements ReportService {
                 Object o = dataRow.get(col);
                 if (o != null) {
                     if (StringUtils.isNotEmpty(format)) {
-                        retval.append(formatData(dc, formatCache, format, o));
+                        retval.append(formatData(formatCache, format, o));
                     } else {
                         retval.append(o.toString());
                     }
@@ -1018,7 +1010,7 @@ public class ReportServiceImpl implements ReportService {
         Double retval = 0.0;
         
         if (m.containsKey(key)) {
-            retval = Double.parseDouble(m.get(key).toString());
+            retval = Double.valueOf(m.get(key).toString());
         }
         
         return retval;
@@ -1029,7 +1021,7 @@ public class ReportServiceImpl implements ReportService {
         Integer retval = null;
         
         if (m.containsKey(key)) {
-            retval = Integer.parseInt(m.get(key).toString());
+            retval = Integer.valueOf(m.get(key).toString());
         }
         
         return retval;
@@ -1144,7 +1136,7 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     };
     
-    private String getDataRecordCss(ReportComponent c, int cindx, String units) {
+    private String getDataRecordCss(ReportComponent c, int cindx) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>)c.getValue();
         List<Map<String, Object>> dcols = (List<Map<String, Object>>)m.get("dataColumns");
@@ -1275,7 +1267,7 @@ public class ReportServiceImpl implements ReportService {
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
                 retval.append(getDataComponentContainerCss(c, cindx, units));
-                retval.append(getDataRecordCss(c, cindx, units));
+                retval.append(getDataRecordCss(c, cindx));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
                 retval.append(getDataComponentContainerCss(c, cindx, units));

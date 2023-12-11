@@ -268,6 +268,8 @@ public class Constants {
         REPORT_SECTION_FOOTER
     };
     
+    public static double PIXELS_PER_INCH = 96.0;
+    
     public static final String GRID_LAYOUT_FREEFORM = "freeform";
     public static final String GRID_LAYOUT_TABULAR = "tabular";
     

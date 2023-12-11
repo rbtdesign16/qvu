@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.rbtdesign.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.dto.BorderSettings;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryResult;
@@ -1118,8 +1119,22 @@ public class ReportServiceImpl implements ReportService {
             retval.append("scomp-");
             retval.append(cindx);
             retval.append("-cont {\n");
-            retval.append("\t\toverflow: hidden;\n\t\tposition: absolute;\n\t\ttop: 0;\n\t\tleft: 0;width: 100%;\n\t\theight: ");
-            retval.append(getStringMapValue("dataRowHeight", m));
+            retval.append("\n\t\tposition: absolute;\n\t\tleft: 0;width: 100%;\n\t\theight: ");
+            
+            BorderSettings bs = c.getBorderSettings3();
+            int bw = bs.getWidth();
+            Double height = getDoubleMapValue("dataRowHeight", m);
+            if (!Constants.NONE.equals(bs.getBorder())) {
+                if (bs.isBottom()) {
+                    height -= ((double)bw/Constants.PIXELS_PER_INCH);
+                }
+                
+                if ((bs.isTop())) {
+                     height -= ((double)bw/Constants.PIXELS_PER_INCH);
+                }   
+            }
+            
+            retval.append(height);
             retval.append(units);
             retval.append(";\n");
             retval.append(c.getBorderSettings3().getBorderCss());

@@ -451,9 +451,9 @@ const AddEditComponentModal = (props) => {
                     <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
                     <div style={{float: "right", marginRight: "15px", display: "inline-block"}} >
                         <input key={getUUID()} id={"sel-" + indx} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)}/>
-                        <label className="ck-label" htmlFor={"sel-" + indx}>{getText("Include Column")}</label>
-                        { showAddTotal && <input key={getUUID()} id={"at-" + indx} style={{marginLeft: "10px"}}  name="addTotal" type="checkbox" defaultChecked={!!sc.addTotal} onChange={e => setQueryValue(e, indx)}/> }
-                        { showAddTotal && <label className="ck-label" htmlFor={"at-" + indx}>{getText("Add Total")}</label>}
+                        <div tabIndex={1} style={{display: "inline-block"}} className="ck-label" onClick={e => setQueryValue({target: {name: "selected", id: "sel-" + indx, checked: !sc.selected}}, indx)}>{getText("Include Column")}</div>
+                        { showAddTotal && <input tabIndex={2} key={getUUID()} id={"at-" + indx} style={{marginLeft: "10px"}}  name="addTotal" type="checkbox" defaultChecked={!!sc.addTotal} onChange={e => setQueryValue(e, indx)}/> }
+                        { showAddTotal && <div className="ck-label" style={{display: "inline-block"}} onClick={e => setQueryValue({target: {name: "addTotal", id: "at-" + indx, checked: !sc.addTotal}}, indx)}>{getText("Add Total")}</div>}
                     </div>    
                 </span>
             </div>

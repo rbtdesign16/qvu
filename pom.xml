@@ -33,7 +33,7 @@
         <poi.version>5.2.3</poi.version>
         <jsoup.version>1.16.2</jsoup.version>
         <opencsv.version>5.7.1</opencsv.version>
-        <openhtmltopdf.version>1.0.10</openhtmltopdf.version>
+        <flying.saucer.version>9.1.20</flying.saucer.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -163,17 +163,16 @@
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
         </dependency>
-       
         <dependency>
-            <groupId>com.openhtmltopdf</groupId>
-            <artifactId>openhtmltopdf-core</artifactId>
-            <version>${openhtmltopdf.version}</version>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-core</artifactId>
+            <version>${flying.saucer.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.openhtmltopdf</groupId>
-            <artifactId>openhtmltopdf-pdfbox</artifactId>
-            <version>${openhtmltopdf.version}</version>
-        </dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf-openpdf</artifactId>
+            <version>${flying.saucer.version}</version>
+        </dependency>    
     </dependencies>
 
     <build>

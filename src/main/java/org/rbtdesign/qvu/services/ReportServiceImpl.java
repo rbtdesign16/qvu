@@ -290,7 +290,7 @@ public class ReportServiceImpl implements ReportService {
 
         if (Constants.REPORT_SECTION_FOOTER.equals(section)) {
             if (pageCount > (currentPage + 1)) {
-                retval.append("style=\"break-after: page;\"");
+                retval.append("style=\"break-after: always;\"");
             }
         }
 
@@ -407,24 +407,25 @@ public class ReportServiceImpl implements ReportService {
 
     private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<style>\n\t@page {\n\t\tsize: ");
+        retval.append("<style>\n\t@page {\n");
+        retval.append("\tmargin-left: 0;\n");
+        retval.append("\tmargin-top: 0;\n");
+        retval.append("\tmargin-right: 0;\n");
+        retval.append("\tmargin-bottom: 0;\n");
+        retval.append(")\n\t\tsize: ");
         retval.append(report.getPageSize());
         retval.append(" ");
         retval.append(report.getPageOrientation());
-        retval.append(";\n\t}\n\tbody {\n\t\tbackground-color: transparent;\n\t}\n\t.page {\n");
-        retval.append("\t\tposition: absolute;\n\t\twidth: ");
+        retval.append(";\n\t}\n");
+        retval.append("\n\tbody {\n\tbackground-color: transparent;\n\t; height: 100%;\n\twidth: 100%;\n}\n");
+        retval.append("\n\t.page {");
+        retval.append("\t\tposition: absolute;\n");
         retval.append(pageWidth);
         retval.append(units);
         retval.append(";\n\t\theight: ");
         retval.append(pageHeight);
         retval.append(units);
-        retval.append(";\n");
-
-        if (System.getProperty("dev.mode") != null) {
-            retval.append("\t\tborder: solid 1px blue;\n");
-        }
-
-        retval.append("\t}\n");
+        retval.append(";\n\t}\n");
 
         retval.append(getSectionClass(report, "header", units, pageHeight, pageWidth));
         retval.append(getSectionClass(report, "body", units, pageHeight, pageWidth));
@@ -495,7 +496,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(0));
                 retval.append(units);
-                retval.append(";\n\t\ttop: 0;\n\t\twidth: ");
+                retval.append(";\n\t\twidth: ");
                 retval.append(pageWidth - (report.getPageBorder().get(0) + report.getPageBorder().get(2)));
                 retval.append(units);
                 retval.append(";\n\t\theight: ");
@@ -507,10 +508,10 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\t\tmargin: 0 ");
                 retval.append(report.getPageBorder().get(2));
                 retval.append(units);
-                retval.append(" 0 ");
+               retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(3));
                 retval.append(units);
-                retval.append(";\n\t\ttop: ");
+                retval.append(";;\n\t\ttop: ");
                 retval.append(report.getHeaderHeight());
                 retval.append(units);
                 retval.append(";\n\t\twidth: ");
@@ -550,8 +551,6 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    ;
-    
     private double getReportWidth(ReportDocument report) {
         double retval;
         double[] size = Constants.PAGE_SIZE_MAP.get(report.getPageSize());

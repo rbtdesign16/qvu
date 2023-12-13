@@ -417,6 +417,9 @@ public class ReportServiceImpl implements ReportService {
         retval.append(" ");
         retval.append(report.getPageOrientation());
         retval.append(";\n\t}\n");
+        
+        retval.append(getFontDefinitions());
+        
         retval.append("\n\tbody {\n\tbackground-color: transparent;\n\t; height: 100%;\n\twidth: 100%;\n}\n");
         retval.append("\n\t.page {");
         retval.append("\t\tposition: absolute;\n");
@@ -427,10 +430,10 @@ public class ReportServiceImpl implements ReportService {
         retval.append(units);
         retval.append(";\n\t}\n");
 
-        retval.append(getSectionClass(report, "header", units, pageHeight, pageWidth));
-        retval.append(getSectionClass(report, "body", units, pageHeight, pageWidth));
-        retval.append(getSectionClass(report, "footer", units, pageHeight, pageWidth));
-
+        for (String section : Constants.REPORT_SECTIONS) {
+            retval.append(getSectionClass(report, section, units, pageHeight, pageWidth));
+        }
+        
         for (int i = 0; i < report.getReportComponents().size(); ++i) {
             ReportComponent c = report.getReportComponents().get(i);
             if (!isDataComponent(c.getType())) {
@@ -476,6 +479,60 @@ public class ReportServiceImpl implements ReportService {
         }
 
         retval.append("</style>\n");
+
+        return retval.toString();
+    }
+    
+    private String getFontDefinitions() {
+        StringBuilder retval = new StringBuilder();
+        
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Arial;\n");
+        retval.append("\t\tsrc: url(fonts/ARIAL.TTF)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Courier;\n");
+        retval.append("\t\tsrc: url(fonts/Courierprime-1OVL.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+        
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Georgia;\n");
+        retval.append("\t\tsrc: url(fonts/georgia.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+        
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Lucida Sans Unicode;\n");
+        retval.append("\t\tsrc: url(fonts/l_10646.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+        
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Tahoma;\n");
+        retval.append("\t\tsrc: url(fonts/tahoma.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Times New Roman;\n");
+        retval.append("\t\tsrc: url(fonts/times.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Trebuchet MS;\n");
+        retval.append("\t\tsrc: url(fonts/trebuc.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\n\t@font-face {\n");
+        retval.append("\t\t@font-family: Verdana;\n");
+        retval.append("\t\tsrc: url(fonts/verdana.ttf)\n");
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         return retval.toString();
     }

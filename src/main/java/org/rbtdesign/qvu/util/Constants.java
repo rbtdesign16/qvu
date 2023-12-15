@@ -389,4 +389,13 @@ public class Constants {
         PDF_FONT_MAP.put("Verdana", "Jost");
     }
 
+    public static final String[] PDF_EMBEDDED_FONT_FILES = {
+        "Arimo-Regular.ttf",
+        "Cousine-Regular.ttf",
+        "Gelasio-Regular.ttf",
+        "OpenSans-Regular.ttf",
+        "Signika-Regular.ttf",
+        "Tinos-Regular.ttf",
+        "Jost-Regular.ttf"};
+
 }

@@ -195,9 +195,8 @@ const ReportDesign = () => {
                 type: PDF_MIME_TYPE
             });
 
+            await showDocumentFromBlob(blob);
             hideMessage();
-
-            showDocumentFromBlob(blob);
         }
     };
 

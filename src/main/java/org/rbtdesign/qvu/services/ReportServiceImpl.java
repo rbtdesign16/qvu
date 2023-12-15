@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.rbtdesign.qvu.client.utils.OperationResult;
-import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.dto.BorderSettings;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
@@ -412,8 +411,6 @@ public class ReportServiceImpl implements ReportService {
     private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
         StringBuilder retval = new StringBuilder();
         retval.append("<style>\n");
-        retval.append(getFontDeclarations());
-
         retval.append("\n\t@page {\n");
         retval.append("\tmargin-left: 0;\n");
         retval.append("\tmargin-top: 0;\n");
@@ -1162,81 +1159,12 @@ public class ReportServiceImpl implements ReportService {
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n");
+        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\toverflow: hidden;\n");
         retval.append(c.getFontSettings().getFontCss());
         retval.append(c.getBorderSettings().getBorderCss());
         retval.append("\t}\n");
         return retval.toString();
     }
-
-    private String getDataComponentContainerCss(ReportComponent c, int cindx, String units) {
-        StringBuilder retval = new StringBuilder();
-
-        Map<String, Object> m = (Map<String, Object>) c.getValue();
-        retval.append("\n\t.");
-        retval.append("comp-");
-        retval.append(cindx);
-        retval.append(" {\n\t\ttop: ");
-        retval.append(c.getTop());
-        retval.append(units);
-        retval.append(";\n\t\tleft: ");
-        retval.append(c.getLeft());
-        retval.append(units);
-        retval.append(";\n\t\twidth: ");
-        retval.append(c.getWidth());
-        retval.append(units);
-        retval.append(";\n\t\theight: ");
-        retval.append(c.getHeight());
-        retval.append(units);
-        retval.append(";\n\t\ttext-align: ");
-        retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n");
-        String val = getStringMapValue("gridTemplateColumns", m);
-        if (StringUtils.isNotEmpty(val)) {
-            retval.append("\t\tdisplay: grid;\n\t\tgrid-template-columns: ");
-            retval.append(val);
-            retval.append(";\n\t\tgrid-template-rows: ");
-            retval.append(getStringMapValue("headerRowHeight", m));
-            retval.append(units);
-            retval.append(";\n\t\tgrid-auto-rows: ");
-            retval.append(getStringMapValue("dataRowHeight", m));
-            retval.append(units);
-            retval.append(";\n\t\tgrid-row-gap: 0;\n");
-        }
-
-        retval.append("\t}\n");
-
-        if (isFreeformGridComponent(c)) {
-            retval.append("\n\t.");
-            retval.append("scomp-");
-            retval.append(cindx);
-            retval.append("-cont {\n");
-            retval.append("\n\t\tposition: absolute;\n\t\tleft: 0;width: 100%;\n\t\theight: ");
-
-            BorderSettings bs = c.getBorderSettings3();
-            int bw = bs.getWidth();
-            Double height = getDoubleMapValue("dataRowHeight", m);
-            if (!Constants.NONE.equals(bs.getBorder())) {
-                if (bs.isBottom()) {
-                    height -= ((double) bw / Constants.PIXELS_PER_INCH);
-                }
-
-                if ((bs.isTop())) {
-                    height -= ((double) bw / Constants.PIXELS_PER_INCH);
-                }
-            }
-
-            retval.append(height);
-            retval.append(units);
-            retval.append(";\n");
-            retval.append(c.getBorderSettings3().getBorderCss());
-            retval.append("\n\t}\n");
-        }
-
-        return retval.toString();
-    }
-
-    ;
 
     private String getDataGridCss(ReportComponent c, int cindx, String units) {
         if (isFreeformGridComponent(c)) {
@@ -1469,6 +1397,27 @@ public class ReportServiceImpl implements ReportService {
         Map<String, Object> m = (Map<String, Object>) c.getValue();
         List<Map<String, Object>> dcols = (List<Map<String, Object>>) m.get("dataColumns");
 
+        retval.append("\n\t.");
+        retval.append("comp-");
+        retval.append(cindx);
+        retval.append(" {\n\t\ttop: ");
+        retval.append(c.getTop());
+        retval.append(units);
+        retval.append(";\n\t\tleft: ");
+        retval.append(c.getLeft());
+        retval.append(units);
+        retval.append(";\n\t\twidth: ");
+        retval.append(c.getWidth());
+        retval.append(units);
+        retval.append(";\n\t\theight: ");
+        retval.append(c.getHeight());
+        retval.append(units);
+        retval.append(";\n\t\ttext-align: ");
+        retval.append(c.getAlign());
+        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tborder-collapse: collapse;\n");
+        retval.append("\t}\n");
+
+ 
         double rowHeight = c.getHeight() / dcols.size();
         int dindx = 0;
         for (Map<String, Object> dc : dcols) {
@@ -1513,7 +1462,6 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getDataFieldCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
-                retval.append(getDataComponentContainerCss(c, cindx, units));
                 retval.append(getDataRecordCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
@@ -1525,65 +1473,13 @@ public class ReportServiceImpl implements ReportService {
     
     private void addFont(ITextRenderer renderer) {
         try {
-            renderer.getFontResolver().addFont("fonts/Arimo-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/Cousine-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/Gelasio-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/OpenSans-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/Signika-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/Tinos-Regular.ttf", BaseFont.IDENTITY_H, true);
-            renderer.getFontResolver().addFont("fonts/Jost-Regular.ttf", BaseFont.IDENTITY_H, true);
+            for (String f : Constants.PDF_EMBEDDED_FONT_FILES) {
+                renderer.getFontResolver().addFont("fonts/" + f, BaseFont.IDENTITY_H, true);
+            }
         }
         
         catch (Exception ex) {
             LOG.error(ex.toString(), ex);
         }
-    }
-
-    private String getFontDeclarations() {
-        StringBuilder retval = new StringBuilder();
-        
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Arimo;\n");
-        retval.append("\t\tsrc: url(fonts/Arimo-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Cousine;\n");
-        retval.append("\t\tsrc: url(fonts/Cousine-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Gelasio;\n");
-        retval.append("\t\tsrc: url(fonts/Gelasio-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Open Sans;\n");
-        retval.append("\t\tsrc: url(fonts/OpendSans-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Signika;\n");
-        retval.append("\t\tsrc: url(fonts/Signika-Regular.ttf)\n");
-                retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Tinos;\n");
-        retval.append("\t\tsrc: url(fonts/Tinos-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\t@font-face {\n");
-        retval.append("\t\tfont-family: Jost;\n");
-        retval.append("\t\tsrc: url(fonts/Jost-Regular.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        return retval.toString();
     }
 }

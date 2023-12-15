@@ -375,7 +375,6 @@ public class Constants {
         "Lucida Sans Unicode",
         "Tahoma",
         "Times New Roman",
-        "Trebuchet MS",
         "Verdana"};
     
     public static final Map <String, String> PDF_FONT_MAP = new HashMap<>();
@@ -386,6 +385,8 @@ public class Constants {
         PDF_FONT_MAP.put("Georgia", "Gelasio");
         PDF_FONT_MAP.put("Lucida Sans Unicode", "Open Sans");
         PDF_FONT_MAP.put("Tahoma", "Signika");
+        PDF_FONT_MAP.put("Times New Roman", "Tinos");
+        PDF_FONT_MAP.put("Verdana", "Jost");
     }
 
 }

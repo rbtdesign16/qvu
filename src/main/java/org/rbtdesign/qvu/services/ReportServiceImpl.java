@@ -1536,6 +1536,8 @@ public class ReportServiceImpl implements ReportService {
             renderer.getFontResolver().addFont("fonts/Gelasio-Regular.ttf", BaseFont.IDENTITY_H, true);
             renderer.getFontResolver().addFont("fonts/OpenSans-Regular.ttf", BaseFont.IDENTITY_H, true);
             renderer.getFontResolver().addFont("fonts/Signika-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/Tinos-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/Jost-Regular.ttf", BaseFont.IDENTITY_H, true);
         }
         
         catch (Exception ex) {
@@ -1573,6 +1575,18 @@ public class ReportServiceImpl implements ReportService {
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Signika;\n");
         retval.append("\t\tsrc: url(fonts/Signika-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Tinos;\n");
+        retval.append("\t\tsrc: url(fonts/Tinos-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Jost;\n");
+        retval.append("\t\tsrc: url(fonts/Jost-Regular.ttf)\n");;
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 

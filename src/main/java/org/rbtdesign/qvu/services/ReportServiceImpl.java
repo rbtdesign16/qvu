@@ -48,9 +48,6 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private FileHandler fileHandler;
 
-    @Autowired
-    private ConfigurationHelper config;
-
     @PostConstruct
     private void init() {
         LOG.info("in ReportServiceImpl.init()");
@@ -884,14 +881,13 @@ public class ReportServiceImpl implements ReportService {
             String units) {
 
         if (isTabularGridComponent(c)) {
-            return getTabularGridHtml(c, queryResult, formatCache, dataColumns, gridRowSpan);
+            return getTabularGridHtml(queryResult, formatCache, dataColumns, gridRowSpan);
         } else {
             return getFreeformGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units);
         }
     }
 
-    private String getTabularGridHtml(ReportComponent c,
-            QueryResult queryResult,
+    private String getTabularGridHtml(QueryResult queryResult,
             Map<String, Format> formatCache,
             List<Map<String, Object>> dataColumns,
             int gridRowSpan) {
@@ -909,7 +905,6 @@ public class ReportServiceImpl implements ReportService {
         }
         retval.append("\t\t\t</tr>\n");
 
-        Map<String, Object> m = (Map<String, Object>) c.getValue();
         for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
             retval.append("\t\t\t<tr class=\"trd\">\n");
             List<Object> dataRow = queryResult.getData().get(currow);
@@ -1150,7 +1145,6 @@ public class ReportServiceImpl implements ReportService {
 
     private String getDataFieldCss(ReportComponent c, int cindx, String units) {
         StringBuilder retval = new StringBuilder();
-        Map<String, Object> m = (Map<String, Object>) c.getValue();
         retval.append("\n\t.");
         retval.append("comp-");
         retval.append(cindx);
@@ -1550,43 +1544,43 @@ public class ReportServiceImpl implements ReportService {
         
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Arimo;\n");
-        retval.append("\t\tsrc: url(fonts/Arimo-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/Arimo-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Cousine;\n");
-        retval.append("\t\tsrc: url(fonts/Cousine-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/Cousine-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Gelasio;\n");
-        retval.append("\t\tsrc: url(fonts/Gelasio-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/Gelasio-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Open Sans;\n");
-        retval.append("\t\tsrc: url(fonts/OpendSans-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/OpendSans-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Signika;\n");
-        retval.append("\t\tsrc: url(fonts/Signika-Regular.ttf)\n");;
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\tsrc: url(fonts/Signika-Regular.ttf)\n");
+                retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Tinos;\n");
-        retval.append("\t\tsrc: url(fonts/Tinos-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/Tinos-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 
         retval.append("\t@font-face {\n");
         retval.append("\t\tfont-family: Jost;\n");
-        retval.append("\t\tsrc: url(fonts/Jost-Regular.ttf)\n");;
+        retval.append("\t\tsrc: url(fonts/Jost-Regular.ttf)\n");
         retval.append("\t\t-fs-pdf-font-embed: embed;\n");
         retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
 

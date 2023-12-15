@@ -166,7 +166,7 @@ public class ReportServiceImpl implements ReportService {
         Map<String, Format> formatCache = new HashMap<>();
 
         retval.append("<html>\n");
-        retval.append(getStyleSection(report, pageWidth, pageHeight, units));
+        retval.append(getStyleSection(report, pageWidth, pageHeight, units, gridRowSpan));
         retval.append("<body>");
 
         LOG.debug("pageCount: " + pageCount);
@@ -408,7 +408,7 @@ public class ReportServiceImpl implements ReportService {
         }
     }
     
-    private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
+    private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units, int gridRowSpan) {
         StringBuilder retval = new StringBuilder();
         retval.append("<style>\n");
         retval.append("\n\t@page {\n");
@@ -476,7 +476,7 @@ public class ReportServiceImpl implements ReportService {
                         break;
                 }
             } else {
-                retval.append(getDataComponentCss(report, c, i));
+                retval.append(getDataComponentCss(report, c, i, gridRowSpan));
             }
         }
 
@@ -1166,17 +1166,23 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    private String getDataGridCss(ReportComponent c, int cindx, String units) {
+    private String getDataGridCss(ReportComponent c, int cindx, String units, int gridRowSpan) {
         if (isFreeformGridComponent(c)) {
-            return getFreeformGridCss(c, cindx, units);
+            return getFreeformGridCss(c, cindx, units, gridRowSpan);
         } else {
-            return getTabularGridCss(c, cindx, units);
+            return getTabularGridCss(c, cindx, units, gridRowSpan);
         }
     }
 
-    private String getTabularGridCss(ReportComponent c, int cindx, String units) {
+    private String getTabularGridCss(ReportComponent c, int cindx, String units, int gridRowSpan) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>) c.getValue();
+        
+        double headerRowHeight = getDoubleMapValue("headerRowHeight", m);
+        double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
+        
+        double calcHeight = Math.min(c.getHeight(), headerRowHeight + (gridRowSpan * dataRowHeight));
+        
         retval.append("\n\t.");
         retval.append("comp-");
         retval.append(cindx);
@@ -1190,7 +1196,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(c.getWidth());
         retval.append(units);
         retval.append(";\n\t\theight: ");
-        retval.append(c.getHeight());
+        retval.append(calcHeight);
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
@@ -1285,10 +1291,12 @@ public class ReportServiceImpl implements ReportService {
 
     ;
     
-    private String getFreeformGridCss(ReportComponent c, int cindx, String units) {
+    private String getFreeformGridCss(ReportComponent c, int cindx, String units, int gridRowSpan) {
         StringBuilder retval = new StringBuilder();
 
         Map<String, Object> m = (Map<String, Object>) c.getValue();
+        
+        double calcHeight = Math.min(c.getHeight(), (getDoubleMapValue("dataRowHeight", m) * gridRowSpan));
         retval.append("\n\t.");
         retval.append("comp-");
         retval.append(cindx);
@@ -1302,7 +1310,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(c.getWidth());
         retval.append(units);
         retval.append(";\n\t\theight: ");
-        retval.append(c.getHeight());
+        retval.append(calcHeight);
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
@@ -1390,8 +1398,6 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    ;
-    
     private String getDataRecordCss(ReportComponent c, int cindx, String units) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>) c.getValue();
@@ -1453,7 +1459,7 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    private String getDataComponentCss(ReportDocument report, ReportComponent c, int cindx) {
+    private String getDataComponentCss(ReportDocument report, ReportComponent c, int cindx, int gridRowSpan) {
         StringBuilder retval = new StringBuilder();
         String units = report.getPageUnits().substring(0, 2);
 
@@ -1465,7 +1471,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getDataRecordCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
-                retval.append(getDataGridCss(c, cindx, units));
+                retval.append(getDataGridCss(c, cindx, units, gridRowSpan));
                 break;
         }
         return retval.toString();

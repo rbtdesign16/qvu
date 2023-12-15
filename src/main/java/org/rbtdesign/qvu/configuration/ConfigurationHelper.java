@@ -45,7 +45,6 @@ public class ConfigurationHelper {
     private Double defaultHeaderHeight;
     private Double defaultFooterHeight;
     private List<Integer> defaultFontSizes;
-    private List<String> defaultFonts;
     private List<String> defaultFloatFormats;
     private List<String> defaultIntFormats;
     private List<String> defaultDateFormats;
@@ -342,14 +341,6 @@ public class ConfigurationHelper {
 
     public void setDefaultFontSizes(List<Integer> defaultFontSizes) {
         this.defaultFontSizes = defaultFontSizes;
-    }
-
-    public List<String> getDefaultFonts() {
-        return defaultFonts;
-    }
-
-    public void setDefaultFonts(List<String> defaultFonts) {
-        this.defaultFonts = defaultFonts;
     }
 
     public String getDefaultComponentBackgroundColor() {

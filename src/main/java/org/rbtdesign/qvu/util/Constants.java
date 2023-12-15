@@ -366,4 +366,26 @@ public class Constants {
         SHAPE_HORIZONTAL_LINE,
         SHAPE_VERTICAL_LINE
     };
+    
+    
+    public static final String[] DEFAULT_FONTS = {
+        "Arial",
+        "Courier New",
+        "Georgia",
+        "Lucida Sans Unicode",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"};
+    
+    public static final Map <String, String> PDF_FONT_MAP = new HashMap<>();
+    
+    static {
+        PDF_FONT_MAP.put("Arial", "Arimo");
+        PDF_FONT_MAP.put("Courier New", "Cousine");
+        PDF_FONT_MAP.put("Georgia", "Gelasio");
+        PDF_FONT_MAP.put("Lucida Sans Unicode", "Open Sans");
+        PDF_FONT_MAP.put("Tahoma", "Signika");
+    }
+
 }

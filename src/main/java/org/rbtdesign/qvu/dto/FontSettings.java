@@ -77,7 +77,10 @@ public class FontSettings {
 
         if (StringUtils.isNotEmpty(font)) {
             retval.append("\t\tfont-family: ");
-            retval.append(font);
+            
+            String f = Constants.PDF_FONT_MAP.getOrDefault(font, font);
+            
+            retval.append(f);
             retval.append(";\n");
             retval.append("\t\tfont-size: ");
             retval.append(size);

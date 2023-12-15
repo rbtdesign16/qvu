@@ -1,5 +1,6 @@
 package org.rbtdesign.qvu.services;
 
+import com.lowagie.text.pdf.BaseFont;
 import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.rbtdesign.qvu.client.utils.OperationResult;
+import org.rbtdesign.qvu.configuration.ConfigurationHelper;
 import org.rbtdesign.qvu.dto.BorderSettings;
 import org.rbtdesign.qvu.dto.QueryDocument;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
@@ -45,6 +47,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private FileHandler fileHandler;
+
+    @Autowired
+    private ConfigurationHelper config;
 
     @PostConstruct
     private void init() {
@@ -117,6 +122,7 @@ public class ReportServiceImpl implements ReportService {
                     Document document = Jsoup.parse(html);
                     document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
                     ITextRenderer iTextRenderer = new ITextRenderer();
+                    addFont(iTextRenderer);
                     iTextRenderer.setDocumentFromString(document.html());
                     iTextRenderer.layout();
                     bos = new ByteArrayOutputStream();
@@ -135,7 +141,8 @@ public class ReportServiceImpl implements ReportService {
             if (bos != null) {
                 try {
                     bos.close();
-                } catch (Exception ex) {};
+                } catch (Exception ex) {
+                };
             }
         }
 
@@ -404,10 +411,13 @@ public class ReportServiceImpl implements ReportService {
             return "";
         }
     }
-
+    
     private String getStyleSection(ReportDocument report, double pageWidth, double pageHeight, String units) {
         StringBuilder retval = new StringBuilder();
-        retval.append("<style>\n\t@page {\n");
+        retval.append("<style>\n");
+        retval.append(getFontDeclarations());
+
+        retval.append("\n\t@page {\n");
         retval.append("\tmargin-left: 0;\n");
         retval.append("\tmargin-top: 0;\n");
         retval.append("\tmargin-right: 0;\n");
@@ -417,9 +427,7 @@ public class ReportServiceImpl implements ReportService {
         retval.append(" ");
         retval.append(report.getPageOrientation());
         retval.append(";\n\t}\n");
-        
-        retval.append(getFontDefinitions());
-        
+
         retval.append("\n\tbody {\n\tbackground-color: transparent;\n\t; height: 100%;\n\twidth: 100%;\n}\n");
         retval.append("\n\t.page {");
         retval.append("\t\tposition: absolute;\n");
@@ -433,7 +441,7 @@ public class ReportServiceImpl implements ReportService {
         for (String section : Constants.REPORT_SECTIONS) {
             retval.append(getSectionClass(report, section, units, pageHeight, pageWidth));
         }
-        
+
         for (int i = 0; i < report.getReportComponents().size(); ++i) {
             ReportComponent c = report.getReportComponents().get(i);
             if (!isDataComponent(c.getType())) {
@@ -482,60 +490,6 @@ public class ReportServiceImpl implements ReportService {
 
         return retval.toString();
     }
-    
-    private String getFontDefinitions() {
-        StringBuilder retval = new StringBuilder();
-        
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Arial;\n");
-        retval.append("\t\tsrc: url(fonts/ARIAL.TTF)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Courier;\n");
-        retval.append("\t\tsrc: url(fonts/Courierprime-1OVL.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-        
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Georgia;\n");
-        retval.append("\t\tsrc: url(fonts/georgia.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-        
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Lucida Sans Unicode;\n");
-        retval.append("\t\tsrc: url(fonts/l_10646.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-        
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Tahoma;\n");
-        retval.append("\t\tsrc: url(fonts/tahoma.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Times New Roman;\n");
-        retval.append("\t\tsrc: url(fonts/times.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Trebuchet MS;\n");
-        retval.append("\t\tsrc: url(fonts/trebuc.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        retval.append("\n\t@font-face {\n");
-        retval.append("\t\t@font-family: Verdana;\n");
-        retval.append("\t\tsrc: url(fonts/verdana.ttf)\n");
-        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
-        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
-
-        return retval.toString();
-    }
 
     private String getSectionClass(ReportDocument report, String section, String units, double pageHeight, double pageWidth) {
         StringBuilder retval = new StringBuilder();
@@ -565,7 +519,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append("\t\tmargin: 0 ");
                 retval.append(report.getPageBorder().get(2));
                 retval.append(units);
-               retval.append(" 0 ");
+                retval.append(" 0 ");
                 retval.append(report.getPageBorder().get(3));
                 retval.append(units);
                 retval.append(";;\n\t\ttop: ");
@@ -1074,19 +1028,16 @@ public class ReportServiceImpl implements ReportService {
         for (Map<String, Object> dc : dataColumns) {
             String format = getStringMapValue("displayFormat", dc);
             Integer col = getIntegerMapValue("selectIndex", dc);
-            if (dindx > 0) {
-                retval.append("\t\t\t");
-            }
-            retval.append("<div class=\"");
+            retval.append("<tr><td class=\"");
             retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-h");
             retval.append(dindx);
             retval.append("\">");
             retval.append(getStringMapValue("displayName", dc));
-            retval.append("</div>\n");
+            retval.append("</td>\n");
 
-            retval.append("\t\t\t<div class=\"");
+            retval.append("\t\t\t<td class=\"");
             retval.append("scomp-");
             retval.append(componentIndex);
             retval.append("-d");
@@ -1102,7 +1053,7 @@ public class ReportServiceImpl implements ReportService {
                     }
                 }
             }
-            retval.append("</div>\n");
+            retval.append("</td><tr>\n");
             dindx++;
         }
 
@@ -1519,11 +1470,12 @@ public class ReportServiceImpl implements ReportService {
 
     ;
     
-    private String getDataRecordCss(ReportComponent c, int cindx) {
+    private String getDataRecordCss(ReportComponent c, int cindx, String units) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>) c.getValue();
         List<Map<String, Object>> dcols = (List<Map<String, Object>>) m.get("dataColumns");
 
+        double rowHeight = c.getHeight() / dcols.size();
         int dindx = 0;
         for (Map<String, Object> dc : dcols) {
             retval.append("\t.");
@@ -1533,6 +1485,9 @@ public class ReportServiceImpl implements ReportService {
             retval.append(dindx);
             retval.append(" {\n\t\ttext-align: ");
             retval.append(getStringMapValue("headerTextAlign", dc));
+            retval.append(";\n\t\theight: ");
+            retval.append(rowHeight);
+            retval.append(units);
             retval.append(";\n");
             retval.append(c.getFontSettings().getFontCss());
             retval.append(c.getBorderSettings().getBorderCss());
@@ -1565,12 +1520,62 @@ public class ReportServiceImpl implements ReportService {
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
                 retval.append(getDataComponentContainerCss(c, cindx, units));
-                retval.append(getDataRecordCss(c, cindx));
+                retval.append(getDataRecordCss(c, cindx, units));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
                 retval.append(getDataGridCss(c, cindx, units));
                 break;
         }
+        return retval.toString();
+    }
+    
+    private void addFont(ITextRenderer renderer) {
+        try {
+            renderer.getFontResolver().addFont("fonts/Arimo-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/Cousine-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/Gelasio-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/OpenSans-Regular.ttf", BaseFont.IDENTITY_H, true);
+            renderer.getFontResolver().addFont("fonts/Signika-Regular.ttf", BaseFont.IDENTITY_H, true);
+        }
+        
+        catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+        }
+    }
+
+    private String getFontDeclarations() {
+        StringBuilder retval = new StringBuilder();
+        
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Arimo;\n");
+        retval.append("\t\tsrc: url(fonts/Arimo-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Cousine;\n");
+        retval.append("\t\tsrc: url(fonts/Cousine-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Gelasio;\n");
+        retval.append("\t\tsrc: url(fonts/Gelasio-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Open Sans;\n");
+        retval.append("\t\tsrc: url(fonts/OpendSans-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
+        retval.append("\t@font-face {\n");
+        retval.append("\t\tfont-family: Signika;\n");
+        retval.append("\t\tsrc: url(fonts/Signika-Regular.ttf)\n");;
+        retval.append("\t\t-fs-pdf-font-embed: embed;\n");
+        retval.append("\t\t-fs-pdf-font-encoding: Identity-H;\n\t}\n");
+
         return retval.toString();
     }
 }

@@ -2378,7 +2378,7 @@ public class MainServiceImpl implements MainService {
         result.setReportObjectTypes(Arrays.asList(Constants.REPORT_OBJECT_TYPES));
         result.setPageSizeSettings(Constants.PAGE_SIZE_MAP);
         result.setDefaultFontSizes(config.getDefaultFontSizes());
-        result.setDefaultFonts(config.getDefaultFonts());
+        result.setDefaultFonts(Arrays.asList(Constants.DEFAULT_FONTS));
         result.setDefaultBackgroundColor(config.getDefaultComponentBackgroundColor());
         result.setDefaultForegroundColor(config.getDefaultComponentForegroundColor());
         result.setReportShapes(Arrays.asList(Constants.REPORT_SHAPES));

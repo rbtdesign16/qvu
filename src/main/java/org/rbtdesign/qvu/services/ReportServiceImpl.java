@@ -372,14 +372,15 @@ public class ReportServiceImpl implements ReportService {
                 Double drh = getDoubleMapValue("dataRowHeight", m);
                 Double hrh = getDoubleMapValue("headerRowHeight", m);
 
-                if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
+                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
                     double dataHeight = c.getHeight() - hrh;
-                    if (Math.floor(dataHeight / drh) < d) {
-                        d = Math.floor(dataHeight / drh);
+                    if ((dataHeight / drh) < d) {
+                        d = (dataHeight / drh);
                     }
                 }
             }
         }
+
 
         if (d != Double.MAX_VALUE) {
             retval = d.intValue();
@@ -917,7 +918,7 @@ public class ReportServiceImpl implements ReportService {
                         if (StringUtils.isNotEmpty(format)) {
                             retval.append(formatData(formatCache, format, o));
                         } else {
-                            retval.append(o.toString().trim());
+                            retval.append("[" + dataRow.get(0) + "]" + o.toString().trim());
                         }
                     }
                 }
@@ -1180,11 +1181,7 @@ public class ReportServiceImpl implements ReportService {
         double headerRowHeight = getDoubleMapValue("headerRowHeight", m);
         double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
         
-        
-        LOG.debug("----------------->ch=" + c.getHeight() + ", calc1=" + (gridRowSpan * dataRowHeight));
-        
         double calcHeight = Math.min(c.getHeight(), headerRowHeight + (gridRowSpan * dataRowHeight));
-       LOG.debug("----------------->ch=" + c.getHeight() + ", calc2=" + calcHeight);
         
         retval.append("\n\t.");
         retval.append("comp-");
@@ -1198,12 +1195,12 @@ public class ReportServiceImpl implements ReportService {
         retval.append(";\n\t\twidth: ");
         retval.append(c.getWidth());
         retval.append(units);
-        retval.append(";\n\t\theight: ");
+        retval.append(";\n\t\tmax-height: ");
         retval.append(calcHeight);
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tborder-collapse: collapse;overflow: hidden;\n\t\ttable-layout: fixed;\n");
+        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tborder-collapse: collapse;overflow: hidden;\n");
         retval.append("\t}\n");
 
         retval.append("\n\t.comp-");
@@ -1242,8 +1239,8 @@ public class ReportServiceImpl implements ReportService {
 
         retval.append("\n\t.comp-");
         retval.append(cindx);
-        retval.append(" .trh td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tmax-height: ");
-        retval.append(headerRowHeight);
+        retval.append(" .trh td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
+        retval.append(headerRowHeight - (headerRowHeight * 0.05));
         retval.append(units);
         retval.append(";\n\t\toverflow: hidden;\n\t}\n");
 
@@ -1255,8 +1252,8 @@ public class ReportServiceImpl implements ReportService {
 
         retval.append("\n\t.comp-");
         retval.append(cindx);
-        retval.append(" .trd td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tmax-height: ");
-        retval.append(dataRowHeight);
+        retval.append(" .trd td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
+        retval.append(dataRowHeight - (dataRowHeight * 0.05));
         retval.append(units);
         retval.append(";\n\t\toverflow: hidden;\n\t}\n");
 

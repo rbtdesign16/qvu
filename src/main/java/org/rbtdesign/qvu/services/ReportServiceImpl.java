@@ -917,11 +917,7 @@ public class ReportServiceImpl implements ReportService {
                         if (StringUtils.isNotEmpty(format)) {
                             retval.append(formatData(formatCache, format, o));
                         } else {
-                            if (dindx == 0) {
-                                retval.append("[" + dataRow.get(0) + "]" + o.toString().trim());
-                            } else {
-                                retval.append(o.toString().trim());
-                            }
+                            retval.append(o.toString().trim());
                         }
                     }
                 }

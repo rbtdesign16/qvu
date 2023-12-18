@@ -132,6 +132,7 @@ public class ReportServiceImpl implements ReportService {
                 }
             }
         } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
             retval.setErrorCode(OperationResult.UNEXPECTED_EXCEPTION);
             retval.setMessage(ex.toString());
         } finally {
@@ -833,20 +834,22 @@ public class ReportServiceImpl implements ReportService {
         Map<String, Object> dc = dataColumns.get(0);
         String format = getStringMapValue("displayFormat", dc);
         int row = queryResult.getCurrentRow();
-        Integer col = getIntegerMapValue("selectIndex", dc);
-        List<Object> dataRow = queryResult.getData().get(row);
+        if (row < queryResult.getData().size()) {
+            Integer col = getIntegerMapValue("selectIndex", dc);
+            List<Object> dataRow = queryResult.getData().get(row);
 
-        if (col != null) {
-            Object o = dataRow.get(col);
-            if (o != null) {
-                if (StringUtils.isNotEmpty(format)) {
-                    retval = formatData(formatCache, format, o);
-                } else {
-                    retval = o.toString();
+            if (col != null) {
+                Object o = dataRow.get(col);
+                if (o != null) {
+                    if (StringUtils.isNotEmpty(format)) {
+                        retval = formatData(formatCache, format, o);
+                    } else {
+                        retval = o.toString();
+                    }
                 }
             }
         }
-
+        
         return retval;
     }
 
@@ -894,41 +897,13 @@ public class ReportServiceImpl implements ReportService {
 
         int currow = queryResult.getCurrentRow();
 
-        int dindx = 0;
-        retval.append("<tr class=\"trh\">\n");
-        for (Map<String, Object> dc : dataColumns) {
-            retval.append("\t\t\t<td><div class=\"");
-            String align = getStringMapValue("headerTextAlign", dc);
-                
-            switch(align) {
-                case "left":
-                    retval.append("\t\t\t\t<td><div class=\"tal\"");
-                    break;
-                case "center":
-                    retval.append("\t\t\t\t<td><div class=\"tac\"");
-                    break;
-                case "right":
-                    retval.append("\t\t\t\t<td><div class=\"tar\"");
-                    break;
-            }
-            
-            retval.append(">");
-
-            retval.append(getStringMapValue("displayName", dc));
-            retval.append("</div></td>\n");
-            dindx++;
-        }
-        retval.append("\t\t\t</tr>\n");
-
-        for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
-            retval.append("\t\t\t<tr class=\"trd\">\n");
-            List<Object> dataRow = queryResult.getData().get(currow);
-            dindx = 0;
+        if (currow < queryResult.getData().size()) {
+            int dindx = 0;
+            retval.append("<tr class=\"trh\">\n");
             for (Map<String, Object> dc : dataColumns) {
-                String format = getStringMapValue("displayFormat", dc);
-                Integer col = getIntegerMapValue("selectIndex", dc);
-                String align = getStringMapValue("dataTextAlign", dc);
-                
+                retval.append("\t\t\t<td><div class=\"");
+                String align = getStringMapValue("headerTextAlign", dc);
+
                 switch(align) {
                     case "left":
                         retval.append("\t\t\t\t<td><div class=\"tal\"");
@@ -940,24 +915,54 @@ public class ReportServiceImpl implements ReportService {
                         retval.append("\t\t\t\t<td><div class=\"tar\"");
                         break;
                 }
+
                 retval.append(">");
-                if (col != null) {
-                    Object o = dataRow.get(col);
-                    if (o != null) {
-                        if (StringUtils.isNotEmpty(format)) {
-                            retval.append(formatData(formatCache, format, o));
-                        } else {
-                            retval.append(o.toString().trim());
-                        }
-                    }
-                }
 
+                retval.append(getStringMapValue("displayName", dc));
                 retval.append("</div></td>\n");
-
                 dindx++;
             }
             retval.append("\t\t\t</tr>\n");
-            currow++;
+
+            for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
+                retval.append("\t\t\t<tr class=\"trd\">\n");
+                List<Object> dataRow = queryResult.getData().get(currow);
+                dindx = 0;
+                for (Map<String, Object> dc : dataColumns) {
+                    String format = getStringMapValue("displayFormat", dc);
+                    Integer col = getIntegerMapValue("selectIndex", dc);
+                    String align = getStringMapValue("dataTextAlign", dc);
+
+                    switch(align) {
+                        case "left":
+                            retval.append("\t\t\t\t<td><div class=\"tal\"");
+                            break;
+                        case "center":
+                            retval.append("\t\t\t\t<td><div class=\"tac\"");
+                            break;
+                        case "right":
+                            retval.append("\t\t\t\t<td><div class=\"tar\"");
+                            break;
+                    }
+                    retval.append(">");
+                    if (col != null) {
+                        Object o = dataRow.get(col);
+                        if (o != null) {
+                            if (StringUtils.isNotEmpty(format)) {
+                                retval.append(formatData(formatCache, format, o));
+                            } else {
+                                retval.append(o.toString().trim());
+                            }
+                        }
+                    }
+
+                    retval.append("</div></td>\n");
+
+                    dindx++;
+                }
+                retval.append("\t\t\t</tr>\n");
+                currow++;
+            }
         }
 
         return retval.toString();
@@ -974,48 +979,100 @@ public class ReportServiceImpl implements ReportService {
 
         int currow = queryResult.getCurrentRow();
 
-        int dindx = 0;
+        if (currow < queryResult.getData().size()) {
+            int dindx = 0;
 
-        Map<String, Object> m = (Map<String, Object>) c.getValue();
-        String altrowcolor = getStringMapValue("altrowcolor", m);
-        Double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
-        for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
-            List<Object> dataRow = queryResult.getData().get(currow);
-            double top = i * dataRowHeight;
-            retval.append("\t\t<div class=\"scomp-");
-            retval.append(componentIndex);
-            retval.append("-cont\" style=\"top: ");
-            retval.append(top);
-            retval.append(units);
-            retval.append(";\">\n");
+            Map<String, Object> m = (Map<String, Object>) c.getValue();
+            String altrowcolor = getStringMapValue("altrowcolor", m);
+            Double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
+            for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
+                List<Object> dataRow = queryResult.getData().get(currow);
+                double top = i * dataRowHeight;
+                retval.append("\t\t<div class=\"scomp-");
+                retval.append(componentIndex);
+                retval.append("-cont\" style=\"top: ");
+                retval.append(top);
+                retval.append(units);
+                retval.append(";\">\n");
 
-            dindx = 0;
+                dindx = 0;
+                for (Map<String, Object> dc : dataColumns) {
+                    retval.append("\t\t\t<div class=\"");
+                    retval.append("scomp-");
+                    retval.append(componentIndex);
+                    retval.append("-h");
+                    retval.append(dindx);
+                    retval.append("\">");
+                    retval.append(getStringMapValue("displayName", dc));
+                    retval.append("</div>\n");
+
+                    String format = getStringMapValue("displayFormat", dc);
+                    Integer col = getIntegerMapValue("selectIndex", dc);
+                    retval.append("\t\t\t<div class=\"");
+                    retval.append("scomp-");
+                    retval.append(componentIndex);
+                    retval.append("-d");
+                    retval.append(dindx);
+                    retval.append("\"");
+
+                    if (StringUtils.isNotEmpty(altrowcolor) && (((i + 1) % 2) == 0)) {
+                        retval.append(" style=\"background-color: ");
+                        retval.append(altrowcolor);
+                        retval.append(";\"");
+                    }
+
+                    retval.append(">");
+                    if (col != null) {
+                        Object o = dataRow.get(col);
+                        if (o != null) {
+                            if (StringUtils.isNotEmpty(format)) {
+                                retval.append(formatData(formatCache, format, o));
+                            } else {
+                                retval.append(o.toString());
+                            }
+                        }
+                    }
+
+                    retval.append("</div>\n");
+
+                    dindx++;
+                }
+                retval.append("\t\t</div>\n");
+
+                currow++;
+            }
+        }
+        
+        return retval.toString();
+    }
+
+    private String getDataRecordHtml(int componentIndex, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
+        StringBuilder retval = new StringBuilder("");
+
+        int row = queryResult.getCurrentRow();
+        
+        if (row < queryResult.getData().size()) {
+            List<Object> dataRow = queryResult.getData().get(row);
+
+            int dindx = 0;
             for (Map<String, Object> dc : dataColumns) {
-                retval.append("\t\t\t<div class=\"");
+                String format = getStringMapValue("displayFormat", dc);
+                Integer col = getIntegerMapValue("selectIndex", dc);
+                retval.append("<tr><td class=\"");
                 retval.append("scomp-");
                 retval.append(componentIndex);
                 retval.append("-h");
                 retval.append(dindx);
                 retval.append("\">");
                 retval.append(getStringMapValue("displayName", dc));
-                retval.append("</div>\n");
+                retval.append("</td>\n");
 
-                String format = getStringMapValue("displayFormat", dc);
-                Integer col = getIntegerMapValue("selectIndex", dc);
-                retval.append("\t\t\t<div class=\"");
+                retval.append("\t\t\t<td class=\"");
                 retval.append("scomp-");
                 retval.append(componentIndex);
                 retval.append("-d");
                 retval.append(dindx);
-                retval.append("\"");
-
-                if (StringUtils.isNotEmpty(altrowcolor) && (((i + 1) % 2) == 0)) {
-                    retval.append(" style=\"background-color: ");
-                    retval.append(altrowcolor);
-                    retval.append(";\"");
-                }
-
-                retval.append(">");
+                retval.append("\">");
                 if (col != null) {
                     Object o = dataRow.get(col);
                     if (o != null) {
@@ -1026,58 +1083,11 @@ public class ReportServiceImpl implements ReportService {
                         }
                     }
                 }
-
-                retval.append("</div>\n");
-
+                retval.append("</td><tr>\n");
                 dindx++;
             }
-            retval.append("\t\t</div>\n");
-
-            currow++;
         }
-
-        return retval.toString();
-    }
-
-    private String getDataRecordHtml(int componentIndex, QueryResult queryResult, Map<String, Format> formatCache, List<Map<String, Object>> dataColumns) {
-        StringBuilder retval = new StringBuilder("");
-
-        int row = queryResult.getCurrentRow();
-        List<Object> dataRow = queryResult.getData().get(row);
-
-        int dindx = 0;
-        for (Map<String, Object> dc : dataColumns) {
-            String format = getStringMapValue("displayFormat", dc);
-            Integer col = getIntegerMapValue("selectIndex", dc);
-            retval.append("<tr><td class=\"");
-            retval.append("scomp-");
-            retval.append(componentIndex);
-            retval.append("-h");
-            retval.append(dindx);
-            retval.append("\">");
-            retval.append(getStringMapValue("displayName", dc));
-            retval.append("</td>\n");
-
-            retval.append("\t\t\t<td class=\"");
-            retval.append("scomp-");
-            retval.append(componentIndex);
-            retval.append("-d");
-            retval.append(dindx);
-            retval.append("\">");
-            if (col != null) {
-                Object o = dataRow.get(col);
-                if (o != null) {
-                    if (StringUtils.isNotEmpty(format)) {
-                        retval.append(formatData(formatCache, format, o));
-                    } else {
-                        retval.append(o.toString());
-                    }
-                }
-            }
-            retval.append("</td><tr>\n");
-            dindx++;
-        }
-
+        
         return retval.toString();
     }
 

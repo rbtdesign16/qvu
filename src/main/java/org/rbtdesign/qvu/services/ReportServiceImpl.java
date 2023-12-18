@@ -350,7 +350,7 @@ public class ReportServiceImpl implements ReportService {
                         // if this is last page and we have totals configured
                         if (totalsMap.containsKey(cindx) 
                             && (currentPage == (pageCount - 1))) {
-                            buf.append("\n\t\t\t<tr class=\"trd\"><td style=\"border: none;\" colspan=\"");
+                            buf.append("\n\t\t\t<tr class=\"trd\"><td style=\"border: none;height: 3px;\" colspan=\"");
                             List<Map<String, Object>> dataColumns = getDataColumns(c);
                             buf.append(dataColumns.size());
                             buf.append("\"><hr style=\"border: solid 1px black;\"/></td></tr>\n\t\t<tr class=\"trd\">");

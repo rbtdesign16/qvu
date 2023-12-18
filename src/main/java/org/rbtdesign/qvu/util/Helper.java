@@ -163,7 +163,7 @@ public class Helper {
                 }
                 
                 if (bs.isBottom()) {
-                    retval += 1 / Constants.PIXELS_PER_INCH;;
+                //    retval += 1 / Constants.PIXELS_PER_INCH;
                 }
                 
              } else {
@@ -172,7 +172,7 @@ public class Helper {
                 }
                 
                 if (bs.isBottom()) {
-                    retval += 1 / Constants.PIXELS_PER_MM;
+                  //  retval += 1 / Constants.PIXELS_PER_MM;
                 }
             }
             

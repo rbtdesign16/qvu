@@ -1199,11 +1199,11 @@ public class ReportServiceImpl implements ReportService {
         if (isFreeformGridComponent(c)) {
             return getFreeformGridCss(c, cindx, units, gridRowSpan);
         } else {
-            return getTabularGridCss(c, cindx, units, gridRowSpan);
+            return getTabularGridCss(c, cindx, units);
         }
     }
 
-    private String getTabularGridCss(ReportComponent c, int cindx, String units, int gridRowSpan) {
+    private String getTabularGridCss(ReportComponent c, int cindx, String units) {
         StringBuilder retval = new StringBuilder();
         Map<String, Object> m = (Map<String, Object>) c.getValue();
         
@@ -1256,7 +1256,6 @@ public class ReportServiceImpl implements ReportService {
 
         String val = getStringMapValue("gridTemplateColumns", m);
         StringTokenizer st = new StringTokenizer(val);
-        List<Map<String, Object>> dcols = (List<Map<String, Object>>) m.get("dataColumns");
 
         retval.append("\n\t.comp-");
         retval.append(cindx);

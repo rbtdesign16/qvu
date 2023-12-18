@@ -159,7 +159,8 @@ public class ReportServiceImpl implements ReportService {
         if (queryResult != null) {
             if (hasGridComponent(report)) {
                 gridRowSpan = getDataGridRowSpan(report);
-                pageCount = (int) Math.floor(queryResult.getRowCount() / gridRowSpan);
+                double cnt = (double)queryResult.getRowCount() / (double)gridRowSpan;
+                pageCount = (int) Math.ceil(cnt);
             } else {
                 pageCount = queryResult.getRowCount();
             }
@@ -187,7 +188,7 @@ public class ReportServiceImpl implements ReportService {
         // use a map to save static compononts so
         // we do not need to recreate on each page
         Map<String, String> staticComponentCache = new HashMap<>();
-        for (int i = 0; i <= pageCount; ++i) {
+        for (int i = 0; i < pageCount; ++i) {
             retval.append("\n<div style=\"top: ");
             retval.append(i * pageHeight);
             retval.append(units);
@@ -371,10 +372,10 @@ public class ReportServiceImpl implements ReportService {
             if (isDataGridComponent(c.getType())) {
                 Map<String, Object> m = (Map<String, Object>) c.getValue();
                 String layout = (String) m.get("gridLayout");
-                Double drh = getDoubleMapValue("dataRowHeight", m);
-                Double hrh = getDoubleMapValue("headerRowHeight", m);
+                Double drh = getDoubleMapValue("dataRowHeight", m) - Helper.getBorderAdjustmentForPdf(report.getPageUnits().substring(0, 2), c.getBorderSettings());
+                Double hrh = getDoubleMapValue("headerRowHeight", m) - Helper.getBorderAdjustmentForPdf(report.getPageUnits().substring(0, 2), c.getBorderSettings2());
 
-                 if (StringUtils.isNotEmpty(layout) && (drh != null) && (drh > 0) && (hrh != null)) {
+                 if (StringUtils.isNotEmpty(layout)) {
                     double dataHeight = c.getHeight() - hrh;
                     if ((dataHeight / drh) < d) {
                         d = (dataHeight / drh);

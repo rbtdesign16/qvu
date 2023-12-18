@@ -27,6 +27,7 @@ import org.rbtdesign.qvu.dto.ReportRunWrapper;
 import org.rbtdesign.qvu.dto.SqlSelectColumn;
 import org.rbtdesign.qvu.util.Constants;
 import org.rbtdesign.qvu.util.FileHandler;
+import org.rbtdesign.qvu.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +186,7 @@ public class ReportServiceImpl implements ReportService {
         // use a map to save static compononts so
         // we do not need to recreate on each page
         Map<String, String> staticComponentCache = new HashMap<>();
-        for (int i = 0; i < pageCount; ++i) {
+        for (int i = 0; i <= pageCount; ++i) {
             retval.append("\n<div style=\"top: ");
             retval.append(i * pageHeight);
             retval.append(units);
@@ -896,7 +897,23 @@ public class ReportServiceImpl implements ReportService {
         int dindx = 0;
         retval.append("<tr class=\"trh\">\n");
         for (Map<String, Object> dc : dataColumns) {
-            retval.append("\t\t\t<td><div>");
+            retval.append("\t\t\t<td><div class=\"");
+            String align = getStringMapValue("headerTextAlign", dc);
+                
+            switch(align) {
+                case "left":
+                    retval.append("\t\t\t\t<td><div class=\"tal\"");
+                    break;
+                case "center":
+                    retval.append("\t\t\t\t<td><div class=\"tac\"");
+                    break;
+                case "right":
+                    retval.append("\t\t\t\t<td><div class=\"tar\"");
+                    break;
+            }
+            
+            retval.append(">");
+
             retval.append(getStringMapValue("displayName", dc));
             retval.append("</div></td>\n");
             dindx++;
@@ -910,15 +927,27 @@ public class ReportServiceImpl implements ReportService {
             for (Map<String, Object> dc : dataColumns) {
                 String format = getStringMapValue("displayFormat", dc);
                 Integer col = getIntegerMapValue("selectIndex", dc);
-                retval.append("\t\t\t\t<td><div>");
-
+                String align = getStringMapValue("dataTextAlign", dc);
+                
+                switch(align) {
+                    case "left":
+                        retval.append("\t\t\t\t<td><div class=\"tal\"");
+                        break;
+                    case "center":
+                        retval.append("\t\t\t\t<td><div class=\"tac\"");
+                        break;
+                    case "right":
+                        retval.append("\t\t\t\t<td><div class=\"tar\"");
+                        break;
+                }
+                retval.append(">");
                 if (col != null) {
                     Object o = dataRow.get(col);
                     if (o != null) {
                         if (StringUtils.isNotEmpty(format)) {
                             retval.append(formatData(formatCache, format, o));
                         } else {
-                            retval.append("[" + dataRow.get(0) + "]" + o.toString().trim());
+                            retval.append(o.toString().trim());
                         }
                     }
                 }
@@ -1181,8 +1210,6 @@ public class ReportServiceImpl implements ReportService {
         double headerRowHeight = getDoubleMapValue("headerRowHeight", m);
         double dataRowHeight = getDoubleMapValue("dataRowHeight", m);
         
-        double calcHeight = Math.min(c.getHeight(), headerRowHeight + (gridRowSpan * dataRowHeight));
-        
         retval.append("\n\t.");
         retval.append("comp-");
         retval.append(cindx);
@@ -1196,11 +1223,11 @@ public class ReportServiceImpl implements ReportService {
         retval.append(c.getWidth());
         retval.append(units);
         retval.append(";\n\t\tmax-height: ");
-        retval.append(calcHeight);
+        retval.append(c.getHeight());
         retval.append(units);
         retval.append(";\n\t\ttext-align: ");
         retval.append(c.getAlign());
-        retval.append(";\n\t\tposition: absolute;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\tborder-collapse: collapse;overflow: hidden;\n");
+        retval.append(";\n\t\tposition: absolute;\n\t\tborder-collapse: collapse;\n\t\toverflow: hidden;\n");
         retval.append("\t}\n");
 
         retval.append("\n\t.comp-");
@@ -1239,8 +1266,8 @@ public class ReportServiceImpl implements ReportService {
 
         retval.append("\n\t.comp-");
         retval.append(cindx);
-        retval.append(" .trh td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
-        retval.append(headerRowHeight - (headerRowHeight * 0.05));
+        retval.append(" .trh td div {\n\t\tvertival-align: top;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
+        retval.append(headerRowHeight - Helper.getBorderAdjustmentForPdf(units, c.getBorderSettings()));
         retval.append(units);
         retval.append(";\n\t\toverflow: hidden;\n\t}\n");
 
@@ -1252,38 +1279,27 @@ public class ReportServiceImpl implements ReportService {
 
         retval.append("\n\t.comp-");
         retval.append(cindx);
-        retval.append(" .trd td div {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
-        retval.append(dataRowHeight - (dataRowHeight * 0.05));
+        retval.append(" .trd td div {\n\t\tvertical-align: top;\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t\theight: ");
+        retval.append(dataRowHeight - Helper.getBorderAdjustmentForPdf(units, c.getBorderSettings2()));
         retval.append(units);
         retval.append(";\n\t\toverflow: hidden;\n\t}\n");
 
         int dindx = 0;
         while (st.hasMoreTokens()) {
-            Map<String, Object> dc = (Map<String, Object>) dcols.get(dindx);
             String width = st.nextToken();
             retval.append("\n\t.comp-");
             retval.append(cindx);
             retval.append(" .trh td:nth-child(");
             retval.append(dindx + 1);
-            retval.append(") {\t\twidth:");
+            retval.append(") {\t\twidth: ");
             retval.append(width);
-            retval.append(";\n\t\ttext-align: ");
-            retval.append(getStringMapValue("headerTextAlign", dc));
             retval.append(";\n\t}\n");
-
-            retval.append("\n\t.comp-");
-            retval.append(cindx);
-            retval.append(" .trd td:nth-child (");
-            retval.append(dindx + 1);
-            retval.append(") {\t\twidth:");
-            retval.append(width);
-            retval.append(units);
-            retval.append(";\n\t\ttext-align: ");
-            retval.append(getStringMapValue("dataTextAlign", dc));
-            retval.append(";\n\t}\n");
-
             dindx++;
         }
+        
+        retval.append("\n\t.tac {\n\t\ttext-align: center;\n\t}");
+        retval.append("\n\t.tal {\n\t\ttext-align: left;\n\t}");
+        retval.append("\n\t.tar {\n\t\ttext-align: right;\n\t}");
 
         return retval.toString();
     }

@@ -269,6 +269,7 @@ public class Constants {
     };
     
     public static double PIXELS_PER_INCH = 96.0;
+    public static double PIXELS_PER_MM = 0.2645833333;
     
     public static final String GRID_LAYOUT_FREEFORM = "freeform";
     public static final String GRID_LAYOUT_TABULAR = "tabular";

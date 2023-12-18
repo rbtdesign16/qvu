@@ -161,18 +161,9 @@ public class Helper {
                 if (bs.isTop()) {
                     retval += 1 / Constants.PIXELS_PER_INCH;
                 }
-                
-                if (bs.isBottom()) {
-                //    retval += 1 / Constants.PIXELS_PER_INCH;
-                }
-                
              } else {
                 if (bs.isTop()) {
                     retval += 1 / Constants.PIXELS_PER_MM;
-                }
-                
-                if (bs.isBottom()) {
-                  //  retval += 1 / Constants.PIXELS_PER_MM;
                 }
             }
             

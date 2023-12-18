@@ -174,6 +174,7 @@ public class ReportServiceImpl implements ReportService {
 
         LOG.debug("pageCount: " + pageCount);
 
+        Map<Integer, Double[]> totalsMap = new HashMap<>();
         for (ReportComponent c : report.getReportComponents()) {
             if (isDataComponent(c.getType())) {
                 Map<String, Object> value = (Map<String, Object>) c.getValue();
@@ -194,7 +195,7 @@ public class ReportServiceImpl implements ReportService {
             retval.append(units);
             retval.append(";\" class=\"page\">");
             for (String section : Constants.REPORT_SECTIONS) {
-                retval.append(getSectionHtml(report, section, queryResult, pageCount, i, formatCache, staticComponentCache, gridRowSpan, units));
+                retval.append(getSectionHtml(report, section, queryResult, pageCount, i, formatCache, staticComponentCache, gridRowSpan, units, totalsMap));
             }
             retval.append("\n</div>");
             if (queryResult != null) {
@@ -207,6 +208,7 @@ public class ReportServiceImpl implements ReportService {
             }
         }
 
+        
         retval.append("\n</body>\n</html>");
 
         return retval.toString();
@@ -219,7 +221,8 @@ public class ReportServiceImpl implements ReportService {
             int componentIndex,
             Map<String, Format> formatCache,
             int gridRowSpan,
-            String units) {
+            String units,
+            Map<Integer, Double[]> totalsMap) {
         StringBuilder retval = new StringBuilder("");
         List<Map<String, Object>> dataColumns = null;
         if (isDataComponent(c.getType())) {
@@ -253,7 +256,7 @@ public class ReportServiceImpl implements ReportService {
                 retval.append(getDataFieldHtml(queryResult, formatCache, dataColumns));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_GRID_ID:
-                retval.append(getDataGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units));
+                retval.append(getDataGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units, totalsMap));
                 break;
             case Constants.REPORT_COMPONENT_TYPE_DATA_RECORD_ID:
                 retval.append(getDataRecordHtml(componentIndex, queryResult, formatCache, dataColumns));
@@ -279,6 +282,21 @@ public class ReportServiceImpl implements ReportService {
                 || Constants.REPORT_COMPONENT_TYPE_PAGE_NUMBER_ID.equals(typeid));
     }
 
+    private List<Map<String, Object>> getDataColumns(ReportComponent c) {
+        List<Map<String, Object>> retval = null;
+        Object val = c.getValue();
+        
+        if ((val != null) && (val instanceof Map)) {
+            Map<String, Object> m = (Map<String, Object>)val;
+            if (m.containsKey("dataColumns")) {
+                retval = (List<Map<String, Object>>)m.get("dataColumns");
+            }
+        }
+        
+        return retval;
+    }
+       
+        
     private String getSectionHtml(ReportDocument report,
             String section,
             QueryResult queryResult,
@@ -287,7 +305,8 @@ public class ReportServiceImpl implements ReportService {
             Map<String, Format> formatCache,
             Map<String, String> staticComponentCache,
             int gridRowSpan,
-            String units) {
+            String units,
+            Map<Integer, Double[]> totalsMap) {
         StringBuilder retval = new StringBuilder();
 
         retval.append("\n\t<div class=\"sec-");
@@ -326,8 +345,49 @@ public class ReportServiceImpl implements ReportService {
                     buf.append("class=\"");
                     buf.append(clazz);
                     buf.append("\">\n\t\t\t");
-                    buf.append(getComponentValue(c, queryResult, currentPage, cindx, formatCache, gridRowSpan, units));
+                    buf.append(getComponentValue(c, queryResult, currentPage, cindx, formatCache, gridRowSpan, units, totalsMap));
                     if (isTabularGridComponent(c) || isDataRecordComponent(c)) {
+                        // if this is last page and we have totals configured
+                        if (totalsMap.containsKey(cindx) 
+                            && (currentPage == (pageCount - 1))) {
+                            buf.append("\n\t\t\t<tr class=\"trd\"><td style=\"border: none;\" colspan=\"");
+                            List<Map<String, Object>> dataColumns = getDataColumns(c);
+                            buf.append(dataColumns.size());
+                            buf.append("\"><hr style=\"border: solid 1px black;\"/></td></tr>\n\t\t<tr class=\"trd\">");
+
+                            Double[] totals = totalsMap.get(cindx);
+                            for (int i = 0; i < totals.length; ++i) {
+                                Double d = totals[i];
+                                Map<String, Object> dc = dataColumns.get(i);
+                                buf.append("<td style=\"border: none;\" style=\"border: none;\"><div class=\"");
+                  
+                                String align = getStringMapValue("dataTextAlign", dc);
+                                
+                                switch(align) {
+                                    case "left":
+                                        buf.append("tal");
+                                        break;
+                                    case "center":
+                                        buf.append("tac");
+                                        break;
+                                    case "right":
+                                        buf.append("tar");
+                                        break;
+                                }
+                                
+                                buf.append("\">");
+                                if (d != null) {
+                                    String format = getStringMapValue("displayFormat", dc);
+                                    if (StringUtils.isNotEmpty(format)) {
+                                        DecimalFormat formatter = (DecimalFormat)formatCache.get(format);
+                                        buf.append(formatter.format(totals[i]));
+                                    } else {
+                                        buf.append(totals[i]);
+                                    }
+                                }
+                                buf.append("</div></td>");
+                            }
+                        }
                         buf.append("\n\t\t</table>\n");
                     } else {
                         buf.append("\n\t\t</div>\n");
@@ -881,19 +941,21 @@ public class ReportServiceImpl implements ReportService {
             Map<String, Format> formatCache,
             List<Map<String, Object>> dataColumns,
             int gridRowSpan,
-            String units) {
+            String units, Map<Integer, Double[]> totalsMap) {
 
         if (isTabularGridComponent(c)) {
-            return getTabularGridHtml(queryResult, formatCache, dataColumns, gridRowSpan);
+            return getTabularGridHtml(queryResult, componentIndex, formatCache, dataColumns, gridRowSpan, totalsMap);
         } else {
             return getFreeformGridHtml(c, componentIndex, queryResult, formatCache, dataColumns, gridRowSpan, units);
         }
     }
 
     private String getTabularGridHtml(QueryResult queryResult,
+            int componentIndex,
             Map<String, Format> formatCache,
             List<Map<String, Object>> dataColumns,
-            int gridRowSpan) {
+            int gridRowSpan,
+            Map<Integer, Double[]> totalsMap) {
         StringBuilder retval = new StringBuilder("");
 
         int currow = queryResult.getCurrentRow();
@@ -902,8 +964,7 @@ public class ReportServiceImpl implements ReportService {
             int dindx = 0;
             retval.append("<tr class=\"trh\">\n");
             for (Map<String, Object> dc : dataColumns) {
-                retval.append("\t\t\t<td><div class=\"");
-                String align = getStringMapValue("headerTextAlign", dc);
+               String align = getStringMapValue("headerTextAlign", dc);
 
                 switch(align) {
                     case "left":
@@ -949,6 +1010,25 @@ public class ReportServiceImpl implements ReportService {
                     if (col != null) {
                         Object o = dataRow.get(col);
                         if (o != null) {
+                            boolean wantTotals = getBooleanMapValue("addTotal", dc);
+                            if (wantTotals) {
+                                Double[] totals = totalsMap.get(componentIndex);
+                                if (totals == null) {
+                                    totals = new Double[dataColumns.size()];
+                                    for (int j = 0; j < totals.length; ++j) {
+                                        totals[j] = null;
+                                    }
+                                    
+                                    totalsMap.put(componentIndex, totals);
+                                } 
+                                
+                                if (totals[dindx] == null) {
+                                    totals[dindx] = 0.0;
+                                }   
+                                 
+                                totals[dindx] += Double.parseDouble(o.toString());
+                            }
+                            
                             if (StringUtils.isNotEmpty(format)) {
                                 retval.append(formatData(formatCache, format, o));
                             } else {

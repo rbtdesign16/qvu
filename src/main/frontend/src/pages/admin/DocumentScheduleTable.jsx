@@ -46,6 +46,11 @@ const DocumentScheduleTable = (props) => {
             }
         },
         {
+            title: getText("Type"),
+            fieldName: "documentType",
+            style: {textAlign: "center"}
+        },
+        {
             title: getText("Group"),
             fieldName: "documentGroup",
             style: {textAlign: "center"}

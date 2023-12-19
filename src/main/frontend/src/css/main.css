@@ -413,7 +413,7 @@ om-foreign-keys {
 
 .schedule-table {
     display: grid;
-    grid-template-columns: 50px 100px 120px 150px 150px 150px 150px 100px 150px 250px;
+    grid-template-columns: 50px 50px 100px 120px 150px 150px 150px 150px 100px 150px 250px;
 }
 
 .schedule-table > div {

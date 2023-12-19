@@ -403,6 +403,20 @@ public class MainController {
     @PostMapping("api/v1/report/run")
     public HttpEntity<byte[]> generateReport(@RequestBody ReportRunWrapper reportWrapper) {
         LOG.debug("in generateReport()");
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport(run) param=" + p);
+                }
+            }
+        }
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport param=" + p);
+                }
+            }
+        }
         HttpEntity<byte[]> retval = null;
         try {
             HttpHeaders header = new HttpHeaders();
@@ -433,11 +447,21 @@ public class MainController {
     public HttpEntity<byte[]> generateReport(@RequestBody ReportDocumentRunWrapper reportWrapper) {
         LOG.debug("in generateReport()");
         HttpEntity<byte[]> retval = null;
+        
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport(document/run) param=" + p);
+                }
+            }
+        }
+        
         try {
             HttpHeaders header = new HttpHeaders();
             header.setContentType(MediaType.APPLICATION_PDF);
             header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
             OperationResult<byte[]> res = reportService.generateReport(reportWrapper);
+            
             if (res.isSuccess()) {
                 header.setContentLength(res.getResult().length);
                 retval = new HttpEntity<>(res.getResult(), header);

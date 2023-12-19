@@ -185,7 +185,7 @@ const ReportDesign = () => {
             };
             
             if (params && (params.length > 0)) {
-                wrapper.queryParameters = params;
+                wrapper.parameters = params;
             }
             
             report.runUser = authData.currentUser.userId;

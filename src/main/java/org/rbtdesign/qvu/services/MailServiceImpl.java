@@ -95,17 +95,21 @@ public class MailServiceImpl implements MailService {
 
     private String getMimeType(ScheduledDocument docinfo) {
         String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = "application/vnd.ms-excel";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = "text/csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                retval = "application/json";
-                break;
+        if (Constants.DOCUMENT_TYPE_REPORT.equals(docinfo.getDocumentType())) {
+            retval = "application/pdf";
+        } else {
+            switch (docinfo.getResultType()) {
+                case Constants.RESULT_TYPE_EXCEL:
+                    retval = "application/vnd.ms-excel";
+                    break;
+                case Constants.RESULT_TYPE_CSV:
+                    retval = "text/csv";
+                    break;
+                case Constants.RESULT_TYPE_JSON_FLAT:
+                case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
+                    retval = "application/json";
+                    break;
+            }
         }
 
         return retval;
@@ -113,18 +117,22 @@ public class MailServiceImpl implements MailService {
 
     private String getEmailAttachmentFileName(ScheduledDocument docinfo) {
         String retval = docinfo.getDocument();
-        switch (docinfo.getResultType()) {
-            case Constants.RESULT_TYPE_EXCEL:
-                retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
-                break;
-            case Constants.RESULT_TYPE_CSV:
-                retval = docinfo.getDocument().replace(".json", "") + ".csv";
-                break;
-            case Constants.RESULT_TYPE_JSON_FLAT:
-            case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
-                break;
+        if (Constants.DOCUMENT_TYPE_REPORT.equals(docinfo.getDocumentType())) {
+            retval = docinfo.getDocument().replace(".json", "") + ".pdf";
+        } else {
+            switch (docinfo.getResultType()) {
+                case Constants.RESULT_TYPE_EXCEL:
+                    retval = docinfo.getDocument().replace(".json", "") + ".xlsx";
+                    break;
+                case Constants.RESULT_TYPE_CSV:
+                    retval = docinfo.getDocument().replace(".json", "") + ".csv";
+                    break;
+                case Constants.RESULT_TYPE_JSON_FLAT:
+                case Constants.RESULT_TYPE_JSON_OBJECTGRAPH:
+                    break;
+            }
         }
-
+        
         return retval;
     }
 

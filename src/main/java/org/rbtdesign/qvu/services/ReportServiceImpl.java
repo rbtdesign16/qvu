@@ -56,7 +56,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public OperationResult<byte[]> generateReport(ReportRunWrapper reportWrapper) {
         OperationResult<byte[]> retval = new OperationResult();
-        OperationResult<ReportDocument> res = mainService.getDocument(Constants.DOCUMENT_TYPE_REPORT, reportWrapper.getGroupName(), reportWrapper.getDocumentName());
+        OperationResult<ReportDocument> res = mainService.getReportDocument(reportWrapper.getGroupName(), reportWrapper.getDocumentName(), reportWrapper.getUser());
 
         if (res.isSuccess()) {
             ReportDocumentRunWrapper rw = new ReportDocumentRunWrapper();

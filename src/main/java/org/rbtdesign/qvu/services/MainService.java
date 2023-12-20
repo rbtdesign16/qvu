@@ -19,6 +19,7 @@ import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
 import org.rbtdesign.qvu.dto.ReportDesignSettings;
+import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
@@ -99,4 +100,6 @@ public interface MainService {
     public OperationResult updateUserPassword(String pass);
     
     public OperationResult<ReportDesignSettings> getReportDesignSettings();
+    public OperationResult<ReportDocument> getReportDocument(String group, String name, String user);
+
 }

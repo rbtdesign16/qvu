@@ -109,9 +109,11 @@ import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.PkColumnComparator;
 import org.rbtdesign.qvu.util.QueryRunner;
+import org.rbtdesign.qvu.util.ReportRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -140,6 +142,10 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
+    
+    @Autowired
+    private ApplicationContext context;
+
 
     @Value("${mail.smtp.auth:false}")
     private boolean mailSmtpAuth;
@@ -1366,7 +1372,7 @@ public class MainServiceImpl implements MainService {
         return retval;
     }
 
-    private OperationResult<ReportDocument> getReportDocument(String group, String name, String user) {
+    public OperationResult<ReportDocument> getReportDocument(String group, String name, String user) {
         OperationResult<ReportDocument> retval = new OperationResult<>();
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, group, name, user);
@@ -1581,7 +1587,7 @@ public class MainServiceImpl implements MainService {
                             case java.sql.Types.DOUBLE:
                             case java.sql.Types.NUMERIC:
                             case java.sql.Types.DECIMAL:
-                                cell.setCellValue(Double.valueOf(val.toString()));
+                                cell.setCellValue(Double.parseDouble(val.toString()));
                                 break;
                             case java.sql.Types.DATE:
                                 cell.setCellValue(Helper.getDate(val));
@@ -1911,11 +1917,10 @@ public class MainServiceImpl implements MainService {
 
         DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
 
-        Set<String> hs = new HashSet<>();
         Map<String, List<ForeignKeySettings>> tmap = new HashMap<>();
         if (ds.getDatasourceTableSettings() != null) {
             for (TableSettings ts : ds.getDatasourceTableSettings()) {
-                if (hs.contains(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
+                if (!tmap.containsKey(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
                     tmap.put(ts.getTableName(), ts.getForeignKeySettings());
                 }
             }
@@ -2270,9 +2275,14 @@ public class MainServiceImpl implements MainService {
                 scheduledDocuments = null;
                 ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
                 for (ScheduledDocument docinfo : docs) {
-                    OperationResult<QueryDocument> dres = getQueryDocument(docinfo.getGroup(), docinfo.getDocument(), Constants.DEFAULT_ADMIN_USER);
-                    if (dres.isSuccess()) {
+                    LOG.debug("---------------->1=" + docinfo.getDocumentType());
+                    if (Constants.DOCUMENT_TYPE_QUERY.equals(docinfo.getDocumentType())) {
+                    LOG.debug("---------------->2");
                         executor.execute(new QueryRunner(this, mailService, getSchedulerConfig(), docinfo));
+                    } else {
+                   LOG.debug("---------------->4");
+                   LOG.debug("---------------->5");
+                        executor.execute(new ReportRunner(context.getBean(ReportService.class), mailService, getSchedulerConfig(), docinfo));
                     }
                 }
 
@@ -2303,6 +2313,7 @@ public class MainServiceImpl implements MainService {
                         if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
                             if (ds.getHoursOfDay().contains(hour)) {
                                 ScheduledDocument doc = new ScheduledDocument();
+                                doc.setDocumentType(ds.getDocumentType());
                                 doc.setDocument(ds.getDocumentName());
                                 doc.setGroup(ds.getDocumentGroup());
                                 doc.setEmailAddresses(ds.getEmailAddresses());

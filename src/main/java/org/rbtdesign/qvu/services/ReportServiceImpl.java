@@ -146,6 +146,31 @@ public class ReportServiceImpl implements ReportService {
 
         return retval;
     }
+    
+    private boolean hasTotalsComponent(ReportDocument report) {
+        boolean retval = false;
+        if (hasGridComponent(report)) {
+            for (ReportComponent c : report.getReportComponents()) {
+                if (isTabularGridComponent(c)) {
+                    List<Map<String, Object>> dataColumns = this.getDataColumns(c);
+                    for (Map<String, Object> dc : dataColumns) {
+                        retval = getBooleanMapValue("addTotal", dc);
+                        if (retval) {
+                            break;
+                        }
+                    }
+                }
+                
+                if (retval) {
+                    break;
+                }
+            }
+        }
+        
+        return retval;
+    }
+        
+                            
 
     private String generateHtml(ReportDocument report, Map<String, Integer> queryColumnIndexMap, QueryResult queryResult) {
         StringBuilder retval = new StringBuilder();
@@ -159,7 +184,13 @@ public class ReportServiceImpl implements ReportService {
         if (queryResult != null) {
             if (hasGridComponent(report)) {
                 gridRowSpan = getDataGridRowSpan(report);
-                double cnt = (double)queryResult.getRowCount() / (double)gridRowSpan;
+                int totalsRows = 0;
+                if (hasTotalsComponent(report)) {
+                    totalsRows = 2;
+                }
+                
+                double cnt = (double)(queryResult.getRowCount() + totalsRows) / (double)gridRowSpan;
+                
                 pageCount = (int) Math.ceil(cnt);
             } else {
                 pageCount = queryResult.getRowCount();
@@ -199,12 +230,7 @@ public class ReportServiceImpl implements ReportService {
             }
             retval.append("\n</div>");
             if (queryResult != null) {
-                int currow = queryResult.getCurrentRow() + gridRowSpan;
-                if (currow > queryResult.getRowCount()) {
-                    break;
-                } else {
-                    queryResult.setCurrentRow(currow);
-                }
+                queryResult.setCurrentRow(Math.min(queryResult.getRowCount(), queryResult.getCurrentRow() + gridRowSpan));
             }
         }
 
@@ -359,7 +385,7 @@ public class ReportServiceImpl implements ReportService {
                             for (int i = 0; i < totals.length; ++i) {
                                 Double d = totals[i];
                                 Map<String, Object> dc = dataColumns.get(i);
-                                buf.append("<td style=\"border: none;\" style=\"border: none;\"><div class=\"");
+                                buf.append("<td style=\"border: none;\"><div class=\"");
                   
                                 String align = getStringMapValue("dataTextAlign", dc);
                                 
@@ -384,7 +410,7 @@ public class ReportServiceImpl implements ReportService {
                                     } else {
                                         buf.append(totals[i]);
                                     }
-                                }
+                                } 
                                 buf.append("</div></td>");
                             }
                         }
@@ -1380,6 +1406,14 @@ public class ReportServiceImpl implements ReportService {
             retval.append("\n\t.comp-");
             retval.append(cindx);
             retval.append(" .trh td:nth-child(");
+            retval.append(dindx + 1);
+            retval.append(") {\t\twidth: ");
+            retval.append(width);
+            retval.append(";\n\t}\n");
+
+            retval.append("\n\t.comp-");
+            retval.append(cindx);
+            retval.append(" .trd td:nth-child(");
             retval.append(dindx + 1);
             retval.append(") {\t\twidth: ");
             retval.append(width);

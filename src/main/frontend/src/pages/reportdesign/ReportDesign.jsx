@@ -177,6 +177,7 @@ const ReportDesign = () => {
             showParamEntry();
         } else {
             closeMenu();
+            hideParameterEntry();
             showMessage(INFO, replaceTokens(getText("Running report", "..."), [currentReport.name]), null, true);
 
             let report = copyObject(currentReport);

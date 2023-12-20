@@ -32,26 +32,26 @@ const BorderSelectModal = (props) => {
     
     if (config) {
         return (
-                <div className="static-modal">
-                    <Modal 
-                        animation={false} 
-                        size="sm"
-                        show={config.show} 
-                        onShow={onShow}
-                        onHide={onHide}>
-                        <Modal.Header closeButton>
-                            <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <BorderPanel />
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
-                            <Button size="sm" variant="primary" type="submit" onClick={() => config.save({...currentComponent.borderSettings})}>{getText("Save")}</Button>
-                        </Modal.Footer>
-                    </Modal>
-                </div>
-                );
+        <div className="static-modal">
+            <Modal 
+                animation={false} 
+                size="sm"
+                show={config.show} 
+                onShow={onShow}
+                onHide={onHide}>
+                <Modal.Header closeButton>
+                    <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <BorderPanel name="borderSettings"/>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>
+                    <Button size="sm" variant="primary" type="submit" onClick={() => config.save({...currentComponent.borderSettings})}>{getText("Save")}</Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+        );
     } else {
         return "";
     }

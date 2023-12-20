@@ -434,6 +434,31 @@ const AddEditComponentModal = (props) => {
         return (isDataTypeNumeric(sc.dataType) || isDataTypeDateTime(sc.dataType));
     };
     
+    const handleDragStart = (e) => {
+        e.dataTransfer.setData("text/plain",e.target.id.replace("scol-", ""));
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDrop = (e) => {
+        let el = document.elementFromPoint(e.clientX, e.clientY);
+         if (el && el.id && el.id.startsWith("scol-")) {
+            let dindx = Number(el.id.replace("scol-", ""));
+            let sindx = Number(e.dataTransfer.getData("text/plain"));
+           if (sindx !== dindx) {
+                let sc = copyObject(selectColumns);
+                let col = sc[sindx];
+                sc.splice(sindx, 1);
+                sc.splice(dindx, 0, col);
+                setSelectColumns(sc);
+            }
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+    
     const getGridSelectColumn = (sc, indx, nameLabel, alignLabel, colcnt) => {
         let wantFormat = isColumnFormatAvailable(sc);
         let isnum = isDataTypeNumeric(sc.dataType);
@@ -448,7 +473,7 @@ const AddEditComponentModal = (props) => {
                 onDragOver={e => handleDragOver(e)}>
                 <span>
                     <MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getQueryColumnHelpText(sc))} />
-                    <span title={getHeaderTitle(sc)} >{sc.displayName}</span>
+                    <span title={getHeaderTitle(sc)} >{sc.tableAlias + "." + sc.columnName}</span>
                     <div style={{float: "right", marginRight: "15px", display: "inline-block"}} >
                         <input key={getUUID()} id={"sel-" + indx} name="selected" type="checkbox" checked={sc.selected} onChange={e => setQueryValue(e, indx)}/>
                         <div tabIndex={1} style={{display: "inline-block"}} className="ck-label" onClick={e => setQueryValue({target: {name: "selected", id: "sel-" + indx, checked: !sc.selected}}, indx)}>{getText("Include Column")}</div>
@@ -467,7 +492,7 @@ const AddEditComponentModal = (props) => {
             <div className="detail">
                 <div className="entrygrid-50p-50p">
                     <div className="entrygrid-100-325">
-                        <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} defaultValue={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
+                        <div className="label">{nameLabel}</div><div><input type="text" name="displayName" size={30} value={sc.displayName} onChange={e => setQueryValue(e, indx)}/></div>
                         {wantFormat ? <div className="label">{getText("Format:")}</div> : <div style={{height: "30px"}}></div>}
                         {wantFormat ? <div><select name="displayFormat" onChange={e => setQueryValue(e, indx)}><option value=""></option>{getQueryColumnFormatOptions(sc)}</select></div> : <div></div>}
                     </div> 

@@ -35,7 +35,6 @@ const FontSelectModal = (props) => {
             <div className="static-modal">
                 <Modal 
                     animation={false} 
-                    size="sm"
                     show={config.show} 
                     onHide={onHide}
                     onShow={onShow}>
@@ -43,7 +42,7 @@ const FontSelectModal = (props) => {
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <FontPanel />
+                        <FontPanel name="fontSettings"/>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button size="sm" onClick={() => onHide() }>{getText("Cancel")}</Button>

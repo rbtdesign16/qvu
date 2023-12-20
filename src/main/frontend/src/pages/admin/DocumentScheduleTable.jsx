@@ -48,7 +48,8 @@ const DocumentScheduleTable = (props) => {
         {
             title: getText("Type"),
             fieldName: "documentType",
-            style: {textAlign: "center"}
+            style: {textAlign: "center"},
+            defaultValue: "PDF"
         },
         {
             title: getText("Group"),

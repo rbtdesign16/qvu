@@ -516,7 +516,7 @@ export const getComponentValue = (reportSettings, currentReport, component, comp
             
             return <div style={myStyle}></div>;
         case COMPONENT_TYPE_CURRENTDATE:
-            return moment().formatWithJDF(component.value.format); 
+            return moment().formatWithJDF(component.value.displayFormat); 
         case COMPONENT_TYPE_PAGENUMBER:
             return component.value.displayFormat.replace("?", "1");
         case COMPONENT_TYPE_DATAGRID:

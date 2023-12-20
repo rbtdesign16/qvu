@@ -458,8 +458,8 @@ public class ReportServiceImpl implements ReportService {
             if (isDataGridComponent(c.getType())) {
                 Map<String, Object> m = (Map<String, Object>) c.getValue();
                 String layout = (String) m.get("gridLayout");
-                Double drh = getDoubleMapValue("dataRowHeight", m) - Helper.getBorderAdjustmentForPdf(report.getPageUnits().substring(0, 2), c.getBorderSettings());
-                Double hrh = getDoubleMapValue("headerRowHeight", m) - Helper.getBorderAdjustmentForPdf(report.getPageUnits().substring(0, 2), c.getBorderSettings2());
+                Double drh = getDoubleMapValue("dataRowHeight", m); 
+                Double hrh = getDoubleMapValue("headerRowHeight", m);
 
                  if (StringUtils.isNotEmpty(layout)) {
                     double dataHeight = c.getHeight() - hrh;
@@ -986,32 +986,33 @@ public class ReportServiceImpl implements ReportService {
 
         int currow = queryResult.getCurrentRow();
 
-        if (currow < queryResult.getData().size()) {
-            int dindx = 0;
-            retval.append("<tr class=\"trh\">\n");
-            for (Map<String, Object> dc : dataColumns) {
-               String align = getStringMapValue("headerTextAlign", dc);
+        int dindx = 0;
+        retval.append("<tr class=\"trh\">\n");
+        for (Map<String, Object> dc : dataColumns) {
+           String align = getStringMapValue("headerTextAlign", dc);
 
-                switch(align) {
-                    case "left":
-                        retval.append("\t\t\t\t<td><div class=\"tal\"");
-                        break;
-                    case "center":
-                        retval.append("\t\t\t\t<td><div class=\"tac\"");
-                        break;
-                    case "right":
-                        retval.append("\t\t\t\t<td><div class=\"tar\"");
-                        break;
-                }
-
-                retval.append(">");
-
-                retval.append(getStringMapValue("displayName", dc));
-                retval.append("</div></td>\n");
-                dindx++;
+            switch(align) {
+                case "left":
+                    retval.append("\t\t\t\t<td><div class=\"tal\"");
+                    break;
+                case "center":
+                    retval.append("\t\t\t\t<td><div class=\"tac\"");
+                    break;
+                case "right":
+                    retval.append("\t\t\t\t<td><div class=\"tar\"");
+                    break;
             }
-            retval.append("\t\t\t</tr>\n");
 
+            retval.append(">");
+
+            retval.append(getStringMapValue("displayName", dc));
+            retval.append("</div></td>\n");
+            dindx++;
+        }
+        
+        retval.append("\t\t\t</tr>\n");
+
+        if (currow < queryResult.getData().size()) {
             for (int i = 0; (i < gridRowSpan) && (currow < queryResult.getRowCount()); ++i) {
                 retval.append("\t\t\t<tr class=\"trd\">\n");
                 List<Object> dataRow = queryResult.getData().get(currow);

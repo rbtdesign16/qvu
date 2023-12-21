@@ -2,7 +2,7 @@ Qvu Data Service 0.2.0
 Release Notes
 12/21/2023
 
-Qvu Data Service 0.2.0 now has an integrated report designer. In order t
+Qvu Data Service 0.2.0 now has an integrated report designer. In order to
 update an existing Qvu Data Service follow these steps:
 
 1. Copy the following entries into the <qvu-repoistory>/config/application.properties file:

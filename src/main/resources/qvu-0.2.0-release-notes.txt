@@ -24,11 +24,11 @@ update an existing Qvu Data Service follow these steps:
 2. Copy qvu-0.2.0.jar found here: https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-0.2.0.jar
    to the desired application location
    
-3. Copy the update help file from https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-help-0.2.0.pdf
+3. Copy the updated help file from https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-help-0.2.0.pdf
    to <qvu-repositort>/help/qvu-help-en-US.pdf
    
 4. Copy the updated language file https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-language-0.2.0.json 
-   to <qvu-repository>/config/qvu-language.json. If you have made updates to the language file you will
-   have to merge the latest file into you existing file.
+   to <qvu-repository>/config/qvu-language.json. If you have made updates to the exiting language file 
+   you will need to merge the latest file into you existing file.
    
-5. After copying the files above restart the server with java -jar -Drepoistory.folder=<path-to-repository> path/to/qvu-0.2.0.jar
+5. After copying the files above restart the server with java -jar -Drepository.folder=<path-to-repository> path/to/qvu-0.2.0.jar

@@ -1,0 +1,34 @@
+Qvu Data Service 0.2.0
+Release Notes
+12/21/2023
+
+Qvu Data Service 0.2.0 now has an integrated report designer. In order t
+update an existing Qvu Data Service follow these steps:
+
+1. Copy the following entries into the <qvu-repoistory>/config/application.properties file:
+
+	#default report settings added in ver 0.2.0
+	default.page.size=letter
+	default.page.orientation=portrait
+	default.page.units=inch
+	default.header.height=1
+	default.footer.height=1
+	default.page.border=0.5,0.5,0.5,0.5
+	default.font.sizes=8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72,84,96,108,144,192,216,244
+	default.component.background.color=white
+	default.component.foreground.color=black
+	default.float.formats=#.00|#.##|#.###|###,###,###.00|###,###,###.##|###,###,###.###
+	default.int.formats=#.00|#0|###,###,###
+	default.date.formats=yyyy-MM-dd|yyyy-MM-dd HH:mm|yyyy-MM-dd hh:mm a|MM/dd/yyyy|MM/dd/yyyy HH:mm|MM/dd/yyyy hh:mm a|E, yyyy-MM-dd|E, yyyy-MM-dd HH:mm|E, yyyy-MM-dd hh:mm a|yyyy.MM.dd|E yyyy.MM.dd|E yyyy.MM.dd HH:mm|E yyyy.MM.dd hh:mm a
+
+2. Copy qvu-0.2.0.jar found here: https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-0.2.0.jar
+   to the desired application location
+   
+3. Copy the update help file from https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-help-0.2.0.pdf
+   to <qvu-repositort>/help/qvu-help-en-US.pdf
+   
+4. Copy the updated language file https://filedn.com/laRzqRKL1TGjbXdA1wpuB6z/qvu-language-0.2.0.json 
+   to <qvu-repository>/config/qvu-language.json. If you have made updates to the language file you will
+   have to merge the latest file into you existing file.
+   
+5. After copying the files above restart the server with java -jar -Drepoistory.folder=<path-to-repository> path/to/qvu-0.2.0.jar

@@ -1429,8 +1429,6 @@ public class ReportServiceImpl implements ReportService {
         return retval.toString();
     }
 
-    ;
-    
     private String getFreeformGridCss(ReportComponent c, int cindx, String units, int gridRowSpan) {
         StringBuilder retval = new StringBuilder();
 

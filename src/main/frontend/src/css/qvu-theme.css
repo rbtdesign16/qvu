@@ -2,10 +2,10 @@
     --default-background-color: white;
     --default-font-color: darkslategray;
     --default-font-size: 11pt;
-    --default-border-color: lightsteelblue;
     --default-label-font-size: 11pt;
     --default-label-font-weight: 600;
     --default-label-font-color: darkslategray;
+    --separator-color: darkslategray;
     --default-border-color: #dee2e6;
     --default-title-font-size: 14pt;
     --default-title-font-weight: 500;
@@ -63,4 +63,28 @@
    --query-results-table-detail-rownum-bkcolor: #F5F5F5;
    
    --popup-hover-background: #DCDCDC;
+   
+   --report-component-outline: dashed 1px silver;
+   --report-component-outline-selected: dashed 1px crimson;
+   
+   --default-burgerbar-color: #0020C2;
+   --default-burgerbar-hover-color: #a90000;
+   
+   --context-menu-background-color: #F5F5F5;
+   --context-menu-background-hover-color: #3f4847;
+   --context-menu-font-hover-color: white;
+   --context-menu-font-size: 14px;
+   --context-menu-font-color: black;
+   
+    --sizing-rect-width: 5px;
+    --sizing-rect-background: silver;
+    --sizing-rect-width-hover: 10px;
+    --sizing-corner-border: solid 2px crimson;
+    --sizing-border: solid 1px crimson;
+    
+    --data-grid-label-border: dashed 1px blue;
+    --data-grid-data-border: dashed 1px darkgreen;
+    
+    --grid-resizer-border: dotted 2px crimson; 
+    
 }

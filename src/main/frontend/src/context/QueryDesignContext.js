@@ -11,7 +11,8 @@ import {
     doSortCompare,
     NODE_TYPE_IMPORTED_FOREIGNKEY,
     CUSTOM_FK_DATA_SEPARATOR,
-    COMPARISON_OPERATOR_IN
+    COMPARISON_OPERATOR_IN,
+    copyObject
 } from "../utils/helper";
 import NumberEntry from "../widgets/NumberEntry";
 import useLang from "./LangContext";
@@ -36,7 +37,7 @@ export const QueryDesignProvider = ({ children }) => {
     const [currentDocument, setCurrentDocument] = useState({
         name: getText(DEFAULT_NEW_DOCUMENT_NAME),
         group: DEFAULT_DOCUMENT_GROUP,
-        newdoc: true
+        newRecord: true
     });
     
     const EMPTY_FILTER_VALUE = getText("empty-filter-value");
@@ -77,7 +78,7 @@ export const QueryDesignProvider = ({ children }) => {
         let cMap = new Map();
 
         if (!scols) {
-            scols = [...selectColumns];
+            scols = copyObject(selectColumns);
         }
 
         for (let i = 0; i < scols.length; ++i) {
@@ -135,8 +136,8 @@ export const QueryDesignProvider = ({ children }) => {
                 });
             }
         }
-
-        setFromClause(buildFromRecords([...tablePathSet], cols));
+        
+        setFromClause(buildFromRecords(copyObject(Array.from(tablePathSet)), cols));
 
         let pSet = new Set();
         
@@ -158,31 +159,7 @@ export const QueryDesignProvider = ({ children }) => {
             }
         }
 
-
         setSelectColumns(cols);
-    };
-
-    const formatPathForDisplay = (path, noColumnDisplay) => {
-        let l = path.split("|");
-        
-        let end = l.length;
-        
-        if (noColumnDisplay) {
-            end -= 1;
-        }
-        
-        for (let i = 0; i < end; ++i) {
-            if (l[i].includes("{")) {
-                let pos1 = l[i].indexOf("{");
-                let pos2 = l[i].indexOf("}");
-                let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
-                l[i] = fkcols.replace("?", "");
-            }
-        }
-
-
-
-        return l.join("->");
     };
 
     const getJoinFromColumns = (part) => {
@@ -246,10 +223,11 @@ export const QueryDesignProvider = ({ children }) => {
     };
 
     const buildFromRecords = (paths, cols) => {
-        paths.sort((a, b) => {
-            return (b.length - a.length);
-        });
-
+        if (paths) {
+            paths.sort((a, b) => {
+                return (b.length - a.length);
+            });
+        }
 
         let tindx = 0;
         // root table
@@ -329,7 +307,7 @@ export const QueryDesignProvider = ({ children }) => {
             } while (pos > -1)
         }
 
-        paths = [...pSet];
+        paths = copyObject(Array.from(pSet));
 
         paths.sort();
 
@@ -410,25 +388,6 @@ export const QueryDesignProvider = ({ children }) => {
         }
     };
 
-    const getFilterComparisonInput = (filter, indx, onChange) => {
-        let id = "f-" + indx;
-        if (isDataTypeString(filter.dataType)) {
-            return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-        } else if (isDataTypeNumeric(filter.dataType)) {
-            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
-                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-            } else {
-                return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
-            }
-        } else if (isDataTypeDateTime(filter.dataType)) {
-            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
-                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
-            } else {
-                return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
-            }
-        }
-    };
-
     const buildRunDocument = (docname) => {
         return {
             name: docname,
@@ -453,8 +412,10 @@ export const QueryDesignProvider = ({ children }) => {
     };
 
     const setNewDocument = () => {
-        setCurrentDocument({name: getText(DEFAULT_NEW_DOCUMENT_NAME),
-            group: DEFAULT_DOCUMENT_GROUP, newdoc: true});
+        setCurrentDocument({
+            name: getText(DEFAULT_NEW_DOCUMENT_NAME),
+            group: DEFAULT_DOCUMENT_GROUP, 
+            newRecord: true});
         clearData();
     };
 
@@ -522,11 +483,9 @@ export const QueryDesignProvider = ({ children }) => {
                                 setSelectColumns,
                                 setFilterColumns,
                                 updateSelectColumns,
-                                formatPathForDisplay,
                                 splitter1Sizes,
                                 setSplitter1Sizes,
                                 isParameterEntryRequired,
-                                getFilterComparisonInput,
                                 buildRunDocument,
                                 queryResults,
                                 setQueryResults,
@@ -555,7 +514,7 @@ const useQueryDesign = () => {
     const context = useContext(QueryDesignContext);
 
     if (context === undefined) {
-        throw new Error("useHelp must be used within an HelpProvider");
+        throw new Error("useQueryDesign must be used within an QueryDesignProvider");
     }
     return context;
 };

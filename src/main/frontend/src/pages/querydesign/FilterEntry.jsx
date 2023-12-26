@@ -7,15 +7,19 @@ import NumberEntry from "../../widgets/NumberEntry"
 import { MdHelpOutline } from "react-icons/md";
 import { AiOutlineDelete } from "react-icons/ai";
 import {
-SMALL_ICON_SIZE,
-        confirm,
-        OPEN_PARENTHESIS,
-        CLOSE_PARENTHESIS,
-        AND_OR,
-        COMPARISON_OPERATORS,
-        UNARY_COMPARISON_OPERATORS,
-        COMPARISON_OPERATOR_IN
-        } from "../../utils/helper";
+    SMALL_ICON_SIZE,
+    confirm,
+    OPEN_PARENTHESIS,
+    CLOSE_PARENTHESIS,
+    AND_OR,
+    COMPARISON_OPERATORS,
+    UNARY_COMPARISON_OPERATORS,
+    COMPARISON_OPERATOR_IN,
+    copyObject,
+    formatPathForDisplay,
+    getColumnHelpDisplay,
+    getFilterComparisonInput
+    } from "../../utils/helper";
 
 const FilterEntry = (props) => {
     const {index} = props;
@@ -26,15 +30,13 @@ const FilterEntry = (props) => {
         setFilterColumns,
         selectColumns,
         setSelectColumns,
-        formatPathForDisplay,
-        getFilterComparisonInput,
         getColumnNameForDisplay
     } = useQueryDesign();
 
     const COLUMN_DEFS = [
         {
             title: "",
-            width: "30px",
+            width: "30px"
         },
         {
             title: "and/or",
@@ -65,33 +67,10 @@ const FilterEntry = (props) => {
 
 
     const getHelpText = () => {
-        let pkindex = -1;
-
         let columnData = findColumnData();
 
         if (columnData) {
-            if (columnData.pkindex) {
-                pkindex = Number(columnData.pkindex);
-            }
-
-            if (pkindex > -1) {
-                return <div className="entrygrid-125-550">
-                    <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                    <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
-                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-                </div>;
-            } else {
-                return <div className="entrygrid-125-550">
-                    <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
-                    <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
-                    <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
-                    <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
-                    <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
-                </div>;
-            }
+            return getColumnHelpDisplay(columnData, getText);
         }
     };
 
@@ -101,7 +80,7 @@ const FilterEntry = (props) => {
                 return selectColumns[i];
             }
         }
-    }
+    };
 
     const getHeaderTitle = () => {
         return getText("Table Alias:", " ") + filterColumns[index].tableAlias + "\n" + getText("Path:", " ") + formatPathForDisplay(filterColumns[index].path);
@@ -113,7 +92,7 @@ const FilterEntry = (props) => {
         } else {
             return AND_OR.map(ao => <option value={ao} selected={(ao === filterColumns[index].andOr)}>{ao}</option>);
         }
-    }
+    };
 
     const loadOpenParenthesis = () => {
         return OPEN_PARENTHESIS.map(p => <option value={p} selected={(p === filterColumns[index].leftParenthesis)}>{p}</option>);
@@ -129,7 +108,7 @@ const FilterEntry = (props) => {
 
     const remove = async () => {
         if (await confirm(getText("Remove:", " " + filterColumns[index].columnName + "?"))) {
-            let s = [...filterColumns];
+            let s = copyObject(filterColumns);
             s.splice(index, 1);
             setFilterColumns(s);
         }
@@ -144,7 +123,7 @@ const FilterEntry = (props) => {
             val = e.target.value;
         }
 
-        let f = [...filterColumns];
+        let f = copyObject(filterColumns);
 
         f[index][e.target.name] = val;
         setFilterColumns(f);
@@ -157,7 +136,7 @@ const FilterEntry = (props) => {
         } else {
             return getFilterComparisonInput(filterColumns[index], index, onChange);
         }
-    }
+    };
 
     const isComparisonValueDisabled = () => {
         if (filterColumns[index].comparisonOperator) {
@@ -184,7 +163,7 @@ const FilterEntry = (props) => {
     return <div key={"fe-" + index}>
         <div className="filter-title" id={"fil-" + index}>
             <span>
-                <MdHelpOutline style={{marginBottom: "5px"}} className="icon" size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
+                <MdHelpOutline className="icon" style={{marginBottom: "5px"}} size={SMALL_ICON_SIZE} onClick={(e) => showHelp(getHelpText())} />
                 <span title={getHeaderTitle()} >{getColumnNameForDisplay(filterColumns[index])}</span>
             </span>
         </div>
@@ -198,12 +177,5 @@ const FilterEntry = (props) => {
         </div>
     </div>
 };
-
-FilterEntry.propTypes = {
-    filterData: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired
-
-};
-
 
 export default FilterEntry;

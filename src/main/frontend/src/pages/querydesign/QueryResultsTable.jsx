@@ -25,7 +25,8 @@ import {
         COLOR_BLACK,
         ARROW_UP_KEY,
         ARROW_DOWN_KEY,
-        DEFAULT_PAGE_SIZE
+        DEFAULT_PAGE_SIZE,
+        copyObject
     } from "../../utils/helper";
 
 const QueryResultsTable = () => {

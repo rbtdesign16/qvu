@@ -17,20 +17,21 @@ import { Splitter, SplitterPanel } from 'primereact/splitter';
 import DataSelectTree from "./DataSelectTree";
 import { isQueryDesigner } from "../../utils/authHelper";
 import {
-SUCCESS,
-        INFO,
-        WARN,
-        ERROR,
-        DEFAULT_ERROR_TITLE,
-        DEFAULT_DOCUMENT_GROUP,
-        QUERY_DOCUMENT_TYPE,
-        replaceTokens,
-        SPLITTER_GUTTER_SIZE,
-        NODE_TYPE_TABLE,
-        NODE_TYPE_COLUMN,
-        NODE_TYPE_IMPORTED_FOREIGNKEY,
-        NODE_TYPE_EXPORTED_FOREIGNKEY
-        } from "../../utils/helper";
+    SUCCESS,
+    INFO,
+    WARN,
+    ERROR,
+    DEFAULT_ERROR_TITLE,
+    DEFAULT_DOCUMENT_GROUP,
+    QUERY_DOCUMENT_TYPE,
+    replaceTokens,
+    SPLITTER_GUTTER_SIZE,
+    NODE_TYPE_TABLE,
+    NODE_TYPE_COLUMN,
+    NODE_TYPE_IMPORTED_FOREIGNKEY,
+    NODE_TYPE_EXPORTED_FOREIGNKEY,
+    copyObject
+    } from "../../utils/helper";
 
 import { getDatasourceTreeViewData,
         isApiError,
@@ -111,7 +112,7 @@ import { getDatasourceTreeViewData,
     };
 
     const onSaveDocument = () => {
-        setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave});
+        setShowSaveDocument({show: true, type: QUERY_DOCUMENT_TYPE, saveDocument: saveQueryDocument, hide: hideShowSave, currentDocument: currentDocument});
     };
 
     const saveQueryDocument = async (name, group) => {
@@ -123,11 +124,11 @@ import { getDatasourceTreeViewData,
             actionTimestamp: actionTimestamp,
             queryDocument: {
                 name: name,
-                newRecord: currentDocument.newdoc,
-                createdBy: userId,
-                updatedBy: userId,
-                createDate: actionTimestamp,
-                lastUpdated: actionTimestamp,
+                newRecord: currentDocument.newRecord,
+                createdBy: currentDocument.createdBy,
+                updatedBy: currentDocument.updatedBy,
+                createDate: currentDocument.createDate,
+                lastUpdated: currentDocument.lastUpdated,
                 datasource: datasource,
                 schema: getDatasourceSchema(datasource),
                 baseTable: baseTable,
@@ -143,8 +144,21 @@ import { getDatasourceTreeViewData,
         if (isApiError(res)) {
             showMessage(ERROR, res.message);
         } else {
+            let udoc = res.result;
             showMessage(SUCCESS, replaceTokens(getText("Document saved"), [name]));
             hideShowSave();
+ 
+            setCurrentDocument({
+                name: udoc.queryDocument.name,
+                group: udoc.queryDocument.documentGroupName,
+                newRecord: false,
+                createDate: udoc.queryDocument.createDate,
+                createdBy: udoc.queryDocument.createdBy,
+                lastUpdated: udoc.queryDocument.lastUpdated,
+                updatedBy: udoc.queryDocument.updatedBy
+            });
+
+
         }
 
     };
@@ -181,13 +195,13 @@ import { getDatasourceTreeViewData,
     const getForeignTableFromPathPart = (part) => {
         let pos = part.indexOf("{");
         return part.substring(0, pos);
-    }
+    };
     
     const getForeignKeyNameFromPathPart = (part) => {
         let pos = part.indexOf("{");
         let pos2 = part.indexOf("@");
         return part.substring(pos + 1, pos2);
-    }
+    };
 
     const findNodeId = (parent, path) => {
         let retval;
@@ -229,7 +243,7 @@ import { getDatasourceTreeViewData,
 
     const populateDocument = async (group, name) => {
         hideDocumentSelect();
-        showMessage(INFO, getText("Loading document", " " + name + "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading document"), name), null, true);
         
         let res = await getDocument(QUERY_DOCUMENT_TYPE, group, name);
         if (isApiError(res)) {
@@ -288,14 +302,18 @@ import { getDatasourceTreeViewData,
                 setSelectColumns(doc.selectColumns);
                 setFromClause(doc.fromClause);
                 setSelectedColumnIds(selIds);
-                setSelectedTableIds([...tids]);
+                setSelectedTableIds(copyObject(tids));
                 setTreeViewExpandedIds(expandedIds);
                 setFilterColumns(doc.filterColumns);
 
                 setCurrentDocument({
                     name: doc.name,
                     group: doc.documentGroupName,
-                    newdoc: false
+                    newRecord: false,
+                    createDate: doc.createDate,
+                    createdBy: doc.createdBy,
+                    lastUpdated: doc.lastUpdated,
+                    updatedBy: doc.updatedBy
                 });
 
                 hideMessage();
@@ -309,7 +327,7 @@ import { getDatasourceTreeViewData,
     };
 
     const onShowDocumentSelect = async () => {
-        showMessage(INFO, getText("Loading available documents", "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), QUERY_DOCUMENT_TYPE), null, true);
 
         let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
 
@@ -328,12 +346,12 @@ import { getDatasourceTreeViewData,
     };
 
     const getDocumentInfo = () => {
-        return  <span style={{marginLeft: "10px"}} className="cobaltBlue-f">
+        return  <span className="cobaltBlue-f" style={{marginLeft: "10px"}} >
             <span style={{color: "darkslategray"}}>{getText("Group", ":  ")}</span>
             {currentDocument.group} 
             <span style={{paddingLeft: "15px", color: "darkslategray"}}>{getText("Document", ":  ")}</span>
             {currentDocument.name}
-            </span>
+            </span>;
     };
 
     useEffect(() => {
@@ -349,8 +367,8 @@ import { getDatasourceTreeViewData,
                 {isQueryDesigner(authData) && <Button size="sm"  title={getText("Save Document")}  style={{marginLeft: "5px", marginBottom: "2px"}} disabled={!isSaveEnabled()} onClick={() => onSaveDocument()}>{getText("Save")}</Button>}
                 <Button size="sm"  title={getText("New Document")} style={{marginLeft: "5px", marginBottom: "2px"}} onClick={() => onNewDocument()}>{getText("New")}</Button>
                 {getDocumentInfo()}
-                <Splitter style={{height: "calc(100% - 90px)"}} onResizeEnd={onResizeEnd}  gutterSize={SPLITTER_GUTTER_SIZE}>
-                    <SplitterPanel minSize={5} size={splitter1Sizes[0]} className="flex align-items-center justify-content-center">
+                <Splitter onResizeEnd={onResizeEnd}  style={{height: "calc(100% - 90px)"}}  gutterSize={SPLITTER_GUTTER_SIZE}>
+                    <SplitterPanel minSize={0} size={splitter1Sizes[0]}>
                         <label className="ck-label">{getText("Datasource")}</label>
                         <select className="ds-sel" title={getText("Select a datasource")} onChange={e => onDatasourceChange(e)}>
                             <option value="" selected={!datasource}></option>                           

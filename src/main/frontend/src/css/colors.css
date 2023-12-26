@@ -1,13 +1,3 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : Jun 24, 2023, 10:16:51 AM
-    Author     : rbtuc
-*/
-
-
 .cloverGreen-f {
     color: #3EA055;
 }
@@ -38,4 +28,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 .yellow-f {
     color: yellow;
+}
+
+.white-f {
+    color: white;
 }

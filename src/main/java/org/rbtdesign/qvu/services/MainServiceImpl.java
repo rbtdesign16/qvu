@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -85,6 +86,7 @@ import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.ReportDesignSettings;
 import org.rbtdesign.qvu.dto.ReportDocument;
 import org.rbtdesign.qvu.dto.ScheduledDocument;
 import org.rbtdesign.qvu.dto.SqlFilterColumn;
@@ -107,9 +109,11 @@ import org.rbtdesign.qvu.util.QuerySelectTreeBuilder;
 import org.rbtdesign.qvu.util.RoleComparator;
 import org.rbtdesign.qvu.util.PkColumnComparator;
 import org.rbtdesign.qvu.util.QueryRunner;
+import org.rbtdesign.qvu.util.ReportRunner;
 import org.rbtdesign.qvu.util.ZipFolder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -138,6 +142,10 @@ public class MainServiceImpl implements MainService {
 
     @Autowired
     private DBHelper dbHelper;
+    
+    @Autowired
+    private ApplicationContext context;
+
 
     @Value("${mail.smtp.auth:false}")
     private boolean mailSmtpAuth;
@@ -1168,13 +1176,11 @@ public class MainServiceImpl implements MainService {
     public OperationResult getDocument(String type, String group, String name) {
         OperationResult retval = null;
         try {
+            User u = getCurrentUser();
             if (Constants.DOCUMENT_TYPE_QUERY.equals(type)) {
-                User u = getCurrentUser();
                 retval = getQueryDocument(group, name, u.getName());
             } else {
-                retval = new OperationResult();
-                retval.setErrorCode(Errors.NOT_SUPPORTED);
-                retval.setMessage(config.getLanguageText(Constants.DEFAULT_LANGUAGE_KEY, Errors.getMessage(Errors.NOT_SUPPORTED)));
+                retval = getReportDocument(group, name, u.getName());
             }
         } catch (Exception ex) {
             LOG.error(ex.toString(), ex);
@@ -1188,11 +1194,13 @@ public class MainServiceImpl implements MainService {
         try {
             if (docWrapper.isReportDocument()) {
                 ReportDocument doc = docWrapper.getReportDocument();
-                if (doc.getCreateDate() == null) {
-                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                if (doc.isNewRecord()) {
+                    doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                     doc.setCreatedBy(docWrapper.getUser());
+                    doc.setLastUpdated(null);
+                    doc.setUpdatedBy(null);
                 } else {
-                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                     doc.setUpdatedBy(docWrapper.getUser());
                 }
 
@@ -1206,15 +1214,19 @@ public class MainServiceImpl implements MainService {
                     String key = this.getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, doc.getDocumentGroupName(), doc.getName(), docWrapper.getUser());
                     cacheHelper.getReportDocumentCache().invalidate(key);
                 }
+                
             } else if (docWrapper.isQueryDocument()) {
                 QueryDocument doc = docWrapper.getQueryDocument();
-                if (doc.getCreateDate() == null) {
-                    doc.setCreateDate(docWrapper.getActionTimestamp());
+                if (doc.isNewRecord()) {
+                    doc.setCreateDate(new Timestamp(System.currentTimeMillis()));
                     doc.setCreatedBy(docWrapper.getUser());
+                    doc.setLastUpdated(null);
+                    doc.setUpdatedBy(null);
                 } else {
-                    doc.setLastUpdated(docWrapper.getActionTimestamp());
+                    doc.setLastUpdated(new Timestamp(System.currentTimeMillis()));
                     doc.setUpdatedBy(docWrapper.getUser());
                 }
+                
                 OperationResult<QueryDocument> opr = fileHandler.saveQueryDocument(doc, docWrapper.getUser());
                 docWrapper.setQueryDocument(opr.getResult());
                 retval.setErrorCode(opr.getErrorCode());
@@ -1342,12 +1354,39 @@ public class MainServiceImpl implements MainService {
 
         String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_QUERY, group, name, user);
 
-        QueryDocument doc = null; //cacheHelper.getQueryDocumentCache().get(key);
+        QueryDocument doc = null; 
 
+        if (System.getProperty("dev.mode") == null) {
+            doc = cacheHelper.getQueryDocumentCache().getIfPresent(key);
+        }
+        
         if (doc == null) {
-            retval = fileHandler.getDocument(FileHandler.QUERY_FOLDER, group, user, name);
+            retval = fileHandler.getQueryDocument(group, user, name);
             if (retval.isSuccess()) {
                 cacheHelper.getQueryDocumentCache().put(key, retval.getResult());
+            }
+        } else {
+            retval.setResult(doc);
+        }
+
+        return retval;
+    }
+
+    public OperationResult<ReportDocument> getReportDocument(String group, String name, String user) {
+        OperationResult<ReportDocument> retval = new OperationResult<>();
+
+        String key = getDocumentCacheKey(Constants.DOCUMENT_TYPE_REPORT, group, name, user);
+
+        ReportDocument doc = null; 
+
+        if (System.getProperty("dev.mode") == null) {
+            doc = cacheHelper.getReportDocumentCache().getIfPresent(key);
+        }
+        
+        if (doc == null) {
+            retval = fileHandler.getReportDocument(group, user, name);
+            if (retval.isSuccess()) {
+                cacheHelper.getReportDocumentCache().put(key, retval.getResult());
             }
         } else {
             retval.setResult(doc);
@@ -1548,7 +1587,7 @@ public class MainServiceImpl implements MainService {
                             case java.sql.Types.DOUBLE:
                             case java.sql.Types.NUMERIC:
                             case java.sql.Types.DECIMAL:
-                                cell.setCellValue(Double.valueOf(val.toString()));
+                                cell.setCellValue(Double.parseDouble(val.toString()));
                                 break;
                             case java.sql.Types.DATE:
                                 cell.setCellValue(Helper.getDate(val));
@@ -1878,11 +1917,10 @@ public class MainServiceImpl implements MainService {
 
         DataSourceConfiguration ds = config.getDatasourcesConfig().getDatasourceConfiguration(doc.getDatasource());
 
-        Set<String> hs = new HashSet<>();
         Map<String, List<ForeignKeySettings>> tmap = new HashMap<>();
         if (ds.getDatasourceTableSettings() != null) {
             for (TableSettings ts : ds.getDatasourceTableSettings()) {
-                if (hs.contains(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
+                if (!tmap.containsKey(ts.getTableName()) && (ts.getForeignKeySettings() != null)) {
                     tmap.put(ts.getTableName(), ts.getForeignKeySettings());
                 }
             }
@@ -2111,6 +2149,13 @@ public class MainServiceImpl implements MainService {
         retval.setCorsAllowedOrigins(config.getCorsAllowedOrigins());
         retval.setBackupFolder(config.getBackupFolder());
         retval.setServerPort(config.getServerPort());
+        retval.setDefaultPageOrientation(config.getDefaultPageOrientation());
+        retval.setDefaultPageSize(config.getDefaultPageSize());
+        retval.setDefaultPageUnits(config.getDefaultPageUnits());
+        
+        retval.setPageOrientations(Arrays.asList(Constants.PAGE_ORIENTATIONS));
+        retval.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
+        retval.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));
 
         return retval;
     }
@@ -2230,9 +2275,14 @@ public class MainServiceImpl implements MainService {
                 scheduledDocuments = null;
                 ExecutorService executor = Executors.newFixedThreadPool(maxSchedulerPoolSize);
                 for (ScheduledDocument docinfo : docs) {
-                    OperationResult<QueryDocument> dres = getQueryDocument(docinfo.getGroup(), docinfo.getDocument(), Constants.DEFAULT_ADMIN_USER);
-                    if (dres.isSuccess()) {
+                    LOG.debug("---------------->1=" + docinfo.getDocumentType());
+                    if (Constants.DOCUMENT_TYPE_QUERY.equals(docinfo.getDocumentType())) {
+                    LOG.debug("---------------->2");
                         executor.execute(new QueryRunner(this, mailService, getSchedulerConfig(), docinfo));
+                    } else {
+                   LOG.debug("---------------->4");
+                   LOG.debug("---------------->5");
+                        executor.execute(new ReportRunner(context.getBean(ReportService.class), mailService, getSchedulerConfig(), docinfo));
                     }
                 }
 
@@ -2263,6 +2313,7 @@ public class MainServiceImpl implements MainService {
                         if (ds.getDaysOfWeek().isEmpty() || ds.getDaysOfWeek().contains(c.get(Calendar.DAY_OF_WEEK))) {
                             if (ds.getHoursOfDay().contains(hour)) {
                                 ScheduledDocument doc = new ScheduledDocument();
+                                doc.setDocumentType(ds.getDocumentType());
                                 doc.setDocument(ds.getDocumentName());
                                 doc.setGroup(ds.getDocumentGroup());
                                 doc.setEmailAddresses(ds.getEmailAddresses());
@@ -2319,6 +2370,36 @@ public class MainServiceImpl implements MainService {
             LOG.error(ex.toString(), ex);
             Errors.populateError(retval, ex);
         }
+        return retval;
+    }
+    
+    @Override
+    public OperationResult<ReportDesignSettings> getReportDesignSettings() {
+        OperationResult<ReportDesignSettings> retval = new OperationResult<>();
+        ReportDesignSettings result = new ReportDesignSettings();
+        result.setDefaultPageOrientation(config.getDefaultPageOrientation());
+        result.setDefaultPageSize(config.getDefaultPageSize());
+        result.setDefaultPageUnits(config.getDefaultPageUnits());
+        result.setDefaultPageBorder(config.getDefaultPageBorder());
+        result.setDefaultFooterHeight(config.getDefaultFooterHeight());
+        result.setDefaultHeaderHeight(config.getDefaultHeaderHeight());
+        result.setPageOrientations(Arrays.asList(Constants.PAGE_ORIENTATIONS));
+        result.setPageSizes(Arrays.asList(Constants.PAGE_SIZE_NAMES));
+        result.setPageUnits(Arrays.asList(Constants.PAGE_UNITS));
+        result.setReportObjectTypes(Arrays.asList(Constants.REPORT_OBJECT_TYPES));
+        result.setPageSizeSettings(Constants.PAGE_SIZE_MAP);
+        result.setDefaultFontSizes(config.getDefaultFontSizes());
+        result.setDefaultFonts(Arrays.asList(Constants.DEFAULT_FONTS));
+        result.setDefaultBackgroundColor(config.getDefaultComponentBackgroundColor());
+        result.setDefaultForegroundColor(config.getDefaultComponentForegroundColor());
+        result.setReportShapes(Arrays.asList(Constants.REPORT_SHAPES));
+        result.setDefaultBorderColor(Constants.DEFAULT_BORDER_COLOR);
+        result.setDefaultBorderStyle(Constants.DEFAULT_BORDER_STYLE);
+        result.setDefaultFloatFormats(config.getDefaultFloatFormats());
+        result.setDefaultIntFormats(config.getDefaultIntFormats());
+        result.setDefaultDateFormats(config.getDefaultDateFormats());
+        retval.setResult(result);
+
         return retval;
     }
 }

@@ -17,7 +17,8 @@ INFO,
         DEFAULT_ERROR_TITLE,
         SMALL_ICON_SIZE,
         MODAL_TITLE_SIZE,
-        findInArray} from "../../utils/helper";
+        findInArray,
+        copyObject} from "../../utils/helper";
 import {
 loadColumnSettings,
         loadForeignKeySettings,
@@ -38,7 +39,7 @@ const TableSettings = (props) => {
 
     const setTableRoles = (indx, selections) => {
         if (selections) {
-            let d = {...datasource};
+            let d = copyObject(datasource);
             if (!d.datasourceTables[indx].roles) {
                 d.datasourceTables[indx].roles = [];
             } else {
@@ -91,7 +92,7 @@ const TableSettings = (props) => {
     };
 
     const setDisplayName = (e, indx) => {
-        let d = {...datasource};
+        let d = copyObject(datasource);
         d.datasourceTables[indx].displayName = e.target.value;
         setDatasource(d);
     };
@@ -109,7 +110,7 @@ const TableSettings = (props) => {
     };
 
     const setHidden = (e, indx) => {
-        let d = {...datasource};
+        let d = copyObject(datasource);
         d.datasourceTables[indx].hide = e.target.checked;
         setDatasource(d);
     };
@@ -123,7 +124,7 @@ const TableSettings = (props) => {
     };
 
     const saveColumnSettings = (table) => {
-        let d = {...datasource};
+        let d = copyObject(datasource);
 
         if (!datasource.datasourceTableSettings) {
             datasource.datasourceTableSettings = [];
@@ -152,7 +153,7 @@ const TableSettings = (props) => {
     };
 
     const saveForeignKeySettings = (table) => {
-        let d = {...datasource};
+        let d = copyObject(datasource);
 
         if (!datasource.datasourceTableSettings) {
             datasource.datasourceTableSettings = [];
@@ -189,7 +190,7 @@ const TableSettings = (props) => {
             if (isApiError(res)) {
                 showMessage(ERROR, res.message);
             } else {
-                let t = {...datasource.datasourceTables[indx]};
+                let t = copyObject(datasource.datasourceTables[indx]);
                 let csMap = new Map();
 
                 t.tableColumnSettings.map(c => {
@@ -227,7 +228,7 @@ const TableSettings = (props) => {
             } else if (!res || !res.result || (res.result.length === 0)) {
                 showMessage(INFO, getText("No foreign keys found"));
             } else {    
-                let t = {...datasource.datasourceTables[indx]};
+                let t = copyObject(datasource.datasourceTables[indx]);
                 let fkMap = new Map();
 
                 t.foreignKeySettings.map(fk => {
@@ -295,9 +296,7 @@ const TableSettings = (props) => {
                        dialogClassName="table-settings"
                        show={config.show} 
                        onShow={onShow}
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                             &nbsp;&nbsp;{getText("Table Settings", " - ") + getDatasourceName() }</Modal.Title>

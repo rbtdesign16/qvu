@@ -29,10 +29,14 @@ import org.rbtdesign.qvu.dto.QueryResult;
 import org.rbtdesign.qvu.dto.QueryDocumentRunWrapper;
 import org.rbtdesign.qvu.dto.QueryRunWrapper;
 import org.rbtdesign.qvu.dto.QuerySelectNode;
+import org.rbtdesign.qvu.dto.ReportDesignSettings;
+import org.rbtdesign.qvu.dto.ReportDocumentRunWrapper;
+import org.rbtdesign.qvu.dto.ReportRunWrapper;
 import org.rbtdesign.qvu.dto.SystemSettings;
 import org.rbtdesign.qvu.dto.Table;
 import org.rbtdesign.qvu.dto.TableColumnNames;
 import org.rbtdesign.qvu.dto.TableSettings;
+import org.rbtdesign.qvu.services.ReportService;
 import org.rbtdesign.qvu.util.AuthHelper;
 import org.rbtdesign.qvu.util.Constants;
 import org.rbtdesign.qvu.util.DBHelper;
@@ -60,6 +64,9 @@ public class MainController {
 
     @Autowired
     MainService service;
+
+    @Autowired
+    ReportService reportService;
 
     @Autowired
     private FileHandler fileHandler;
@@ -386,4 +393,90 @@ public class MainController {
         
         return new ResponseEntity<>(headers, HttpStatus.UNAUTHORIZED);
     }
- }
+
+    @RequestMapping(value="/api/v1/report/settings", method = RequestMethod.GET)
+    public OperationResult<ReportDesignSettings> getReportDesignSettings() {
+        LOG.debug("in getReportDesignSettings()");
+        return service.getReportDesignSettings();
+    }
+    
+    @PostMapping("api/v1/report/run")
+    public HttpEntity<byte[]> generateReport(@RequestBody ReportRunWrapper reportWrapper) {
+        LOG.debug("in generateReport()");
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport(run) param=" + p);
+                }
+            }
+        }
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport param=" + p);
+                }
+            }
+        }
+        HttpEntity<byte[]> retval = null;
+        try {
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
+            
+            OperationResult<byte[]> res  = reportService.generateReport(reportWrapper);
+
+            if (res.isSuccess()) {
+                header.setContentLength(res.getResult().length);
+                retval = new HttpEntity<>(res.getResult(), header);
+            } else {
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(res.getMessage().getBytes());
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            retval = ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.toString().getBytes());
+        }
+
+        return retval;
+    }
+
+    @PostMapping("api/v1/report/document/run")
+    public HttpEntity<byte[]> generateReport(@RequestBody ReportDocumentRunWrapper reportWrapper) {
+        LOG.debug("in generateReport()");
+        HttpEntity<byte[]> retval = null;
+        
+        if (LOG.isDebugEnabled()) {
+            if (reportWrapper.getParameters() != null) {
+                for (String p : reportWrapper.getParameters()) {
+                    LOG.debug("generateReport(document/run) param=" + p);
+                }
+            }
+        }
+        
+        try {
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_PDF);
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=qvu-gettingstarted.pdf");
+            OperationResult<byte[]> res = reportService.generateReport(reportWrapper);
+            
+            if (res.isSuccess()) {
+                header.setContentLength(res.getResult().length);
+                retval = new HttpEntity<>(res.getResult(), header);
+            } else {
+                retval = ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(res.getMessage().getBytes());
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.toString(), ex);
+            retval = ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ex.toString().getBytes());
+        }
+
+        return retval;
+    }
+}

@@ -27,9 +27,7 @@ const EditObjectModal = (props) => {
                 <Modal animation={false} 
                        size={config.dlgsize ? config.dlgsize : ""}
                        show={config.show} 
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{config.title}</Modal.Title>
                     </Modal.Header>

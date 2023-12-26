@@ -49,6 +49,7 @@ export const loadAuth = async() => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadAuth - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
 
     }
@@ -62,8 +63,8 @@ export const loadLang = async() => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadLang - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
-
     }
 };
 
@@ -75,6 +76,7 @@ export const loadDatasources = async () => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadDatasources - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -87,6 +89,7 @@ export const loadDocumentGroups = async () => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadDocumentGroups - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -99,6 +102,7 @@ export const loadDatabaseTypes = async () => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadDatabaseTypes - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -115,6 +119,7 @@ export const saveDatasource = async (ds) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveDatasource - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -131,6 +136,7 @@ export const testDatasource = async (ds) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: testDatasource - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -143,6 +149,7 @@ export const deleteDatasource = async (dsname) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: deleteDatasource - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -155,6 +162,7 @@ export const saveRole = async (r) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveRole - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -168,6 +176,7 @@ export const saveDocumentGroup = async (g) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveDocumentGroup - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -180,6 +189,7 @@ export const deleteDocumentGroup = async (gname) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: deleteDocumentGroup - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -192,6 +202,7 @@ export const deleteRole = async (rname) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: deleteRole - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -204,6 +215,7 @@ export const saveUser = async (u) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveUser - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -216,6 +228,7 @@ export const deleteUser = async (uid) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: deleteUser - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -227,6 +240,7 @@ export const verifyInitialRepositoryFolder = async (repositoryFolder) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: verifyInitialRepositoryFolder - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -239,6 +253,7 @@ export const initializeRepository = async (repositoryFolder, adminPassword) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: initializeRepository - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -274,6 +289,7 @@ export const getDatasourceTables = async (dsname) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: getDatasourceTables - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -286,6 +302,7 @@ export const getDatasourceTreeViewData = async (dsname) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: getDatasourceTreeViewData - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -298,6 +315,7 @@ export const loadTableSettings = async (datasource) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadTableSettings - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -310,6 +328,7 @@ export const loadColumnSettings = async (datasource, tableName) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadColumnSettings - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -322,6 +341,7 @@ export const loadForeignKeySettings = async (datasource, tableName) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadForeignKeySettings - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -334,6 +354,7 @@ export const loadDatasourceTableNames = async (datasource) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadDatasourceTableNames - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -345,6 +366,7 @@ export const saveDocument = async (d) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveDocument - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -372,6 +394,7 @@ export const exportToExcel = async (excelExport) => {
     try {
         return await axios.post(getApiURL() + "/query/excel/export", excelExport, {responseType: "arraybuffer"});
     } catch (e) {
+        console.log("error: exportToExcel - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -384,6 +407,7 @@ export const getAvailableDocuments = async (documentType) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: getAvailableDocuments - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -396,6 +420,7 @@ export const getDocument = async (documentType, documentGroup, documentName) => 
             return res.data;
         }
     } catch (e) {
+        console.log("error: getDocument - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -408,7 +433,8 @@ export const getSystemSettings = async() => {
             return res.data;
         }
     } catch (e) {
-        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
+       console.log("error: getSystemSettings - " + e);
+       return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
 
     }
 };
@@ -421,6 +447,7 @@ export const saveSystemSettings = async (config) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveSystemSettings - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -451,6 +478,7 @@ export const backupRepository = async () => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: backupRepository - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -463,6 +491,7 @@ export const loadDocumentSchedules = async () => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: loadDocumentSchedules - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -475,6 +504,7 @@ export const saveDocumentSchedules = async (schedules) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: saveDocumentSchedules - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -487,6 +517,7 @@ export const updateUserPassword = async (pass) => {
             return res.data;
         }
     } catch (e) {
+        console.log("error: updateUserPassword - " + e);
         return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e.toString()};
     }
 };
@@ -499,5 +530,28 @@ export const logout = async (securityType) => {
             location.href = getServerURL();
         }
         console.log("logout: " + e);
+    }
+};
+
+export const getReportSettings = async () => {
+    try {
+        let res = await axios.get(getApiURL() + "/report/settings", hconfig);
+
+        if (res) {
+            return res.data;
+        }
+    } catch (e) {
+        console.log("error: getReportSettings - " + e);
+        return {errorCode: UNEXPECTED_EXCEPTION_CODE, message: e.message ? e.message : e};
+    }
+};
+
+
+export const generateReport = async (reportWrapper) => {
+    try {
+        let res = await axios.post(getApiURL() + "/report/document/run", reportWrapper, {...hconfig, responseType: "arraybuffer"});
+        return res.data;
+    } catch (e) {
+        console.log("error: generateReport - " + e);
     }
 };

@@ -1,5 +1,7 @@
 import Confirmation from "../widgets/Confirmation";
 import { v4 as uuid } from 'uuid';
+import NumberEntry from "../widgets/NumberEntry";
+
 import { createConfirmation } from 'react-confirm';
 
 const defaultConfirmation = createConfirmation(Confirmation);
@@ -10,6 +12,7 @@ export function confirm(confirmation, options = {}) {
 
 export const SPECIAL_CHARACTERS = ["!", "@", "#", "$", "%", "^" < "&", "*", "(", ")", "{", "}", "[", "]", "?", "~"];
 
+export const PDF_MIME_TYPE = "application/pdf";
 export const SUCCESS = "success";
 export const ERROR = "error";
 export const WARN = "warn";
@@ -21,10 +24,15 @@ export const DEFAULT_WARN_TITLE = "Warning";
 
 export const DEFAULT_DOCUMENT_GROUP = "user";
 export const DEFAULT_NEW_DOCUMENT_NAME = "default document name";
+export const DEFAULT_NEW_REPORT_NAME = "default report name";
 export const QUERY_DOCUMENT_TYPE = "query";
 export const REPORT_DOCUMENT_TYPE = "report";
 
 export const BASIC_SECURITY_TYPE = "basic";
+
+export const DATA_TYPE = "data";
+export const LABEL_TYPE = "label";
+export const WIDTH_TYPE = "width";
 
 export const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING"];
 
@@ -36,12 +44,23 @@ export const INFO_TEXT_COLOR = "#4682B4";
 export const COLOR_CRIMSON = "crimson";
 export const COLOR_COBALT_BLUE = "#0020C2";
 export const COLOR_BLACK = "black";
+export const NONE_SETTING = "none";
+export const TRANSPARENT_SETTING = "transparent";
+export const ITALIC_SETTING = "italic";
+export const UNDERLINE_SETTING = "underline";
+export const FORMAT_SETTING = "displayFormat";
 
 export const MODAL_TITLE_SIZE = "h5";
 export const SPLITTER_GUTTER_SIZE = 8;
 export const SMALL_ICON_SIZE = 18;
 export const MEDIUM_ICON_SIZE = 20;
 export const BIG_ICON_SIZE = 25;
+export const EDIT_ACTION = "edit";
+export const DELETE_ACTION = "delete";
+export const SELECT_ACTION = "select";
+export const SELECTALL_ACTION = "selectall";
+export const DESELECT_ACTION = "deselect";
+export const DESELECTALL_ACTION = "deselectall";
 
 export const DEFAULT_PIXELS_PER_CHARACTER = 12;
 
@@ -111,21 +130,27 @@ export const NUMERIC_KEYS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "
 export const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 export const RESULT_SET_PAGE_SIZES = [100, 200, 300, 400, 500, 600, 800, 1000];
-export const DEFAULT_PAGE_SIZE  = 200;
+export const DEFAULT_PAGE_SIZE = 200;
 
 export const ARROW_UP_KEY = "arrowup";
 export const ARROW_DOWN_KEY = "arrowdown";
+export const ARROW_LEFT_KEY = "arrowleft";
+export const ARROW_RIGHT_KEY = "arrowright";
+
+
 export const HOME_KEY = "arrowleft";
 export const END_KEY = "arrowright";
 
-export const DEFAULT_EXPORTED_KEY_DEPTH  = 4;
-export const DEFAULT_IMPORTED_KEY_DEPTH  = 2;
+export const DEFAULT_EXPORTED_KEY_DEPTH = 4;
+export const DEFAULT_IMPORTED_KEY_DEPTH = 2;
 export const CUSTOM_FK_DATA_SEPARATOR = "?";
 
 export const RESULT_TYPE_EXCEL = "excel";
 export const RESULT_TYPE_CSV = "csv";
 export const RESULT_TYPE_JSON_FLAT = "jsonflat";
 export const RESULT_TYPE_JSON_OBJECTGRAPH = "jsonobjectgraph";
+
+export const ESCAPE_KEY_CODE = 27;
 
 export const isNotEmpty = (val) => {
     return val && ("" + val).length > 0;
@@ -136,7 +161,11 @@ export const isEmpty = (val) => {
 };
 
 export const copyObject = (o) => {
-    return JSON.parse(JSON.stringify(o));
+    if (o) {
+        return JSON.parse(JSON.stringify(o));
+    } else {
+        return o;
+    }
 };
 
 export const loadDocumentFromBlob = async (fileName, blob) => {
@@ -185,10 +214,9 @@ export const checkColorString = (input) => {
             retval = input + input.substring(1);
         }
     }
-    
-    return retval;
-}
 
+    return retval;
+};
 
 export const getHexColor = (colorStr) => {
     var a = document.createElement('div');
@@ -313,11 +341,13 @@ export const updateJsonArray = (fieldName, newRec, data) => {
 export const replaceTokens = (msg, tokens) => {
     if (!tokens) {
         return msg;
-    } else {
+    } else if (Array.isArray(tokens)){
         for (let i = 0; i < tokens.length; ++i) {
             msg = msg.replace("$" + (i + 1), tokens[i]);
         }
-    }
+    } else {
+        msg = msg.replace("$1", tokens);
+    }   
 
     return msg;
 };
@@ -358,16 +388,24 @@ export const getAggregateFunctionsByDataType = (dataType) => {
 
 
 export const isDataTypeNumeric = (type) => {
-    return ((type === JDBC_TYPE_TINYINT)
-            || (type === JDBC_TYPE_BIT)
-            || (type === JDBC_TYPE_SMALLINT)
-            || (type === JDBC_TYPE_INTEGER)
-            || (type === JDBC_TYPE_BIGINT)
-            || (type === JDBC_TYPE_REAL)
+    return (isDataTypeFloat(type) || isDataTypeInt(type));
+};
+
+export const isDataTypeFloat = (type) => {
+    return ((type === JDBC_TYPE_REAL)
             || (type === JDBC_TYPE_DOUBLE)
             || (type === JDBC_TYPE_NUMERIC)
             || (type === JDBC_TYPE_DECIMAL));
 };
+
+export const isDataTypeInt = (type) => {
+   return ((type === JDBC_TYPE_TINYINT)
+            || (type === JDBC_TYPE_BIT)
+            || (type === JDBC_TYPE_SMALLINT)
+            || (type === JDBC_TYPE_INTEGER)
+            || (type === JDBC_TYPE_BIGINT));
+};
+
 
 export const isDataTypeDateTime = (type) => {
     return ((type === JDBC_TYPE_DATE)
@@ -387,14 +425,6 @@ export const isDataTypeString = (type) => {
             || (type === JDBC_TYPE_NVARCHAR)
             || (type === JDBC_TYPE_LONGNVARCHAR)
             || (type === JDBC_TYPE_NCLOB));
-};
-
-export const isDataTypeFloat = (type, decimalDigits) => {
-    if ((type === JDBC_TYPE_REAL) || (type === JDBC_TYPE_DOUBLE)) {
-        return true;
-    } else if ((type === JDBC_TYPE_NUMERIC) || (type === JDBC_TYPE_DECIMAL)) {
-        return decimalDigits > 0;
-    }
 };
 
 export const isSqlOrderByRequired = (selectColumns) => {
@@ -587,12 +617,12 @@ export const doSortCompare = (dataType, val1, val2) => {
 
 export const getParameterTypeFromId = (id) => {
     let retval;
-    switch(id) {
+    switch (id) {
         case JDBC_TYPE_CHAR:
         case JDBC_TYPE_VARCHAR:
         case JDBC_TYPE_LONGVARCHAR:
         case JDBC_TYPE_NCHAR:
-       case JDBC_TYPE_NVARCHAR:
+        case JDBC_TYPE_NVARCHAR:
         case JDBC_TYPE_LONGNVARCHAR:
             retval = TYPE_STRING;
             break;
@@ -626,7 +656,7 @@ export const getParameterTypeFromId = (id) => {
             retval = TYPE_STRING;
             break;
     }
-    
+
     return retval;
 };
 
@@ -646,14 +676,112 @@ export const arraysEqual = (a1, a2, nosort = false) => {
             a1.sort();
             a2.sort();
         }
-        
+
         for (let i = 0; i < a1.length; ++i) {
             if (a1[i] !== a2[i]) {
                 return false;
             }
         }
-        
+
         return true;
     }
-        
 };
+
+export const getDigitsCount = (num) => {
+    let s = num + "";
+    return s.length;
+};
+
+export const isArrowKey = (e) => {
+    if (e.code) {
+        let code = e.code.toLowerCase();
+
+        return (code === ARROW_LEFT_KEY 
+            || code === ARROW_RIGHT_KEY
+            || code === ARROW_UP_KEY
+            || code === ARROW_DOWN_KEY);
+    }
+};
+
+export const intersectRect = (r1, r2) => {
+  return !(r2.left > r1.right ||
+    r2.right < r1.left ||
+    r2.top > r1.bottom ||
+    r2.bottom < r1.top);
+};
+
+
+export const getColumnHelpDisplay = (columnData, getText) => {
+    let pkindex = -1;
+    if (columnData.pkindex) {
+        pkindex = Number(columnData.pkindex);
+    }
+
+    if (pkindex > -1) {
+        return <div className="entrygrid-125-550">
+            <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
+            <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+            <div className="label">{getText("PK Index:")}</div><div>{pkindex}</div>
+            <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+            <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+            <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
+            <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+        </div>;
+    } else {
+        return <div className="entrygrid-125-550">
+            <div className="label">{getText("Table Alias:")}</div><div>{columnData.tableAlias}</div>
+            <div className="label">{getText("Column Name:")}</div><div>{columnData.columnName}</div>
+            <div className="label">{getText("Table Name:")}</div><div>{columnData.tableName}</div>
+            <div className="label">{getText("Data Type:")}</div><div>{columnData.dataTypeName}</div>
+            <div className="label">{getText("Data Type ID:")}</div><div>{columnData.dataType}</div>
+            <div className="label">{getText("Path:")}</div><div>{formatPathForDisplay(columnData.path)}</div>
+        </div>;
+    }
+};
+
+ export const formatPathForDisplay = (path, noColumnDisplay) => {
+    let l = path.split("|");
+
+    let end = l.length;
+
+    if (noColumnDisplay) {
+        end -= 1;
+    }
+
+    for (let i = 0; i < end; ++i) {
+        if (l[i].includes("{")) {
+            let pos1 = l[i].indexOf("{");
+            let pos2 = l[i].indexOf("}");
+            let fkcols = l[i].substring(0, pos1) + l[i].substring(pos2 + 1);
+            l[i] = fkcols.replace("?", "");
+        }
+    }
+
+
+
+    return l.join("->");
+};
+
+export const isString = (input) => {
+    return (input && (typeof input === "string"));
+};
+
+export const getFilterComparisonInput = (filter, indx, onChange) => {
+        let id = "f-" + indx;
+        if (isDataTypeString(filter.dataType)) {
+            return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+        } else if (isDataTypeNumeric(filter.dataType)) {
+            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
+                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+            } else {
+                return <NumberEntry name="comparisonValue"  id={id} onChange={e => onChange(e)} defaultValue={filter.comparisonValue} />;
+            }
+        } else if (isDataTypeDateTime(filter.dataType)) {
+            if (filter.comparisonOperator === COMPARISON_OPERATOR_IN) {
+                return <input type="text" name="comparisonValue"  id={id} onBlur={e => onChange(e)}  style={{width: "98%"}} defaultValue={filter.comparisonValue} />;
+            } else {
+                return <input type="date" id={id} name="comparisonValue" onBlur={e => onChange(e)} style={{width: "95%"}}  defaultValue={filter.comparisonValue}/>;
+            }
+        }
+    };
+

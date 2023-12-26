@@ -16,7 +16,8 @@ import {
     MODAL_TITLE_SIZE,
     confirm,
     getUUID,
-    CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+    CUSTOM_FK_DATA_SEPARATOR,
+    copyObject } from "../../utils/helper";
 
 const ColumnSelect = (props) => {
     const {config} = props;
@@ -41,7 +42,7 @@ const ColumnSelect = (props) => {
     };
 
     const onChange = (e, indx) => {
-        let cols = [...columnSelections];
+        let cols = copyObject(columnSelections);
         let sel = findColumnSelection(columns[indx]);
 
         if (e.target.checked && !sel) {
@@ -151,8 +152,7 @@ const ColumnSelect = (props) => {
                        show={config.show} 
                        onShow={onShow}
                        onHide={onHide}
-                       backdrop={false} 
-                       keyboard={true}>
+                       backdrop={false}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                             &nbsp;&nbsp;{getText("Column select for", " ") + config.tableName }</Modal.Title>

@@ -11,7 +11,8 @@ import {
     ERROR,
     SMALL_ICON_SIZE, 
     showDocumentFromBlob, 
-    BASIC_SECURITY_TYPE} from "../utils/helper"
+    BASIC_SECURITY_TYPE,
+    PDF_MIME_TYPE} from "../utils/helper"
 import {loadHelpDocument, 
     loadGettingStartedDocument, 
     updateUserPassword,
@@ -44,7 +45,7 @@ const Header = (props) => {
         let res = await loadGettingStartedDocument();
 
         let blob = new Blob([res], {
-            type: "application/pdf"
+            type: PDF_MIME_TYPE
         });
 
         showDocumentFromBlob(blob);
@@ -55,7 +56,7 @@ const Header = (props) => {
         let res = await loadHelpDocument();
 
         let blob = new Blob([res], {
-            type: "application/pdf"
+            type: PDF_MIME_TYPE
         });
 
         showDocumentFromBlob(blob);

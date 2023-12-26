@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.rbtdesign.qvu.dto.BorderSettings;
 import org.rbtdesign.qvu.dto.QueryResult;
+import org.rbtdesign.qvu.dto.ReportDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,4 +153,24 @@ public class Helper {
         return retval;
     }
 
+    
+    public static double getBorderAdjustmentForPdf(String units, BorderSettings bs) {
+        double retval = 0;
+        if (!Constants.DEFAULT_BORDER_STYLE.equals(bs.getBorder())) {
+            if ("in".equals(units)) {
+                if (bs.isTop()) {
+                    retval += 1 / Constants.PIXELS_PER_INCH;
+                }
+             } else {
+                if (bs.isTop()) {
+                    retval += 1 / Constants.PIXELS_PER_MM;
+                }
+            }
+            
+            retval *= bs.getWidth();
+        }
+          
+        
+        return retval;
+    }
 }

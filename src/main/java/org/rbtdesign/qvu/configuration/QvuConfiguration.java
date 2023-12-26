@@ -2,6 +2,7 @@ package org.rbtdesign.qvu.configuration;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.rbtdesign.qvu.configuration.security.BasicAuthSecurityProvider;
@@ -79,7 +80,43 @@ public class QvuConfiguration {
 
     @Value("${backup.folder:}")
     private String backupFolder;
+
+    @Value("${default.page.size:letter}")
+    private String defaultPageSize;
+
+    @Value("${default.page.orientation:portrait}")
+    private String defaultPageOrientation;
+
+    @Value("${default.page.units:inch}")
+    private String defaultPageUnits;
+
+    @Value("#{'${default.page.border:0.5,0.5,0.5,0.5}'.split(',')}")
+    private List<Double> defaultPageBorder;
+
+    @Value("${default.header.height:1}")
+    private Double defaultHeaderHeight;
+
+    @Value("${default.footer.height:1}")
+    private Double defaultFooterHeight;
+
+    @Value("#{'${default.font.sizes:8,9,10,11,12,14,16,18,20,22}'.split(',')}")
+    private List<Integer> defaultFontSizes;
+
+    @Value("${default.component.background.color:white}")
+    private String defaultCompoenetBackgroundColor;
     
+    @Value("${default.component.foreground.color:black}")
+    private String defaultCompoenetForegroundColor;
+    
+    @Value("#{'${default.float.formats:}'.split('\\|')}")
+    private List<String> defaultFloatFormats;
+
+    @Value("#{'${default.int.formats:}'.split('\\|')}")
+    private List<String> defaultIntFormats;
+
+    @Value("#{'${default.date.formats:yyyy-MM-dd\\|yyyy-MM-dd HH:mm}'.split('\\|')}")
+    private List<String> defaultDateFormats;
+
     @PostConstruct
     private void init() {
         LOG.info("in QvuConfiguration.init()");
@@ -92,6 +129,18 @@ public class QvuConfiguration {
         config.setSslConfig(getSslConfig());
         config.setServerPort(serverPort);
         config.setCorsAllowedOrigins(corsAllowedOrigins);
+        config.setDefaultPageOrientation(defaultPageOrientation);
+        config.setDefaultPageSize(defaultPageSize);
+        config.setDefaultPageUnits(defaultPageUnits);
+        config.setDefaultPageBorder(defaultPageBorder);
+        config.setDefaultHeaderHeight(defaultHeaderHeight);
+        config.setDefaultFooterHeight(defaultFooterHeight);
+        config.setDefaultFontSizes(defaultFontSizes);
+        config.setDefaultComponentBackgroundColor(defaultCompoenetBackgroundColor);
+        config.setDefaultComponentForegroundColor(defaultCompoenetForegroundColor);
+        config.setDefaultFloatFormats(defaultFloatFormats);
+        config.setDefaultIntFormats(defaultIntFormats);
+        config.setDefaultDateFormats(defaultDateFormats);
     }
 
     @Autowired

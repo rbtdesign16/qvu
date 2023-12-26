@@ -3,6 +3,7 @@ package org.rbtdesign.qvu.configuration;
 import org.rbtdesign.qvu.util.ConfigBuilder;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,18 @@ public class ConfigurationHelper {
     private SSLConfig sslConfig;
     private int serverPort;
     private String corsAllowedOrigins;
+    private String defaultPageOrientation;
+    private String defaultPageSize;
+    private String defaultPageUnits;
+    private String defaultComponentBackgroundColor;
+    private String defaultComponentForegroundColor;
+    private List<Double> defaultPageBorder;
+    private Double defaultHeaderHeight;
+    private Double defaultFooterHeight;
+    private List<Integer> defaultFontSizes;
+    private List<String> defaultFloatFormats;
+    private List<String> defaultIntFormats;
+    private List<String> defaultDateFormats;
  
     private SecurityConfiguration securityConfig;
     private DataSourcesConfiguration datasourcesConfig;
@@ -273,6 +286,102 @@ public class ConfigurationHelper {
     public void setCorsAllowedOrigins(String corsAllowedOrigins) {
         this.corsAllowedOrigins = corsAllowedOrigins;
     }
+
+    public String getDefaultPageOrientation() {
+        return defaultPageOrientation;
+    }
+
+    public void setDefaultPageOrientation(String defaultPageOrientation) {
+        this.defaultPageOrientation = defaultPageOrientation;
+    }
+
+    public String getDefaultPageSize() {
+        return defaultPageSize;
+    }
+
+    public void setDefaultPageSize(String defaultPageSize) {
+        this.defaultPageSize = defaultPageSize;
+    }
+
+    public String getDefaultPageUnits() {
+        return defaultPageUnits;
+    }
+
+    public void setDefaultPageUnits(String defaultPageUnits) {
+        this.defaultPageUnits = defaultPageUnits;
+    }
+
+    public List<Double> getDefaultPageBorder() {
+        return defaultPageBorder;
+    }
+
+    public void setDefaultPageBorder(List<Double> defaultPageBorder) {
+        this.defaultPageBorder = defaultPageBorder;
+    }
+
+    public Double getDefaultHeaderHeight() {
+        return defaultHeaderHeight;
+    }
+
+    public void setDefaultHeaderHeight(Double defaultHeaderHeight) {
+        this.defaultHeaderHeight = defaultHeaderHeight;
+    }
+
+    public Double getDefaultFooterHeight() {
+        return defaultFooterHeight;
+    }
+
+    public void setDefaultFooterHeight(Double defaultFooterHeight) {
+        this.defaultFooterHeight = defaultFooterHeight;
+    }
+
+    public List<Integer> getDefaultFontSizes() {
+        return defaultFontSizes;
+    }
+
+    public void setDefaultFontSizes(List<Integer> defaultFontSizes) {
+        this.defaultFontSizes = defaultFontSizes;
+    }
+
+    public String getDefaultComponentBackgroundColor() {
+        return defaultComponentBackgroundColor;
+    }
+
+    public void setDefaultComponentBackgroundColor(String defaultComponentBackgroundColor) {
+        this.defaultComponentBackgroundColor = defaultComponentBackgroundColor;
+    }
+
+    public String getDefaultComponentForegroundColor() {
+        return defaultComponentForegroundColor;
+    }
+
+    public void setDefaultComponentForegroundColor(String defaultComponentForegroundColor) {
+        this.defaultComponentForegroundColor = defaultComponentForegroundColor;
+    }
+
+    public List<String> getDefaultFloatFormats() {
+        return defaultFloatFormats;
+    }
+
+    public void setDefaultFloatFormats(List<String> defaultFloatFormats) {
+        this.defaultFloatFormats = defaultFloatFormats;
+    }
+
+    public List<String> getDefaultIntFormats() {
+        return defaultIntFormats;
+    }
+
+    public void setDefaultIntFormats(List<String> defaultIntFormats) {
+        this.defaultIntFormats = defaultIntFormats;
+    }
+
+    public List<String> getDefaultDateFormats() {
+        return defaultDateFormats;
+    }
+
+    public void setDefaultDateFormats(List<String> defaultDateFormats) {
+        this.defaultDateFormats = defaultDateFormats;
+    }
     
     
-}
+ }

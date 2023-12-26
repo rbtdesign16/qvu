@@ -19,7 +19,8 @@ INFO,
         CUSTOM_FK_DATA_SEPARATOR,
         MONTHS,
         DAYS_OF_WEEK,
-        arraysEqual} from "../../utils/helper";
+        arraysEqual,
+        copyObject} from "../../utils/helper";
 import { loadDocumentSchedules, isApiSuccess } from "../../utils/apiHelper";
 
 const DocumentScheduleTable = (props) => {
@@ -43,6 +44,12 @@ const DocumentScheduleTable = (props) => {
                     <span title={getText("Delete Schedule")}><MdOutlineDeleteForever className="icon crimson-f" size={SMALL_ICON_SIZE}  onClick={(e) => onDelete(rownum)} /></span>
                 </div>;
             }
+        },
+        {
+            title: getText("Type"),
+            fieldName: "documentType",
+            style: {textAlign: "center"},
+            defaultValue: "PDF"
         },
         {
             title: getText("Group"),
@@ -198,7 +205,7 @@ const DocumentScheduleTable = (props) => {
         if (scheduledDocuments
                 && scheduledDocuments.documentSchedules
                 && (scheduledDocuments.documentSchedules.length > 0)) {
-            sd = {...scheduledDocuments};
+            sd = copyObject(scheduledDocuments);
         }
 
 
@@ -234,12 +241,12 @@ const DocumentScheduleTable = (props) => {
     };
 
     const onEdit = (indx) => {
-        setShowDocumentSchedule({show: true, indx: indx, schedule: {...scheduledDocuments.documentSchedules[indx]}, saveSchedule: saveSchedule, hide: hideSchedule});
+        setShowDocumentSchedule({show: true, indx: indx, schedule: copyObject(scheduledDocuments.documentSchedules[indx]), saveSchedule: saveSchedule, hide: hideSchedule});
     };
 
     const onDelete = async (indx) => {
         if (await confirm(getText("Delete schedule?"))) {
-            let s = {...scheduledDocuments};
+            let s = copyObject(scheduledDocuments);
             s.modified = true;
             s.documentSchedules.splice(indx, 1);
             setScheduledDocuments(s);
@@ -269,9 +276,7 @@ const DocumentScheduleTable = (props) => {
                        dialogClassName="schedule-modal"
                        show={config.show} 
                        onShow={onShow}
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={e => onHelp()}/>
                             &nbsp;&nbsp;{getText("Scheduled Documents") }</Modal.Title>

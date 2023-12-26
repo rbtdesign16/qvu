@@ -14,6 +14,7 @@ import useDataHandler from "../context/DataHandlerContext";
 import useMessage from "../context/MessageContext";
 import RepositorySetup from "../widgets/RepositorySetup";
 import {QueryDesignProvider} from "../context/QueryDesignContext";
+import {ReportDesignProvider} from "../context/ReportDesignContext";
 
 import PropTypes from "prop-types";
 import {INFO, isAdministrator} from "../utils/authHelper";
@@ -56,6 +57,11 @@ const Home = (props) => {
                                 <QueryDesignProvider>
                                     <QueryDesign/>
                                 </QueryDesignProvider>
+                            </Tab>
+                            <Tab eventKey="rdsgn" title={getText("Report Design")}>
+                                <ReportDesignProvider>
+                                    <ReportDesign/>
+                                </ReportDesignProvider>
                             </Tab>
                         </Tabs></div>);
                 return <Splash />;

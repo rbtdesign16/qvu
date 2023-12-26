@@ -15,12 +15,14 @@ import {
     isValidFilenameKey,
     isEmpty,
     UNARY_COMPARISON_OPERATORS,
-    getParameterTypeFromId} from "../utils/helper";
+    getParameterTypeFromId,
+    copyObject,
+    getFilterComparisonInput} from "../utils/helper";
 
 
 const ParameterEntryModal = (props) => {
     const {config} = props;
-    const {filterColumns, getFilterComparisonInput} = useQueryDesign();
+    const {filterColumns} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [parameters, setParameters] = useState(null);
@@ -66,7 +68,7 @@ const ParameterEntryModal = (props) => {
     const onChange = (e) => {
         let indx = Number(e.target.id.replace("f-", ""));
         
-        let params = [...parameters];
+        let params = copyObject(parameters);
         params[indx] = e.target.value;
         
         setParameters(params);
@@ -105,9 +107,7 @@ const ParameterEntryModal = (props) => {
                 <Modal animation={false} 
                        show={config.show} 
                        onHide={onHide}
-                       onShow={onShow}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onShow={onShow}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>

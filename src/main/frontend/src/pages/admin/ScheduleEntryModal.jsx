@@ -10,18 +10,20 @@ import { flattenTree } from "react-accessible-treeview";
 import {FcDocument} from "react-icons/fc";
 import DocumentSelectModal from "../../widgets/DocumentSelectModal";
 import {
-        INFO,
-        ERROR,
-        MODAL_TITLE_SIZE,
-        QUERY_DOCUMENT_TYPE,
-        SMALL_ICON_SIZE,
-        RESULT_TYPE_EXCEL,
-        RESULT_TYPE_CSV,
-        RESULT_TYPE_JSON_FLAT,
-        RESULT_TYPE_JSON_OBJECTGRAPH,
-        MONTHS,
-        DAYS_OF_WEEK,
-        getCurrentSelectValue} from "../../utils/helper";
+    INFO,
+    ERROR,
+    MODAL_TITLE_SIZE,
+    QUERY_DOCUMENT_TYPE,
+    REPORT_DOCUMENT_TYPE,
+    SMALL_ICON_SIZE,
+    RESULT_TYPE_EXCEL,
+    RESULT_TYPE_CSV,
+    RESULT_TYPE_JSON_FLAT,
+    RESULT_TYPE_JSON_OBJECTGRAPH,
+    MONTHS,
+    DAYS_OF_WEEK,
+    getCurrentSelectValue,
+    replaceTokens} from "../../utils/helper";
 
 import { getAvailableDocuments, isApiSuccess } from "../../utils/apiHelper";
 
@@ -33,6 +35,15 @@ const ScheduleEntryModal = (props) => {
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const [toggle, setToggle] = useState(false);
     const [showDocumentSelect, setShowDocumentSelect] = useState({show: false, type: QUERY_DOCUMENT_TYPE});
+    const documentTypes = [
+    {
+        value: QUERY_DOCUMENT_TYPE,
+        label: getText(QUERY_DOCUMENT_TYPE)
+    },
+    {
+        value: REPORT_DOCUMENT_TYPE,
+        label: getText(REPORT_DOCUMENT_TYPE)
+    }];
 
     const attachmentTypes = [
     {
@@ -87,7 +98,7 @@ const ScheduleEntryModal = (props) => {
 
     const isValidSchedule = () => {
         let retval = ((isDaysOfMonthDisabled() || isDaysOfWeekDisabled())
-                && schedule.attachmentType
+                && ((schedule.documentType === REPORT_DOCUMENT_TYPE) || schedule.attachmentType)
                 && schedule.documentGroup
                 && schedule.documentName
                 && schedule.hoursOfDay
@@ -113,6 +124,9 @@ const ScheduleEntryModal = (props) => {
     };
 
     const onShow = () => {
+        if (!schedule.documentType) {
+            schedule.documentType = QUERY_DOCUMENT_TYPE;
+        }
     };
 
     const setMonths = (selections) => {
@@ -266,21 +280,20 @@ const ScheduleEntryModal = (props) => {
     };
 
     const loadDocument = (group, name) => {
-        schedule.documentType = QUERY_DOCUMENT_TYPE;
         schedule.documentGroup = group;
         schedule.documentName = name;
         hideDocumentSelect();
     };
 
     const onShowDocumentSelect = async () => {
-        showMessage(INFO, getText("Loading available documents", "..."), null, true);
+        showMessage(INFO, replaceTokens(getText("Loading available documents", "..."), schedule.documentType), null, true);
 
-        let res = await getAvailableDocuments(QUERY_DOCUMENT_TYPE);
+        let res = await getAvailableDocuments(schedule.documentType);
 
         hideMessage();
 
         if (isApiSuccess(res)) {
-            setShowDocumentSelect({show: true, type: QUERY_DOCUMENT_TYPE, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
+            setShowDocumentSelect({show: true, type: schedule.documentType, hide: hideDocumentSelect, loadDocument: loadDocument, treeRoot: flattenTree(res.result)});
         } else {
             showMessage(ERROR, res.message);
         }
@@ -291,6 +304,24 @@ const ScheduleEntryModal = (props) => {
         setToggle(!toggle);
     };
     
+    const onDocumentType = (e) => {
+        schedule.documentType = e.target.options[e.target.selectedIndex].value;
+        if (schedule.documentType === REPORT_DOCUMENT_TYPE) {
+            schedule.attachmentType = "";
+        }
+        setToggle(!toggle);
+    };
+
+    const loadDocumentTypes = () => {
+        return documentTypes.map(a => {
+            if (schedule && (schedule.documentType === a.value)) {
+                return <option value={a.value} selected>{a.label}</option>;
+            } else {
+                return <option value={a.value}>{a.label}</option>;
+            }
+        });
+    };
+
     const loadAttachmentTypes = () => {
         return attachmentTypes.map(a => {
             if (schedule && (schedule.attachmentType === a.value)) {
@@ -301,6 +332,18 @@ const ScheduleEntryModal = (props) => {
         });
     };
 
+    const isReportDocument = () => {
+        return (schedule && (schedule.documentType === REPORT_DOCUMENT_TYPE));
+    };
+    
+    const getAttachmentInput = () => {
+        if (isReportDocument()) {
+            return "PDF";
+        } else {
+            return <select disabled={isReportDocument()} onChange={e => onAttachmentType(e)}><option value=""></option>{loadAttachmentTypes()}</select>;
+        }
+    };
+    
     const getSelectedDocument = () => {
         if (schedule && schedule.documentName) {
             return getText("Group:", " ") + schedule.documentGroup + ",    " + getText("Name:", " ") + schedule.documentName;
@@ -317,14 +360,14 @@ const ScheduleEntryModal = (props) => {
                        show={config.show} 
                        onShow={onShow}
                        dialogClassName="schedule-entry"
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div className="entrygrid-120-375">
+                            <div title={getText("Document Type")} className="label">{getText("Document Type:")}</div>
+                            <div><select name="documentType" onChange={e => onDocumentType(e)}>{loadDocumentTypes()}</select></div>
                             <div title={getText("Select Document")} className="label">{getText("Document:")}</div>
                             <div style={{whiteSpace: "nowrap", height: "30px", border: "solid 1px darkslategray"}}>
                                 <FcDocument className="icon" size={SMALL_ICON_SIZE} onClick={e => onShowDocumentSelect()}/>
@@ -347,7 +390,7 @@ const ScheduleEntryModal = (props) => {
                                 <MultiSelect options={getHoursOfDay()} value={getSelectedHoursOfDay()} onChange={selections => setHoursOfDay(selections)} valueRenderer={(selected) => multiSelectValueRenderer(selected)} />
                             </div>
                             <div className="label">{getText("Parameters:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.parameters) ? schedule.parameters.join(",") : ""} onBlur={e => setParameters(e.target.value)}/></div>
-                            <div className="label">{getText("Attachment:")}</div><div><select onChange={e => onAttachmentType(e)}><option value=""></option>{loadAttachmentTypes()}</select></div>
+                            <div className="label">{getText("Attachment:")}</div><div>{getAttachmentInput()}</div>
                             <div className="label">{getText("Emails:")}</div><div><input type="text" size={45} defaultValue={(schedule && schedule.emailAddresses) ? schedule.emailAddresses.join(",") : ""} onBlur={e => setEmails(e.target.value)}/></div>
                         </div>
                     </Modal.Body>

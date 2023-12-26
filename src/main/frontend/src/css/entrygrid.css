@@ -1,7 +1,3 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
 .entrygrid-150-200 {
     display: grid;
     grid-template-columns: 150px 200px;
@@ -9,9 +5,65 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     grid-row-gap: 6px;
 }
 
+.entrygrid-125-75 {
+    display: grid;
+    grid-template-columns: 150px 200px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+.entrygrid-50p-50p {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    margin: 0;
+    grid-row-gap: 0;
+}
+
+.entrygrid-33p-33p-33p {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+    margin: 0;
+    grid-row-gap: 0;
+}
+
+.entrygrid-75-75 {
+    display: grid;
+    grid-template-columns: 75px 75px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+.entrygrid-125-100 {
+    display: grid;
+    grid-template-columns: 125px 100px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+.entrygrid-125-75-175-50 {
+    display: grid;
+    grid-template-columns: 125px 75px 175px 50px;;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+.entrygrid-125-125 {
+    display: grid;
+    grid-template-columns: 125px 125px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
+.entrygrid-125-150 {
+    display: grid;
+    grid-template-columns: 125px 150px;
+    margin: 5px;
+    grid-row-gap: 6px;
+}
+
 .entrygrid-175-100 {
     display: grid;
-    grid-template-columns: 150px 100px;
+    grid-template-columns: 175px 100px;
     margin: 5px;
     grid-row-gap: 6px;
 }
@@ -115,6 +167,27 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 .entrygrid-100-175 {
     display: grid;
     grid-template-columns: 100px 175px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
+.entrygrid-100-75 {
+    display: grid;
+    grid-template-columns: 100px 75px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
+.entrygrid-100-325 {
+    display: grid;
+    grid-template-columns: 100px 325px;
+    grid-row-gap: 6px;
+    margin: 5px;
+}
+
+.entrygrid-100-400 {
+    display: grid;
+    grid-template-columns: 100px 400px;
     grid-row-gap: 6px;
     margin: 5px;
 }

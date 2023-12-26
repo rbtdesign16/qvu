@@ -11,6 +11,7 @@ import org.rbtdesign.qvu.util.Constants;
 public class ScheduledDocument {
     private String group;
     private String document;
+    private String documentType = Constants.DOCUMENT_TYPE_QUERY;
     private String resultType = Constants.RESULT_TYPE_CSV;
     private List<String> parameters  = new ArrayList<>();
     private List<String> emailAddresses = new ArrayList<>();
@@ -54,4 +55,14 @@ public class ScheduledDocument {
     public void setParameters(List<String> parameters) {
         this.parameters = parameters;
     }
+
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
+    }
+    
+    
 }

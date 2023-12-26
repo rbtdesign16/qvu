@@ -19,7 +19,8 @@ ERROR,
         MODAL_TITLE_SIZE,
         confirm,
         getUUID,
-        CUSTOM_FK_DATA_SEPARATOR} from "../../utils/helper";
+        CUSTOM_FK_DATA_SEPARATOR,
+        copyObject} from "../../utils/helper";
 
 const CustomForeignKeys = (props) => {
     const {config} = props;
@@ -51,7 +52,7 @@ const CustomForeignKeys = (props) => {
     };
 
     const addForeignKey = () => {
-        let cfk = [...customForeignKeys];
+        let cfk = copyObject(customForeignKeys);
 
         cfk.unshift({
             datasourceName: getDatasourceName(),
@@ -66,7 +67,7 @@ const CustomForeignKeys = (props) => {
     };
 
     const clearCustomFkData = () => {
-        let cfk = [...customForeignKeys];
+        let cfk = copyObject(customForeignKeys);
         let toColumns = [];
         let updateRequired = false;
         cfk.map(fk => {
@@ -88,7 +89,7 @@ const CustomForeignKeys = (props) => {
     }
    
     const onChange = (e, indx) => {
-        let cfks = [...customForeignKeys];
+        let cfks = copyObject(customForeignKeys);
         let fk = cfks[indx];
         if (e.target.name === "imported") {
             fk.imported = e.target.checked;
@@ -105,7 +106,7 @@ const CustomForeignKeys = (props) => {
     };
 
     const remove = async (indx) => {
-        let cfk = [...customForeignKeys];
+        let cfk = copyObject(customForeignKeys);
         if (await confirm(getText("Remove:", " " + cfk[indx].name + "?"))) {
             cfk.splice(indx, 1);
             setCustomForeignKeys(cfk);
@@ -141,7 +142,7 @@ const CustomForeignKeys = (props) => {
     };
 
     const saveColumnSelections = (index, selectedColumns, field) => {
-        let cfks = [...customForeignKeys];
+        let cfks = copyObject(customForeignKeys);
         
         let sel = [];
         
@@ -174,7 +175,7 @@ const CustomForeignKeys = (props) => {
                 tableName: tableName,
                 columnNames: columnNames,
                 field: field,
-                selectedColumns: [...selectedColumns],
+                selectedColumns: copyObject(selectedColumns),
                 index: indx,
                 saveColumnSelections: saveColumnSelections,
                 hideColumnSelect: hideColumnSelect
@@ -283,7 +284,7 @@ const CustomForeignKeys = (props) => {
     const onSave = () => {
         let err = checkValues();
         if (!err) {
-            let cfk = [...customForeignKeys];
+            let cfk = copyObject(customForeignKeys);
             cfk.sort((a, b) => a.name - b.name);
             config.saveCustomForeignKeys(config.dataObject, cfk);
         } else {
@@ -297,9 +298,7 @@ const CustomForeignKeys = (props) => {
                        dialogClassName="custom-foreign-keys"
                        show={config.show} 
                        onShow={onShow}
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                             &nbsp;&nbsp;{getText("Custom Foreign Keys", " - ") + datasourceName }</Modal.Title>

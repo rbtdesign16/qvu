@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button"
 import useMessage from "../context/MessageContext";
 import useAuth from "../context/AuthContext";
 import useLang from "../context/LangContext";
-import useQueryDesign from "../context/QueryDesignContext";
 import useDataHandler from "../context/DataHandlerContext";
 import TextEntry from "./TextEntry";
 import PropTypes from "prop-types";
@@ -20,15 +19,6 @@ import {
 const SaveDocumentModal = (props) => {
     const {config} = props;
     const {authData} = useAuth();
-    const {setTreeViewData, 
-        treeViewData, 
-        setDatasource, 
-        datasource, 
-        selectColumns, 
-        filterColumns, 
-        baseTable, 
-        fromClause,
-        currentDocument} = useQueryDesign();
     const {getText} = useLang();
     const {messageInfo, showMessage, hideMessage, setMessageInfo} = useMessage();
     const {datasources, documentGroups} = useDataHandler();
@@ -66,15 +56,15 @@ const SaveDocumentModal = (props) => {
     const onShow = () => {
         let el = document.getElementById("docname");
         if (el) {
-            el.value = currentDocument.name;
+            el.value = config.currentDocument.name;
         }
         
-        if (currentDocument.name) {
-            setDocumentName(currentDocument.name);
+        if (config.currentDocument && config.currentDocument.name) {
+            setDocumentName(config.currentDocument.name);
         }
         
-        if (currentDocument.group) {
-            setGroupName(currentDocument.group);
+        if (config.currentDocument && config.currentDocument.group) {
+            setGroupName(config.currentDocument.group);
         }
     };
 
@@ -83,9 +73,7 @@ const SaveDocumentModal = (props) => {
                 <Modal animation={false} 
                        show={config.show} 
                        onShow={onShow}
-                       onHide={onHide}
-                       backdrop={true} 
-                       keyboard={true}>
+                       onHide={onHide}>
                     <Modal.Header closeButton>
                         <Modal.Title as={MODAL_TITLE_SIZE}>{getTitle()}</Modal.Title>
                     </Modal.Header>
@@ -105,7 +93,7 @@ const SaveDocumentModal = (props) => {
 };
 
 SaveDocumentModal.propTypes = {
-    config: PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired
 };
 
 export default SaveDocumentModal;

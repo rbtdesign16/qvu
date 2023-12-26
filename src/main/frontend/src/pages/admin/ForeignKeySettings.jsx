@@ -14,7 +14,8 @@ import {
     ERROR,
     DEFAULT_ERROR_TITLE,
     SMALL_ICON_SIZE,
-    MODAL_TITLE_SIZE} from "../../utils/helper";
+    MODAL_TITLE_SIZE,
+    copyObject} from "../../utils/helper";
 import {
     loadTableSettings,
     isApiSuccess,
@@ -49,7 +50,7 @@ const ForeignKeySettings = (props) => {
         }
     };
     const setDisplayName = (e, indx) => {
-        let t = {...table};
+        let t = copyObject(table);
         t.foreignKeySettings[indx].displayName = e.target.value;
         setTable(t);
     };
@@ -59,7 +60,7 @@ const ForeignKeySettings = (props) => {
     };
 
     const setFieldName = (e, indx) => {
-        let t = {...table};
+        let t = copyObject(table);
         t.foreignKeySettings[indx].fieldName = e.target.value;
         setTable(t);
     };
@@ -112,9 +113,7 @@ const ForeignKeySettings = (props) => {
                    dialogClassName="foreignkey-settings"
                    show={config.show} 
                    onShow={onShow}
-                   onHide={onHide}
-                   backdrop={true} 
-                   keyboard={true}>
+                   onHide={onHide}>
                 <Modal.Header closeButton>
                     <Modal.Title as={MODAL_TITLE_SIZE}><MdHelpOutline className="icon" size={SMALL_ICON_SIZE} onClick={(e) => onHelp()}/>
                     &nbsp;&nbsp;{getText("Foreign Key Settings", " - ") + getTableName() }</Modal.Title>

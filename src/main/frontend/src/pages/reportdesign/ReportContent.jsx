@@ -82,7 +82,8 @@ const ReportContent = (props) => {
         setLastSelectedSubIndex,
         haveSelectedComponents,
         haveSelectedSubComponents,
-        deselectAllSubComponents
+        deselectAllSubComponents,
+        componentHasSelectedSubComponents
     } = useReportDesign();
     const reportWidth = getReportWidth(currentReport, reportSettings);
     const reportHeight = getReportHeight(currentReport, reportSettings);
@@ -211,7 +212,6 @@ const ReportContent = (props) => {
         hideMenu();
         
         let cr = copyObject(currentReport);
-        
         for (let i = 0; i < cr.reportComponents.length; ++i) {
             if (cr.reportComponents[i].section === section) {
                 cr.reportComponents[i].selected = sel;

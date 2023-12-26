@@ -763,7 +763,6 @@ export const onComponentClick = (e,
     componentIndex, 
     lastSelectedIndex, 
     setLastSelectedIndex,
-    lastSelectedSubIndex, 
     setLastSelectedSubIndex,
     deselectAllSubComponents,
     componentHasSelectedSubComponents) => {
